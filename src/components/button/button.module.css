@@ -1,0 +1,45 @@
+.primary {
+  background-color: #075985;
+  border-radius: 0.5em;
+  border-style: none;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 0;
+  max-width: none;
+  min-height: 44px;
+  min-width: 10px;
+  outline: none;
+  overflow: hidden;
+  padding: 9px 20px 8px;
+  position: relative;
+  text-align: center;
+  text-transform: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.secondary {
+  background-color: #ffffff;
+  border: 1px solid rgb(209, 213, 219);
+  border-radius: 0.5em;
+  box-sizing: border-box;
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  padding: 9px 20px 8px;
+  text-align: center;
+  text-decoration: none #d1d5db solid;
+  text-decoration-thickness: auto;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
