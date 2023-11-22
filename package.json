@@ -10,7 +10,8 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "gen-types": "npx supabase gen types typescript --project-id tqyavwqbewvvgoizsipl --schema public > ./src/utils/generated_types.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.6.0",
