@@ -5,5 +5,13 @@ type NavbarProps = {
 };
 
 export const Navbar = ({ size }: NavbarProps) => {
-  return <Logo size="large" />;
+  return size === "mobile" ? (
+    <div className="m-0 p-0">
+      <Logo size="large" />
+    </div>
+  ) : (
+    <div className="m-0 p-0">
+      <Logo size="small" />
+    </div>
+  );
 };
