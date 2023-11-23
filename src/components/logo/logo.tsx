@@ -12,6 +12,7 @@ export const Logo = ({ size }: LogoProps) => {
         alt="Site logo"
         height={size === "small" ? 30 : 50}
         width={size === "small" ? 30 : 50}
+        priority={true}
       />
       <div className="align-center flex flex-col justify-center text-center">
         <div>The</div>
