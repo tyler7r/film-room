@@ -15,13 +15,7 @@ export const Button = ({
   ...props
 }: ButtonProps) => {
   return (
-    <Btn
-      variant={variant}
-      disabled={disabled}
-      size={size}
-      // className={`${styles[primary ? "primary" : "secondary"]} ${styles[size]}`}
-      {...props}
-    >
+    <Btn variant={variant} disabled={disabled} size={size} {...props}>
       {label}
     </Btn>
   );
