@@ -1,9 +1,8 @@
-import { useContext } from "react";
-import { IsMobileContext } from "~/pages/_app";
+import { useMobileContext } from "~/contexts/mobile";
 import { Logo } from "../logo/logo";
 
 export const Navbar = () => {
-  let isMobile = useContext(IsMobileContext);
+  const isMobile = useMobileContext();
   return isMobile ? (
     <div className="m-0 p-0">
       <Logo size="small" />
