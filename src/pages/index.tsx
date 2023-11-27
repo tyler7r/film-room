@@ -19,8 +19,18 @@ export default function Home() {
   return teams?.map((team) => (
     <div key={team.id}>
       {team.city} {team.name}
-      <Button label={team.name!} primary={false} size="large" />
-      <Button label={team.city!} primary={true} size="large" />
+      <Button
+        label={team.name!}
+        variant="outlined"
+        disabled={true}
+        size="large"
+      />
+      <Button
+        label={team.city!}
+        variant="contained"
+        disabled={true}
+        size="large"
+      />
     </div>
   ));
 }

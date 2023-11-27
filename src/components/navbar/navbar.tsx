@@ -10,15 +10,30 @@ export const Navbar = () => {
     <div className="align-center flex justify-between">
       <Logo size="small" />
       <div className="align-center flex justify-center gap-2 px-1 py-4">
-        <Button label="Signup" primary={true} size="small" />
-        <Button label="Login" primary={false} size="small" />
+        <Button
+          label="Signup"
+          variant="contained"
+          disabled={false}
+          size="small"
+        />
+        <Button
+          label="Login"
+          variant="outlined"
+          disabled={false}
+          size="small"
+        />
       </div>
     </div>
   ) : (
     <div className="m-0 p-0">
       <Logo size="large" />
-      <Button label="Login" primary={false} size="large" />
-      <Button label="Signup" primary={true} size="large" />
+      <Button label="Login" variant="outlined" disabled={false} size="large" />
+      <Button
+        label="Signup"
+        variant="contained"
+        disabled={false}
+        size="large"
+      />
     </div>
   );
 };
