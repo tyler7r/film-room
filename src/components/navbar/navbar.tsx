@@ -22,24 +22,22 @@ export const Navbar = ({ switchTheme }: NavbarProps) => {
           disabled={false}
           size="small"
         />
-        <Button
-          label="Login"
-          variant="outlined"
-          disabled={false}
-          size="small"
-        />
+        <Button label="Login" variant="text" disabled={false} size="small" />
       </div>
     </div>
   ) : (
-    <div className="m-0 p-0">
+    <div className="align-center flex justify-between">
       <Logo size="large" />
-      <Button label="Login" variant="outlined" disabled={false} size="large" />
-      <Button
-        label="Signup"
-        variant="contained"
-        disabled={false}
-        size="large"
-      />
+      <Switch onChange={switchTheme} />
+      <div className="align-center flex justify-center gap-2 px-1 py-8">
+        <Button
+          label="Signup"
+          variant="contained"
+          disabled={false}
+          size="large"
+        />
+        <Button label="Login" variant="text" disabled={false} size="large" />
+      </div>
     </div>
   );
 };
