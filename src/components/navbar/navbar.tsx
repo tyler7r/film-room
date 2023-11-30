@@ -22,7 +22,12 @@ export const Navbar = ({ switchTheme }: NavbarProps) => {
           disabled={false}
           size="small"
         />
-        <Button label="Login" variant="text" disabled={false} size="small" />
+        <Button
+          label="Login"
+          variant="outlined"
+          disabled={false}
+          size="small"
+        />
       </div>
     </div>
   ) : (
@@ -36,7 +41,12 @@ export const Navbar = ({ switchTheme }: NavbarProps) => {
           disabled={false}
           size="large"
         />
-        <Button label="Login" variant="text" disabled={false} size="large" />
+        <Button
+          label="Login"
+          variant="outlined"
+          disabled={false}
+          size="large"
+        />
       </div>
     </div>
   );
