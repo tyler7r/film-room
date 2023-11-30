@@ -23,7 +23,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
       <CssBaseline />
       <IsMobile>
-        <Navbar switchTheme={switchTheme} />
+        <Navbar switchTheme={switchTheme} isDark={isDark} />
         <Component {...pageProps} />
       </IsMobile>
     </ThemeProvider>
