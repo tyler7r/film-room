@@ -14,13 +14,6 @@ export const Logo = ({ size }: LogoProps) => {
         width={size === "small" ? 70 : 100}
         priority={true}
       />
-      <div
-        className="align-center flex flex-col justify-center text-center
-      leading-5"
-      >
-        <div>The</div>
-        <div>Film Room</div>
-      </div>
     </div>
   );
 };
