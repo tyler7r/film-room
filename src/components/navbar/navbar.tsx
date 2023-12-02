@@ -30,12 +30,14 @@ export const Navbar = ({ switchTheme }: NavbarProps) => {
               variant="contained"
               disabled={false}
               size="small"
+              href="/signup"
             />
             <Button
               label="Login"
               variant="outlined"
               disabled={false}
               size="small"
+              href="/login"
             />
           </div>
           <div className="align-center flex flex-col justify-center gap-0 p-0">

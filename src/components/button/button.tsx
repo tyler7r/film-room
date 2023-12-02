@@ -4,7 +4,8 @@ type ButtonProps = {
   variant: "text" | "contained" | "outlined";
   size: "small" | "medium" | "large";
   label: string;
-  disabled: boolean;
+  disabled?: boolean;
+  href?: string;
 };
 
 export const Button = ({
@@ -12,10 +13,17 @@ export const Button = ({
   size,
   label,
   disabled,
+  href,
   ...props
 }: ButtonProps) => {
   return (
-    <Btn variant={variant} disabled={disabled} size={size} {...props}>
+    <Btn
+      href={href}
+      variant={variant}
+      disabled={disabled}
+      size={size}
+      {...props}
+    >
       {label}
     </Btn>
   );

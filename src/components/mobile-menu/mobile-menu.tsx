@@ -1,14 +1,13 @@
-import { colors, useTheme } from "@mui/material";
+import { colors } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
 import { Button } from "../button/button";
 
 export const MobileMenu = () => {
-  const theme = useTheme();
   const isDark = useIsDarkContext();
   return (
     <div
       style={{
-        backgroundColor: `${isDark ? colors.grey[900] : colors.grey[200]}`,
+        backgroundColor: `${isDark ? colors.grey[900] : colors.grey[100]}`,
       }}
       className={`align-center flex justify-between`}
     >
