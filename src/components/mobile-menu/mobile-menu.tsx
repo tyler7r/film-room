@@ -11,12 +11,7 @@ export const MobileMenu = () => {
       }}
       className={`align-center flex justify-between`}
     >
-      <Button
-        disabled={false}
-        variant="text"
-        size="medium"
-        label="The Film Room"
-      />
+      <Button disabled={false} variant="text" size="medium" label="Film Room" />
       <Button
         disabled={false}
         variant="text"
