@@ -1,8 +1,8 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import { Switch, colors } from "@mui/material";
+import { Button, Switch, colors } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
-import { Button } from "../button/button";
+// import { Button } from "../button/button";
 import { Logo } from "../logo/logo";
 
 type DesktopNavProps = {
@@ -21,26 +21,26 @@ const DesktopNav = ({ switchTheme }: DesktopNavProps) => {
         }}
         className="align-center wrap col-span-3 flex flex-wrap justify-around self-center border-solid"
       >
-        <Button label="Film Room" variant="text" size="large" />
-        <Button label="Highlight Factory" variant="text" size="large" />
-        <Button label="Team Profile" variant="text" size="large" />
-        <Button label="Inbox" variant="text" size="large" />
+        <Button variant="text" size="large" href="/film-room">
+          Film Room
+        </Button>
+        <Button variant="text" size="large">
+          Highlight Factory
+        </Button>
+        <Button variant="text" size="large">
+          Team Profile
+        </Button>
+        <Button variant="text" size="large">
+          Inbox
+        </Button>
       </div>
       <div className="align-center col-span-1 flex gap-2 self-center">
-        <Button
-          label="Signup"
-          variant="contained"
-          disabled={false}
-          size="large"
-          href="/signup"
-        />
-        <Button
-          label="Login"
-          variant="outlined"
-          disabled={false}
-          size="large"
-          href="/login"
-        />
+        <Button variant="contained" size="large" href="/signup">
+          Signup
+        </Button>
+        <Button variant="outlined" disabled={false} size="large" href="/login">
+          Login
+        </Button>
         <Switch
           className="align-center justify-center self-center"
           icon={<LightModeIcon color="primary" fontSize="small" />}

@@ -1,9 +1,8 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
-import { Switch } from "@mui/material";
+import { Button, Switch } from "@mui/material";
 import { useState } from "react";
-import { Button } from "../button/button";
 import { Logo } from "../logo/logo";
 import { MobileMenu } from "../mobile-menu/mobile-menu";
 
@@ -22,20 +21,12 @@ const MobileNav = ({ switchTheme }: MobileNavProps) => {
         </div>
         <div className="flex gap-1">
           <div className="align-center flex justify-center gap-2 px-1 py-4">
-            <Button
-              label="Signup"
-              variant="contained"
-              disabled={false}
-              size="small"
-              href="/signup"
-            />
-            <Button
-              label="Login"
-              variant="outlined"
-              disabled={false}
-              size="small"
-              href="/login"
-            />
+            <Button variant="contained" size="small" href="/signup">
+              Signup
+            </Button>
+            <Button variant="outlined" size="small" href="/login">
+              Login
+            </Button>
           </div>
           <div className="align-center flex flex-col justify-center gap-0 p-0">
             <Switch
