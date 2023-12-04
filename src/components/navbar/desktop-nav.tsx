@@ -32,12 +32,14 @@ const DesktopNav = ({ switchTheme }: DesktopNavProps) => {
           variant="contained"
           disabled={false}
           size="large"
+          href="/signup"
         />
         <Button
           label="Login"
           variant="outlined"
           disabled={false}
           size="large"
+          href="/login"
         />
         <Switch
           className="align-center justify-center self-center"
