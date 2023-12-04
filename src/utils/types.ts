@@ -9,3 +9,8 @@ export type TeamType = {
   next_opp: string | null;
   owner: string | null;
 };
+
+export type MessageType = {
+  text: string | undefined;
+  status: "error" | "success";
+};

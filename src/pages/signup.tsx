@@ -1,8 +1,28 @@
 import { Button, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import FormMessage from "~/components/form-message";
+import { validateEmail } from "~/utils/helpers";
+import { MessageType } from "~/utils/types";
 
 const Signup = () => {
+  const [message, setMessage] = useState<MessageType>({
+    status: "error",
+    text: undefined,
+  });
   const [email, setEmail] = useState<string>("");
+  const [isValidForm, setIsValidForm] = useState<boolean>(false);
+
+  // Checks for valid email after every input and updates form message as needed
+  useEffect(() => {
+    const isValidEmail = validateEmail(email);
+    if (!isValidEmail) {
+      setMessage({ ...message, text: "Please enter a valid email address!" });
+      setIsValidForm(false);
+    } else {
+      setMessage({ ...message, text: undefined });
+      setIsValidForm(true);
+    }
+  }, [email]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,7 +52,13 @@ const Signup = () => {
           }}
           value={email}
         />
-        <Button variant="contained" size="large" type="submit">
+        <FormMessage message={message} />
+        <Button
+          variant="contained"
+          size="large"
+          type="submit"
+          disabled={!isValidForm}
+        >
           Signup
         </Button>
       </form>
