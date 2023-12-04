@@ -6,7 +6,7 @@ type LogoProps = {
 
 export const Logo = ({ size, ...props }: LogoProps) => {
   return (
-    <div className="align-center flex self-center p-0 text-center">
+    <div className="flex items-center p-0 text-center">
       <Image
         src="https://t4.ftcdn.net/jpg/03/42/40/31/360_F_342403172_c5dPVzqyfc1gUKakA9k5IzpKG4KTctz5.jpg"
         alt="Site logo"

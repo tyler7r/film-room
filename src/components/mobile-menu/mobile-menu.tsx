@@ -8,7 +8,7 @@ export const MobileMenu = () => {
       style={{
         backgroundColor: `${isDark ? colors.grey[900] : colors.grey[100]}`,
       }}
-      className={`align-center flex justify-between`}
+      className={`flex items-center justify-between`}
     >
       <Button variant="text" size="medium">
         Film Room

@@ -1,28 +1,41 @@
-import { Box, Button, TextField } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { Button, TextField, Typography } from "@mui/material";
+import { useState } from "react";
 
 const Signup = () => {
-  const { register, handleSubmit } = useForm();
+  const [email, setEmail] = useState<string>("");
 
-  const handleFormSubmit = (formData: any) => {
-    console.log("form data is ", formData);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(email);
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
-      <TextField
-        required
-        fullWidth
-        id="email"
-        label="Email"
-        type="email"
-        autoFocus
-        {...register("email")}
-      />
-      <Button variant="contained" size="large">
-        Signup
-      </Button>
-    </Box>
+    <div className="flex h-full w-full flex-col items-center justify-center text-center">
+      <Typography variant="h1" fontSize={72}>
+        Sign Up
+      </Typography>
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-4/5 flex-col items-center justify-center text-center"
+      >
+        <TextField
+          name="email"
+          autoComplete="email"
+          required
+          id="email"
+          label="Email"
+          type="email"
+          autoFocus
+          onInput={(e) => {
+            setEmail((e.target as HTMLInputElement).value);
+          }}
+          value={email}
+        />
+        <Button variant="contained" size="large" type="submit">
+          Signup
+        </Button>
+      </form>
+    </div>
   );
 };
 
