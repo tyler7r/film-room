@@ -1,9 +1,9 @@
 import {
-  ReactNode,
   createContext,
   useContext,
   useEffect,
   useState,
+  type ReactNode,
 } from "react";
 
 type MobileProps = {

@@ -13,7 +13,7 @@ export const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: colors.purple["A400"],
+      main: colors.purple.A400,
     },
   },
 });
