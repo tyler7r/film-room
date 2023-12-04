@@ -1,17 +1,18 @@
-import { Logo } from "../logo/logo";
+import { useMobileContext } from "~/contexts/mobile";
+import DesktopNav from "./desktop-nav";
+import MobileNav from "./mobile-nav";
 
 type NavbarProps = {
-  size: "mobile" | "desktop";
+  switchTheme: () => void;
 };
 
-export const Navbar = ({ size }: NavbarProps) => {
-  return size === "mobile" ? (
-    <div className="m-0 p-0">
-      <Logo size="large" />
-    </div>
+export const Navbar = ({ switchTheme }: NavbarProps) => {
+  const isMobile = useMobileContext();
+  // const auth = useAuthContext();
+
+  return isMobile ? (
+    <MobileNav switchTheme={switchTheme} />
   ) : (
-    <div className="m-0 p-0">
-      <Logo size="small" />
-    </div>
+    <DesktopNav switchTheme={switchTheme} />
   );
 };

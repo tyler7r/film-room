@@ -1,18 +1,30 @@
-import styles from "./button.module.css";
+import { Button as Btn } from "@mui/material";
 
 type ButtonProps = {
-  primary: boolean;
+  variant: "text" | "contained" | "outlined";
   size: "small" | "medium" | "large";
   label: string;
+  disabled?: boolean;
+  href?: string;
 };
 
-export const Button = ({ primary, size, label, ...props }: ButtonProps) => {
+export const Button = ({
+  variant,
+  size,
+  label,
+  disabled,
+  href,
+  ...props
+}: ButtonProps) => {
   return (
-    <button
-      className={`${styles[primary ? "primary" : "secondary"]} ${styles[size]}`}
+    <Btn
+      href={href}
+      variant={variant}
+      disabled={disabled}
+      size={size}
       {...props}
     >
       {label}
-    </button>
+    </Btn>
   );
 };
