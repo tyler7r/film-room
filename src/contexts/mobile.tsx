@@ -10,7 +10,7 @@ type MobileProps = {
   children: ReactNode;
 };
 
-export const IsMobileContext = createContext<boolean>(false);
+export const IsMobileContext = createContext<boolean | undefined>(false);
 
 export const IsMobile = ({ children }: MobileProps) => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -28,6 +28,14 @@ export const IsMobile = ({ children }: MobileProps) => {
         setIsMobile(false);
       }
     });
+    return () =>
+      window.removeEventListener("resize", () => {
+        if (window.innerWidth <= 480) {
+          setIsMobile(true);
+        } else {
+          setIsMobile(false);
+        }
+      });
   }, []);
 
   return (

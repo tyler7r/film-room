@@ -2,6 +2,7 @@ import { Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import { validateEmail } from "~/utils/helpers";
+import { supabase } from "~/utils/supabase";
 import { MessageType } from "~/utils/types";
 
 const Signup = () => {
@@ -26,7 +27,34 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(email);
+    // Create initial random pwd
+    const timestamp = Date.now();
+    const pwd = `${Math.floor(Math.random() * 100000)}${email}${timestamp}`;
+
+    //Signup in supabase
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: pwd,
+      options: {
+        emailRedirectTo: "http://localhost:3000/login",
+      },
+    });
+    if (error) {
+      setMessage({
+        ...message,
+        text: `There was a problem creating the user. ${error.message}`,
+      });
+    } else if (data.user?.identities?.length === 0) {
+      setMessage({
+        ...message,
+        text: `User already registered with this email!`,
+      });
+    } else {
+      setMessage({
+        status: "success",
+        text: "Success. Please verify your email to finish your account creation.",
+      });
+    }
   };
 
   return (
