@@ -17,10 +17,13 @@ const Signup = () => {
   useEffect(() => {
     const isValidEmail = validateEmail(email);
     if (!isValidEmail) {
-      setMessage({ ...message, text: "Please enter a valid email address!" });
+      setMessage({
+        status: "error",
+        text: "Please enter a valid email address!",
+      });
       setIsValidForm(false);
     } else {
-      setMessage({ ...message, text: undefined });
+      setMessage({ status: "error", text: undefined });
       setIsValidForm(true);
     }
   }, [email]);
@@ -41,12 +44,12 @@ const Signup = () => {
     });
     if (error) {
       setMessage({
-        ...message,
+        status: "error",
         text: `There was a problem creating the user. ${error.message}`,
       });
     } else if (data.user?.identities?.length === 0) {
       setMessage({
-        ...message,
+        status: "error",
         text: `User already registered with this email!`,
       });
     } else {

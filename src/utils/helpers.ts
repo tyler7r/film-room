@@ -5,3 +5,11 @@ export const validateEmail = (email: string) => {
   }
   return false;
 };
+
+export const validatePwdMatch = (p1: string, p2: string) => {
+  if (p1 === p2) {
+    return true;
+  } else {
+    return false;
+  }
+};
