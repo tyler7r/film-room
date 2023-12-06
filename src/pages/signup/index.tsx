@@ -39,7 +39,7 @@ const Signup = () => {
       email: email,
       password: pwd,
       options: {
-        emailRedirectTo: "http://localhost:3000/login",
+        emailRedirectTo: "http://localhost:3000/signup/details",
       },
     });
     if (error) {
@@ -57,6 +57,7 @@ const Signup = () => {
         status: "success",
         text: "Success. Please verify your email to finish your account creation.",
       });
+      setIsValidForm(false);
     }
   };
 

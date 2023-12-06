@@ -1,3 +1,9 @@
+export type UserSession = {
+  isLoggedIn: boolean;
+  userId: string | undefined;
+  email: string | undefined;
+};
+
 export type TeamType = {
   announcements: string[] | null;
   city: string | null;

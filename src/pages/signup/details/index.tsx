@@ -5,9 +5,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
+import { useAuthContext } from "~/contexts/auth";
 import { validatePwdMatch } from "~/utils/helpers";
+import { supabase } from "~/utils/supabase";
 import { MessageType } from "~/utils/types";
 
 type DetailsType = {
@@ -17,6 +20,8 @@ type DetailsType = {
 };
 
 const SignupDetails = () => {
+  const user = useAuthContext();
+  const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     status: "error",
     text: undefined,
@@ -37,9 +42,52 @@ const SignupDetails = () => {
     });
   };
 
+  const updateUserName = async () => {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ name: data.name })
+      .eq("id", `${user.userId}`);
+    if (error) {
+      setMessage({
+        status: "error",
+        text: `There was a problem adding your details. ${error.message}`,
+      });
+      setIsValidForm(true);
+      return "error";
+    }
+  };
+
+  const updatePassword = async () => {
+    const { error } = await supabase.auth.updateUser({
+      password: `${data.password}`,
+    });
+    if (error) {
+      setMessage({
+        status: "error",
+        text: `There was an issue updating your password. ${error.message}`,
+      });
+      setIsValidForm(true);
+      return "error";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(data);
+    const checkValidName = await updateUserName();
+    const checkValidPassword = await updatePassword();
+
+    if (checkValidName === "error" || checkValidPassword === "error") {
+      return;
+    } else {
+      setMessage({
+        status: "success",
+        text: "Successfully updated your profile!",
+      });
+      setIsValidForm(false);
+      setTimeout(() => {
+        router.push("/signup/team-select");
+      }, 1000);
+    }
   };
 
   useEffect(() => {
