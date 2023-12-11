@@ -8,16 +8,23 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import FormMessage from "~/components/form-message";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { type TeamType } from "~/utils/types";
+import { MessageType, type TeamType } from "~/utils/types";
 
 const TeamSelect = () => {
   const user = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<MessageType>({
+    text: undefined,
+    status: "error",
+  });
   const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [team, setTeam] = useState<string>("");
   const [isValidForm, setIsValidForm] = useState<boolean>(true);
+  const [isMultipleTeams, setIsMultipleTeams] = useState<boolean>(false);
+  const [team2, setTeam2] = useState<string>("");
 
   const fetchTeams = async () => {
     const { data } = await supabase.from("teams").select();
@@ -52,7 +59,46 @@ const TeamSelect = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsValidForm(false);
     console.log(user);
+
+    // Ensuring that only one team is selected join
+    if (teams && team2 === "") {
+      const teamFind = teams.find((t) => t.id === team);
+      // Error boundary in case team data is not pulled initially somehow
+      if (!teamFind)
+        return setMessage({
+          text: "No team found in the database.",
+          status: "error",
+        });
+
+      // Handle request depending on team's request state, empty, or occupied
+      let requests = teamFind.member_requests;
+      if (requests) {
+        requests.push(`${user.email}`);
+      } else {
+        requests = [`${user.email}`];
+      }
+
+      // Update team's requests
+      const { data, error } = await supabase
+        .from("teams")
+        .update({ member_requests: requests })
+        .eq("id", team)
+        .select();
+      if (data) {
+        setMessage({
+          text: `Successfully sent join request to ${teamFind.city} ${teamFind.name}.`,
+          status: "success",
+        });
+      } else {
+        setMessage({
+          text: `There was an issue sending your request. ${error.message}`,
+          status: "error",
+        });
+        setIsValidForm(true);
+      }
+    }
   };
 
   return isLoading ? (
@@ -85,22 +131,51 @@ const TeamSelect = () => {
           </Select>
         </FormControl>
         {team === "" ? (
-          <Button type="submit" variant="contained" disabled={!isValidForm}>
+          <Button
+            type="button"
+            variant="contained"
+            disabled={!isValidForm}
+            href="/"
+          >
             Skip
           </Button>
         ) : (
-          <Button type="submit" variant="contained" disabled={!isValidForm}>
-            Submit
-          </Button>
+          <div className="flex flex-col items-center justify-center gap-1">
+            <Button
+              type="submit"
+              variant="contained"
+              className="mb-1"
+              disabled={!isValidForm}
+            >
+              Submit
+            </Button>
+            <Typography variant="overline" fontSize="small">
+              or
+            </Typography>
+            <Button
+              size="small"
+              variant="outlined"
+              className="mt-0"
+              disabled={!isValidForm}
+            >
+              Join an additional team
+            </Button>
+          </div>
         )}
       </form>
-      <div>
-        <div className="mt-2 flex flex-col items-center justify-center gap-2">
-          <div className="">Don't see your team's account?</div>
-          <Button variant="outlined" size="small" href="/create-team">
-            Create One
-          </Button>
-        </div>
+      <FormMessage message={message} />
+      <div className="flex items-center justify-center gap-1 p-2">
+        <Typography variant="caption" fontSize="medium" className="">
+          Don't see your team's account?
+        </Typography>
+        <Button
+          variant="text"
+          size="medium"
+          href="/create-team"
+          disabled={!isValidForm}
+        >
+          Create One
+        </Button>
       </div>
     </div>
   ) : (
