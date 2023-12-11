@@ -5,6 +5,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
@@ -14,6 +15,7 @@ const TeamSelect = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [team, setTeam] = useState<string>("");
+  const [isValidForm, setIsValidForm] = useState<boolean>(true);
 
   const fetchTeams = async () => {
     const { data } = await supabase.from("teams").select();
@@ -51,26 +53,43 @@ const TeamSelect = () => {
   return isLoading ? (
     <div>Loading...</div>
   ) : teams ? (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <FormControl className="g-4 flex flex-col">
-        <InputLabel>Team Select</InputLabel>
-        <Select
-          native={false}
-          label="team-select"
-          labelId="Team-Select"
-          value={team}
-          onChange={handleChange}
-        >
-          <MenuItem value={""}>None</MenuItem>
-          {teams.map((team) => (
-            <MenuItem value={team.id} key={team.id}>
-              {team.city} {team.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <Button variant="contained">Submit</Button>
-    </form>
+    <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
+      <Typography variant="h1" fontSize={54}>
+        Join a Team!
+      </Typography>
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-4/5 max-w-screen-md flex-col items-center justify-center gap-6 text-center"
+      >
+        <FormControl className="g-4 flex w-full flex-col">
+          <InputLabel>Team Select</InputLabel>
+          <Select
+            native={false}
+            label="team-select"
+            labelId="Team-Select"
+            value={team}
+            onChange={handleChange}
+            className="w-full text-start"
+          >
+            <MenuItem value={""}>None</MenuItem>
+            {teams.map((team) => (
+              <MenuItem value={team.id} key={team.id}>
+                {team.city} {team.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        {team === "" ? (
+          <Button variant="contained" disabled={!isValidForm}>
+            Skip
+          </Button>
+        ) : (
+          <Button variant="contained" disabled={!isValidForm}>
+            Submit
+          </Button>
+        )}
+      </form>
+    </div>
   ) : (
     <div>No teams</div>
   );
