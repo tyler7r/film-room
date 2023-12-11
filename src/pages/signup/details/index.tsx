@@ -1,3 +1,4 @@
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import {
   Button,
   Checkbox,
@@ -175,6 +176,7 @@ const SignupDetails = () => {
           size="large"
           type="submit"
           disabled={!isValidForm}
+          endIcon={<KeyboardDoubleArrowRightIcon />}
         >
           Continue
         </Button>
