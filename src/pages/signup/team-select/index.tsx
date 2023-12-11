@@ -8,10 +8,12 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { type TeamType } from "~/utils/types";
 
 const TeamSelect = () => {
+  const user = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [team, setTeam] = useState<string>("");
@@ -48,7 +50,10 @@ const TeamSelect = () => {
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {};
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(user);
+  };
 
   return isLoading ? (
     <div>Loading...</div>
@@ -80,15 +85,23 @@ const TeamSelect = () => {
           </Select>
         </FormControl>
         {team === "" ? (
-          <Button variant="contained" disabled={!isValidForm}>
+          <Button type="submit" variant="contained" disabled={!isValidForm}>
             Skip
           </Button>
         ) : (
-          <Button variant="contained" disabled={!isValidForm}>
+          <Button type="submit" variant="contained" disabled={!isValidForm}>
             Submit
           </Button>
         )}
       </form>
+      <div>
+        <div className="mt-2 flex flex-col items-center justify-center gap-2">
+          <div className="">Don't see your team's account?</div>
+          <Button variant="outlined" size="small" href="/create-team">
+            Create One
+          </Button>
+        </div>
+      </div>
     </div>
   ) : (
     <div>No teams</div>

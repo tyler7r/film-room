@@ -29,7 +29,7 @@ export const IsAuth = ({ children }: AuthProps) => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event: string, session) => {
         console.log(event, session);
-        if (event === "SIGNED_IN" && session) {
+        if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
           setUser({
             isLoggedIn: true,
             userId: session.user.id,
@@ -37,7 +37,7 @@ export const IsAuth = ({ children }: AuthProps) => {
           });
         } else {
           setUser({
-            isLoggedIn: true,
+            isLoggedIn: false,
             userId: undefined,
             email: undefined,
           });
