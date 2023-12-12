@@ -1,15 +1,59 @@
-// import { type ReactNode, createContext, useContext, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import { supabase } from "~/utils/supabase";
+import { type UserSession } from "~/utils/types";
 
-// export const isAuthContext = createContext<boolean>(false);
+type AuthProps = {
+  children: ReactNode;
+};
 
-// export const isAuth = (children: ReactNode) => {
-//   const [auth, setAuth] = useState<boolean>(false);
+export const isAuthContext = createContext<UserSession>({
+  isLoggedIn: false,
+  userId: undefined,
+  email: undefined,
+});
 
-//   return (
-//     <isAuthContext.Provider value={auth}>{children}</isAuthContext.Provider>
-//   );
-// };
+export const IsAuth = ({ children }: AuthProps) => {
+  const [user, setUser] = useState<UserSession>({
+    isLoggedIn: false,
+    userId: undefined,
+    email: undefined,
+  });
 
-// export const useAuthContext = () => {
-//   return useContext(isAuthContext);
-// };
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event: string, session) => {
+        console.log(event, session);
+        if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
+          setUser({
+            isLoggedIn: true,
+            userId: session.user.id,
+            email: session.user.email,
+          });
+        } else {
+          setUser({
+            isLoggedIn: false,
+            userId: undefined,
+            email: undefined,
+          });
+        }
+      },
+    );
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  return (
+    <isAuthContext.Provider value={user}>{children}</isAuthContext.Provider>
+  );
+};
+
+export const useAuthContext = () => {
+  return useContext(isAuthContext);
+};

@@ -8,6 +8,7 @@ import { type AppType } from "next/app";
 import { createContext, useContext, useState } from "react";
 
 import { Navbar } from "~/components/navbar/navbar";
+import { IsAuth } from "~/contexts/auth";
 import { IsMobile } from "~/contexts/mobile";
 import { darkTheme, lightTheme } from "~/contexts/theme";
 import "~/styles/globals.css";
@@ -25,10 +26,12 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
       <IsDarkContext.Provider value={isDark}>
         <CssBaseline />
-        <IsMobile>
-          <Navbar switchTheme={switchTheme} />
-          <Component {...pageProps} />
-        </IsMobile>
+        <IsAuth>
+          <IsMobile>
+            <Navbar switchTheme={switchTheme} />
+            <Component {...pageProps} />
+          </IsMobile>
+        </IsAuth>
       </IsDarkContext.Provider>
     </ThemeProvider>
   );

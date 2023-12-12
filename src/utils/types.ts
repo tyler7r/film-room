@@ -1,11 +1,21 @@
+export type UserSession = {
+  isLoggedIn: boolean;
+  userId: string | undefined;
+  email: string | undefined;
+};
+
 export type TeamType = {
   announcements: string[] | null;
   city: string | null;
   division: string | null;
-  id: number;
+  id: string;
   logo: string | null;
   member_requests: string[] | null;
   name: string | null;
-  next_opp: string | null;
   owner: string | null;
+};
+
+export type MessageType = {
+  text: string | undefined;
+  status: "error" | "success";
 };

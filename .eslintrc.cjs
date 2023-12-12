@@ -31,6 +31,7 @@ const config = {
         checksVoidReturn: { attributes: false },
       },
     ],
+    "@typescript-eslint/no-redundant-type-constituents": "off",
   },
 };
 

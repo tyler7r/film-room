@@ -1,9 +1,8 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
-import { Switch } from "@mui/material";
+import { Button, Switch } from "@mui/material";
 import { useState } from "react";
-import { Button } from "../button/button";
 import { Logo } from "../logo/logo";
 import { MobileMenu } from "../mobile-menu/mobile-menu";
 
@@ -16,28 +15,20 @@ const MobileNav = ({ switchTheme }: MobileNavProps) => {
 
   return (
     <div className="flex flex-col">
-      <div className="align-center flex justify-between">
-        <div className="align-center flex h-max justify-center self-center p-0">
+      <div className="flex items-center justify-between">
+        <div className="flex h-max items-center justify-center p-0">
           <Logo size="small" />
         </div>
         <div className="flex gap-1">
-          <div className="align-center flex justify-center gap-2 px-1 py-4">
-            <Button
-              label="Signup"
-              variant="contained"
-              disabled={false}
-              size="small"
-              href="/signup"
-            />
-            <Button
-              label="Login"
-              variant="outlined"
-              disabled={false}
-              size="small"
-              href="/login"
-            />
+          <div className="flex items-center justify-center gap-2 px-1 py-4">
+            <Button variant="contained" size="small" href="/signup">
+              Signup
+            </Button>
+            <Button variant="outlined" size="small" href="/login">
+              Login
+            </Button>
           </div>
-          <div className="align-center flex flex-col justify-center gap-0 p-0">
+          <div className="flex flex-col items-center justify-center gap-0 p-0">
             <Switch
               className="m-0"
               icon={<LightModeIcon color="primary" fontSize="small" />}
@@ -45,7 +36,7 @@ const MobileNav = ({ switchTheme }: MobileNavProps) => {
               checkedIcon={<DarkModeIcon fontSize="small" />}
             />
             <div
-              className="m-0 self-center hover:cursor-pointer"
+              className="m-0 hover:cursor-pointer"
               onClick={() => setMenuOpen(!menuOpen)}
             >
               <MenuRoundedIcon fontSize="large" color="action" />
