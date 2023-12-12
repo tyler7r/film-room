@@ -1,7 +1,7 @@
 import { Button, colors } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
 
-export const MobileMenu = () => {
+const MenuItems = () => {
   const isDark = useIsDarkContext();
   return (
     <div
@@ -25,3 +25,5 @@ export const MobileMenu = () => {
     </div>
   );
 };
+
+export default MenuItems;
