@@ -16,13 +16,13 @@ export const IsMobile = ({ children }: MobileProps) => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
-    if (window.innerWidth <= 480) {
+    if (window.innerWidth <= 842) {
       setIsMobile(true);
     } else {
       setIsMobile(false);
     }
     window.addEventListener("resize", () => {
-      if (window.innerWidth <= 480) {
+      if (window.innerWidth <= 842) {
         setIsMobile(true);
       } else {
         setIsMobile(false);
@@ -30,7 +30,7 @@ export const IsMobile = ({ children }: MobileProps) => {
     });
     return () =>
       window.removeEventListener("resize", () => {
-        if (window.innerWidth <= 480) {
+        if (window.innerWidth <= 842) {
           setIsMobile(true);
         } else {
           setIsMobile(false);
