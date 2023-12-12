@@ -4,7 +4,7 @@ import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import { Button, Switch } from "@mui/material";
 import { useState } from "react";
 import { Logo } from "../logo/logo";
-import { MobileMenu } from "../mobile-menu/mobile-menu";
+import MainMenu from "../main-menu/main-menu";
 
 type MobileNavProps = {
   switchTheme: () => void;
@@ -44,7 +44,7 @@ const MobileNav = ({ switchTheme }: MobileNavProps) => {
           </div>
         </div>
       </div>
-      {menuOpen && <MobileMenu />}
+      {menuOpen && <MainMenu size="medium" />}
     </div>
   );
 };
