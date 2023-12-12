@@ -12,7 +12,7 @@ import FormMessage from "~/components/form-message";
 import { useAuthContext } from "~/contexts/auth";
 import { validatePwdMatch } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { MessageType } from "~/utils/types";
+import { type MessageType } from "~/utils/types";
 
 type DetailsType = {
   name: string;
