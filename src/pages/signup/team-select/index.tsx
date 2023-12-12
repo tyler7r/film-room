@@ -4,14 +4,14 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Typography,
+  type SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { MessageType, type TeamType } from "~/utils/types";
+import { type MessageType, type TeamType } from "~/utils/types";
 
 const TeamSelect = () => {
   const user = useAuthContext();
@@ -45,7 +45,7 @@ const TeamSelect = () => {
   };
 
   useEffect(() => {
-    fetchTeams();
+    void fetchTeams();
 
     //Establish realtime updates for team list
     const channel = supabase
@@ -53,15 +53,14 @@ const TeamSelect = () => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "teams" },
-        async () => {
-          const { data } = await supabase.from("teams").select();
-          setTeams(data);
+        () => {
+          void fetchTeams();
         },
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      void supabase.removeChannel(channel);
     };
   }, []);
 
@@ -119,8 +118,8 @@ const TeamSelect = () => {
       </Typography>
       <form
         onSubmit={(e) => {
-          handleSubmit(e, team);
-          handleSubmit(e, team2);
+          void handleSubmit(e, team);
+          void handleSubmit(e, team2);
         }}
         className="flex w-4/5 max-w-screen-md flex-col items-center justify-center gap-6 text-center"
       >

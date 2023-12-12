@@ -1,6 +1,6 @@
 import { colors, useTheme } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
-import { MessageType } from "~/utils/types";
+import { type MessageType } from "~/utils/types";
 
 type FormMessageType = {
   message: MessageType;
