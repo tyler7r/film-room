@@ -1,7 +1,6 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { Button, Switch } from "@mui/material";
-import { useIsDarkContext } from "~/pages/_app";
 // import { Button } from "../button/button";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
@@ -11,8 +10,6 @@ type DesktopNavProps = {
 };
 
 const DesktopNav = ({ switchTheme }: DesktopNavProps) => {
-  const isDark = useIsDarkContext();
-
   return (
     <div className="flex flex-col">
       <div className="flex justify-between px-3">
