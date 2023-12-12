@@ -12,7 +12,7 @@ const MainMenu = ({ size }: MainMenuProps) => {
       style={{
         backgroundColor: `${isDark ? colors.grey[900] : colors.grey[100]}`,
       }}
-      className={`flex items-center justify-between`}
+      className={`flex items-center justify-around`}
     >
       <Button variant="text" size={size}>
         Film Room

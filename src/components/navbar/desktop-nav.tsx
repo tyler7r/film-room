@@ -14,10 +14,10 @@ const DesktopNav = ({ switchTheme }: DesktopNavProps) => {
   const isDark = useIsDarkContext();
 
   return (
-    <div className="">
-      <div className="grid grid-cols-5 items-center gap-5 px-3">
+    <div className="flex flex-col">
+      <div className="flex justify-between px-3">
         <Logo size="large" />
-        <div className="col-span-1 flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <Button variant="contained" size="large" href="/signup">
             Signup
           </Button>
