@@ -32,8 +32,16 @@ const TeamSelect = () => {
     setIsLoading(false);
   };
 
-  const handleChange = (e: SelectChangeEvent) => {
-    setTeam(e.target.value);
+  const handleChange = (e: SelectChangeEvent, t: number) => {
+    if (t === 1) {
+      setTeam(e.target.value);
+      if (e.target.value === "") {
+        setTeam2("");
+      }
+    } else {
+      setTeam2(e.target.value);
+    }
+    console.log("t1:", team, "t2:", team2);
   };
 
   useEffect(() => {
@@ -57,47 +65,48 @@ const TeamSelect = () => {
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+    tm: string,
+  ) => {
     e.preventDefault();
     setIsValidForm(false);
-    console.log(user);
+    if (tm) console.log(tm);
 
     // Ensuring that only one team is selected join
-    if (teams && team2 === "") {
-      const teamFind = teams.find((t) => t.id === team);
-      // Error boundary in case team data is not pulled initially somehow
-      if (!teamFind)
-        return setMessage({
-          text: "No team found in the database.",
-          status: "error",
-        });
+    const teamFind = teams?.find((t) => t.id === tm);
+    // Error boundary in case team data is not pulled initially somehow
+    if (!teamFind)
+      return setMessage({
+        text: "No team found in the database.",
+        status: "error",
+      });
 
-      // Handle request depending on team's request state, empty, or occupied
-      let requests = teamFind.member_requests;
-      if (requests) {
-        requests.push(`${user.email}`);
-      } else {
-        requests = [`${user.email}`];
-      }
+    // Handle request depending on team's request state, empty, or occupied
+    let requests = teamFind.member_requests;
+    if (requests) {
+      requests.push(`${user.email}`);
+    } else {
+      requests = [`${user.email}`];
+    }
 
-      // Update team's requests
-      const { data, error } = await supabase
-        .from("teams")
-        .update({ member_requests: requests })
-        .eq("id", team)
-        .select();
-      if (data) {
-        setMessage({
-          text: `Successfully sent join request to ${teamFind.city} ${teamFind.name}.`,
-          status: "success",
-        });
-      } else {
-        setMessage({
-          text: `There was an issue sending your request. ${error.message}`,
-          status: "error",
-        });
-        setIsValidForm(true);
-      }
+    // Update team's requests
+    const { data, error } = await supabase
+      .from("teams")
+      .update({ member_requests: requests })
+      .eq("id", tm)
+      .select();
+    if (data) {
+      setMessage({
+        text: `Successfully sent join request to ${teamFind.city} ${teamFind.name}. Team's account owner must approve your request.`,
+        status: "success",
+      });
+    } else {
+      setMessage({
+        text: `There was an issue sending your request to ${teamFind.city} ${teamFind.name}. ${error.message}`,
+        status: "error",
+      });
+      setIsValidForm(true);
     }
   };
 
@@ -109,7 +118,10 @@ const TeamSelect = () => {
         Join a Team!
       </Typography>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={(e) => {
+          handleSubmit(e, team);
+          handleSubmit(e, team2);
+        }}
         className="flex w-4/5 max-w-screen-md flex-col items-center justify-center gap-6 text-center"
       >
         <FormControl className="g-4 flex w-full flex-col">
@@ -119,17 +131,41 @@ const TeamSelect = () => {
             label="team-select"
             labelId="Team-Select"
             value={team}
-            onChange={handleChange}
+            onChange={(e) => handleChange(e, 1)}
             className="w-full text-start"
           >
             <MenuItem value={""}>None</MenuItem>
-            {teams.map((team) => (
-              <MenuItem value={team.id} key={team.id}>
-                {team.city} {team.name}
-              </MenuItem>
-            ))}
+            {teams
+              .filter((t) => t.id !== team2)
+              .map((team) => (
+                <MenuItem value={team.id} key={team.id}>
+                  {team.city} {team.name}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
+        {isMultipleTeams && team && (
+          <FormControl className="g-4 flex w-full flex-col">
+            <InputLabel>Team 2 Select</InputLabel>
+            <Select
+              native={false}
+              label="team-2-select"
+              labelId="Team-2-Select"
+              value={team2}
+              onChange={(e) => handleChange(e, 2)}
+              className="w-full text-start"
+            >
+              <MenuItem value={""}>None</MenuItem>
+              {teams
+                .filter((t) => t.id !== team)
+                .map((tm) => (
+                  <MenuItem value={tm.id} key={tm.id}>
+                    {tm.city} {tm.name}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        )}
         {team === "" ? (
           <Button
             type="button"
@@ -152,14 +188,30 @@ const TeamSelect = () => {
             <Typography variant="overline" fontSize="small">
               or
             </Typography>
-            <Button
-              size="small"
-              variant="outlined"
-              className="mt-0"
-              disabled={!isValidForm}
-            >
-              Join an additional team
-            </Button>
+            {!isMultipleTeams ? (
+              <Button
+                size="small"
+                variant="outlined"
+                className="mt-0"
+                disabled={!isValidForm}
+                onClick={() => setIsMultipleTeams(true)}
+              >
+                Join an additional team
+              </Button>
+            ) : (
+              <Button
+                size="small"
+                variant="outlined"
+                className="mt-0"
+                disabled={!isValidForm}
+                onClick={() => {
+                  setIsMultipleTeams(false);
+                  setTeam2("");
+                }}
+              >
+                Remove second team
+              </Button>
+            )}
           </div>
         )}
       </form>
