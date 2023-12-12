@@ -44,7 +44,7 @@ const MobileNav = ({ switchTheme }: MobileNavProps) => {
           </div>
         </div>
       </div>
-      {menuOpen && <MenuItems />}
+      {menuOpen && <MenuItems size="medium" />}
     </div>
   );
 };
