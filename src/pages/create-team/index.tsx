@@ -5,9 +5,9 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   TextField,
   Typography,
+  type SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
