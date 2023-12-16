@@ -13,3 +13,17 @@ export const validatePwdMatch = (p1: string, p2: string) => {
     return false;
   }
 };
+
+export const divisions = [
+  "Open",
+  "Mixed",
+  "Women's",
+  "PUL",
+  "WUL",
+  "AUDL",
+  "D1 College Men's",
+  "D1 College Women's",
+  "D3 College Men's",
+  "D3 College Women's",
+  "Other",
+];

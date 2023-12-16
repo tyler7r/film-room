@@ -41,7 +41,6 @@ const TeamSelect = () => {
     } else {
       setTeam2(e.target.value);
     }
-    console.log("t1:", team, "t2:", team2);
   };
 
   useEffect(() => {
@@ -81,20 +80,15 @@ const TeamSelect = () => {
         status: "error",
       });
 
-    // Handle request depending on team's request state, empty, or occupied
-    let requests = teamFind.member_requests;
-    if (requests) {
-      requests.push(`${user.email}`);
-    } else {
-      requests = [`${user.email}`];
-    }
-
-    // Update team's requests
     const { data, error } = await supabase
-      .from("teams")
-      .update({ member_requests: requests })
-      .eq("id", tm)
-      .select();
+      .from("affiliations")
+      .insert({
+        team_id: tm,
+        user_id: `${user.userId}`,
+      })
+      .select()
+      .single();
+
     if (data) {
       setMessage({
         text: `Successfully sent join request to ${teamFind.city} ${teamFind.name}. Team's account owner must approve your request.`,
@@ -102,7 +96,7 @@ const TeamSelect = () => {
       });
     } else {
       setMessage({
-        text: `There was an issue sending your request to ${teamFind.city} ${teamFind.name}. ${error.message}`,
+        text: `There was an issue sending your request to ${teamFind.city} ${teamFind.name}. ${error?.message}`,
         status: "error",
       });
       setIsValidForm(true);

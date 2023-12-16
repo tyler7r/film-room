@@ -10,7 +10,6 @@ export type TeamType = {
   division: string | null;
   id: string;
   logo: string | null;
-  member_requests: string[] | null;
   name: string | null;
   owner: string | null;
 };
