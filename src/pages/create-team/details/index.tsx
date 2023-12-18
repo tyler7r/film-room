@@ -24,12 +24,8 @@ type TeamDetailsType = {
   division: (typeof divisions)[number];
 };
 
-type CreateTeamProps = {
-  updateAffiliation: (team: string) => void;
-};
-
-const CreateTeam = ({ updateAffiliation }: CreateTeamProps) => {
-  const { user } = useAuthContext();
+const CreateTeam = () => {
+  const { user, setUser } = useAuthContext();
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
@@ -105,6 +101,7 @@ const CreateTeam = ({ updateAffiliation }: CreateTeamProps) => {
 
       // When successfully created, create an owner affiliation of the team for the user
       if (data) {
+        setUser({ ...user, currentAffiliation: data.id });
         // Set team id to newly created teams' id
         await supabase
           .from("affiliations")
@@ -115,7 +112,6 @@ const CreateTeam = ({ updateAffiliation }: CreateTeamProps) => {
             role: "owner",
           })
           .select();
-        updateAffiliation(data.id);
         setMessage({ text: "Team successfully created!", status: "success" });
         setTimeout(() => {
           router.push("/create-team/logo");

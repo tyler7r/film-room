@@ -21,7 +21,7 @@ type DetailsType = {
 };
 
 const SignupDetails = () => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     status: "error",

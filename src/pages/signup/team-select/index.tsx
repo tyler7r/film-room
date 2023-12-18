@@ -7,6 +7,7 @@ import {
   Typography,
   type SelectChangeEvent,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import { useAuthContext } from "~/contexts/auth";
@@ -15,6 +16,7 @@ import { type MessageType, type TeamType } from "~/utils/types";
 
 const TeamSelect = () => {
   const { user } = useAuthContext();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
@@ -216,7 +218,7 @@ const TeamSelect = () => {
         <Button
           variant="text"
           size="medium"
-          href="/create-team"
+          onClick={() => router.push("/create-team/details")}
           disabled={!isValidForm}
         >
           Create One

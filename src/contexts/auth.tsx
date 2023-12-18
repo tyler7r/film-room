@@ -35,29 +35,31 @@ export const IsAuth = ({ children }: AuthProps) => {
     currentAffiliation: undefined,
   });
 
+  // useEffect(() => {
+  //   console.log(user);
+  // }, [user]);
+
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event: string, session) => {
+        // console.log(event, session);
         if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
           setUser({
             isLoggedIn: true,
             userId: session.user.id,
             email: session.user.email,
-            currentAffiliation: undefined,
           });
         } else if (event === "INITIAL_SESSION" && session) {
           setUser({
             isLoggedIn: false,
             userId: session.user.id,
             email: session.user.email,
-            currentAffiliation: undefined,
           });
         } else {
           setUser({
             isLoggedIn: false,
             userId: undefined,
             email: undefined,
-            currentAffiliation: undefined,
           });
         }
       },
