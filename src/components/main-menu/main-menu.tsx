@@ -30,28 +30,28 @@ const MainMenu = ({ size }: MainMenuProps) => {
       <Button
         variant="text"
         size={size}
-        onClick={() => handleClick(user.isLoggedIn, "/film-room")}
+        onClick={() => handleClick(user.isLoggedIn, "film-room")}
       >
         Film Room
       </Button>
       <Button
         variant="text"
         size={size}
-        onClick={() => handleClick(user.isLoggedIn, "/highlight-factory")}
+        onClick={() => handleClick(user.isLoggedIn, "highlight-factory")}
       >
         Highlight Factory
       </Button>
       <Button
         variant="text"
         size={size}
-        onClick={() => handleClick(user.isLoggedIn, "/team-profile")}
+        onClick={() => handleClick(user.isLoggedIn, "team-profile")}
       >
         Team Profile
       </Button>
       <Button
         variant="text"
         size={size}
-        onClick={() => handleClick(user.isLoggedIn, "/inbox")}
+        onClick={() => handleClick(user.isLoggedIn, "inbox")}
       >
         Inbox
       </Button>
