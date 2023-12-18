@@ -164,7 +164,6 @@ const CreateTeam = () => {
           required
           id="name"
           label="Name"
-          autoFocus
           onChange={handleInput}
           value={details.name}
         />
@@ -200,7 +199,7 @@ const CreateTeam = () => {
           variant="outlined"
           size="medium"
           type="button"
-          href="/"
+          onClick={() => router.push("/signup/team-select")}
           endIcon={<ClearIcon />}
         >
           Cancel

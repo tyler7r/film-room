@@ -24,7 +24,7 @@ export const isAuthContext = createContext<AuthContextProps>({
     email: undefined,
     currentAffiliation: undefined,
   },
-  setUser: () => {},
+  setUser: () => null,
 });
 
 export const IsAuth = ({ children }: AuthProps) => {
@@ -35,9 +35,9 @@ export const IsAuth = ({ children }: AuthProps) => {
     currentAffiliation: undefined,
   });
 
-  // useEffect(() => {
-  //   console.log(user);
-  // }, [user]);
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(

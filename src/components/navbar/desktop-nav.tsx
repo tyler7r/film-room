@@ -2,7 +2,6 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { Button, Switch } from "@mui/material";
 // import { Button } from "../button/button";
-import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 
@@ -11,7 +10,6 @@ type DesktopNavProps = {
 };
 
 const DesktopNav = ({ switchTheme }: DesktopNavProps) => {
-  const { user } = useAuthContext();
   return (
     <div className="flex flex-col">
       <div className="flex justify-between px-3">

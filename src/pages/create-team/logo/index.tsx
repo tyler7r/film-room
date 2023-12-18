@@ -6,7 +6,7 @@ import { useState } from "react";
 import FormMessage from "~/components/form-message";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { MessageType } from "~/utils/types";
+import { type MessageType } from "~/utils/types";
 
 const TeamLogo = () => {
   const { user } = useAuthContext();
@@ -19,12 +19,14 @@ const TeamLogo = () => {
   const [pubURL, setPubURL] = useState<string>("");
 
   const handleChange = async (files: FileList | null) => {
-    console.log(files);
     if (files === null) return;
     const file = files[0];
     if (file) {
+      // Create image preview src
       const url = URL.createObjectURL(file);
       setImagePreview(url);
+
+      // Upload image to supabase storage and get image's public URL for use as team logo
       const { data, error } = await supabase.storage
         .from("team_logos")
         .upload(`logos/${user.currentAffiliation}.png`, file, {
@@ -46,6 +48,8 @@ const TeamLogo = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Update team data to include logo
     const { error } = await supabase
       .from("teams")
       .update({ logo: pubURL })
@@ -85,7 +89,7 @@ const TeamLogo = () => {
             id="file_upload"
             type="file"
             onChange={(e) => {
-              handleChange((e.target as HTMLInputElement).files);
+              void handleChange((e.target as HTMLInputElement).files);
             }}
             style={{ display: "none" }}
           />
