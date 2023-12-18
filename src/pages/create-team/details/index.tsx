@@ -1,3 +1,4 @@
+import ClearIcon from "@mui/icons-material/Clear";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import {
   Button,
@@ -9,6 +10,7 @@ import {
   Typography,
   type SelectChangeEvent,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import { useAuthContext } from "~/contexts/auth";
@@ -24,6 +26,7 @@ type TeamDetailsType = {
 
 const CreateTeam = () => {
   const user = useAuthContext();
+  const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
     status: "error",
@@ -34,7 +37,6 @@ const CreateTeam = () => {
     name: "",
     division: "",
   });
-  //   const [teamId, setTeamId] = useState<string>("");
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -111,6 +113,9 @@ const CreateTeam = () => {
           })
           .select();
         setMessage({ text: "Team successfully created!", status: "success" });
+        setTimeout(() => {
+          router.push("/create-team/logo");
+        }, 1000);
       } else {
         setMessage({
           text: `There was a problem creating the team account. ${error.message}`,
@@ -190,6 +195,15 @@ const CreateTeam = () => {
           endIcon={<KeyboardDoubleArrowRightIcon />}
         >
           Continue
+        </Button>
+        <Button
+          variant="outlined"
+          size="medium"
+          type="button"
+          href="/"
+          endIcon={<ClearIcon />}
+        >
+          Cancel
         </Button>
       </form>
     </div>
