@@ -7,6 +7,7 @@ import MainMenu from "../main-menu/main-menu";
 
 type DesktopNavProps = {
   switchTheme: () => void;
+  affiliation: string | null;
 };
 
 const DesktopNav = ({ switchTheme }: DesktopNavProps) => {

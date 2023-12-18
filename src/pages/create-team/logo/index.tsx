@@ -1,5 +1,6 @@
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { Button, Input, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
+import Image from "next/image";
 import { useState } from "react";
 import FormMessage from "~/components/form-message";
 import { supabase } from "~/utils/supabase";
@@ -14,6 +15,7 @@ const TeamLogo = () => {
   const [pubURL, setPubURL] = useState<string>("");
 
   const handleChange = async (files: FileList | null) => {
+    console.log(files);
     if (files === null) return;
     const file = files[0];
     if (file) {
@@ -54,7 +56,8 @@ const TeamLogo = () => {
           startIcon={<CloudUploadIcon />}
         >
           Upload Logo
-          <Input
+          <input
+            id="file_upload"
             type="file"
             onChange={(e) => {
               handleChange((e.target as HTMLInputElement).files);
@@ -62,6 +65,15 @@ const TeamLogo = () => {
             style={{ display: "none" }}
           />
         </Button>
+        {imagePreview !== "" && (
+          <Image
+            src={imagePreview}
+            alt="Site logo"
+            height={200}
+            width={200}
+            priority={true}
+          />
+        )}
       </form>
       <FormMessage message={message} />
     </div>

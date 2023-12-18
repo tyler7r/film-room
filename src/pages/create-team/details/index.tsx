@@ -102,7 +102,6 @@ const CreateTeam = () => {
       // When successfully created, create an owner affiliation of the team for the user
       if (data) {
         // Set team id to newly created teams' id
-        // setTeamId(data.id);
         await supabase
           .from("affiliations")
           .insert({

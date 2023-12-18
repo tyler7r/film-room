@@ -17,9 +17,14 @@ export const IsDarkContext = createContext<boolean>(false);
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [affiliation, setAffiliation] = useState<string | null>(null);
 
   const switchTheme = () => {
     setIsDark(!isDark);
+  };
+
+  const updateAffiliation = (team: string) => {
+    setAffiliation(team);
   };
 
   return (
@@ -28,8 +33,8 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <CssBaseline />
         <IsAuth>
           <IsMobile>
-            <Navbar switchTheme={switchTheme} />
-            <Component {...pageProps} />
+            <Navbar switchTheme={switchTheme} affiliation={affiliation} />
+            <Component {...pageProps} updateAffiliation={updateAffiliation} />
           </IsMobile>
         </IsAuth>
       </IsDarkContext.Provider>
