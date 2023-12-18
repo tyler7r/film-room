@@ -1,4 +1,5 @@
 import { Button, TextField, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import { validateEmail } from "~/utils/helpers";
@@ -6,6 +7,7 @@ import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";
 
 const Signup = () => {
+  const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     status: "error",
     text: undefined,
@@ -96,7 +98,11 @@ const Signup = () => {
       </form>
       <div className="mt-2 flex flex-col items-center justify-center gap-2">
         <div className="">Already have an account?</div>
-        <Button variant="outlined" size="small">
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => router.push("/login")}
+        >
           Login
         </Button>
       </div>

@@ -6,12 +6,9 @@ import { useRouter } from "next/navigation";
 import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
+import { ChildrenNavProps } from "./navbar";
 
-type DesktopNavProps = {
-  switchTheme: () => void;
-};
-
-const DesktopNav = ({ switchTheme }: DesktopNavProps) => {
+const DesktopNav = ({ switchTheme, logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
   const router = useRouter();
 
@@ -21,8 +18,8 @@ const DesktopNav = ({ switchTheme }: DesktopNavProps) => {
         <Logo size="large" />
         <div className="flex items-center gap-2">
           {user.isLoggedIn ? (
-            <Button variant="contained" size="medium">
-              Sign Out
+            <Button variant="contained" size="medium" onClick={logout}>
+              Logout
             </Button>
           ) : (
             <div>

@@ -7,12 +7,9 @@ import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
+import { ChildrenNavProps } from "./navbar";
 
-type MobileNavProps = {
-  switchTheme: () => void;
-};
-
-const MobileNav = ({ switchTheme }: MobileNavProps) => {
+const MobileNav = ({ switchTheme, logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -26,8 +23,8 @@ const MobileNav = ({ switchTheme }: MobileNavProps) => {
         <div className="flex gap-1">
           {user.isLoggedIn ? (
             <div className="flex items-center justify-center px-1 py-2">
-              <Button variant="contained" size="small">
-                Log Out
+              <Button variant="contained" size="small" onClick={logout}>
+                Logout
               </Button>
             </div>
           ) : (
