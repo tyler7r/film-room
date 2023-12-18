@@ -2,6 +2,8 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { Button, Switch } from "@mui/material";
 // import { Button } from "../button/button";
+import { useRouter } from "next/navigation";
+import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 
@@ -10,22 +12,37 @@ type DesktopNavProps = {
 };
 
 const DesktopNav = ({ switchTheme }: DesktopNavProps) => {
+  const { user } = useAuthContext();
+  const router = useRouter();
+
   return (
     <div className="flex flex-col">
       <div className="flex justify-between px-3">
         <Logo size="large" />
         <div className="flex items-center gap-2">
-          <Button variant="contained" size="large" href="/signup">
-            Signup
-          </Button>
-          <Button
-            variant="outlined"
-            disabled={false}
-            size="large"
-            href="/login"
-          >
-            Login
-          </Button>
+          {user.isLoggedIn ? (
+            <Button variant="contained" size="medium">
+              Sign Out
+            </Button>
+          ) : (
+            <div>
+              <Button
+                variant="contained"
+                size="medium"
+                onClick={() => router.push("/signup")}
+              >
+                Signup
+              </Button>
+              <Button
+                variant="outlined"
+                disabled={false}
+                size="medium"
+                onClick={() => router.push("/login")}
+              >
+                Login
+              </Button>
+            </div>
+          )}
           <Switch
             className="items-center justify-center"
             icon={<LightModeIcon color="primary" fontSize="small" />}
