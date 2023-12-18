@@ -2,6 +2,7 @@ export type UserSession = {
   isLoggedIn: boolean;
   userId: string | undefined;
   email: string | undefined;
+  currentAffiliation?: string | undefined;
 };
 
 export type TeamType = {
@@ -10,7 +11,6 @@ export type TeamType = {
   division: string | null;
   id: string;
   logo: string | null;
-  member_requests: string[] | null;
   name: string | null;
   owner: string | null;
 };

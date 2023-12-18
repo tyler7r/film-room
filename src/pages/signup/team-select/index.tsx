@@ -7,6 +7,7 @@ import {
   Typography,
   type SelectChangeEvent,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import { useAuthContext } from "~/contexts/auth";
@@ -14,7 +15,8 @@ import { supabase } from "~/utils/supabase";
 import { type MessageType, type TeamType } from "~/utils/types";
 
 const TeamSelect = () => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
@@ -41,7 +43,6 @@ const TeamSelect = () => {
     } else {
       setTeam2(e.target.value);
     }
-    console.log("t1:", team, "t2:", team2);
   };
 
   useEffect(() => {
@@ -70,42 +71,52 @@ const TeamSelect = () => {
   ) => {
     e.preventDefault();
     setIsValidForm(false);
-    if (tm) console.log(tm);
 
-    // Ensuring that only one team is selected join
-    const teamFind = teams?.find((t) => t.id === tm);
-    // Error boundary in case team data is not pulled initially somehow
-    if (!teamFind)
-      return setMessage({
-        text: "No team found in the database.",
-        status: "error",
-      });
+    if (tm !== "") {
+      // Ensuring that only one team is selected join
+      const teamFind = teams?.find((t) => t.id === tm);
+      // Error boundary in case team data is not pulled initially somehow
+      if (!teamFind)
+        return setMessage({
+          text: "No team found in the database.",
+          status: "error",
+        });
 
-    // Handle request depending on team's request state, empty, or occupied
-    let requests = teamFind.member_requests;
-    if (requests) {
-      requests.push(`${user.email}`);
-    } else {
-      requests = [`${user.email}`];
-    }
+      // Ensure that the user does not already have an affilation with this team
+      const { data } = await supabase
+        .from("affiliations")
+        .select()
+        .match({ team_id: tm, user_id: user.userId });
 
-    // Update team's requests
-    const { data, error } = await supabase
-      .from("teams")
-      .update({ member_requests: requests })
-      .eq("id", tm)
-      .select();
-    if (data) {
-      setMessage({
-        text: `Successfully sent join request to ${teamFind.city} ${teamFind.name}. Team's account owner must approve your request.`,
-        status: "success",
-      });
-    } else {
-      setMessage({
-        text: `There was an issue sending your request to ${teamFind.city} ${teamFind.name}. ${error.message}`,
-        status: "error",
-      });
-      setIsValidForm(true);
+      if (data) {
+        return setMessage({
+          text: "You already have an affiliation with this team!",
+          status: "error",
+        });
+      }
+
+      // Create an affiliation row for this user and selected team
+      const { error } = await supabase
+        .from("affiliations")
+        .insert({
+          team_id: tm,
+          user_id: `${user.userId}`,
+        })
+        .select()
+        .single();
+
+      if (!error) {
+        setMessage({
+          text: `Successfully sent join request to ${teamFind.city} ${teamFind.name}. Team's account owner must approve your request.`,
+          status: "success",
+        });
+      } else {
+        setMessage({
+          text: `There was an issue sending your request to ${teamFind.city} ${teamFind.name}. ${error?.message}`,
+          status: "error",
+        });
+        setIsValidForm(true);
+      }
     }
   };
 
@@ -170,9 +181,9 @@ const TeamSelect = () => {
             type="button"
             variant="contained"
             disabled={!isValidForm}
-            href="/"
+            onClick={() => router.push("/")}
           >
-            Skip
+            Continue w/ No Team
           </Button>
         ) : (
           <div className="flex flex-col items-center justify-center gap-1">
@@ -222,7 +233,7 @@ const TeamSelect = () => {
         <Button
           variant="text"
           size="medium"
-          href="/create-team"
+          onClick={() => router.push("/create-team/details")}
           disabled={!isValidForm}
         >
           Create One
@@ -230,7 +241,9 @@ const TeamSelect = () => {
       </div>
     </div>
   ) : (
-    <div>No teams</div>
+    <Typography className="mt-5 text-center" variant="h1" fontSize={48}>
+      Loading...
+    </Typography>
   );
 };
 

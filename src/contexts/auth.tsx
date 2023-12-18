@@ -12,10 +12,19 @@ type AuthProps = {
   children: ReactNode;
 };
 
-export const isAuthContext = createContext<UserSession>({
-  isLoggedIn: false,
-  userId: undefined,
-  email: undefined,
+type AuthContextProps = {
+  user: UserSession;
+  setUser: (user: UserSession) => void;
+};
+
+export const isAuthContext = createContext<AuthContextProps>({
+  user: {
+    isLoggedIn: false,
+    userId: undefined,
+    email: undefined,
+    currentAffiliation: undefined,
+  },
+  setUser: () => null,
 });
 
 export const IsAuth = ({ children }: AuthProps) => {
@@ -23,7 +32,12 @@ export const IsAuth = ({ children }: AuthProps) => {
     isLoggedIn: false,
     userId: undefined,
     email: undefined,
+    currentAffiliation: undefined,
   });
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -32,6 +46,12 @@ export const IsAuth = ({ children }: AuthProps) => {
         if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
           setUser({
             isLoggedIn: true,
+            userId: session.user.id,
+            email: session.user.email,
+          });
+        } else if (event === "INITIAL_SESSION" && session) {
+          setUser({
+            isLoggedIn: false,
             userId: session.user.id,
             email: session.user.email,
           });
@@ -50,7 +70,9 @@ export const IsAuth = ({ children }: AuthProps) => {
   }, []);
 
   return (
-    <isAuthContext.Provider value={user}>{children}</isAuthContext.Provider>
+    <isAuthContext.Provider value={{ user, setUser }}>
+      {children}
+    </isAuthContext.Provider>
   );
 };
 

@@ -15,18 +15,21 @@ export interface Database {
           role: string
           team_id: string
           user_id: string
+          verified: boolean
         }
         Insert: {
           id?: string
           role?: string
           team_id: string
           user_id: string
+          verified?: boolean
         }
         Update: {
           id?: string
           role?: string
           team_id?: string
           user_id?: string
+          verified?: boolean
         }
         Relationships: [
           {
@@ -117,13 +120,6 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "plays_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "affiliations"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "plays_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: false
@@ -168,7 +164,6 @@ export interface Database {
           division: string | null
           id: string
           logo: string | null
-          member_requests: string[] | null
           name: string | null
           owner: string | null
         }
@@ -178,7 +173,6 @@ export interface Database {
           division?: string | null
           id?: string
           logo?: string | null
-          member_requests?: string[] | null
           name?: string | null
           owner?: string | null
         }
@@ -188,7 +182,6 @@ export interface Database {
           division?: string | null
           id?: string
           logo?: string | null
-          member_requests?: string[] | null
           name?: string | null
           owner?: string | null
         }
@@ -197,7 +190,7 @@ export interface Database {
             foreignKeyName: "teams_owner_fkey"
             columns: ["owner"]
             isOneToOne: false
-            referencedRelation: "affiliations"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]
