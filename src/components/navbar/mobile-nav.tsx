@@ -8,7 +8,6 @@ import MainMenu from "../main-menu/main-menu";
 
 type MobileNavProps = {
   switchTheme: () => void;
-  affiliation: string | null;
 };
 
 const MobileNav = ({ switchTheme }: MobileNavProps) => {

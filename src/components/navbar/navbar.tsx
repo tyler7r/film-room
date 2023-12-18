@@ -4,16 +4,15 @@ import MobileNav from "./mobile-nav";
 
 type NavbarProps = {
   switchTheme: () => void;
-  affiliation: string | null;
 };
 
-export const Navbar = ({ switchTheme, affiliation }: NavbarProps) => {
+export const Navbar = ({ switchTheme }: NavbarProps) => {
   const isMobile = useMobileContext();
   // const auth = useAuthContext();
 
   return isMobile ? (
-    <MobileNav switchTheme={switchTheme} affiliation={affiliation} />
+    <MobileNav switchTheme={switchTheme} />
   ) : (
-    <DesktopNav switchTheme={switchTheme} affiliation={affiliation} />
+    <DesktopNav switchTheme={switchTheme} />
   );
 };

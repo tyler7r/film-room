@@ -14,7 +14,7 @@ import { supabase } from "~/utils/supabase";
 import { type MessageType, type TeamType } from "~/utils/types";
 
 const TeamSelect = () => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<MessageType>({
     text: undefined,

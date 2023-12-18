@@ -24,8 +24,12 @@ type TeamDetailsType = {
   division: (typeof divisions)[number];
 };
 
-const CreateTeam = () => {
-  const user = useAuthContext();
+type CreateTeamProps = {
+  updateAffiliation: (team: string) => void;
+};
+
+const CreateTeam = ({ updateAffiliation }: CreateTeamProps) => {
+  const { user } = useAuthContext();
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
@@ -111,6 +115,7 @@ const CreateTeam = () => {
             role: "owner",
           })
           .select();
+        updateAffiliation(data.id);
         setMessage({ text: "Team successfully created!", status: "success" });
         setTimeout(() => {
           router.push("/create-team/logo");
