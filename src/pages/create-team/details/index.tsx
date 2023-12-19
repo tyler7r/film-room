@@ -66,68 +66,45 @@ const CreateTeam = () => {
     }
   }, [details]);
 
-  const validateUniqueTeam = async () => {
-    const { error } = await supabase
-      .from("teams")
-      .select()
-      .match({
-        name: details.name,
-        city: details.city,
-        division: details.division,
-      })
-      .single();
-    if (error) return true;
-    else return false;
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsValidForm(false);
-    // Confirm that team does not already exist in database
-    const isValidTeam = await validateUniqueTeam();
 
-    if (isValidTeam) {
-      // Create team with details
-      const { data, error } = await supabase
-        .from("teams")
+    // Create team with details
+    const { data, error } = await supabase
+      .from("teams")
+      .insert({
+        name: details.name,
+        city: details.city,
+        division: details.division,
+        owner: `${user.userId}`,
+      })
+      .select("id")
+      .single();
+
+    // When successfully created, create an owner affiliation of the team for the user
+    if (data) {
+      setUser({ ...user, currentAffiliation: data.id });
+      // Set team id to newly created teams' id
+      await supabase
+        .from("affiliations")
         .insert({
-          name: details.name,
-          city: details.city,
-          division: details.division,
-          owner: `${user.userId}`,
+          team_id: `${data.id}`,
+          user_id: `${user.userId}`,
+          verified: true,
+          role: "owner",
         })
-        .select("id")
-        .single();
-
-      // When successfully created, create an owner affiliation of the team for the user
-      if (data) {
-        setUser({ ...user, currentAffiliation: data.id });
-        // Set team id to newly created teams' id
-        await supabase
-          .from("affiliations")
-          .insert({
-            team_id: `${data.id}`,
-            user_id: `${user.userId}`,
-            verified: true,
-            role: "owner",
-          })
-          .select();
-        setMessage({ text: "Team successfully created!", status: "success" });
-        setTimeout(() => {
-          router.push("/create-team/logo");
-        }, 1000);
-      } else {
-        setMessage({
-          text: `There was a problem creating the team account. ${error.message}`,
-          status: "error",
-        });
-        setIsValidForm(true);
-      }
+        .select();
+      setMessage({ text: "Team successfully created!", status: "success" });
+      setTimeout(() => {
+        router.push("/create-team/logo");
+      }, 1000);
     } else {
       setMessage({
-        text: `There is already a team account with these details!`,
+        text: `There was a problem creating the team account. ${error.message}`,
         status: "error",
       });
+      setIsValidForm(true);
     }
   };
 

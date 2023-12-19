@@ -1,4 +1,5 @@
 import { useRouter } from "next/navigation";
+import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
 import DesktopNav from "./desktop-nav";
@@ -16,6 +17,7 @@ export type ChildrenNavProps = {
 export const Navbar = ({ switchTheme }: NavbarProps) => {
   const isMobile = useMobileContext();
   const router = useRouter();
+  const { user } = useAuthContext();
 
   const logout = async () => {
     await supabase.auth.signOut();

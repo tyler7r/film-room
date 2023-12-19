@@ -1,8 +1,16 @@
+export type TeamAffiliationType = {
+  id: string;
+  name: string;
+  city: string;
+  logo: string | null;
+};
+
 export type UserSession = {
   isLoggedIn: boolean;
   userId: string | undefined;
   email: string | undefined;
   currentAffiliation?: string | undefined;
+  affiliations?: string[] | undefined;
 };
 
 export type TeamType = {

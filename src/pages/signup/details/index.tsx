@@ -74,17 +74,21 @@ const SignupDetails = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsValidForm(false);
     const checkValidName = await updateUserName();
     const checkValidPassword = await updatePassword();
 
     if (checkValidName === "error" || checkValidPassword === "error") {
-      return;
+      setMessage({
+        text: "There was an issue updating name and password.",
+        status: "error",
+      });
+      setIsValidForm(true);
     } else {
       setMessage({
         status: "success",
         text: "Successfully updated your profile!",
       });
-      setIsValidForm(false);
       setTimeout(() => {
         router.push("/signup/team-select");
       }, 1000);
