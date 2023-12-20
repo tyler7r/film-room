@@ -1,7 +1,6 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { Button, Switch } from "@mui/material";
-// import { Button } from "../button/button";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";

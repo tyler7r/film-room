@@ -22,8 +22,7 @@ export const isAuthContext = createContext<AuthContextProps>({
     isLoggedIn: false,
     userId: undefined,
     email: undefined,
-    currentAffiliation: undefined,
-    affiliations: undefined,
+    name: undefined,
   },
   setUser: () => null,
 });
@@ -33,22 +32,12 @@ export const IsAuth = ({ children }: AuthProps) => {
     isLoggedIn: false,
     userId: undefined,
     email: undefined,
-    currentAffiliation: undefined,
-    affiliations: undefined,
+    name: undefined,
   });
 
   useEffect(() => {
     console.log(user);
   }, [user]);
-
-  // const checkForAffiliation = async (user: string) => {
-  //   const { data } = await supabase
-  //     .from("affiliations")
-  //     .select(`team_id`)
-  //     .eq("user_id", user);
-  //   if (data) return data.map((tm) => tm.team_id) as string[];
-  //   else return undefined;
-  // };
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -59,21 +48,21 @@ export const IsAuth = ({ children }: AuthProps) => {
             isLoggedIn: true,
             userId: session.user.id,
             email: session.user.email,
-            // affiliations: await checkForAffiliation(session.user.id),
+            name: session.user.user_metadata.name || undefined,
           });
         } else if (event === "INITIAL_SESSION" && session) {
           setUser({
             isLoggedIn: false,
             userId: session.user.id,
             email: session.user.email,
-            // affiliations: await checkForAffiliation(session.user.id),
+            name: session.user.user_metadata.name || undefined,
           });
         } else {
           setUser({
             isLoggedIn: false,
             userId: undefined,
             email: undefined,
-            affiliations: undefined,
+            name: undefined,
           });
         }
       },
