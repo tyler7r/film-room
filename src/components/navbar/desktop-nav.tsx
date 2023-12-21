@@ -2,14 +2,22 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { Button, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
+import TeamProfileButton from "../team-profile-btn";
 import { ChildrenNavProps } from "./navbar";
 
 const DesktopNav = ({ switchTheme, logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
+  const { affiliations } = useAffiliatedContext();
   const router = useRouter();
+
+  useEffect(() => {
+    console.log(affiliations);
+  }, [affiliations]);
 
   return (
     <div className="flex flex-col">
@@ -17,9 +25,12 @@ const DesktopNav = ({ switchTheme, logout }: ChildrenNavProps) => {
         <Logo size="large" />
         <div className="flex items-center gap-2">
           {user.isLoggedIn ? (
-            <Button variant="contained" size="medium" onClick={logout}>
-              Logout
-            </Button>
+            <div className="flex items-center justify-center gap-3">
+              <TeamProfileButton />
+              <Button variant="contained" size="medium" onClick={logout}>
+                Logout
+              </Button>
+            </div>
           ) : (
             <div className="flex gap-2">
               <Button

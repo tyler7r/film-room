@@ -37,7 +37,6 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
       .match({ user_id: `${user.userId}`, verified: true });
     if (data) {
       const l: TeamAffiliationType[] = data.map((tm) => tm.teams!);
-      console.log(l);
       setAffiliations(l);
     }
   };
