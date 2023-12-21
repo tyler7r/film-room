@@ -16,11 +16,17 @@ type AffiliationProps = {
 type AffiliationContextProps = {
   affiliations: TeamAffiliationType[] | undefined;
   setAffiliations: (affiliations: TeamAffiliationType[] | undefined) => void;
+  activeAffiliation: TeamAffiliationType | undefined;
+  setActiveAffiliation: (
+    activeAffiliation: TeamAffiliationType | undefined,
+  ) => void;
 };
 
 export const isAffiliatedContext = createContext<AffiliationContextProps>({
   affiliations: undefined,
   setAffiliations: () => null,
+  activeAffiliation: undefined,
+  setActiveAffiliation: () => null,
 });
 
 export const IsAffiliated = ({ children }: AffiliationProps) => {
@@ -30,14 +36,21 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
     TeamAffiliationType[] | undefined
   >(undefined);
 
+  const [activeAffiliation, setActiveAffiliation] = useState<
+    TeamAffiliationType | undefined
+  >(undefined);
+
   const fetchAffiliations = async () => {
     const { data } = await supabase
       .from("affiliations")
       .select(`teams!inner(id, name, city, division, logo)`)
       .match({ user_id: `${user.userId}`, verified: true });
     if (data) {
-      const l: TeamAffiliationType[] = data.map((tm) => tm.teams!);
-      setAffiliations(l);
+      const typedAffiliations: TeamAffiliationType[] = data.map(
+        (tm) => tm.teams!,
+      );
+      setAffiliations(typedAffiliations);
+      setActiveAffiliation(typedAffiliations[0]);
     }
   };
 
@@ -65,7 +78,14 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
   }, [user]);
 
   return (
-    <isAffiliatedContext.Provider value={{ affiliations, setAffiliations }}>
+    <isAffiliatedContext.Provider
+      value={{
+        affiliations,
+        setAffiliations,
+        activeAffiliation,
+        setActiveAffiliation,
+      }}
+    >
       {children}
     </isAffiliatedContext.Provider>
   );

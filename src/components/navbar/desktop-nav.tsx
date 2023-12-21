@@ -7,7 +7,6 @@ import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
-import TeamProfileButton from "../team-profile-btn";
 import { ChildrenNavProps } from "./navbar";
 
 const DesktopNav = ({ switchTheme, logout }: ChildrenNavProps) => {
@@ -26,7 +25,6 @@ const DesktopNav = ({ switchTheme, logout }: ChildrenNavProps) => {
         <div className="flex items-center gap-2">
           {user.isLoggedIn ? (
             <div className="flex items-center justify-center gap-3">
-              <TeamProfileButton />
               <Button variant="contained" size="medium" onClick={logout}>
                 Logout
               </Button>

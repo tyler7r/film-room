@@ -2,6 +2,7 @@ import { Button, colors } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import TeamPageButton from "../team-profile-btn";
 
 type MainMenuProps = {
   size: "small" | "medium" | "large";
@@ -34,20 +35,20 @@ const MainMenu = ({ size }: MainMenuProps) => {
       >
         Film Room
       </Button>
-      <Button
-        variant="text"
-        size={size}
-        onClick={() => handleClick(user.isLoggedIn, "highlight-factory")}
-      >
+      <Button variant="text" size={size} onClick={() => router.push("/login")}>
         Highlight Factory
       </Button>
-      <Button
-        variant="text"
-        size={size}
-        onClick={() => handleClick(user.isLoggedIn, "team-profile")}
-      >
-        Team Profile
-      </Button>
+      {user.isLoggedIn ? (
+        <TeamPageButton />
+      ) : (
+        <Button
+          variant="text"
+          size={size}
+          onClick={() => handleClick(user.isLoggedIn, "team-profile")}
+        >
+          Team Hub
+        </Button>
+      )}
       <Button
         variant="text"
         size={size}
