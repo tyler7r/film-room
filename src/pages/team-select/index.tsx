@@ -82,20 +82,6 @@ const TeamSelect = () => {
           status: "error",
         });
 
-      // Ensure that the user does not already have an affilation with this team
-      const { data } = await supabase
-        .from("affiliations")
-        .select()
-        .match({ team_id: tm, user_id: user.userId });
-
-      if (data) {
-        return setMessage({
-          text: "You already have an affiliation with this team!",
-          status: "error",
-        });
-      }
-
-      // Create an affiliation row for this user and selected team
       const { error } = await supabase
         .from("affiliations")
         .insert({
@@ -110,9 +96,12 @@ const TeamSelect = () => {
           text: `Successfully sent join request to ${teamFind.city} ${teamFind.name}. Team's account owner must approve your request.`,
           status: "success",
         });
+        setTimeout(() => {
+          router.push("/");
+        }, 1000);
       } else {
         setMessage({
-          text: `There was an issue sending your request to ${teamFind.city} ${teamFind.name}. ${error?.message}`,
+          text: `There was an issue sending your request to ${teamFind.city} ${teamFind.name}.`,
           status: "error",
         });
         setIsValidForm(true);
@@ -233,7 +222,7 @@ const TeamSelect = () => {
         <Button
           variant="text"
           size="medium"
-          onClick={() => router.push("/create-team/details")}
+          onClick={() => router.push("/create-team")}
           disabled={!isValidForm}
         >
           Create One

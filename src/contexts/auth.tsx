@@ -22,7 +22,7 @@ export const isAuthContext = createContext<AuthContextProps>({
     isLoggedIn: false,
     userId: undefined,
     email: undefined,
-    currentAffiliation: undefined,
+    name: undefined,
   },
   setUser: () => null,
 });
@@ -32,7 +32,7 @@ export const IsAuth = ({ children }: AuthProps) => {
     isLoggedIn: false,
     userId: undefined,
     email: undefined,
-    currentAffiliation: undefined,
+    name: undefined,
   });
 
   useEffect(() => {
@@ -41,25 +41,28 @@ export const IsAuth = ({ children }: AuthProps) => {
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event: string, session) => {
+      async (event: string, session) => {
         // console.log(event, session);
         if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
           setUser({
             isLoggedIn: true,
             userId: session.user.id,
             email: session.user.email,
+            name: session.user.user_metadata.name as string,
           });
         } else if (event === "INITIAL_SESSION" && session) {
           setUser({
             isLoggedIn: false,
             userId: session.user.id,
             email: session.user.email,
+            name: session.user.user_metadata.name as string,
           });
         } else {
           setUser({
             isLoggedIn: false,
             userId: undefined,
             email: undefined,
+            name: undefined,
           });
         }
       },

@@ -1,12 +1,26 @@
 import { Button, colors } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import TeamPageButton from "../team-profile-btn";
 
 type MainMenuProps = {
   size: "small" | "medium" | "large";
 };
 
 const MainMenu = ({ size }: MainMenuProps) => {
+  const router = useRouter();
   const isDark = useIsDarkContext();
+  const { user } = useAuthContext();
+
+  const handleClick = (isLoggedIn: boolean, path: string) => {
+    if (isLoggedIn) {
+      router.push(`/${path}`);
+    } else {
+      router.push("/login");
+    }
+  };
+
   return (
     <div
       style={{
@@ -14,16 +28,32 @@ const MainMenu = ({ size }: MainMenuProps) => {
       }}
       className={`flex items-center justify-around`}
     >
-      <Button variant="text" size={size}>
+      <Button
+        variant="text"
+        size={size}
+        onClick={() => handleClick(user.isLoggedIn, "film-room")}
+      >
         Film Room
       </Button>
-      <Button variant="text" size={size}>
+      <Button variant="text" size={size} onClick={() => router.push("/login")}>
         Highlight Factory
       </Button>
-      <Button variant="text" size={size}>
-        Team Profile
-      </Button>
-      <Button variant="text" size={size}>
+      {user.isLoggedIn ? (
+        <TeamPageButton />
+      ) : (
+        <Button
+          variant="text"
+          size={size}
+          onClick={() => handleClick(user.isLoggedIn, "team-profile")}
+        >
+          Team Hub
+        </Button>
+      )}
+      <Button
+        variant="text"
+        size={size}
+        onClick={() => handleClick(user.isLoggedIn, "inbox")}
+      >
         Inbox
       </Button>
     </div>

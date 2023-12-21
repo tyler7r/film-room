@@ -43,6 +43,22 @@ const SignupDetails = () => {
     });
   };
 
+  const updateUserData = async () => {
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        name: `${data.name}`,
+      },
+    });
+    if (error) {
+      setMessage({
+        text: `There was an error updating your user data. ${error.message}`,
+        status: "error",
+      });
+      setIsValidForm(true);
+      return "error";
+    } else return true;
+  };
+
   const updateUserName = async () => {
     const { error } = await supabase
       .from("profiles")
@@ -55,7 +71,7 @@ const SignupDetails = () => {
       });
       setIsValidForm(true);
       return "error";
-    }
+    } else return true;
   };
 
   const updatePassword = async () => {
@@ -69,24 +85,24 @@ const SignupDetails = () => {
       });
       setIsValidForm(true);
       return "error";
-    }
+    } else return true;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsValidForm(false);
+
+    const ensureUpdate = await updateUserData();
     const checkValidName = await updateUserName();
     const checkValidPassword = await updatePassword();
 
-    if (checkValidName === "error" || checkValidPassword === "error") {
-      return;
-    } else {
+    if (ensureUpdate && checkValidName && checkValidPassword) {
       setMessage({
         status: "success",
         text: "Successfully updated your profile!",
       });
-      setIsValidForm(false);
       setTimeout(() => {
-        router.push("/signup/team-select");
+        router.push("/team-select");
       }, 1000);
     }
   };

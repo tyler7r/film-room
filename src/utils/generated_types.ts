@@ -11,21 +11,18 @@ export interface Database {
     Tables: {
       affiliations: {
         Row: {
-          id: string
           role: string
           team_id: string
           user_id: string
           verified: boolean
         }
         Insert: {
-          id?: string
           role?: string
           team_id: string
           user_id: string
           verified?: boolean
         }
         Update: {
-          id?: string
           role?: string
           team_id?: string
           user_id?: string
@@ -55,7 +52,6 @@ export interface Database {
           team1_id: string | null
           team2_id: string | null
           tournament: string | null
-          url: string | null
         }
         Insert: {
           id?: string
@@ -63,7 +59,6 @@ export interface Database {
           team1_id?: string | null
           team2_id?: string | null
           tournament?: string | null
-          url?: string | null
         }
         Update: {
           id?: string
@@ -71,7 +66,6 @@ export interface Database {
           team1_id?: string | null
           team2_id?: string | null
           tournament?: string | null
-          url?: string | null
         }
         Relationships: [
           {
@@ -94,31 +88,38 @@ export interface Database {
         Row: {
           author_id: string | null
           game_id: string | null
-          highlight: boolean | null
+          highlight: boolean
           id: string
           keywords: string[] | null
           note: string | null
-          timestamp: string
+          timestamp: string | null
         }
         Insert: {
           author_id?: string | null
           game_id?: string | null
-          highlight?: boolean | null
+          highlight?: boolean
           id?: string
           keywords?: string[] | null
           note?: string | null
-          timestamp: string
+          timestamp?: string | null
         }
         Update: {
           author_id?: string | null
           game_id?: string | null
-          highlight?: boolean | null
+          highlight?: boolean
           id?: string
           keywords?: string[] | null
           note?: string | null
-          timestamp?: string
+          timestamp?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "plays_game_id_fkey"
             columns: ["game_id"]
@@ -130,19 +131,16 @@ export interface Database {
       }
       profiles: {
         Row: {
-          created_at: string | null
           email: string | null
           id: string
           name: string | null
         }
         Insert: {
-          created_at?: string | null
           email?: string | null
           id: string
           name?: string | null
         }
         Update: {
-          created_at?: string | null
           email?: string | null
           id?: string
           name?: string | null
@@ -160,29 +158,29 @@ export interface Database {
       teams: {
         Row: {
           announcements: string[] | null
-          city: string | null
-          division: string | null
+          city: string
+          division: string
           id: string
           logo: string | null
-          name: string | null
+          name: string
           owner: string | null
         }
         Insert: {
           announcements?: string[] | null
-          city?: string | null
-          division?: string | null
+          city: string
+          division: string
           id?: string
           logo?: string | null
-          name?: string | null
+          name: string
           owner?: string | null
         }
         Update: {
           announcements?: string[] | null
-          city?: string | null
-          division?: string | null
+          city?: string
+          division?: string
           id?: string
           logo?: string | null
-          name?: string | null
+          name?: string
           owner?: string | null
         }
         Relationships: [

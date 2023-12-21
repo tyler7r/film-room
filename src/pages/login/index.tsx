@@ -1,4 +1,10 @@
-import { Button, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
@@ -6,67 +12,66 @@ import { validateEmail } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";
 
-const Signup = () => {
+const Login = () => {
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
-    status: "error",
     text: undefined,
+    status: "error",
   });
-  const [email, setEmail] = useState<string>("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
+  const [showPwd, setShowPwd] = useState<boolean>(false);
 
-  // Checks for valid email after every input and updates form message as needed
   useEffect(() => {
-    const isValidEmail = validateEmail(email);
-    if (!isValidEmail) {
-      setMessage({
-        status: "error",
-        text: "Please enter a valid email address!",
-      });
+    const isValidEmail = validateEmail(formData.email);
+    if (!isValidEmail || formData.password === "") {
       setIsValidForm(false);
     } else {
-      setMessage({ status: "error", text: undefined });
       setIsValidForm(true);
     }
-  }, [email]);
+  }, [formData]);
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Create initial random pwd
-    const timestamp = Date.now();
-    const pwd = `${Math.floor(Math.random() * 100000)}${email}${timestamp}`;
+    setIsValidForm(false);
 
-    //Signup in supabase
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: pwd,
-      options: {
-        emailRedirectTo: "http://localhost:3000/signup/details",
-      },
+    const { error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
     });
+
     if (error) {
       setMessage({
+        text: `${error.message}. Try again.`,
         status: "error",
-        text: `There was a problem creating the user. ${error.message}`,
       });
-    } else if (data.user?.identities?.length === 0) {
-      setMessage({
-        status: "error",
-        text: `User already registered with this email!`,
-      });
+      setIsValidForm(true);
     } else {
       setMessage({
+        text: `Logged in!`,
         status: "success",
-        text: "Success. Please verify your email to finish your account creation.",
       });
-      setIsValidForm(false);
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
     }
   };
 
   return (
     <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
       <Typography variant="h1" fontSize={72}>
-        Sign Up
+        Log In
       </Typography>
       <form
         onSubmit={handleSubmit}
@@ -81,10 +86,30 @@ const Signup = () => {
           label="Email"
           type="email"
           autoFocus
-          onInput={(e) => {
-            setEmail((e.target as HTMLInputElement).value);
-          }}
-          value={email}
+          onChange={handleInput}
+          value={formData.email}
+        />
+        <TextField
+          className="w-full"
+          name="password"
+          autoComplete="email"
+          required
+          id="password"
+          label="Password"
+          type={showPwd ? "text" : "password"}
+          onChange={handleInput}
+          value={formData.password}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showPwd}
+              onChange={() => setShowPwd(!showPwd)}
+              size="small"
+            />
+          }
+          labelPlacement="end"
+          label="Show Password?"
         />
         <FormMessage message={message} />
         <Button
@@ -93,21 +118,21 @@ const Signup = () => {
           type="submit"
           disabled={!isValidForm}
         >
-          Signup
+          Login
         </Button>
       </form>
       <div className="mt-2 flex flex-col items-center justify-center gap-2">
-        <div className="">Already have an account?</div>
+        <div className="">Need to make an account?</div>
         <Button
           variant="outlined"
           size="small"
-          onClick={() => router.push("/login")}
+          onClick={() => router.push("/signup")}
         >
-          Login
+          Signup
         </Button>
       </div>
     </div>
   );
 };
 
-export default Signup;
+export default Login;

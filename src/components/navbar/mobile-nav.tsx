@@ -2,15 +2,16 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import { Button, Switch } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
+import { type ChildrenNavProps } from "./navbar";
 
-type MobileNavProps = {
-  switchTheme: () => void;
-};
-
-const MobileNav = ({ switchTheme }: MobileNavProps) => {
+const MobileNav = ({ switchTheme, logout }: ChildrenNavProps) => {
+  const { user } = useAuthContext();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
   return (
@@ -20,14 +21,30 @@ const MobileNav = ({ switchTheme }: MobileNavProps) => {
           <Logo size="small" />
         </div>
         <div className="flex gap-1">
-          <div className="flex items-center justify-center gap-2 px-1 py-4">
-            <Button variant="contained" size="small" href="/signup">
-              Signup
-            </Button>
-            <Button variant="outlined" size="small" href="/login">
-              Login
-            </Button>
-          </div>
+          {user.isLoggedIn ? (
+            <div className="flex items-center justify-center px-1 py-2">
+              <Button variant="contained" size="small" onClick={logout}>
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2 px-1 py-4">
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => router.push("/signup")}
+              >
+                Signup
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => router.push("/login")}
+              >
+                Login
+              </Button>
+            </div>
+          )}
           <div className="flex flex-col items-center justify-center gap-0 p-0">
             <Switch
               className="m-0"
