@@ -2,6 +2,7 @@ export type TeamAffiliationType = {
   id: string;
   name: string;
   city: string;
+  division: string;
   logo: string | null;
 };
 
