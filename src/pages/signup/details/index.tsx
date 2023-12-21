@@ -102,7 +102,7 @@ const SignupDetails = () => {
         text: "Successfully updated your profile!",
       });
       setTimeout(() => {
-        router.push("/signup/team-select");
+        router.push("/team-select");
       }, 1000);
     }
   };

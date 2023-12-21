@@ -1,11 +1,13 @@
+import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Button, Menu, MenuItem, Typography, useTheme } from "@mui/material";
+import { Button, Menu, MenuItem, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 
 const TeamPageButton = () => {
-  const { affiliations, activeAffiliation } = useAffiliatedContext();
-  const theme = useTheme();
+  const { affiliations } = useAffiliatedContext();
+  const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -17,28 +19,6 @@ const TeamPageButton = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  // return (
-  //   activeAffiliation && (
-  //     <div>
-  //       {activeAffiliation.logo ? (
-  //         <img
-  //           className="rounded-full"
-  //           alt="team-logo"
-  //           src={activeAffiliation.logo}
-  //           height={50}
-  //           width={50}
-  //         />
-  //       ) : (
-  // <div>
-  //   {`${activeAffiliation.city.slice(
-  //     0,
-  //     1,
-  //   )} ${activeAffiliation.name.slice(0, 1)}`}
-  // </div>
-  //       )}
-  //     </div>
-  //   )
-  // );
 
   return (
     <div>
@@ -74,6 +54,18 @@ const TeamPageButton = () => {
               >{`${aff.city} ${aff.name}`}</Typography>
             </MenuItem>
           ))}
+          <MenuItem
+            className="flex items-center justify-center gap-2"
+            onClick={() => {
+              handleClose();
+              router.push(`/team-select`);
+            }}
+          >
+            <AddIcon />
+            <Typography variant="overline" fontWeight="bold" fontSize="small">
+              Join a New Team
+            </Typography>
+          </MenuItem>
         </Menu>
       )}
     </div>

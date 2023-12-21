@@ -16,17 +16,11 @@ type AffiliationProps = {
 type AffiliationContextProps = {
   affiliations: TeamAffiliationType[] | undefined;
   setAffiliations: (affiliations: TeamAffiliationType[] | undefined) => void;
-  activeAffiliation: TeamAffiliationType | undefined;
-  setActiveAffiliation: (
-    activeAffiliation: TeamAffiliationType | undefined,
-  ) => void;
 };
 
 export const isAffiliatedContext = createContext<AffiliationContextProps>({
   affiliations: undefined,
   setAffiliations: () => null,
-  activeAffiliation: undefined,
-  setActiveAffiliation: () => null,
 });
 
 export const IsAffiliated = ({ children }: AffiliationProps) => {
@@ -34,10 +28,6 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
 
   const [affiliations, setAffiliations] = useState<
     TeamAffiliationType[] | undefined
-  >(undefined);
-
-  const [activeAffiliation, setActiveAffiliation] = useState<
-    TeamAffiliationType | undefined
   >(undefined);
 
   const fetchAffiliations = async () => {
@@ -50,7 +40,6 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
         (tm) => tm.teams!,
       );
       setAffiliations(typedAffiliations);
-      setActiveAffiliation(typedAffiliations[0]);
     }
   };
 
@@ -82,8 +71,6 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
       value={{
         affiliations,
         setAffiliations,
-        activeAffiliation,
-        setActiveAffiliation,
       }}
     >
       {children}
