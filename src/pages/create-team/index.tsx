@@ -1,4 +1,5 @@
 import ClearIcon from "@mui/icons-material/Clear";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import {
   Button,
@@ -10,6 +11,7 @@ import {
   Typography,
   type SelectChangeEvent,
 } from "@mui/material";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
@@ -37,6 +39,8 @@ const CreateTeam = () => {
     name: "",
     division: "",
   });
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [pubURL, setPubURL] = useState<string | null>(null);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,6 +52,38 @@ const CreateTeam = () => {
 
   const handleChange = (e: SelectChangeEvent) => {
     setDetails({ ...details, division: e.target.value });
+  };
+
+  const handleImage = async (files: FileList | null) => {
+    if (files === null) return;
+    const file = files[0];
+    if (file) {
+      // Create image preview src
+      const url = URL.createObjectURL(file);
+      setImagePreview(url);
+
+      // Upload image to supabase storage and get image's public URL for use as team logo
+      const { data, error } = await supabase.storage
+        .from("team_logos")
+        .upload(
+          `logos/${details.city}-${details.name}-${details.division}.png`,
+          file,
+          {
+            upsert: true,
+          },
+        );
+      if (data) {
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("team_logos").getPublicUrl(data.path);
+        setPubURL(publicUrl);
+      } else {
+        setMessage({
+          text: `There was an error with the image you chose to upload. ${error.message}`,
+          status: "error",
+        });
+      }
+    }
   };
 
   useEffect(() => {
@@ -77,6 +113,7 @@ const CreateTeam = () => {
         name: details.name,
         city: details.city,
         division: details.division,
+        logo: pubURL,
         owner: `${user.userId}`,
       })
       .select("id")
@@ -96,7 +133,7 @@ const CreateTeam = () => {
         .select();
       setMessage({ text: "Team successfully created!", status: "success" });
       setTimeout(() => {
-        router.push("/create-team/logo");
+        router.push("/");
       }, 1000);
     } else {
       setMessage({
@@ -161,6 +198,33 @@ const CreateTeam = () => {
             ))}
           </Select>
         </FormControl>
+        <Button
+          disabled={!isValidForm}
+          component="label"
+          variant="outlined"
+          startIcon={<CloudUploadIcon />}
+        >
+          {imagePreview === "" ? "Upload Logo" : "Change Logo"}
+          <input
+            id="file_upload"
+            type="file"
+            onChange={(e) => {
+              void handleImage((e.target as HTMLInputElement).files);
+            }}
+            style={{ display: "none" }}
+          />
+        </Button>
+        {imagePreview !== "" && (
+          <Image
+            className={`rounded-full border-4 border-solid border-stone-300`}
+            src={imagePreview}
+            alt="Site logo"
+            height={250}
+            width={250}
+            priority={true}
+          />
+        )}
+        <div className="flex flex-col items-center justify-center"></div>
         <FormMessage message={message} />
         <Button
           variant="contained"

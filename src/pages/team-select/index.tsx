@@ -222,7 +222,7 @@ const TeamSelect = () => {
         <Button
           variant="text"
           size="medium"
-          onClick={() => router.push("/create-team/details")}
+          onClick={() => router.push("/create-team")}
           disabled={!isValidForm}
         >
           Create One
