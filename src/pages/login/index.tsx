@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import { validateEmail } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { MessageType } from "~/utils/types";
+import { type MessageType } from "~/utils/types";
 
 const Login = () => {
   const router = useRouter();

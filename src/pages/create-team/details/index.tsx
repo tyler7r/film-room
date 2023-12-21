@@ -25,7 +25,7 @@ type TeamDetailsType = {
 };
 
 const CreateTeam = () => {
-  const { user, setUser } = useAuthContext();
+  const { user } = useAuthContext();
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,

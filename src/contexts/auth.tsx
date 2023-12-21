@@ -48,14 +48,14 @@ export const IsAuth = ({ children }: AuthProps) => {
             isLoggedIn: true,
             userId: session.user.id,
             email: session.user.email,
-            name: session.user.user_metadata.name || undefined,
+            name: session.user.user_metadata.name as string,
           });
         } else if (event === "INITIAL_SESSION" && session) {
           setUser({
             isLoggedIn: false,
             userId: session.user.id,
             email: session.user.email,
-            name: session.user.user_metadata.name || undefined,
+            name: session.user.user_metadata.name as string,
           });
         } else {
           setUser({

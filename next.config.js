@@ -22,6 +22,9 @@ const config = {
       {
         hostname: '"t4.ftcdn.net"',
       },
+      {
+        hostname: "tqyavwqbewvvgoizsipl.supabase.co",
+      },
     ],
   },
 };

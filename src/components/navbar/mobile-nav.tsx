@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
-import { ChildrenNavProps } from "./navbar";
+import { type ChildrenNavProps } from "./navbar";
 
 const MobileNav = ({ switchTheme, logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();

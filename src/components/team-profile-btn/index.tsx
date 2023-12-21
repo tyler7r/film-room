@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Button, Menu, MenuItem, Typography } from "@mui/material";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAffiliatedContext } from "~/contexts/affiliations";
@@ -33,7 +34,8 @@ const TeamPageButton = () => {
               className="flex items-center justify-center gap-2"
             >
               {aff.logo ? (
-                <img
+                <Image
+                  alt="team-logo"
                   src={aff.logo}
                   height={35}
                   width={35}

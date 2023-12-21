@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { supabase } from "~/utils/supabase";
-import { TeamAffiliationType } from "~/utils/types";
+import { type TeamAffiliationType } from "~/utils/types";
 import { useAuthContext } from "./auth";
 
 type AffiliationProps = {
