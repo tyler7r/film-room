@@ -2,8 +2,6 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { Button, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
@@ -11,12 +9,7 @@ import { type ChildrenNavProps } from "./navbar";
 
 const DesktopNav = ({ switchTheme, logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
   const router = useRouter();
-
-  useEffect(() => {
-    console.log(affiliations);
-  }, [affiliations]);
 
   return (
     <div className="flex flex-col">

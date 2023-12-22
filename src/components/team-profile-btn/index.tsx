@@ -32,6 +32,10 @@ const TeamPageButton = () => {
             <MenuItem
               key={aff.id}
               className="flex items-center justify-center gap-2"
+              onClick={() => {
+                handleClose();
+                router.push(`/team-hub/${aff.id}`);
+              }}
             >
               {aff.logo ? (
                 <Image
