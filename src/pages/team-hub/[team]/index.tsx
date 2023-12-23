@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Announcement from "~/components/announcement";
+import Requests from "~/components/requests";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 
@@ -133,13 +134,16 @@ const TeamHub = () => {
         {modalStatus.announcement && (
           <Announcement team={team} toggleOpen={handleModalToggle} />
         )}
+        {modalStatus.requests && (
+          <Requests toggleOpen={handleModalToggle} team={team} />
+        )}
         <div>
           <Typography variant="h2" fontSize={42}>
             Roster
           </Typography>
           {roster?.map((p) => (
             <div key={p.id}>
-              {p.name} #{p.num}
+              {p.name} {p.num}
             </div>
           ))}
         </div>
