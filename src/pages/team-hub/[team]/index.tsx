@@ -3,10 +3,11 @@ import { Button, Typography } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Announcement from "~/components/announcement";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 
-type TeamHubType = {
+export type TeamHubType = {
   city: string;
   division: string;
   id: string;
@@ -15,13 +16,24 @@ type TeamHubType = {
   owner: string | null;
 } | null;
 
+type RosterType = {
+  id: string;
+  name: string;
+  num: number | null;
+}[];
+
 const TeamHub = () => {
   const router = useRouter();
   const { user } = useAuthContext();
   const [loading, setLoading] = useState<boolean>(true);
   const [team, setTeam] = useState<TeamHubType | undefined>(undefined);
   const [role, setRole] = useState<string>("");
-  const [roster, setRoster] = useState<string[] | undefined>(undefined);
+  const [roster, setRoster] = useState<RosterType | undefined>(undefined);
+  const [modalStatus, setModalStatus] = useState({
+    roster: false,
+    announcement: false,
+    requests: false,
+  });
 
   const fetchTeam = async () => {
     const { data } = await supabase
@@ -39,15 +51,27 @@ const TeamHub = () => {
   const fetchRoster = async () => {
     const { data } = await supabase
       .from("affiliations")
-      .select("profiles(name)")
+      .select("number, user_id, profiles(name)")
       .match({
         team_id: `${router.query.team}`,
+        role: "player",
         verified: true,
-      })
-      .neq("role", "coach");
+      });
     if (data) {
-      const ros: string[] = data.map((player) => player.profiles?.name!);
-      setRoster(ros);
+      const r = data.map((p) => {
+        return { id: p.user_id, name: p.profiles?.name!, num: p.number };
+      });
+      setRoster(r);
+    }
+  };
+
+  const handleModalToggle = (modal: string, open: boolean) => {
+    if (modal === "roster") {
+      setModalStatus({ roster: open, announcement: false, requests: false });
+    } else if (modal === "announcement") {
+      setModalStatus({ roster: false, announcement: open, requests: false });
+    } else {
+      setModalStatus({ roster: false, announcement: false, requests: open });
     }
   };
 
@@ -82,16 +106,42 @@ const TeamHub = () => {
         )}
         {(role === "owner" || role === "coach") && (
           <div>
-            <Button>Edit Roster</Button>
-            <Button>Send Announcement</Button>
-            <Button>Handle Requests</Button>
+            <Button
+              variant={modalStatus.roster ? "outlined" : "text"}
+              onClick={() => handleModalToggle("roster", !modalStatus.roster)}
+            >
+              Edit Roster
+            </Button>
+            <Button
+              variant={modalStatus.announcement ? "outlined" : "text"}
+              onClick={() =>
+                handleModalToggle("announcement", !modalStatus.announcement)
+              }
+            >
+              Send Announcement
+            </Button>
+            <Button
+              variant={modalStatus.requests ? "outlined" : "text"}
+              onClick={() =>
+                handleModalToggle("requests", !modalStatus.requests)
+              }
+            >
+              Handle Requests
+            </Button>
           </div>
+        )}
+        {modalStatus.announcement && (
+          <Announcement team={team} toggleOpen={handleModalToggle} />
         )}
         <div>
           <Typography variant="h2" fontSize={42}>
             Roster
           </Typography>
-          {roster?.map((p) => <div key={p}>{p}</div>)}
+          {roster?.map((p) => (
+            <div key={p.id}>
+              {p.name} #{p.num}
+            </div>
+          ))}
         </div>
         <div>
           <Typography variant="h2" fontSize={42}>
