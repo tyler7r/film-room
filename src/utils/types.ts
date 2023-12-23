@@ -14,7 +14,6 @@ export type UserSession = {
 };
 
 export type TeamType = {
-  announcements: string[] | null;
   city: string | null;
   division: string | null;
   id: string;

@@ -1,6 +1,8 @@
 import {
   Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -14,6 +16,11 @@ import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { type MessageType, type TeamType } from "~/utils/types";
 
+type TeamSelectType = {
+  id: string;
+  isCoach: boolean;
+};
+
 const TeamSelect = () => {
   const { user } = useAuthContext();
   const router = useRouter();
@@ -23,10 +30,16 @@ const TeamSelect = () => {
     status: "error",
   });
   const [teams, setTeams] = useState<TeamType[] | null>(null);
-  const [team, setTeam] = useState<string>("");
+  const [team, setTeam] = useState<TeamSelectType>({
+    id: "",
+    isCoach: false,
+  });
   const [isValidForm, setIsValidForm] = useState<boolean>(true);
   const [isMultipleTeams, setIsMultipleTeams] = useState<boolean>(false);
-  const [team2, setTeam2] = useState<string>("");
+  const [team2, setTeam2] = useState<TeamSelectType>({
+    id: "",
+    isCoach: false,
+  });
 
   const fetchTeams = async () => {
     const { data } = await supabase.from("teams").select();
@@ -36,12 +49,12 @@ const TeamSelect = () => {
 
   const handleChange = (e: SelectChangeEvent, t: number) => {
     if (t === 1) {
-      setTeam(e.target.value);
+      setTeam({ ...team, id: e.target.value });
       if (e.target.value === "") {
-        setTeam2("");
+        setTeam2({ id: "", isCoach: false });
       }
     } else {
-      setTeam2(e.target.value);
+      setTeam2({ ...team2, id: e.target.value });
     }
   };
 
@@ -67,14 +80,14 @@ const TeamSelect = () => {
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
-    tm: string,
+    tm: TeamSelectType,
   ) => {
     e.preventDefault();
     setIsValidForm(false);
 
-    if (tm !== "") {
+    if (tm.id !== "") {
       // Ensuring that only one team is selected join
-      const teamFind = teams?.find((t) => t.id === tm);
+      const teamFind = teams?.find((t) => t.id === tm.id);
       // Error boundary in case team data is not pulled initially somehow
       if (!teamFind)
         return setMessage({
@@ -85,8 +98,9 @@ const TeamSelect = () => {
       const { error } = await supabase
         .from("affiliations")
         .insert({
-          team_id: tm,
+          team_id: tm.id,
           user_id: `${user.userId}`,
+          role: `${tm.isCoach ? "coach" : "player"}`,
         })
         .select()
         .single();
@@ -129,19 +143,36 @@ const TeamSelect = () => {
             native={false}
             label="team-select"
             labelId="Team-Select"
-            value={team}
+            value={team.id}
             onChange={(e) => handleChange(e, 1)}
             className="w-full text-start"
           >
             <MenuItem value={""}>None</MenuItem>
             {teams
-              .filter((t) => t.id !== team2)
+              .filter((t) => t.id !== team2.id)
               .map((team) => (
                 <MenuItem value={team.id} key={team.id}>
                   {team.city} {team.name}
                 </MenuItem>
               ))}
           </Select>
+          {team.id && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={team.isCoach}
+                  onChange={() => setTeam({ ...team, isCoach: !team.isCoach })}
+                  size="small"
+                />
+              }
+              labelPlacement="start"
+              label={
+                <Typography fontSize={12} variant="button">
+                  Are you a coach?
+                </Typography>
+              }
+            />
+          )}
         </FormControl>
         {isMultipleTeams && team && (
           <FormControl className="g-4 flex w-full flex-col">
@@ -150,22 +181,41 @@ const TeamSelect = () => {
               native={false}
               label="team-2-select"
               labelId="Team-2-Select"
-              value={team2}
+              value={team2.id}
               onChange={(e) => handleChange(e, 2)}
               className="w-full text-start"
             >
               <MenuItem value={""}>None</MenuItem>
               {teams
-                .filter((t) => t.id !== team)
+                .filter((t) => t.id !== team.id)
                 .map((tm) => (
                   <MenuItem value={tm.id} key={tm.id}>
                     {tm.city} {tm.name}
                   </MenuItem>
                 ))}
             </Select>
+            {team2.id && (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={team2.isCoach}
+                    onChange={() =>
+                      setTeam2({ ...team2, isCoach: !team2.isCoach })
+                    }
+                    size="small"
+                  />
+                }
+                labelPlacement="start"
+                label={
+                  <Typography fontSize={12} variant="button">
+                    Are you a coach?
+                  </Typography>
+                }
+              />
+            )}
           </FormControl>
         )}
-        {team === "" ? (
+        {team.id === "" ? (
           <Button
             type="button"
             variant="contained"
@@ -205,7 +255,7 @@ const TeamSelect = () => {
                 disabled={!isValidForm}
                 onClick={() => {
                   setIsMultipleTeams(false);
-                  setTeam2("");
+                  setTeam2({ id: "", isCoach: false });
                 }}
               >
                 Remove second team

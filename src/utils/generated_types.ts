@@ -11,18 +11,21 @@ export interface Database {
     Tables: {
       affiliations: {
         Row: {
+          number: number | null
           role: string
           team_id: string
           user_id: string
           verified: boolean
         }
         Insert: {
+          number?: number | null
           role?: string
           team_id: string
           user_id: string
           verified?: boolean
         }
         Update: {
+          number?: number | null
           role?: string
           team_id?: string
           user_id?: string
@@ -41,6 +44,35 @@ export interface Database {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      announcements: {
+        Row: {
+          created_at: string
+          id: string
+          team_id: string | null
+          text: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          team_id?: string | null
+          text: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          team_id?: string | null
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcements_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           }
         ]
@@ -157,7 +189,6 @@ export interface Database {
       }
       teams: {
         Row: {
-          announcements: string[] | null
           city: string
           division: string
           id: string
@@ -166,7 +197,6 @@ export interface Database {
           owner: string | null
         }
         Insert: {
-          announcements?: string[] | null
           city: string
           division: string
           id?: string
@@ -175,7 +205,6 @@ export interface Database {
           owner?: string | null
         }
         Update: {
-          announcements?: string[] | null
           city?: string
           division?: string
           id?: string
