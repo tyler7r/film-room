@@ -1,4 +1,4 @@
-import { Button, Typography, colors } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -6,7 +6,6 @@ import { TeamHubType } from "~/utils/types";
 
 type RequestsProps = {
   team: TeamHubType;
-  toggleOpen: (modal: string, open: boolean) => void;
 };
 
 type RequestType = {
@@ -18,8 +17,8 @@ type RequestType = {
   } | null;
 };
 
-const Requests = ({ team, toggleOpen }: RequestsProps) => {
-  const { isDark } = useIsDarkContext();
+const Requests = ({ team }: RequestsProps) => {
+  const { backgroundStyle } = useIsDarkContext();
   const [requests, setRequests] = useState<RequestType[] | undefined>(
     undefined,
   );
@@ -65,9 +64,7 @@ const Requests = ({ team, toggleOpen }: RequestsProps) => {
         <Typography
           variant="button"
           fontSize={14}
-          style={{
-            backgroundColor: `${isDark ? colors.grey[900] : colors.grey[100]}`,
-          }}
+          style={backgroundStyle}
           className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
         >
           No Join Requests
@@ -77,11 +74,7 @@ const Requests = ({ team, toggleOpen }: RequestsProps) => {
         requests.map((req) => (
           <div
             key={req.user_id}
-            style={{
-              backgroundColor: `${
-                isDark ? colors.grey[900] : colors.grey[100]
-              }`,
-            }}
+            style={backgroundStyle}
             className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
           >
             <div>

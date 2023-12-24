@@ -1,5 +1,5 @@
 import CheckIcon from "@mui/icons-material/Check";
-import { Button, TextField, Typography, colors } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -19,16 +19,13 @@ export type RosterType = {
 };
 
 const Roster = ({ team, role }: RosterProps) => {
-  const { isDark } = useIsDarkContext();
+  const { backgroundStyle } = useIsDarkContext();
   const [roster, setRoster] = useState<RosterType[] | undefined>(undefined);
   const [edit, setEdit] = useState<RosterType>({
     id: "",
     num: null,
   });
   const [isValidNumber, setIsValidNumber] = useState(false);
-  const backgroundStyle = {
-    backgroundColor: `${isDark ? colors.grey[900] : colors.grey[100]}`,
-  };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -116,11 +113,7 @@ const Roster = ({ team, role }: RosterProps) => {
             edit?.id !== p.id ? (
               <div
                 key={p.id}
-                style={{
-                  backgroundColor: `${
-                    isDark ? colors.grey[900] : colors.grey[100]
-                  }`,
-                }}
+                style={backgroundStyle}
                 className="flex items-center justify-center gap-2 rounded-lg px-2"
               >
                 <Player player={p} />
@@ -135,11 +128,7 @@ const Roster = ({ team, role }: RosterProps) => {
               <div
                 key={p.id}
                 className="flex items-center justify-center gap-4 rounded-lg p-2"
-                style={{
-                  backgroundColor: `${
-                    isDark ? colors.grey[900] : colors.grey[100]
-                  }`,
-                }}
+                style={backgroundStyle}
               >
                 <Typography>{p.name}</Typography>
                 <form onSubmit={handleSubmit}>

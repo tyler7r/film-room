@@ -1,4 +1,4 @@
-import { Typography, colors } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
 import { RosterType } from "../roster";
 
@@ -7,13 +7,11 @@ type PlayerProps = {
 };
 
 const Player = ({ player }: PlayerProps) => {
-  const { isDark } = useIsDarkContext();
+  const { backgroundStyle } = useIsDarkContext();
   return (
     <div
       key={player.id}
-      style={{
-        backgroundColor: `${isDark ? colors.grey[900] : colors.grey[100]}`,
-      }}
+      style={backgroundStyle}
       className="flex items-center justify-around gap-2 rounded-lg p-2"
     >
       <Typography fontSize={18}>{player.name}</Typography>
