@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import { TeamHubType } from "~/utils/types";
+import Player from "../player";
 
 type RosterProps = {
   team: TeamHubType;
@@ -11,7 +12,7 @@ type RosterProps = {
   role: string;
 };
 
-type RosterType = {
+export type RosterType = {
   id: string;
   name?: string;
   num: number | null;
@@ -93,20 +94,7 @@ const Roster = ({ team, role }: RosterProps) => {
         Roster
       </Typography>
       {role === "player" &&
-        roster?.map((p) => (
-          <div
-            key={p.id}
-            style={{
-              backgroundColor: `${
-                isDark ? colors.grey[900] : colors.grey[100]
-              }`,
-            }}
-            className="flex items-center justify-around gap-2 rounded-lg p-2"
-          >
-            <Typography fontSize={18}>{p.name}</Typography>
-            {p.num && <Typography variant="overline">#{p.num}</Typography>}
-          </div>
-        ))}
+        roster?.map((p) => <Player key={p.id} player={p} />)}
       {role !== "player" &&
         roster?.map((p) =>
           edit?.id !== p.id ? (
@@ -117,20 +105,9 @@ const Roster = ({ team, role }: RosterProps) => {
                   isDark ? colors.grey[900] : colors.grey[100]
                 }`,
               }}
-              className="flex w-4/5 items-center justify-around gap-2 rounded-lg"
+              className="flex items-center justify-center gap-2 rounded-lg px-2"
             >
-              <div className="flex items-center gap-2">
-                <Typography fontSize={18}>{p.name}</Typography>
-                {p.num && (
-                  <Typography
-                    variant="overline"
-                    fontSize={14}
-                    fontWeight="bold"
-                  >
-                    #{p.num}
-                  </Typography>
-                )}
-              </div>
+              <Player player={p} />
               <div className="flex">
                 <Button size="small" onClick={() => setEdit(p)}>
                   Edit
