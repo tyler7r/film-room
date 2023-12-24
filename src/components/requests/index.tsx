@@ -30,7 +30,6 @@ const Requests = ({ team, toggleOpen }: RequestsProps) => {
       .select("role, number, user_id, profiles(name)")
       .match({ team_id: team?.id, verified: false });
     if (data && data.length > 0) {
-      console.log(data);
       setRequests(data);
     } else setRequests(undefined);
   };

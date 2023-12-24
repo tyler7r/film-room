@@ -3,7 +3,9 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import {
   Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -24,6 +26,7 @@ type TeamDetailsType = {
   city: string;
   name: string;
   division: (typeof divisions)[number];
+  isCoach: boolean;
 };
 
 const CreateTeam = () => {
@@ -38,6 +41,7 @@ const CreateTeam = () => {
     city: "",
     name: "",
     division: "",
+    isCoach: false,
   });
   const [imagePreview, setImagePreview] = useState<string>("");
   const [pubURL, setPubURL] = useState<string | null>(null);
@@ -128,7 +132,7 @@ const CreateTeam = () => {
           team_id: `${data.id}`,
           user_id: `${user.userId}`,
           verified: true,
-          role: "owner",
+          role: `${details.isCoach ? "coach" : "player"}`,
         })
         .select();
       setMessage({ text: "Team successfully created!", status: "success" });
@@ -198,6 +202,23 @@ const CreateTeam = () => {
             ))}
           </Select>
         </FormControl>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={details.isCoach}
+              onChange={() =>
+                setDetails({ ...details, isCoach: !details.isCoach })
+              }
+              size="small"
+            />
+          }
+          labelPlacement="start"
+          label={
+            <Typography fontSize={12} variant="button">
+              Are you a coach?
+            </Typography>
+          }
+        />
         <Button
           disabled={!isValidForm}
           component="label"

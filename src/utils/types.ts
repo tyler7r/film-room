@@ -26,3 +26,12 @@ export type MessageType = {
   text: string | undefined;
   status: "error" | "success";
 };
+
+export type TeamHubType = {
+  city: string;
+  division: string;
+  id: string;
+  logo: string | null;
+  name: string;
+  owner: string | null;
+} | null;
