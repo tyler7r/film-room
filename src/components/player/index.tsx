@@ -7,7 +7,7 @@ type PlayerProps = {
 };
 
 const Player = ({ player }: PlayerProps) => {
-  const isDark = useIsDarkContext();
+  const { isDark } = useIsDarkContext();
   return (
     <div
       key={player.id}

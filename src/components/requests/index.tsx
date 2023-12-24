@@ -1,8 +1,8 @@
 import { Button, Typography, colors } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
-import { TeamHubType } from "~/pages/team-hub/[team]";
 import { supabase } from "~/utils/supabase";
+import { TeamHubType } from "~/utils/types";
 
 type RequestsProps = {
   team: TeamHubType;
@@ -19,7 +19,7 @@ type RequestType = {
 };
 
 const Requests = ({ team, toggleOpen }: RequestsProps) => {
-  const isDark = useIsDarkContext();
+  const { isDark } = useIsDarkContext();
   const [requests, setRequests] = useState<RequestType[] | undefined>(
     undefined,
   );

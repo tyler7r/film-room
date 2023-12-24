@@ -5,12 +5,14 @@ import { Button, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 import { type ChildrenNavProps } from "./navbar";
 
-const MobileNav = ({ switchTheme, logout }: ChildrenNavProps) => {
+const MobileNav = ({ logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
+  const { isDark, setIsDark } = useIsDarkContext();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
@@ -49,7 +51,7 @@ const MobileNav = ({ switchTheme, logout }: ChildrenNavProps) => {
             <Switch
               className="m-0"
               icon={<LightModeIcon color="primary" fontSize="small" />}
-              onChange={switchTheme}
+              onChange={() => setIsDark(!isDark)}
               checkedIcon={<DarkModeIcon fontSize="small" />}
             />
             <div

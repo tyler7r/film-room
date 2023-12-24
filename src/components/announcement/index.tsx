@@ -1,8 +1,7 @@
 import { Button, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
-import { TeamHubType } from "~/pages/team-hub/[team]";
 import { supabase } from "~/utils/supabase";
-import { MessageType } from "~/utils/types";
+import { MessageType, TeamHubType } from "~/utils/types";
 import FormMessage from "../form-message";
 
 type AnnouncementProps = {

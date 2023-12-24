@@ -82,23 +82,30 @@ const TeamHub = ({
     </Typography>
   ) : (
     team && (
-      <div className="mx-2 flex flex-col items-center justify-center">
-        <div className="m-2 flex items-center justify-center gap-2">
-          {team.logo && (
+      <div className="mx-2 my-4 flex flex-col items-center justify-center gap-4">
+        <div className="m-2 flex items-center justify-center gap-5">
+          {team.logo ? (
             <Image
               src={team.logo!}
               className="rounded-full"
               alt="team-logo"
-              height={80}
-              width={80}
+              height={150}
+              width={150}
             />
+          ) : (
+            <Typography
+              variant="caption"
+              fontSize={72}
+              fontWeight="bold"
+              className="rounded-full bg-fuchsia-500 p-3 text-white"
+            >{`${team.city.slice(0, 1)}${team.name.slice(0, 1)}`}</Typography>
           )}
           <Typography variant="h1" fontSize={64} className="text-center">
             {team.city} {team.name}
           </Typography>
         </div>
         {role !== "player" && (
-          <div>
+          <div className="flex w-full justify-center gap-4">
             <Button
               variant={modalStatus.announcement ? "outlined" : "text"}
               onClick={() =>

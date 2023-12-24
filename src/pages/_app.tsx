@@ -14,23 +14,27 @@ import { IsMobile } from "~/contexts/mobile";
 import { darkTheme, lightTheme } from "~/contexts/theme";
 import "~/styles/globals.css";
 
-export const IsDarkContext = createContext<boolean>(false);
+type isDarkContextType = {
+  isDark: boolean;
+  setIsDark: (isDark: boolean) => void;
+};
+
+export const IsDarkContext = createContext<isDarkContextType>({
+  isDark: false,
+  setIsDark: () => null,
+});
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const [isDark, setIsDark] = useState<boolean>(false);
 
-  const switchTheme = () => {
-    setIsDark(!isDark);
-  };
-
   return (
     <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
-      <IsDarkContext.Provider value={isDark}>
+      <IsDarkContext.Provider value={{ isDark, setIsDark }}>
         <CssBaseline />
         <IsAuth>
           <IsMobile>
             <IsAffiliated>
-              <Navbar switchTheme={switchTheme} />
+              <Navbar />
               <Component {...pageProps} />
             </IsAffiliated>
           </IsMobile>
