@@ -1,4 +1,3 @@
-import SettingsIcon from "@mui/icons-material/Settings";
 import { Button, Typography } from "@mui/material";
 import {
   GetServerSideProps,
@@ -100,9 +99,14 @@ const TeamHub = ({
               className="rounded-full bg-fuchsia-500 p-3 text-white"
             >{`${team.city.slice(0, 1)}${team.name.slice(0, 1)}`}</Typography>
           )}
-          <Typography variant="h1" fontSize={64} className="text-center">
-            {team.city} {team.name}
-          </Typography>
+          <div className="flex flex-col items-center justify-center gap-2 text-center">
+            <Typography variant="h1" fontSize={64}>
+              {team.city} {team.name}
+            </Typography>
+            <Typography variant="caption" fontWeight="bold" fontSize={18}>
+              Division: {team.division}
+            </Typography>
+          </div>
         </div>
         {role !== "player" && (
           <div className="flex w-full justify-center gap-4">
@@ -125,10 +129,7 @@ const TeamHub = ({
             {isOwner && (
               <Button
                 size="small"
-                endIcon={<SettingsIcon />}
-                onClick={() =>
-                  handleModalToggle("settings", !modalStatus.settings)
-                }
+                onClick={() => router.push(`/team-settings/${team.id}`)}
               >
                 Team Settings
               </Button>
@@ -138,10 +139,8 @@ const TeamHub = ({
         {modalStatus.announcement && (
           <Announcement team={team} toggleOpen={handleModalToggle} />
         )}
-        {modalStatus.requests && (
-          <Requests toggleOpen={handleModalToggle} team={team} />
-        )}
-        <Roster team={team} toggleOpen={handleModalToggle} role={role} />
+        {modalStatus.requests && <Requests team={team} />}
+        <Roster team={team} role={role} />
         <div>
           <Typography variant="h2" fontSize={42}>
             Recent Games

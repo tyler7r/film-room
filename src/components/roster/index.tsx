@@ -8,7 +8,6 @@ import Player from "../player";
 
 type RosterProps = {
   team: TeamHubType;
-  toggleOpen: (modal: string, open: boolean) => void;
   role: string;
 };
 
