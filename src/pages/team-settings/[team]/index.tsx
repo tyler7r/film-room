@@ -3,9 +3,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import {
   Button,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -13,59 +11,60 @@ import {
   Typography,
   type SelectChangeEvent,
 } from "@mui/material";
+import {
+  type GetServerSideProps,
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+} from "next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { v4 } from "uuid";
 import FormMessage from "~/components/form-message";
-import { useAuthContext } from "~/contexts/auth";
 import { divisions } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { type MessageType } from "~/utils/types";
+import { type MessageType, type TeamHubType } from "~/utils/types";
 
-type TeamDetailsType = {
-  city: string;
-  name: string;
-  division: (typeof divisions)[number];
-  isCoach: boolean;
-  id: string;
-};
+export const getServerSideProps = (async (
+  context: GetServerSidePropsContext,
+) => {
+  const teamData = await supabase
+    .from("teams")
+    .select()
+    .eq("id", context.query.team as string)
+    .single();
+  const team: TeamHubType = teamData.data;
+  return { props: { team } };
+}) satisfies GetServerSideProps<{ team: TeamHubType }>;
 
-const CreateTeam = () => {
-  const { user } = useAuthContext();
+const TeamSettings = ({
+  team,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-  const genID = v4();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
     status: "error",
   });
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
-  const [details, setDetails] = useState<TeamDetailsType>({
-    city: "",
-    name: "",
-    division: "",
-    id: genID,
-    isCoach: false,
-  });
-  const [imagePreview, setImagePreview] = useState<string>("");
-  const [pubURL, setPubURL] = useState<string | null>(null);
+  const [details, setDetails] = useState<TeamHubType | undefined>(team);
+  const [imagePreview, setImagePreview] = useState<string>(team?.logo ?? "");
+  const [pubURL, setPubURL] = useState<string | null>(team?.logo ?? null);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setDetails({
-      ...details,
+      ...details!,
       [name]: value,
     });
   };
 
   const handleChange = (e: SelectChangeEvent) => {
-    setDetails({ ...details, division: e.target.value });
+    setDetails({ ...details!, division: e.target.value });
   };
 
   const handleImage = async (files: FileList | null) => {
     if (files === null) return;
     const file = files[0];
-    if (file) {
+    if (file && details) {
       // Create image preview src
       const url = URL.createObjectURL(file);
       setImagePreview(url);
@@ -81,6 +80,10 @@ const CreateTeam = () => {
           data: { publicUrl },
         } = supabase.storage.from("team_logos").getPublicUrl(data.path);
         setPubURL(publicUrl);
+        await supabase
+          .from("teams")
+          .update({ logo: null })
+          .eq("id", `${details.id}`);
       } else {
         setMessage({
           text: `There was an error with the image you chose to upload. ${error.message}`,
@@ -91,19 +94,23 @@ const CreateTeam = () => {
   };
 
   useEffect(() => {
-    if (details.city === "") {
-      setMessage({ text: "Please enter a valid city!", status: "error" });
-      setIsValidForm(false);
-    } else if (details.name === "") {
-      setMessage({ text: "Please enter a valid team name!", status: "error" });
-      setIsValidForm(false);
-    } else if (details.division === "") {
-      setMessage({ text: "Please set your team division!", status: "error" });
-      setIsValidForm(false);
-    } else {
-      setMessage({ text: undefined, status: "error" });
-      setIsValidForm(true);
-    }
+    if (details)
+      if (details.city === "") {
+        setMessage({ text: "Please enter a valid city!", status: "error" });
+        setIsValidForm(false);
+      } else if (details.name === "") {
+        setMessage({
+          text: "Please enter a valid team name!",
+          status: "error",
+        });
+        setIsValidForm(false);
+      } else if (details.division === "") {
+        setMessage({ text: "Please set your team division!", status: "error" });
+        setIsValidForm(false);
+      } else {
+        setMessage({ text: undefined, status: "error" });
+        setIsValidForm(true);
+      }
   }, [details]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -111,41 +118,33 @@ const CreateTeam = () => {
     setIsValidForm(false);
 
     // Create team with details
-    const { data, error } = await supabase
-      .from("teams")
-      .insert({
-        id: details.id,
-        name: details.name,
-        city: details.city,
-        division: details.division,
-        logo: pubURL,
-        owner: `${user.userId}`,
-      })
-      .select("id")
-      .single();
-
-    // When successfully created, create an owner affiliation of the team for the user
-    if (data) {
-      // Set team id to newly created teams' id
-      await supabase
-        .from("affiliations")
-        .insert({
-          team_id: `${details.id}`,
-          user_id: `${user.userId}`,
-          verified: true,
-          role: `${details.isCoach ? "coach" : "player"}`,
+    if (details) {
+      const { data, error } = await supabase
+        .from("teams")
+        .update({
+          logo: pubURL,
+          name: details.name,
+          city: details.city,
+          division: details.division,
         })
-        .select();
-      setMessage({ text: "Team successfully created!", status: "success" });
-      setTimeout(() => {
-        router.push("/");
-      }, 1000);
-    } else {
-      setMessage({
-        text: `There was a problem creating the team account. ${error.message}`,
-        status: "error",
-      });
-      setIsValidForm(true);
+        .eq("id", `${details.id}`)
+        .select()
+        .single();
+      if (data) {
+        setMessage({
+          text: "Successfully updated team details!",
+          status: "success",
+        });
+        setTimeout(() => {
+          router.push(`/team-hub/${team?.id}`);
+        }, 1000);
+      } else {
+        setMessage({
+          text: `There was an error updating the team details. ${error.message}`,
+          status: "error",
+        });
+        setIsValidForm(true);
+      }
     }
   };
 
@@ -153,10 +152,7 @@ const CreateTeam = () => {
     <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
       <div className="flex flex-col">
         <Typography variant="h1" fontSize={64}>
-          Create Team
-        </Typography>
-        <Typography variant="caption" fontWeight="bold" color="primary">
-          * You will be the team's account owner *
+          Team Settings
         </Typography>
       </div>
       <form
@@ -173,7 +169,7 @@ const CreateTeam = () => {
           type="text"
           autoFocus
           onChange={handleInput}
-          value={details.city}
+          value={details?.city}
         />
         <TextField
           className="w-full"
@@ -183,7 +179,7 @@ const CreateTeam = () => {
           id="name"
           label="Name"
           onChange={handleInput}
-          value={details.name}
+          value={details?.name}
         />
         <FormControl className="g-4 flex w-full flex-col">
           <InputLabel>Team Division</InputLabel>
@@ -191,7 +187,7 @@ const CreateTeam = () => {
             native={false}
             label="team-division"
             labelId="Team-Division"
-            value={details.division}
+            value={details?.division}
             onChange={handleChange}
             className="w-full text-start"
           >
@@ -203,23 +199,6 @@ const CreateTeam = () => {
             ))}
           </Select>
         </FormControl>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={details.isCoach}
-              onChange={() =>
-                setDetails({ ...details, isCoach: !details.isCoach })
-              }
-              size="small"
-            />
-          }
-          labelPlacement="start"
-          label={
-            <Typography fontSize={12} variant="button">
-              Are you a coach?
-            </Typography>
-          }
-        />
         <Button
           disabled={!isValidForm}
           component="label"
@@ -271,4 +250,4 @@ const CreateTeam = () => {
   );
 };
 
-export default CreateTeam;
+export default TeamSettings;

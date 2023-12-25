@@ -9,7 +9,7 @@ type FormMessageType = {
 const FormMessage = ({ message }: FormMessageType) => {
   const { text, status } = message;
   const theme = useTheme();
-  const isDark = useIsDarkContext();
+  const { isDark } = useIsDarkContext();
 
   const errorStyle = {
     border: `1px solid ${

@@ -5,15 +5,15 @@ import DesktopNav from "./desktop-nav";
 import MobileNav from "./mobile-nav";
 
 type NavbarProps = {
-  switchTheme: () => void;
+  // switchTheme: () => void;
 };
 
 export type ChildrenNavProps = {
-  switchTheme: () => void;
+  // switchTheme: () => void;
   logout: () => void;
 };
 
-export const Navbar = ({ switchTheme }: NavbarProps) => {
+export const Navbar = ({}: NavbarProps) => {
   const isMobile = useMobileContext();
   const router = useRouter();
 
@@ -23,8 +23,8 @@ export const Navbar = ({ switchTheme }: NavbarProps) => {
   };
 
   return isMobile ? (
-    <MobileNav switchTheme={switchTheme} logout={logout} />
+    <MobileNav logout={logout} />
   ) : (
-    <DesktopNav switchTheme={switchTheme} logout={logout} />
+    <DesktopNav logout={logout} />
   );
 };

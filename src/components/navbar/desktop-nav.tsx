@@ -2,21 +2,16 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { Button, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 import { type ChildrenNavProps } from "./navbar";
 
-const DesktopNav = ({ switchTheme, logout }: ChildrenNavProps) => {
+const DesktopNav = ({ logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
+  const { isDark, setIsDark } = useIsDarkContext();
   const router = useRouter();
-
-  useEffect(() => {
-    console.log(affiliations);
-  }, [affiliations]);
 
   return (
     <div className="flex flex-col">
@@ -51,7 +46,7 @@ const DesktopNav = ({ switchTheme, logout }: ChildrenNavProps) => {
           <Switch
             className="items-center justify-center"
             icon={<LightModeIcon color="primary" fontSize="small" />}
-            onChange={switchTheme}
+            onChange={() => setIsDark(!isDark)}
             checkedIcon={<DarkModeIcon fontSize="small" />}
           />
         </div>

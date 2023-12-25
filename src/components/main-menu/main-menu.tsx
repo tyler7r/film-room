@@ -1,6 +1,4 @@
-import { Button, colors } from "@mui/material";
-import { useRouter } from "next/navigation";
-import { useAuthContext } from "~/contexts/auth";
+import { Button } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
 import TeamPageButton from "../team-profile-btn";
 
@@ -9,51 +7,17 @@ type MainMenuProps = {
 };
 
 const MainMenu = ({ size }: MainMenuProps) => {
-  const router = useRouter();
-  const isDark = useIsDarkContext();
-  const { user } = useAuthContext();
-
-  const handleClick = (isLoggedIn: boolean, path: string) => {
-    if (isLoggedIn) {
-      router.push(`/${path}`);
-    } else {
-      router.push("/login");
-    }
-  };
-
+  const { backgroundStyle } = useIsDarkContext();
   return (
-    <div
-      style={{
-        backgroundColor: `${isDark ? colors.grey[900] : colors.grey[100]}`,
-      }}
-      className={`flex items-center justify-around`}
-    >
-      <Button
-        variant="text"
-        size={size}
-        onClick={() => handleClick(user.isLoggedIn, "film-room")}
-      >
+    <div style={backgroundStyle} className={`flex items-center justify-around`}>
+      <Button variant="text" size={size}>
         Film Room
       </Button>
-      <Button variant="text" size={size} onClick={() => router.push("/login")}>
+      <Button variant="text" size={size}>
         Highlight Factory
       </Button>
-      {user.isLoggedIn ? (
-        <TeamPageButton />
-      ) : (
-        <Button
-          variant="text"
-          size={size}
-          onClick={() => handleClick(user.isLoggedIn, "team-profile")}
-        >
-          Team Hub
-        </Button>
-      )}
-      <Button
-        variant="text"
-        size={size}
-        onClick={() => handleClick(user.isLoggedIn, "inbox")}
-      >
+      <TeamPageButton />
+      <Button variant="text" size={size}>
         Inbox
       </Button>
     </div>

@@ -14,7 +14,6 @@ export type UserSession = {
 };
 
 export type TeamType = {
-  announcements: string[] | null;
   city: string | null;
   division: string | null;
   id: string;
@@ -27,3 +26,12 @@ export type MessageType = {
   text: string | undefined;
   status: "error" | "success";
 };
+
+export type TeamHubType = {
+  city: string;
+  division: string;
+  id: string;
+  logo: string | null;
+  name: string;
+  owner: string | null;
+} | null;
