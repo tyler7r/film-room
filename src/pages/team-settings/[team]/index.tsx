@@ -47,7 +47,7 @@ const TeamSettings = ({
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
   const [details, setDetails] = useState<TeamHubType | undefined>(team);
   const [imagePreview, setImagePreview] = useState<string>(team?.logo!);
-  const [pubURL, setPubURL] = useState<string | null>(team!.logo);
+  const [pubURL, setPubURL] = useState<string | null>(team?.logo!);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,18 +72,18 @@ const TeamSettings = ({
       // Upload image to supabase storage and get image's public URL for use as team logo
       const { data, error } = await supabase.storage
         .from("team_logos")
-        .upload(
-          `logos/${details.city}-${details.name}-${details.division}.png`,
-          file,
-          {
-            upsert: true,
-          },
-        );
+        .upload(`logos/${details.id}.png`, file, {
+          upsert: true,
+        });
       if (data) {
         const {
           data: { publicUrl },
         } = supabase.storage.from("team_logos").getPublicUrl(data.path);
         setPubURL(publicUrl);
+        await supabase
+          .from("teams")
+          .update({ logo: null })
+          .eq("id", `${details.id}`);
       } else {
         setMessage({
           text: `There was an error with the image you chose to upload. ${error.message}`,
@@ -122,12 +122,12 @@ const TeamSettings = ({
       const { data, error } = await supabase
         .from("teams")
         .update({
+          logo: pubURL,
           name: details.name,
           city: details.city,
           division: details.division,
-          logo: pubURL,
         })
-        .eq("id", `${team?.id}`)
+        .eq("id", `${details.id}`)
         .select()
         .single();
       if (data) {

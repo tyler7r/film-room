@@ -108,7 +108,7 @@ const TeamHub = ({
             </Typography>
           </div>
         </div>
-        {role !== "player" && (
+        {(role === "coach" || isOwner) && (
           <div className="flex w-full justify-center gap-4">
             <Button
               variant={modalStatus.announcement ? "outlined" : "text"}

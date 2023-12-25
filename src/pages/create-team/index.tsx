@@ -16,6 +16,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { v4 } from "uuid";
 import FormMessage from "~/components/form-message";
 import { useAuthContext } from "~/contexts/auth";
 import { divisions } from "~/utils/helpers";
@@ -27,11 +28,13 @@ type TeamDetailsType = {
   name: string;
   division: (typeof divisions)[number];
   isCoach: boolean;
+  id: string;
 };
 
 const CreateTeam = () => {
   const { user } = useAuthContext();
   const router = useRouter();
+  const genID = v4();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
     status: "error",
@@ -41,6 +44,7 @@ const CreateTeam = () => {
     city: "",
     name: "",
     division: "",
+    id: genID,
     isCoach: false,
   });
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -69,13 +73,9 @@ const CreateTeam = () => {
       // Upload image to supabase storage and get image's public URL for use as team logo
       const { data, error } = await supabase.storage
         .from("team_logos")
-        .upload(
-          `logos/${details.city}-${details.name}-${details.division}.png`,
-          file,
-          {
-            upsert: true,
-          },
-        );
+        .upload(`logos/${details.id}.png`, file, {
+          upsert: true,
+        });
       if (data) {
         const {
           data: { publicUrl },
@@ -114,6 +114,7 @@ const CreateTeam = () => {
     const { data, error } = await supabase
       .from("teams")
       .insert({
+        id: details.id,
         name: details.name,
         city: details.city,
         division: details.division,
@@ -129,7 +130,7 @@ const CreateTeam = () => {
       await supabase
         .from("affiliations")
         .insert({
-          team_id: `${data.id}`,
+          team_id: `${details.id}`,
           user_id: `${user.userId}`,
           verified: true,
           role: `${details.isCoach ? "coach" : "player"}`,
