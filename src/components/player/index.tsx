@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
-import { RosterType } from "../roster";
+import { type RosterType } from "../roster";
 
 type PlayerProps = {
   player: RosterType;

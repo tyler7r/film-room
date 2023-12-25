@@ -1,7 +1,7 @@
 import { Button, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
-import { MessageType, TeamHubType } from "~/utils/types";
+import { type MessageType, type TeamHubType } from "~/utils/types";
 import FormMessage from "../form-message";
 
 type AnnouncementProps = {
@@ -24,7 +24,7 @@ const Announcement = ({ toggleOpen, team }: AnnouncementProps) => {
 
   const handleAnnouncement = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("announcements")
       .insert({
         team_id: team?.id,

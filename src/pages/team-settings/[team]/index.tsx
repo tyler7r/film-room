@@ -7,14 +7,14 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   TextField,
   Typography,
+  type SelectChangeEvent,
 } from "@mui/material";
 import {
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
+  type GetServerSideProps,
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
 } from "next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import { divisions } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { MessageType, TeamHubType } from "~/utils/types";
+import { type MessageType, type TeamHubType } from "~/utils/types";
 
 export const getServerSideProps = (async (
   context: GetServerSidePropsContext,
@@ -30,7 +30,7 @@ export const getServerSideProps = (async (
   const teamData = await supabase
     .from("teams")
     .select()
-    .eq("id", `${context.query.team}`)
+    .eq("id", context.query.team as string)
     .single();
   const team: TeamHubType = teamData.data;
   return { props: { team } };
@@ -46,8 +46,8 @@ const TeamSettings = ({
   });
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
   const [details, setDetails] = useState<TeamHubType | undefined>(team);
-  const [imagePreview, setImagePreview] = useState<string>(team?.logo!);
-  const [pubURL, setPubURL] = useState<string | null>(team?.logo!);
+  const [imagePreview, setImagePreview] = useState<string>(team?.logo ?? "");
+  const [pubURL, setPubURL] = useState<string | null>(team?.logo ?? null);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

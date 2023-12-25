@@ -2,7 +2,7 @@ import { Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { TeamHubType } from "~/utils/types";
+import { type TeamHubType } from "~/utils/types";
 
 type RequestsProps = {
   team: TeamHubType;
@@ -70,32 +70,31 @@ const Requests = ({ team }: RequestsProps) => {
           No Join Requests
         </Typography>
       )}
-      {requests &&
-        requests.map((req) => (
-          <div
-            key={req.user_id}
-            style={backgroundStyle}
-            className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
-          >
-            <div>
-              {req.profiles?.name} ({req.role})
-            </div>
-            <Button
-              type="button"
-              color="success"
-              onClick={() => handleAccept(req.user_id)}
-            >
-              Accept
-            </Button>
-            <Button
-              type="button"
-              color="error"
-              onClick={() => handleReject(req.user_id)}
-            >
-              Reject
-            </Button>
+      {requests?.map((req) => (
+        <div
+          key={req.user_id}
+          style={backgroundStyle}
+          className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
+        >
+          <div>
+            {req.profiles?.name} ({req.role})
           </div>
-        ))}
+          <Button
+            type="button"
+            color="success"
+            onClick={() => handleAccept(req.user_id)}
+          >
+            Accept
+          </Button>
+          <Button
+            type="button"
+            color="error"
+            onClick={() => handleReject(req.user_id)}
+          >
+            Reject
+          </Button>
+        </div>
+      ))}
     </div>
   );
 };

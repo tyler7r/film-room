@@ -3,7 +3,7 @@ import { Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { TeamHubType } from "~/utils/types";
+import { type TeamHubType } from "~/utils/types";
 import Player from "../player";
 
 type RosterProps = {
@@ -13,7 +13,7 @@ type RosterProps = {
 
 export type RosterType = {
   id: string;
-  name?: string;
+  name?: string | null;
   num: number | null;
 };
 
@@ -41,23 +41,6 @@ const Roster = ({ team, role }: RosterProps) => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { data } = await supabase
-      .from("affiliations")
-      .update({
-        number: edit.num,
-      })
-      .match({ team_id: team?.id, user_id: edit.id })
-      .select();
-    if (data) {
-      fetchRoster();
-      setTimeout(() => {
-        closeEdit();
-      }, 300);
-    }
-  };
-
   const fetchRoster = async () => {
     const { data } = await supabase
       .from("affiliations")
@@ -69,11 +52,28 @@ const Roster = ({ team, role }: RosterProps) => {
       });
     if (data && data.length > 0) {
       const roster: RosterType[] = data?.map((p) => {
-        return { id: p.user_id, name: p.profiles?.name!, num: p.number };
+        return { id: p.user_id, name: p.profiles?.name, num: p.number };
       });
       setRoster(roster);
     } else {
       setRoster(undefined);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { data } = await supabase
+      .from("affiliations")
+      .update({
+        number: edit.num,
+      })
+      .match({ team_id: team?.id, user_id: edit.id })
+      .select();
+    if (data) {
+      void fetchRoster();
+      setTimeout(() => {
+        closeEdit();
+      }, 300);
     }
   };
 
@@ -141,7 +141,7 @@ const Roster = ({ team, role }: RosterProps) => {
                     type="number"
                     autoFocus
                     onChange={handleInput}
-                    value={edit.num === null ? "" : edit.num}
+                    value={edit.num ?? ""}
                   />
                   <Button type="submit" disabled={!isValidNumber}>
                     <CheckIcon />

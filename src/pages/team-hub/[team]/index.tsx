@@ -1,8 +1,8 @@
 import { Button, Typography } from "@mui/material";
 import {
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
+  type GetServerSideProps,
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
 } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -12,16 +12,13 @@ import Requests from "~/components/requests";
 import Roster from "~/components/roster";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { TeamHubType } from "~/utils/types";
+import { type TeamHubType } from "~/utils/types";
 
 export const getServerSideProps = (async (
   context: GetServerSidePropsContext,
 ) => {
-  const teamData = await supabase
-    .from("teams")
-    .select()
-    .eq("id", `${context.query.team}`)
-    .single();
+  const tId = context.query.team as string;
+  const teamData = await supabase.from("teams").select().eq("id", tId).single();
   const team: TeamHubType = teamData.data;
   return { props: { team } };
 }) satisfies GetServerSideProps<{ team: TeamHubType }>;
@@ -44,7 +41,10 @@ const TeamHub = ({
     const { data } = await supabase
       .from("affiliations")
       .select("role")
-      .match({ user_id: `${user.userId}`, team_id: `${router.query.team}` })
+      .match({
+        user_id: `${user.userId}`,
+        team_id: router.query.team as string,
+      })
       .single();
     if (data) {
       setRole(data.role);
@@ -85,7 +85,7 @@ const TeamHub = ({
         <div className="m-2 flex items-center justify-center gap-5">
           {team.logo ? (
             <Image
-              src={team.logo!}
+              src={team.logo}
               className="rounded-full"
               alt="team-logo"
               height={150}
