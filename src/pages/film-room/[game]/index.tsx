@@ -29,7 +29,7 @@ const FilmRoom = () => {
         <Typography variant="h6">
           {game.season} {game.tournament}
         </Typography>
-        <div className="flex items-center justify-center text-center">
+        <div className="flex items-center justify-center gap-4 text-center">
           <Typography variant="h1" fontSize={36}>
             {game.one?.city} {game.one?.name}
           </Typography>
