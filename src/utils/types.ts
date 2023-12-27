@@ -35,3 +35,16 @@ export type TeamHubType = {
   name: string;
   owner: string | null;
 } | null;
+
+export type GameListType = {
+  id: string;
+  link: string | null;
+  season: string | null;
+  team1_id: string | null;
+  team2_id: string | null;
+  tournament: string | null;
+  teams: {
+    city: string;
+    name: string;
+  } | null;
+};

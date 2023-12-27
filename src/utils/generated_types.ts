@@ -80,36 +80,39 @@ export interface Database {
       games: {
         Row: {
           id: string
+          link: string | null
+          one_id: string
           season: string | null
-          team1_id: string | null
-          team2_id: string | null
           tournament: string | null
+          two_id: string
         }
         Insert: {
           id?: string
+          link?: string | null
+          one_id: string
           season?: string | null
-          team1_id?: string | null
-          team2_id?: string | null
           tournament?: string | null
+          two_id: string
         }
         Update: {
           id?: string
+          link?: string | null
+          one_id?: string
           season?: string | null
-          team1_id?: string | null
-          team2_id?: string | null
           tournament?: string | null
+          two_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "games_team1_id_fkey"
-            columns: ["team1_id"]
+            foreignKeyName: "games_one_id_fkey"
+            columns: ["one_id"]
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "games_team2_id_fkey"
-            columns: ["team2_id"]
+            foreignKeyName: "games_two_id_fkey"
+            columns: ["two_id"]
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
