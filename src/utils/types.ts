@@ -39,11 +39,17 @@ export type TeamHubType = {
 export type GameListType = {
   id: string;
   link: string | null;
+  one_id: string;
   season: string | null;
-  team1_id: string | null;
-  team2_id: string | null;
   tournament: string | null;
-  teams: {
+  two_id: string;
+  one: {
+    id: string;
+    city: string;
+    name: string;
+  } | null;
+  two: {
+    id: string;
     city: string;
     name: string;
   } | null;
