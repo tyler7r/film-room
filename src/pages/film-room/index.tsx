@@ -1,6 +1,6 @@
 import { Typography, useTheme } from "@mui/material";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { supabase } from "~/utils/supabase";
 import { GameListType } from "~/utils/types";
 import { useIsDarkContext } from "../_app";
@@ -12,7 +12,6 @@ export const getServerSideProps = (async () => {
       `*, one: teams!games_one_id_fkey(id, city, name), two: teams!games_two_id_fkey(id, city, name)`,
     );
   const games: GameListType[] | null = gamesData.data;
-  if (gamesData.error) console.log(gamesData.error);
   return { props: { games } };
 }) satisfies GetServerSideProps<{ games: GameListType[] | null }>;
 
@@ -30,22 +29,23 @@ const FilmRoomHome = ({
         Film
       </Typography>
       <div className="flex w-4/5 flex-col items-center justify-center gap-8">
-        {games?.map((game) => (
+        {games?.map((g) => (
           <div
             style={{
               backgroundColor: `${backgroundStyle.backgroundColor}`,
               border: `2px solid ${theme.palette.primary.main}`,
             }}
-            key={game.id}
+            key={g.id}
             className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg p-2"
-            onClick={() => router.push(`/film-room/${game.id}`)}
+            onClick={() => router.push(`/film-room/${g.id}`)}
           >
             <Typography
               color={isDark ? `white` : `black`}
+              component="span"
               className="flex items-center justify-center gap-1"
             >
-              <div>{game.season}</div>
-              <div>{game.tournament}</div>
+              <div>{g.season}</div>
+              <div>{g.tournament}</div>
             </Typography>
             <div className="flex items-center gap-4">
               <Typography
@@ -55,7 +55,7 @@ const FilmRoomHome = ({
                 color="primary"
                 fontSize={20}
               >
-                {game.one?.city} {game.one?.name}
+                {g.one?.city} {g.one?.name}
               </Typography>
               <Typography
                 variant="overline"
@@ -71,7 +71,7 @@ const FilmRoomHome = ({
                 color="primary"
                 fontSize={20}
               >
-                {game.two?.city} {game.two?.name}
+                {g.two?.city} {g.two?.name}
               </Typography>
             </div>
           </div>
