@@ -23,6 +23,7 @@ export const isAuthContext = createContext<AuthContextProps>({
     userId: undefined,
     email: undefined,
     name: undefined,
+    currentAffiliation: undefined,
   },
   setUser: () => null,
 });
@@ -33,6 +34,7 @@ export const IsAuth = ({ children }: AuthProps) => {
     userId: undefined,
     email: undefined,
     name: undefined,
+    currentAffiliation: undefined,
   });
 
   useEffect(() => {
@@ -40,6 +42,7 @@ export const IsAuth = ({ children }: AuthProps) => {
       async (event: string, session) => {
         if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
           setUser({
+            ...user,
             isLoggedIn: true,
             userId: session.user.id,
             email: session.user.email,
@@ -47,6 +50,7 @@ export const IsAuth = ({ children }: AuthProps) => {
           });
         } else if (event === "INITIAL_SESSION" && session) {
           setUser({
+            ...user,
             isLoggedIn: false,
             userId: session.user.id,
             email: session.user.email,
@@ -58,6 +62,7 @@ export const IsAuth = ({ children }: AuthProps) => {
             userId: undefined,
             email: undefined,
             name: undefined,
+            currentAffiliation: undefined,
           });
         }
       },

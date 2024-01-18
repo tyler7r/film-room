@@ -106,10 +106,6 @@ const FilmRoom = () => {
   };
 
   useEffect(() => {
-    console.log(play);
-  }, [play]);
-
-  useEffect(() => {
     void fetchGame();
   }, []);
 
