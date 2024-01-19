@@ -8,11 +8,15 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
+import { useAffiliatedContext } from "~/contexts/affiliations";
+import { useAuthContext } from "~/contexts/auth";
 import { validateEmail } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";
 
 const Login = () => {
+  const { user, setUser } = useAuthContext();
+  const { affiliations } = useAffiliatedContext();
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
@@ -46,7 +50,7 @@ const Login = () => {
     e.preventDefault();
     setIsValidForm(false);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: formData.email,
       password: formData.password,
     });
@@ -62,6 +66,15 @@ const Login = () => {
         text: `Logged in!`,
         status: "success",
       });
+      if (affiliations) {
+        setUser({
+          userId: data.user.id,
+          email: data.user.email,
+          name: data.user.user_metadata.name as string,
+          isLoggedIn: true,
+          currentAffiliation: affiliations[0],
+        });
+      }
       setTimeout(() => {
         router.push("/");
       }, 1000);

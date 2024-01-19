@@ -32,7 +32,7 @@ type TeamDetailsType = {
 };
 
 const CreateTeam = () => {
-  const { user } = useAuthContext();
+  const { user, setUser } = useAuthContext();
   const router = useRouter();
   const genID = v4();
   const [message, setMessage] = useState<MessageType>({
@@ -121,7 +121,7 @@ const CreateTeam = () => {
         logo: pubURL,
         owner: `${user.userId}`,
       })
-      .select("id")
+      .select()
       .single();
 
     // When successfully created, create an owner affiliation of the team for the user
@@ -140,6 +140,7 @@ const CreateTeam = () => {
       setTimeout(() => {
         router.push("/");
       }, 1000);
+      setUser({ ...user, currentAffiliation: data });
     } else {
       setMessage({
         text: `There was a problem creating the team account. ${error.message}`,

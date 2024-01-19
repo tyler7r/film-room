@@ -7,6 +7,7 @@ import {
 } from "react";
 import { supabase } from "~/utils/supabase";
 import { type UserSession } from "~/utils/types";
+import { useAffiliatedContext } from "./affiliations";
 
 type AuthProps = {
   children: ReactNode;
@@ -29,6 +30,7 @@ export const isAuthContext = createContext<AuthContextProps>({
 });
 
 export const IsAuth = ({ children }: AuthProps) => {
+  const { affiliations } = useAffiliatedContext();
   const [user, setUser] = useState<UserSession>({
     isLoggedIn: false,
     userId: undefined,
@@ -50,11 +52,11 @@ export const IsAuth = ({ children }: AuthProps) => {
           });
         } else if (event === "INITIAL_SESSION" && session) {
           setUser({
-            ...user,
             isLoggedIn: false,
             userId: session.user.id,
             email: session.user.email,
             name: session.user.user_metadata.name as string,
+            currentAffiliation: undefined,
           });
         } else {
           setUser({
@@ -71,6 +73,10 @@ export const IsAuth = ({ children }: AuthProps) => {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    console.log(user);
+  });
 
   return (
     <isAuthContext.Provider value={{ user, setUser }}>

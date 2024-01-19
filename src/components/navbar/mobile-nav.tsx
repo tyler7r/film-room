@@ -8,11 +8,12 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
+import TeamLogo from "../team-logo";
 import { type ChildrenNavProps } from "./navbar";
 
 const MobileNav = ({ logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
-  const { isDark, setIsDark } = useIsDarkContext();
+  const { isDark, setIsDark, colorBackground } = useIsDarkContext();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
@@ -24,7 +25,10 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
         </div>
         <div className="flex gap-1">
           {user.isLoggedIn ? (
-            <div className="flex items-center justify-center px-1 py-2">
+            <div className="flex items-center justify-center gap-3 px-1 py-2">
+              {user.currentAffiliation && (
+                <TeamLogo team={user.currentAffiliation} />
+              )}
               <Button variant="contained" size="small" onClick={logout}>
                 Logout
               </Button>

@@ -6,6 +6,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
+import TeamLogo from "../team-logo";
 import { type ChildrenNavProps } from "./navbar";
 
 const DesktopNav = ({ logout }: ChildrenNavProps) => {
@@ -20,6 +21,9 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
         <div className="flex items-center gap-2">
           {user.isLoggedIn ? (
             <div className="flex items-center justify-center gap-3">
+              {user.currentAffiliation && (
+                <TeamLogo team={user.currentAffiliation} />
+              )}
               <Button variant="contained" size="medium" onClick={logout}>
                 Logout
               </Button>

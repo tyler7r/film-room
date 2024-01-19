@@ -11,7 +11,7 @@ export type UserSession = {
   userId: string | undefined;
   email: string | undefined;
   name: string | undefined;
-  currentAffiliation: string | undefined;
+  currentAffiliation: TeamAffiliationType | undefined;
 };
 
 export type TeamType = {
