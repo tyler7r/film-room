@@ -173,9 +173,10 @@ const FilmRoom = () => {
                 playerVars: {
                   enablejsapi: 1,
                   playsinline: 1,
-                  //   fs: 0,
+                  fs: 0,
                   rel: 0,
                   color: "red",
+                  origin: "https://www.youtube.com",
                 },
               }}
               id="player"

@@ -24,7 +24,7 @@ export const isAffiliatedContext = createContext<AffiliationContextProps>({
 });
 
 export const IsAffiliated = ({ children }: AffiliationProps) => {
-  const { user } = useAuthContext();
+  const { user, setUser } = useAuthContext();
 
   const [affiliations, setAffiliations] = useState<
     TeamAffiliationType[] | undefined
@@ -63,6 +63,9 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
   useEffect(() => {
     if (user.userId) {
       void fetchAffiliations();
+    }
+    if (user.isLoggedIn && affiliations && !user.currentAffiliation) {
+      setUser({ ...user, currentAffiliation: affiliations[0] });
     }
   }, [user]);
 

@@ -66,15 +66,6 @@ const Login = () => {
         text: `Logged in!`,
         status: "success",
       });
-      if (affiliations) {
-        setUser({
-          userId: data.user.id,
-          email: data.user.email,
-          name: data.user.user_metadata.name as string,
-          isLoggedIn: true,
-          currentAffiliation: affiliations[0],
-        });
-      }
       setTimeout(() => {
         router.push("/");
       }, 1000);
