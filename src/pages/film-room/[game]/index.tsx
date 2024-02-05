@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import { GameListType } from "~/utils/types";
 
@@ -20,11 +21,11 @@ type PlayType = {
 type NoteType = {
   note: string;
   highlight: boolean;
-  keywords: string[] | null;
 };
 
 const FilmRoom = () => {
   const router = useRouter();
+  const { backgroundStyle } = useIsDarkContext();
   const { user } = useAuthContext();
   const [game, setGame] = useState<GameListType | null>(null);
   const [isClipStarted, setIsClipStarted] = useState(false);
@@ -33,12 +34,23 @@ const FilmRoom = () => {
     start: null,
     end: null,
   });
-  const [noteOpen, setNoteOpen] = useState<boolean>(false);
+  const [noteOpen, setNoteOpen] = useState<boolean>(true);
   const [noteDetails, setNoteDetails] = useState<NoteType>({
     note: "",
     highlight: false,
-    keywords: null,
   });
+  const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
+
+  const fetchGame = async () => {
+    const { data } = await supabase
+      .from("games")
+      .select(
+        `*, one: teams!games_one_id_fkey(id, city, name), two: teams!games_two_id_fkey(id, city, name)`,
+      )
+      .eq("id", router.query.game as string)
+      .single();
+    if (data) setGame(data);
+  };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -63,6 +75,7 @@ const FilmRoom = () => {
     setIsClipStarted(true);
     const time = await getCurrentTime();
     setPlay({ ...play, start: time });
+    player?.playVideo();
   };
 
   const endClip = async () => {
@@ -73,37 +86,52 @@ const FilmRoom = () => {
     setNoteOpen(true);
   };
 
-  const fetchGame = async () => {
-    const { data } = await supabase
-      .from("games")
-      .select(
-        `*, one: teams!games_one_id_fkey(id, city, name), two: teams!games_two_id_fkey(id, city, name)`,
-      )
-      .eq("id", router.query.game as string)
-      .single();
-    if (data) setGame(data);
+  const resetPlay = async () => {
+    setNoteOpen(false);
+    setNoteDetails({
+      note: "",
+      highlight: false,
+    });
+    setPlay({ end: null, start: null });
   };
 
   const createPlay = async () => {
     const { data } = await supabase
       .from("plays")
       .insert({
+        team_id: user.currentAffiliation?.id,
         author_id: user.userId,
         game_id: game?.id,
-        highlight: false,
-        keywords: [""],
-        note: "This is a test!",
+        highlight: noteDetails.highlight,
+        note: noteDetails.note,
         timestamp: { start: play.start, end: play.end },
       })
       .select();
-    if (data) console.log(data);
+    if (data) {
+      resetPlay();
+    }
   };
 
-  const resetPlay = async () => {
-    setNoteOpen(false);
-    setNoteDetails({ note: "", highlight: false, keywords: null });
-    setPlay({ end: null, start: null });
+  const checkValidForm = () => {
+    if (
+      typeof play.end !== "number" ||
+      typeof play.start !== "number" ||
+      noteDetails.note === ""
+    ) {
+      setIsValidPlay(false);
+    } else {
+      setIsValidPlay(true);
+    }
   };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    createPlay();
+  };
+
+  useEffect(() => {
+    checkValidForm();
+  }, [noteDetails, play]);
 
   useEffect(() => {
     void fetchGame();
@@ -127,7 +155,11 @@ const FilmRoom = () => {
           </Typography>
         </div>
         {noteOpen ? (
-          <form>
+          <form
+            onSubmit={handleSubmit}
+            style={backgroundStyle}
+            className="flex w-4/5 flex-col items-center justify-center gap-2 p-4"
+          >
             <TextField
               className="w-full"
               name="note"
@@ -154,12 +186,14 @@ const FilmRoom = () => {
               labelPlacement="end"
               label="Highlight Play?"
             />
-            <Button type="submit" variant="contained">
-              Submit
-            </Button>
-            <Button type="button" variant="text" onClick={() => resetPlay()}>
-              Cancel
-            </Button>
+            <div className="flex items-center justify-center gap-2">
+              <Button type="submit" variant="contained" disabled={!isValidPlay}>
+                Submit
+              </Button>
+              <Button type="button" variant="text" onClick={() => resetPlay()}>
+                Cancel
+              </Button>
+            </div>
           </form>
         ) : !isClipStarted ? (
           <Button onClick={() => startClip()}>Start Clip</Button>

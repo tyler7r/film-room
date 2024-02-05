@@ -4,16 +4,11 @@ import { supabase } from "~/utils/supabase";
 import DesktopNav from "./desktop-nav";
 import MobileNav from "./mobile-nav";
 
-type NavbarProps = {
-  // switchTheme: () => void;
-};
-
 export type ChildrenNavProps = {
-  // switchTheme: () => void;
   logout: () => void;
 };
 
-export const Navbar = ({}: NavbarProps) => {
+export const Navbar = () => {
   const isMobile = useMobileContext();
   const router = useRouter();
 

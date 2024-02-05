@@ -119,14 +119,57 @@ export interface Database {
           },
         ];
       };
+      play_mentions: {
+        Row: {
+          created_at: string;
+          play_id: string;
+          receiver_id: string;
+          sender_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          play_id: string;
+          receiver_id: string;
+          sender_id: string;
+        };
+        Update: {
+          created_at?: string;
+          play_id?: string;
+          receiver_id?: string;
+          sender_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "play_mentions_play_id_fkey";
+            columns: ["play_id"];
+            isOneToOne: false;
+            referencedRelation: "plays";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "play_mentions_receiver_id_fkey";
+            columns: ["receiver_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "play_mentions_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       plays: {
         Row: {
           author_id: string | null;
           game_id: string | null;
           highlight: boolean;
           id: string;
-          keywords: string[] | null;
           note: string | null;
+          team_id: string | null;
           timestamp: Json | null;
         };
         Insert: {
@@ -134,8 +177,8 @@ export interface Database {
           game_id?: string | null;
           highlight?: boolean;
           id?: string;
-          keywords?: string[] | null;
           note?: string | null;
+          team_id?: string | null;
           timestamp?: Json | null;
         };
         Update: {
@@ -143,8 +186,8 @@ export interface Database {
           game_id?: string | null;
           highlight?: boolean;
           id?: string;
-          keywords?: string[] | null;
           note?: string | null;
+          team_id?: string | null;
           timestamp?: Json | null;
         };
         Relationships: [
@@ -160,6 +203,13 @@ export interface Database {
             columns: ["game_id"];
             isOneToOne: false;
             referencedRelation: "games";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "plays_team_id_fkey";
+            columns: ["team_id"];
+            isOneToOne: false;
+            referencedRelation: "teams";
             referencedColumns: ["id"];
           },
         ];

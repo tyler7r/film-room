@@ -11,7 +11,7 @@ const MainMenu = ({ size }: MainMenuProps) => {
   const router = useRouter();
   const { backgroundStyle } = useIsDarkContext();
   return (
-    <div style={backgroundStyle} className={`flex items-center justify-around`}>
+    <div style={backgroundStyle} className="flex items-center justify-around">
       <Button
         variant="text"
         size={size}

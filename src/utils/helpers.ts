@@ -27,3 +27,13 @@ export const divisions = [
   "D3 College Women's",
   "Other",
 ];
+
+export const isItemUnique = (item: string, array: string[] | null) => {
+  if (array) {
+    const itemInArray = array.includes(item);
+    if (itemInArray) return false;
+    else return true;
+  } else {
+    return true;
+  }
+};

@@ -13,7 +13,7 @@ import { type ChildrenNavProps } from "./navbar";
 
 const MobileNav = ({ logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
-  const { isDark, setIsDark, colorBackground } = useIsDarkContext();
+  const { isDark, setIsDark } = useIsDarkContext();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
