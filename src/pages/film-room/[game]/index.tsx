@@ -34,7 +34,7 @@ const FilmRoom = () => {
     start: null,
     end: null,
   });
-  const [noteOpen, setNoteOpen] = useState<boolean>(true);
+  const [noteOpen, setNoteOpen] = useState<boolean>(false);
   const [noteDetails, setNoteDetails] = useState<NoteType>({
     note: "",
     highlight: false,
