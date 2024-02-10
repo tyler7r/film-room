@@ -19,6 +19,7 @@ type isDarkContextType = {
   setIsDark: (isDark: boolean) => void;
   backgroundStyle: { backgroundColor: string };
   colorBackground: { backgroundColor: string };
+  borderStyle: { border: string };
 };
 
 export const IsDarkContext = createContext<isDarkContextType>({
@@ -26,6 +27,7 @@ export const IsDarkContext = createContext<isDarkContextType>({
   setIsDark: () => null,
   backgroundStyle: { backgroundColor: "" },
   colorBackground: { backgroundColor: "" },
+  borderStyle: { border: "" },
 });
 
 const MyApp: AppType = ({ Component, pageProps }) => {
@@ -38,10 +40,24 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     backgroundColor: `${isDark ? colors.purple[400] : colors.purple.A400}`,
   };
 
+  const borderStyle = {
+    border: `${
+      isDark
+        ? `2px solid ${colors.purple[400]}`
+        : `2px solid ${colors.purple.A400}`
+    }`,
+  };
+
   return (
     <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
       <IsDarkContext.Provider
-        value={{ isDark, setIsDark, backgroundStyle, colorBackground }}
+        value={{
+          isDark,
+          setIsDark,
+          backgroundStyle,
+          colorBackground,
+          borderStyle,
+        }}
       >
         <CssBaseline />
         <IsAuth>

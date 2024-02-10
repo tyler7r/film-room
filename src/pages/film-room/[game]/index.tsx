@@ -8,6 +8,7 @@ import {
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
+import Mentions from "~/components/play-mentions";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -23,13 +24,26 @@ type NoteType = {
   highlight: boolean;
 };
 
+export type PlayerType = {
+  user_id: string;
+  profiles: {
+    name: string | null;
+  } | null;
+}[];
+
 const FilmRoom = () => {
   const router = useRouter();
-  const { backgroundStyle } = useIsDarkContext();
+  const { borderStyle } = useIsDarkContext();
   const { user } = useAuthContext();
   const [game, setGame] = useState<GameListType | null>(null);
-  const [isClipStarted, setIsClipStarted] = useState(false);
+  const [playIndex, setPlayIndex] = useState<any>([]);
+
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
+
+  const [players, setPlayers] = useState<PlayerType | null>(null);
+  const [mentions, setMentions] = useState<string[]>([]);
+
+  const [isClipStarted, setIsClipStarted] = useState(false);
   const [play, setPlay] = useState<PlayType>({
     start: null,
     end: null,
@@ -50,6 +64,24 @@ const FilmRoom = () => {
       .eq("id", router.query.game as string)
       .single();
     if (data) setGame(data);
+    const gamePlays = await supabase
+      .from("plays")
+      .select()
+      .match({
+        game_id: `${router.query.game}`,
+        team_id: `${user.currentAffiliation?.id}`,
+      });
+    if (gamePlays.data) setPlayIndex(gamePlays);
+    console.log(gamePlays.data);
+  };
+
+  const fetchPlayers = async () => {
+    const { data } = await supabase
+      .from("affiliations")
+      .select(`user_id, profiles (name)`)
+      .neq("user_id", user.userId);
+    //   .match({ team_id: user.currentAffiliation?.id });
+    if (data) setPlayers(data);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,6 +125,19 @@ const FilmRoom = () => {
       highlight: false,
     });
     setPlay({ end: null, start: null });
+    setMentions([]);
+  };
+
+  const handleMention = async (player: string, play: string) => {
+    await supabase
+      .from("play_mentions")
+      .insert({
+        play_id: play,
+        sender_id: `${user.userId}`,
+        receiver_id: player,
+      })
+      .select()
+      .single();
   };
 
   const createPlay = async () => {
@@ -106,8 +151,15 @@ const FilmRoom = () => {
         note: noteDetails.note,
         timestamp: { start: play.start, end: play.end },
       })
-      .select();
+      .select()
+      .single();
     if (data) {
+      mentions.forEach(async (mention) => {
+        const player = players?.find((v) => v.profiles?.name === mention);
+        if (player) {
+          void handleMention(player.user_id, data.id);
+        }
+      });
       resetPlay();
     }
   };
@@ -135,6 +187,7 @@ const FilmRoom = () => {
 
   useEffect(() => {
     void fetchGame();
+    void fetchPlayers();
   }, []);
 
   return (
@@ -157,8 +210,8 @@ const FilmRoom = () => {
         {noteOpen ? (
           <form
             onSubmit={handleSubmit}
-            style={backgroundStyle}
-            className="flex w-4/5 flex-col items-center justify-center gap-2 p-4"
+            style={borderStyle}
+            className="flex w-4/5 flex-col items-center justify-center gap-4 rounded-md border-solid p-4"
           >
             <TextField
               className="w-full"
@@ -170,6 +223,11 @@ const FilmRoom = () => {
               onChange={handleInput}
               value={noteDetails.note}
             />
+            <Mentions
+              players={players}
+              mentions={mentions}
+              setMentions={setMentions}
+            />
             <FormControlLabel
               control={
                 <Checkbox
@@ -180,11 +238,11 @@ const FilmRoom = () => {
                       highlight: !noteDetails.highlight,
                     })
                   }
-                  size="small"
+                  size="medium"
                 />
               }
               labelPlacement="end"
-              label="Highlight Play?"
+              label="Highlight?"
             />
             <div className="flex items-center justify-center gap-2">
               <Button type="submit" variant="contained" disabled={!isValidPlay}>
