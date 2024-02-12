@@ -8,15 +8,11 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
-import { useAffiliatedContext } from "~/contexts/affiliations";
-import { useAuthContext } from "~/contexts/auth";
 import { validateEmail } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";
 
 const Login = () => {
-  const { user, setUser } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
@@ -50,7 +46,7 @@ const Login = () => {
     e.preventDefault();
     setIsValidForm(false);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: formData.email,
       password: formData.password,
     });

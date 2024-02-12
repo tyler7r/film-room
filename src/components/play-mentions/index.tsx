@@ -6,15 +6,20 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
-  SelectChangeEvent,
+  type SelectChangeEvent,
 } from "@mui/material";
-import { PlayerType } from "~/pages/film-room/[game]";
+import { type PlayerType } from "~/pages/film-room/[game]";
 
 type MentionsProps = {
   mentions: string[];
   setMentions: (mentions: string[]) => void;
   players: PlayerType | null;
 };
+
+// type IndividualPlayer = {
+//   user_id: string;
+//   profiles: { name: string };
+// };
 
 const Mentions = ({ mentions, setMentions, players }: MentionsProps) => {
   const handleChange = (event: SelectChangeEvent<typeof mentions>) => {
@@ -26,28 +31,33 @@ const Mentions = ({ mentions, setMentions, players }: MentionsProps) => {
   };
 
   return (
-    <div className="w-4/5">
-      <FormControl className="w-full ">
-        <InputLabel>Player Mentions</InputLabel>
-        <Select
-          multiple
-          value={mentions}
-          onChange={handleChange}
-          input={<OutlinedInput label="Player Mentions" />}
-          renderValue={(selected) => selected.join(", ")}
-          className=""
-        >
-          {players?.map((player) => (
-            <MenuItem key={player.user_id} value={player.profiles?.name!}>
-              <Checkbox
-                checked={mentions.indexOf(player.profiles?.name!) > -1}
-              />
-              <ListItemText primary={player.profiles?.name} />
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
+    players && (
+      <div className="w-4/5">
+        <FormControl className="w-full ">
+          <InputLabel>Player Mentions</InputLabel>
+          <Select
+            multiple
+            value={mentions}
+            onChange={handleChange}
+            input={<OutlinedInput label="Player Mentions" />}
+            renderValue={(selected) => selected.join(", ")}
+            className=""
+          >
+            {players.map(
+              (player) =>
+                player.profiles?.name && (
+                  <MenuItem key={player.user_id} value={player.profiles.name}>
+                    <Checkbox
+                      checked={mentions.indexOf(player.profiles.name) > -1}
+                    />
+                    <ListItemText primary={player.profiles.name} />
+                  </MenuItem>
+                ),
+            )}
+          </Select>
+        </FormControl>
+      </div>
+    )
   );
 };
 

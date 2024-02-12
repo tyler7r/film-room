@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { TeamAffiliationType } from "~/utils/types";
+import { type TeamAffiliationType } from "~/utils/types";
 
 const TeamPageButton = () => {
   const { user, setUser } = useAuthContext();

@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import Image from "next/image";
 import { useIsDarkContext } from "~/pages/_app";
-import { TeamAffiliationType } from "~/utils/types";
+import { type TeamAffiliationType } from "~/utils/types";
 
 type TeamLogoProps = {
   team: TeamAffiliationType;

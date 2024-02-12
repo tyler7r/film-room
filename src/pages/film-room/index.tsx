@@ -1,8 +1,8 @@
 import { Typography, useTheme } from "@mui/material";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
 import { supabase } from "~/utils/supabase";
-import { GameListType } from "~/utils/types";
+import { type GameListType } from "~/utils/types";
 import { useIsDarkContext } from "../_app";
 
 export const getServerSideProps = (async () => {

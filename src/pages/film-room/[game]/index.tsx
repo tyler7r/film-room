@@ -12,7 +12,7 @@ import Mentions from "~/components/play-mentions";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { GameListType } from "~/utils/types";
+import { type GameListType } from "~/utils/types";
 
 type PlayType = {
   start: number | null | undefined;
@@ -36,7 +36,7 @@ const FilmRoom = () => {
   const { borderStyle } = useIsDarkContext();
   const { user } = useAuthContext();
   const [game, setGame] = useState<GameListType | null>(null);
-  const [playIndex, setPlayIndex] = useState<any>([]);
+  //   const [playIndex, setPlayIndex] = useState<string[]>([]);
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
@@ -68,10 +68,10 @@ const FilmRoom = () => {
       .from("plays")
       .select()
       .match({
-        game_id: `${router.query.game}`,
+        game_id: router.query.game as string,
         team_id: `${user.currentAffiliation?.id}`,
       });
-    if (gamePlays.data) setPlayIndex(gamePlays);
+    // if (gamePlays.data) setPlayIndex(gamePlays.data);
     console.log(gamePlays.data);
   };
 
@@ -105,15 +105,15 @@ const FilmRoom = () => {
 
   const startClip = async () => {
     setIsClipStarted(true);
-    const time = await getCurrentTime();
+    const time = await player?.getCurrentTime();
     setPlay({ ...play, start: time });
-    player?.playVideo();
+    void player?.playVideo();
   };
 
   const endClip = async () => {
     setIsClipStarted(false);
     const time = await getCurrentTime();
-    player?.pauseVideo();
+    void player?.pauseVideo();
     setPlay({ ...play, end: time });
     setNoteOpen(true);
   };
@@ -154,13 +154,13 @@ const FilmRoom = () => {
       .select()
       .single();
     if (data) {
-      mentions.forEach(async (mention) => {
+      mentions.forEach((mention) => {
         const player = players?.find((v) => v.profiles?.name === mention);
         if (player) {
           void handleMention(player.user_id, data.id);
         }
       });
-      resetPlay();
+      void resetPlay();
     }
   };
 
@@ -178,7 +178,7 @@ const FilmRoom = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    createPlay();
+    void createPlay();
   };
 
   useEffect(() => {
