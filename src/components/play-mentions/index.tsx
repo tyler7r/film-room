@@ -16,14 +16,8 @@ type MentionsProps = {
   players: PlayerType | null;
 };
 
-// type IndividualPlayer = {
-//   user_id: string;
-//   profiles: { name: string };
-// };
-
 const Mentions = ({ mentions, setMentions, players }: MentionsProps) => {
   const handleChange = (event: SelectChangeEvent<typeof mentions>) => {
-    console.log(mentions);
     const {
       target: { value },
     } = event;

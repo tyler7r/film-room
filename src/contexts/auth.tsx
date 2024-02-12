@@ -73,10 +73,6 @@ export const IsAuth = ({ children }: AuthProps) => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(user);
-  });
-
   return (
     <isAuthContext.Provider value={{ user, setUser }}>
       {children}
