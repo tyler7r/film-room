@@ -140,7 +140,13 @@ const CreateTeam = () => {
       setTimeout(() => {
         router.push("/");
       }, 1000);
-      setUser({ ...user, currentAffiliation: data });
+      setUser({
+        ...user,
+        currentAffiliation: {
+          team: data,
+          role: details.isCoach ? "coach" : "player",
+        },
+      });
     } else {
       setMessage({
         text: `There was a problem creating the team account. ${error.message}`,

@@ -8,7 +8,7 @@ import {
   Select,
   type SelectChangeEvent,
 } from "@mui/material";
-import { type PlayerType } from "~/pages/film-room/[game]";
+import { PlayerType } from "~/utils/types";
 
 type MentionsProps = {
   mentions: string[];

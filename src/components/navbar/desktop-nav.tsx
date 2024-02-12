@@ -22,7 +22,7 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
           {user.isLoggedIn ? (
             <div className="flex items-center justify-center gap-3">
               {user.currentAffiliation && (
-                <TeamLogo team={user.currentAffiliation} />
+                <TeamLogo tm={user.currentAffiliation} />
               )}
               <Button variant="contained" size="medium" onClick={logout}>
                 Logout

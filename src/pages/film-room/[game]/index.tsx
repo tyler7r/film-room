@@ -8,12 +8,16 @@ import {
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
+import PlayDirectory from "~/components/play-directory";
 import Mentions from "~/components/play-mentions";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { Json } from "~/utils/generated_types";
 import { supabase } from "~/utils/supabase";
-import { type GameListType } from "~/utils/types";
+import {
+  PlayDirectoryType,
+  PlayerType,
+  type GameListType,
+} from "~/utils/types";
 
 type PlayType = {
   start: number | null | undefined;
@@ -25,29 +29,14 @@ type NoteType = {
   highlight: boolean;
 };
 
-export type PlayerType = {
-  user_id: string;
-  profiles: {
-    name: string | null;
-  } | null;
-}[];
-
-type PlayIndexType = {
-  author_id: string | null;
-  game_id: string | null;
-  highlight: boolean;
-  id: string;
-  note: string | null;
-  team_id: string | null;
-  timestamp: Json;
-}[];
-
 const FilmRoom = () => {
   const router = useRouter();
   const { borderStyle } = useIsDarkContext();
   const { user } = useAuthContext();
   const [game, setGame] = useState<GameListType | null>(null);
-  const [playIndex, setPlayIndex] = useState<PlayIndexType | null>(null);
+  const [playDirectory, setPlayDirectory] = useState<PlayDirectoryType | null>(
+    null,
+  );
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
@@ -77,14 +66,15 @@ const FilmRoom = () => {
     if (data) setGame(data);
     const gamePlays = await supabase
       .from("plays")
-      .select()
+      .select(`*`)
       .match({
         game_id: router.query.game as string,
-        team_id: `${user.currentAffiliation?.id}`,
+        team_id: `${user.currentAffiliation?.team.id}`,
       });
+    console.log(gamePlays.data);
     if (gamePlays.data) {
       let p = gamePlays.data;
-      setPlayIndex(p);
+      setPlayDirectory(p);
       console.log(p);
     }
   };
@@ -94,7 +84,7 @@ const FilmRoom = () => {
       .from("affiliations")
       .select(`user_id, profiles (name)`)
       .neq("user_id", user.userId)
-      .match({ team_id: user.currentAffiliation?.id, role: "player" });
+      .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
     if (data) setPlayers(data);
   };
 
@@ -158,12 +148,14 @@ const FilmRoom = () => {
     const { data } = await supabase
       .from("plays")
       .insert({
-        team_id: user.currentAffiliation?.id,
-        author_id: user.userId,
+        team_id: user.currentAffiliation?.team.id,
+        profile_id: user.userId,
         game_id: game?.id,
         highlight: noteDetails.highlight,
         note: noteDetails.note,
         timestamp: { start: play.start, end: play.end },
+        author_role: user.currentAffiliation?.role,
+        author_name: user.name,
       })
       .select()
       .single();
@@ -291,6 +283,7 @@ const FilmRoom = () => {
             />
           </div>
         )}
+        {playDirectory && <PlayDirectory plays={playDirectory} />}
       </div>
     )
   );

@@ -26,10 +26,10 @@ const TeamPageButton = () => {
     setAnchorEl(null);
   };
 
-  const handleItemClick = (team: TeamAffiliationType) => {
+  const handleItemClick = (tm: TeamAffiliationType) => {
     handleClose();
-    setUser({ ...user, currentAffiliation: team });
-    router.push(`/team-hub/${team.id}`);
+    setUser({ ...user, currentAffiliation: tm });
+    router.push(`/team-hub/${tm.team.id}`);
   };
 
   return (
@@ -41,14 +41,14 @@ const TeamPageButton = () => {
         <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
           {affiliations.map((aff) => (
             <MenuItem
-              key={aff.id}
+              key={aff.team.id}
               className="flex items-center justify-center gap-2"
               onClick={() => handleItemClick(aff)}
             >
-              {aff.logo ? (
+              {aff.team.logo ? (
                 <Image
                   alt="team-logo"
-                  src={aff.logo}
+                  src={aff.team.logo}
                   height={35}
                   width={35}
                   className="rounded-full"
@@ -60,13 +60,16 @@ const TeamPageButton = () => {
                   fontWeight="bold"
                   className="rounded-full p-1 text-white"
                   style={colorBackground}
-                >{`${aff.city.slice(0, 1)}${aff.name.slice(0, 1)}`}</Typography>
+                >{`${aff.team.city.slice(0, 1)}${aff.team.name.slice(
+                  0,
+                  1,
+                )}`}</Typography>
               )}
               <Typography
                 variant="overline"
                 fontWeight="bold"
                 fontSize="small"
-              >{`${aff.city} ${aff.name}`}</Typography>
+              >{`${aff.team.city} ${aff.team.name}`}</Typography>
             </MenuItem>
           ))}
           <MenuItem

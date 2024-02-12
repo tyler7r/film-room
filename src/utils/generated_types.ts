@@ -6,11 +6,12 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       affiliations: {
         Row: {
+          id: string
           number: number | null
           role: string
           team_id: string
@@ -18,6 +19,7 @@ export interface Database {
           verified: boolean
         }
         Insert: {
+          id?: string
           number?: number | null
           role?: string
           team_id: string
@@ -25,6 +27,7 @@ export interface Database {
           verified?: boolean
         }
         Update: {
+          id?: string
           number?: number | null
           role?: string
           team_id?: string
@@ -164,45 +167,51 @@ export interface Database {
       }
       plays: {
         Row: {
-          author_id: string | null
+          author_name: string | null
+          author_role: string | null
           game_id: string | null
           highlight: boolean
           id: string
           note: string | null
+          profile_id: string | null
           team_id: string | null
           timestamp: Json | null
         }
         Insert: {
-          author_id?: string | null
+          author_name?: string | null
+          author_role?: string | null
           game_id?: string | null
           highlight?: boolean
           id?: string
           note?: string | null
+          profile_id?: string | null
           team_id?: string | null
           timestamp?: Json | null
         }
         Update: {
-          author_id?: string | null
+          author_name?: string | null
+          author_role?: string | null
           game_id?: string | null
           highlight?: boolean
           id?: string
           note?: string | null
+          profile_id?: string | null
           team_id?: string | null
           timestamp?: Json | null
         }
         Relationships: [
           {
-            foreignKeyName: "plays_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "plays_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plays_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {

@@ -1,9 +1,14 @@
+import { Json } from "./generated_types";
+
 export type TeamAffiliationType = {
-  id: string;
-  name: string;
-  city: string;
-  division: string;
-  logo: string | null;
+  team: {
+    id: string;
+    name: string;
+    city: string;
+    division: string;
+    logo: string | null;
+  };
+  role: string;
 };
 
 export type UserSession = {
@@ -55,3 +60,22 @@ export type GameListType = {
     name: string;
   } | null;
 };
+
+export type PlayDirectoryType = {
+  profile_id: string | null;
+  game_id: string | null;
+  highlight: boolean;
+  id: string;
+  note: string | null;
+  team_id: string | null;
+  author_name: string | null;
+  author_role: string | null;
+  timestamp: Json;
+}[];
+
+export type PlayerType = {
+  user_id: string;
+  profiles: {
+    name: string | null;
+  } | null;
+}[];

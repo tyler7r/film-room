@@ -4,10 +4,11 @@ import { useIsDarkContext } from "~/pages/_app";
 import { type TeamAffiliationType } from "~/utils/types";
 
 type TeamLogoProps = {
-  team: TeamAffiliationType;
+  tm: TeamAffiliationType;
 };
 
-const TeamLogo = ({ team }: TeamLogoProps) => {
+const TeamLogo = ({ tm }: TeamLogoProps) => {
+  const { team } = tm;
   const { colorBackground } = useIsDarkContext();
 
   return team.logo ? (
