@@ -1,5 +1,3 @@
-import { Json } from "./generated_types";
-
 export type TeamAffiliationType = {
   team: {
     id: string;
@@ -70,7 +68,8 @@ export type PlayDirectoryType = {
   team_id: string | null;
   author_name: string | null;
   author_role: string | null;
-  timestamp: Json;
+  start_time: number;
+  end_time: number;
 }[];
 
 export type PlayerType = {

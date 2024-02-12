@@ -110,15 +110,17 @@ const FilmRoom = () => {
   const startClip = async () => {
     setIsClipStarted(true);
     const time = await player?.getCurrentTime();
-    setPlay({ ...play, start: time });
+    const roundedTime = Math.round(time as number);
+    setPlay({ ...play, start: roundedTime });
     void player?.playVideo();
   };
 
   const endClip = async () => {
     setIsClipStarted(false);
     const time = await getCurrentTime();
+    const roundedTime = Math.round(time as number);
     void player?.pauseVideo();
-    setPlay({ ...play, end: time });
+    setPlay({ ...play, end: roundedTime });
     setNoteOpen(true);
   };
 
@@ -148,14 +150,15 @@ const FilmRoom = () => {
     const { data } = await supabase
       .from("plays")
       .insert({
-        team_id: user.currentAffiliation?.team.id,
-        profile_id: user.userId,
-        game_id: game?.id,
-        highlight: noteDetails.highlight,
-        note: noteDetails.note,
-        timestamp: { start: play.start, end: play.end },
-        author_role: user.currentAffiliation?.role,
-        author_name: user.name,
+        team_id: user.currentAffiliation?.team.id as string,
+        profile_id: user.userId as string,
+        game_id: game?.id as string,
+        highlight: noteDetails.highlight as boolean,
+        note: noteDetails.note as string,
+        start_time: play.start as number,
+        end_time: play.end as number,
+        author_role: user.currentAffiliation?.role as string,
+        author_name: user.name as string,
       })
       .select()
       .single();

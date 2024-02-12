@@ -169,35 +169,38 @@ export type Database = {
         Row: {
           author_name: string | null
           author_role: string | null
-          game_id: string | null
+          end_time: number
+          game_id: string
           highlight: boolean
           id: string
-          note: string | null
+          note: string
           profile_id: string | null
+          start_time: number
           team_id: string | null
-          timestamp: Json | null
         }
         Insert: {
           author_name?: string | null
           author_role?: string | null
-          game_id?: string | null
+          end_time: number
+          game_id: string
           highlight?: boolean
           id?: string
-          note?: string | null
+          note: string
           profile_id?: string | null
+          start_time: number
           team_id?: string | null
-          timestamp?: Json | null
         }
         Update: {
           author_name?: string | null
           author_role?: string | null
-          game_id?: string | null
+          end_time?: number
+          game_id?: string
           highlight?: boolean
           id?: string
-          note?: string | null
+          note?: string
           profile_id?: string | null
+          start_time?: number
           team_id?: string | null
-          timestamp?: Json | null
         }
         Relationships: [
           {
