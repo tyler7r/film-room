@@ -13,10 +13,10 @@ import Mentions from "~/components/play-mentions";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import {
+import type {
+  GameListType,
   PlayDirectoryType,
   PlayerType,
-  type GameListType,
 } from "~/utils/types";
 
 type PlayType = {
@@ -73,7 +73,7 @@ const FilmRoom = () => {
       });
     console.log(gamePlays.data);
     if (gamePlays.data) {
-      let p = gamePlays.data;
+      const p = gamePlays.data;
       setPlayDirectory(p);
       console.log(p);
     }
@@ -110,7 +110,7 @@ const FilmRoom = () => {
   const startClip = async () => {
     setIsClipStarted(true);
     const time = await player?.getCurrentTime();
-    const roundedTime = Math.round(time as number);
+    const roundedTime = Math.round(time!);
     setPlay({ ...play, start: roundedTime });
     void player?.playVideo();
   };
@@ -118,7 +118,7 @@ const FilmRoom = () => {
   const endClip = async () => {
     setIsClipStarted(false);
     const time = await getCurrentTime();
-    const roundedTime = Math.round(time as number);
+    const roundedTime = Math.round(time!);
     void player?.pauseVideo();
     setPlay({ ...play, end: roundedTime });
     setNoteOpen(true);
@@ -150,15 +150,15 @@ const FilmRoom = () => {
     const { data } = await supabase
       .from("plays")
       .insert({
-        team_id: user.currentAffiliation?.team.id as string,
-        profile_id: user.userId as string,
-        game_id: game?.id as string,
-        highlight: noteDetails.highlight as boolean,
-        note: noteDetails.note as string,
-        start_time: play.start as number,
-        end_time: play.end as number,
-        author_role: user.currentAffiliation?.role as string,
-        author_name: user.name as string,
+        team_id: user.currentAffiliation?.team.id,
+        profile_id: user.userId,
+        game_id: `${game?.id}`,
+        highlight: noteDetails.highlight,
+        note: noteDetails.note,
+        start_time: play.start!,
+        end_time: play.end!,
+        author_role: user.currentAffiliation?.role,
+        author_name: user.name,
       })
       .select()
       .single();

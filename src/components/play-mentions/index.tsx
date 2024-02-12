@@ -8,7 +8,7 @@ import {
   Select,
   type SelectChangeEvent,
 } from "@mui/material";
-import { PlayerType } from "~/utils/types";
+import { type PlayerType } from "~/utils/types";
 
 type MentionsProps = {
   mentions: string[];
