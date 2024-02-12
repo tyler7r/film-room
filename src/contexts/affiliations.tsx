@@ -35,12 +35,12 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
       .from("affiliations")
       .select(`teams!inner(id, name, city, division, logo)`)
       .match({ user_id: `${user.userId}`, verified: true });
-    if (data) {
+    if (data && data.length > 0) {
       const typedAffiliations: TeamAffiliationType[] = data.map(
         (tm) => tm.teams!,
       );
       setAffiliations(typedAffiliations);
-    }
+    } else setAffiliations(undefined);
   };
 
   useEffect(() => {
@@ -50,6 +50,7 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
         "postgres_changes",
         { event: "*", schema: "public", table: "affiliations" },
         () => {
+          console.log("channel run");
           void fetchAffiliations();
         },
       )
