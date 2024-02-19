@@ -1,3 +1,5 @@
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Button,
   Checkbox,
@@ -73,11 +75,9 @@ const FilmRoom = () => {
         game_id: router.query.game as string,
         team_id: `${user.currentAffiliation?.team.id}`,
       });
-    console.log(gamePlays.data);
     if (gamePlays.data) {
       const p = gamePlays.data;
       setPlayDirectory(p);
-      console.log(p);
     }
   };
 
@@ -288,7 +288,26 @@ const FilmRoom = () => {
             />
           </div>
         )}
-        <PlayDirectory plays={playDirectory} />
+        {isPlayDirectoryOpen ? (
+          <div>
+            <Button
+              variant="text"
+              onClick={() => setIsPlayDirectoryOpen(false)}
+              endIcon={<ExpandLessIcon />}
+            >
+              Close Play Directory
+            </Button>
+            <PlayDirectory plays={playDirectory} />
+          </div>
+        ) : (
+          <Button
+            variant="text"
+            onClick={() => setIsPlayDirectoryOpen(true)}
+            endIcon={<ExpandMoreIcon />}
+          >
+            Open Play Directory
+          </Button>
+        )}
       </div>
     )
   );

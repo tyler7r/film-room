@@ -37,7 +37,7 @@ const FilmRoomHome = ({
             }}
             key={g.id}
             className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg p-2"
-            onClick={() => router.push(`/film-room/${g.id}`)}
+            onClick={() => router.push(`/film-room/${g.id}/0`)}
           >
             <Typography
               color={isDark ? `white` : `black`}
