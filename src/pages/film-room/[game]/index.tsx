@@ -37,6 +37,8 @@ const FilmRoom = () => {
   const [playDirectory, setPlayDirectory] = useState<PlayDirectoryType | null>(
     null,
   );
+  const [isPlayDirectoryOpen, setIsPlayDirectoryOpen] =
+    useState<boolean>(false);
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
@@ -286,7 +288,7 @@ const FilmRoom = () => {
             />
           </div>
         )}
-        {playDirectory && <PlayDirectory plays={playDirectory} />}
+        <PlayDirectory plays={playDirectory} />
       </div>
     )
   );
