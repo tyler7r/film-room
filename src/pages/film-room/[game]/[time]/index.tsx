@@ -15,11 +15,7 @@ import Mentions from "~/components/play-mentions";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type {
-  GameListType,
-  PlayDirectoryType,
-  PlayerType,
-} from "~/utils/types";
+import type { GameListType, PlayerType } from "~/utils/types";
 
 type PlayType = {
   start: number | null | undefined;
@@ -36,9 +32,6 @@ const FilmRoom = () => {
   const { borderStyle } = useIsDarkContext();
   const { user } = useAuthContext();
   const [game, setGame] = useState<GameListType | null>(null);
-  const [playDirectory, setPlayDirectory] = useState<PlayDirectoryType | null>(
-    null,
-  );
   const [isPlayDirectoryOpen, setIsPlayDirectoryOpen] =
     useState<boolean>(false);
 
@@ -68,17 +61,6 @@ const FilmRoom = () => {
       .eq("id", router.query.game as string)
       .single();
     if (data) setGame(data);
-    const gamePlays = await supabase
-      .from("plays")
-      .select(`*`)
-      .match({
-        game_id: router.query.game as string,
-        team_id: `${user.currentAffiliation?.team.id}`,
-      });
-    if (gamePlays.data) {
-      const p = gamePlays.data;
-      setPlayDirectory(p);
-    }
   };
 
   const fetchPlayers = async () => {
@@ -107,6 +89,10 @@ const FilmRoom = () => {
   const videoOnReady = (e: YouTubeEvent) => {
     const video = e.target;
     setPlayer(video);
+    const time = Number(router.query.time);
+    if (time) {
+      player?.seekTo(time, true);
+    }
   };
 
   const startClip = async () => {
@@ -276,7 +262,7 @@ const FilmRoom = () => {
                 playerVars: {
                   enablejsapi: 1,
                   playsinline: 1,
-                  fs: 0,
+                  fs: 1,
                   rel: 0,
                   color: "red",
                   origin: "https://www.youtube.com",
@@ -297,7 +283,7 @@ const FilmRoom = () => {
             >
               Close Play Directory
             </Button>
-            <PlayDirectory plays={playDirectory} />
+            <PlayDirectory gameId={game.id} player={player} />
           </div>
         ) : (
           <Button
