@@ -39,7 +39,9 @@ const FilmRoom = () => {
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
-  const [players, setPlayers] = useState<PlayerType | null>(null);
+  const [affiliatedPlayers, setAffiliatedPlayers] = useState<PlayerType | null>(
+    null,
+  );
   const [mentions, setMentions] = useState<string[]>([]);
 
   const [isClipStarted, setIsClipStarted] = useState(false);
@@ -71,7 +73,7 @@ const FilmRoom = () => {
       .select(`user_id, profiles (name)`)
       .neq("user_id", user.userId)
       .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
-    if (data) setPlayers(data);
+    if (data) setAffiliatedPlayers(data);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,7 +156,9 @@ const FilmRoom = () => {
       .single();
     if (data) {
       mentions.forEach((mention) => {
-        const player = players?.find((v) => v.profiles?.name === mention);
+        const player = affiliatedPlayers?.find(
+          (v) => v.profiles?.name === mention,
+        );
         if (player) {
           void handleMention(player.user_id, data.id);
         }
@@ -185,9 +189,9 @@ const FilmRoom = () => {
   }, [noteDetails, play]);
 
   useEffect(() => {
-    void fetchGame();
-    void fetchPlayers();
-  }, []);
+    if (router.query.game) void fetchGame();
+    if (user.currentAffiliation) void fetchPlayers();
+  }, [router.query.game]);
 
   return (
     game && (
@@ -223,7 +227,7 @@ const FilmRoom = () => {
               value={noteDetails.note}
             />
             <Mentions
-              players={players}
+              players={affiliatedPlayers}
               mentions={mentions}
               setMentions={setMentions}
             />
@@ -258,7 +262,6 @@ const FilmRoom = () => {
           <Button onClick={() => endClip()}>End Clip</Button>
         )}
         {game.link && (
-          // <div className="aspect-video h-auto w-full justify-center">
           <Youtube
             opts={{
               width: `${screenWidth * 0.8}`,

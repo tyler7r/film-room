@@ -8,7 +8,6 @@ import {
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import { type PlayDirectoryType } from "~/utils/types";
 import Plays from "./plays";
@@ -25,7 +24,6 @@ type PlayIndexType = {
 
 const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
   const { user } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
   const [plays, setPlays] = useState<PlayDirectoryType | null>(null);
   const [filteredPlays, setFilteredPlays] = useState<PlayDirectoryType | null>(
     null,
@@ -42,13 +40,13 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
         team_id: `${user.currentAffiliation?.team.id}`,
       })
       .order("start_time");
+    let arr: PlayIndexType[] = [
+      { name: "Coaches", count: 0 },
+      { name: "Players", count: 0 },
+      { name: "Highlights", count: 0 },
+    ];
     if (data) {
       setPlays(data);
-      let arr: PlayIndexType[] = [
-        { name: "Coaches", count: 0 },
-        { name: "Players", count: 0 },
-        { name: "Highlights", count: 0 },
-      ];
       data.forEach((play) => {
         const authorRole = play.author_role === "player" ? arr[1] : arr[0];
         if (authorRole) authorRole.count++;
@@ -60,8 +58,8 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
           arr.push({ name: play.author_name as string, count: 1 });
         }
       });
-      setPlayIndex(arr);
     }
+    setPlayIndex(arr);
   };
 
   const handleChange = (e: SelectChangeEvent) => {
@@ -84,7 +82,7 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
   };
 
   useEffect(() => {
-    void fetchPlays();
+    if (user.currentAffiliation) void fetchPlays();
   }, []);
 
   return (

@@ -71,8 +71,12 @@ const TeamHub = ({
   };
 
   useEffect(() => {
-    void fetchRole();
-    checkIfOwner();
+    if (user.isLoggedIn) {
+      void fetchRole();
+      checkIfOwner();
+    } else {
+      router.push("/");
+    }
   }, [user, router.query.team]);
 
   return loading ? (
