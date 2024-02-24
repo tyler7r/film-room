@@ -4,13 +4,14 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import { type PlayDirectoryType } from "~/utils/types";
+import Plays from "./plays";
 
 type PlayDirectoryProps = {
   player: YouTubePlayer | null;
@@ -24,6 +25,7 @@ type PlayIndexType = {
 
 const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
   const { user } = useAuthContext();
+  const { backgroundStyle } = useIsDarkContext();
   const [plays, setPlays] = useState<PlayDirectoryType | null>(null);
   const [filteredPlays, setFilteredPlays] = useState<PlayDirectoryType | null>(
     null,
@@ -38,16 +40,19 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
       .match({
         game_id: gameId,
         team_id: `${user.currentAffiliation?.team.id}`,
-      });
+      })
+      .order("start_time");
     if (data) {
       setPlays(data);
       let arr: PlayIndexType[] = [
-        { name: "Coach Notes", count: 0 },
-        { name: "Player Notes", count: 0 },
+        { name: "Coaches", count: 0 },
+        { name: "Players", count: 0 },
+        { name: "Highlights", count: 0 },
       ];
       data.forEach((play) => {
         const authorRole = play.author_role === "player" ? arr[1] : arr[0];
         if (authorRole) authorRole.count++;
+        if (play.highlight && arr[2]) arr[2].count++;
         const isRepeatAuthor = arr.find((p) => p.name === play.author_name);
         if (isRepeatAuthor) {
           isRepeatAuthor.count++;
@@ -63,11 +68,14 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
     const f = e.target.value as string;
     setFilter(f);
     let copy = plays;
-    if (f === "Player Notes") {
+    if (f === "Players") {
       let result = copy?.filter((v) => v.author_role === "player");
       if (result) setFilteredPlays(result);
-    } else if (f === "Coach Notes") {
+    } else if (f === "Coaches") {
       let result = copy?.filter((v) => v.author_role === "coach");
+      if (result) setFilteredPlays(result);
+    } else if (f === "Highlights") {
+      let result = copy?.filter((v) => v.highlight);
       if (result) setFilteredPlays(result);
     } else {
       let result = copy?.filter((v) => v.author_name === f);
@@ -80,46 +88,23 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
   }, []);
 
   return (
-    <div>
-      <FormControl>
-        <InputLabel>Play Filter</InputLabel>
-        <Select value={filter} onChange={handleChange} label="Play Filter">
-          <MenuItem value="">None</MenuItem>
+    <div className="flex w-4/5 flex-col gap-3">
+      <FormControl className="mb-2 w-1/2 self-center">
+        <InputLabel>Filter</InputLabel>
+        <Select value={filter} onChange={handleChange} label="Filter">
+          <MenuItem value="">No Filter</MenuItem>
           {playIndex?.map((i) => (
             <MenuItem key={i.name} value={i.name}>
-              {i.name} ({i.count})
+              {i.name === "Highlights" ? "Highlights" : `Notes by ${i.name}`} (
+              {i.count})
             </MenuItem>
           ))}
         </Select>
       </FormControl>
       {filter !== "" ? (
-        filteredPlays && filteredPlays.length > 0 ? (
-          filteredPlays.map((play) => (
-            <div
-              key={play.id}
-              className=""
-              onClick={() => player?.seekTo(play.start_time, true)}
-            >
-              <div>{play.author_name}</div>
-              <div>{play.note}</div>
-            </div>
-          ))
-        ) : (
-          <Typography>Play directory is empty!</Typography>
-        )
-      ) : plays && plays.length > 0 ? (
-        plays.map((play) => (
-          <div
-            key={play.id}
-            className=""
-            onClick={() => player?.seekTo(play.start_time, true)}
-          >
-            <div>{play.author_name}</div>
-            <div>{play.note}</div>
-          </div>
-        ))
+        <Plays plays={filteredPlays} player={player} />
       ) : (
-        <Typography>Play directory is empty!</Typography>
+        <Plays player={player} plays={plays} />
       )}
     </div>
   );

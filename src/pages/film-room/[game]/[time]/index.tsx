@@ -13,6 +13,7 @@ import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import PlayDirectory from "~/components/play-directory";
 import Mentions from "~/components/play-mentions";
 import { useAuthContext } from "~/contexts/auth";
+import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { GameListType, PlayerType } from "~/utils/types";
@@ -29,6 +30,7 @@ type NoteType = {
 
 const FilmRoom = () => {
   const router = useRouter();
+  const { screenWidth } = useMobileContext();
   const { borderStyle } = useIsDarkContext();
   const { user } = useAuthContext();
   const [game, setGame] = useState<GameListType | null>(null);
@@ -256,30 +258,32 @@ const FilmRoom = () => {
           <Button onClick={() => endClip()}>End Clip</Button>
         )}
         {game.link && (
-          <div className="relative">
-            <Youtube
-              opts={{
-                playerVars: {
-                  enablejsapi: 1,
-                  playsinline: 1,
-                  fs: 1,
-                  rel: 0,
-                  color: "red",
-                  origin: "https://www.youtube.com",
-                },
-              }}
-              id="player"
-              videoId={game.link.split("v=")[1]?.split("&")[0]}
-              onReady={videoOnReady}
-            />
-          </div>
+          // <div className="aspect-video h-auto w-full justify-center">
+          <Youtube
+            opts={{
+              width: `${screenWidth * 0.8}`,
+              height: `${(screenWidth * 0.8) / 1.778}`,
+              playerVars: {
+                enablejsapi: 1,
+                playsinline: 1,
+                fs: 1,
+                rel: 0,
+                color: "red",
+                origin: "https://www.youtube.com",
+              },
+            }}
+            id="player"
+            videoId={game.link.split("v=")[1]?.split("&")[0]}
+            onReady={videoOnReady}
+          />
         )}
         {isPlayDirectoryOpen ? (
-          <div>
+          <div className="flex w-full flex-col items-center justify-center gap-4">
             <Button
               variant="text"
               onClick={() => setIsPlayDirectoryOpen(false)}
               endIcon={<ExpandLessIcon />}
+              size="large"
             >
               Close Play Directory
             </Button>
@@ -290,6 +294,7 @@ const FilmRoom = () => {
             variant="text"
             onClick={() => setIsPlayDirectoryOpen(true)}
             endIcon={<ExpandMoreIcon />}
+            size="large"
           >
             Open Play Directory
           </Button>

@@ -6,6 +6,9 @@ export const darkTheme = createTheme({
     primary: {
       main: colors.purple[400],
     },
+    secondary: {
+      main: colors.yellow.A700,
+    },
   },
 });
 
@@ -14,6 +17,9 @@ export const lightTheme = createTheme({
     mode: "light",
     primary: {
       main: colors.purple.A400,
+    },
+    secondary: {
+      main: colors.yellow.A700,
     },
   },
 });
