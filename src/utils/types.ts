@@ -64,13 +64,28 @@ export type PlayDirectoryType = {
   game_id: string | null;
   highlight: boolean;
   id: string;
-  note: string | null;
+  note: string;
   team_id: string | null;
-  author_name: string | null;
-  author_role: string | null;
+  author_name: string;
+  author_role: string;
   start_time: number;
   end_time: number;
+  title: string;
 }[];
+
+export type PlayType = {
+  profile_id: string | null;
+  game_id: string | null;
+  highlight: boolean;
+  id: string;
+  note: string;
+  team_id: string | null;
+  author_name: string;
+  author_role: string;
+  start_time: number;
+  end_time: number;
+  title: string;
+};
 
 export type PlayerType = {
   user_id: string;
