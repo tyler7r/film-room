@@ -17,6 +17,7 @@ import Plays from "./plays";
 type PlayIndexProps = {
   player: YouTubePlayer | null;
   gameId: string;
+  scrollToPlayer: () => void;
 };
 
 type ActivePlayFilterType = {
@@ -24,7 +25,7 @@ type ActivePlayFilterType = {
   count: number;
 };
 
-const PlayIndex = ({ player, gameId }: PlayIndexProps) => {
+const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
   const { user } = useAuthContext();
 
   const [plays, setPlays] = useState<PlayIndexType | null>(null);
@@ -112,9 +113,13 @@ const PlayIndex = ({ player, gameId }: PlayIndexProps) => {
         </Typography>
       </div>
       {currentFilter !== "" ? (
-        <Plays plays={filteredPlays} player={player} />
+        <Plays
+          scrollToPlayer={scrollToPlayer}
+          plays={filteredPlays}
+          player={player}
+        />
       ) : (
-        <Plays player={player} plays={plays} />
+        <Plays scrollToPlayer={scrollToPlayer} player={player} plays={plays} />
       )}
     </div>
   );

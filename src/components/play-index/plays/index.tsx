@@ -6,11 +6,14 @@ import Play from "../play";
 type PlaysProps = {
   plays: PlayIndexType | null;
   player: YouTubePlayer | null;
+  scrollToPlayer: () => void;
 };
 
-const Plays = ({ plays, player }: PlaysProps) => {
+const Plays = ({ plays, player, scrollToPlayer }: PlaysProps) => {
   return plays && plays.length > 0 ? (
-    plays.map((play) => <Play play={play} player={player} />)
+    plays.map((play) => (
+      <Play scrollToPlayer={scrollToPlayer} play={play} player={player} />
+    ))
   ) : (
     <Typography variant="caption" className="text-center" fontSize={18}>
       Play directory is empty!

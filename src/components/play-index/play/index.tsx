@@ -10,19 +10,25 @@ import type { PlayType } from "~/utils/types";
 type PlayProps = {
   player: YouTubePlayer | null;
   play: PlayType;
+  scrollToPlayer: () => void;
 };
 
-const Play = ({ player, play }: PlayProps) => {
+const Play = ({ player, play, scrollToPlayer }: PlayProps) => {
   const { backgroundStyle } = useIsDarkContext();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+  const handleClick = (playTime: number) => {
+    scrollToPlayer();
+    void player?.seekTo(playTime, true);
+  };
 
   return (
     <div>
       <div
         style={backgroundStyle}
         className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2"
-        onClick={() => player?.seekTo(play.start_time, true)}
+        onClick={() => handleClick(play.start_time)}
       >
         <Typography variant="button" className="w-min" fontSize={16}>
           {play.author_name}

@@ -2,7 +2,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Button, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import PlayIndex from "~/components/play-index";
 import PlayModal from "~/components/play-modal";
@@ -15,7 +15,9 @@ const FilmRoom = () => {
   const { screenWidth } = useMobileContext();
 
   const [game, setGame] = useState<GameListType | null>(null);
+
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
+  const playerRef = useRef<HTMLDivElement | null>(null);
 
   const [isPlayModalOpen, setIsPlayModalOpen] = useState<boolean>(false);
 
@@ -39,6 +41,10 @@ const FilmRoom = () => {
     if (time) {
       void player?.seekTo(time, true);
     }
+  };
+
+  const scrollToPlayer = () => {
+    if (playerRef) playerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -69,23 +75,25 @@ const FilmRoom = () => {
           setIsPlayModalOpen={setIsPlayModalOpen}
         />
         {game.link && (
-          <Youtube
-            opts={{
-              width: `${screenWidth * 0.8}`,
-              height: `${(screenWidth * 0.8) / 1.778}`,
-              playerVars: {
-                enablejsapi: 1,
-                playsinline: 1,
-                fs: 1,
-                rel: 0,
-                color: "red",
-                origin: "https://www.youtube.com",
-              },
-            }}
-            id="player"
-            videoId={game.link.split("v=")[1]?.split("&")[0]}
-            onReady={videoOnReady}
-          />
+          <div ref={playerRef}>
+            <Youtube
+              opts={{
+                width: `${screenWidth * 0.8}`,
+                height: `${(screenWidth * 0.8) / 1.778}`,
+                playerVars: {
+                  enablejsapi: 1,
+                  playsinline: 1,
+                  fs: 1,
+                  rel: 0,
+                  color: "red",
+                  origin: "https://www.youtube.com",
+                },
+              }}
+              id="player"
+              videoId={game.link.split("v=")[1]?.split("&")[0]}
+              onReady={videoOnReady}
+            />
+          </div>
         )}
         {isPlayIndexOpen ? (
           <div className="flex w-full flex-col items-center justify-center gap-4">
@@ -97,7 +105,11 @@ const FilmRoom = () => {
             >
               Close Play Index
             </Button>
-            <PlayIndex gameId={game.id} player={player} />
+            <PlayIndex
+              gameId={game.id}
+              player={player}
+              scrollToPlayer={scrollToPlayer}
+            />
           </div>
         ) : (
           <Button
