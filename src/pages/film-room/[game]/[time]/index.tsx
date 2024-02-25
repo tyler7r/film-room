@@ -97,7 +97,7 @@ const FilmRoom = () => {
     setPlayer(video);
     const time = Number(router.query.time);
     if (time) {
-      player?.seekTo(time, true);
+      void player?.seekTo(time, true);
     }
   };
 

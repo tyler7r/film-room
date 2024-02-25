@@ -4,8 +4,8 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Typography,
+  type SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
@@ -42,7 +42,7 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
         team_id: `${user.currentAffiliation?.team.id}`,
       })
       .order("start_time");
-    let arr: PlayIndexType[] = [
+    const arr: PlayIndexType[] = [
       { name: "Coaches", count: 0 },
       { name: "Players", count: 0 },
       { name: "Highlights", count: 0 },
@@ -57,7 +57,7 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
         if (isRepeatAuthor) {
           isRepeatAuthor.count++;
         } else {
-          arr.push({ name: play.author_name as string, count: 1 });
+          arr.push({ name: play.author_name, count: 1 });
         }
       });
     }
@@ -65,20 +65,20 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
   };
 
   const handleChange = (e: SelectChangeEvent) => {
-    const f = e.target.value as string;
+    const f = e.target.value;
     setFilter(f);
-    let copy = plays;
+    const copy = plays;
     if (f === "Players") {
-      let result = copy?.filter((v) => v.author_role === "player");
+      const result = copy?.filter((v) => v.author_role === "player");
       if (result) setFilteredPlays(result);
     } else if (f === "Coaches") {
-      let result = copy?.filter((v) => v.author_role === "coach");
+      const result = copy?.filter((v) => v.author_role === "coach");
       if (result) setFilteredPlays(result);
     } else if (f === "Highlights") {
-      let result = copy?.filter((v) => v.highlight);
+      const result = copy?.filter((v) => v.highlight);
       if (result) setFilteredPlays(result);
     } else {
-      let result = copy?.filter((v) => v.author_name === f);
+      const result = copy?.filter((v) => v.author_name === f);
       if (result) setFilteredPlays(result);
     }
   };

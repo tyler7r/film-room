@@ -75,7 +75,7 @@ const TeamHub = ({
       void fetchRole();
       checkIfOwner();
     } else {
-      router.push("/");
+      void router.push("/");
     }
   }, [user, router.query.team]);
 

@@ -5,7 +5,7 @@ import { Divider, Typography } from "@mui/material";
 import { useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useIsDarkContext } from "~/pages/_app";
-import { PlayType } from "~/utils/types";
+import type { PlayType } from "~/utils/types";
 
 type PlayProps = {
   player: YouTubePlayer | null;
@@ -20,7 +20,7 @@ const Play = ({ player, play }: PlayProps) => {
     <div>
       <div
         style={backgroundStyle}
-        className="flex cursor-pointer items-center gap-2 rounded-md p-2"
+        className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2"
         onClick={() => player?.seekTo(play.start_time, true)}
       >
         <Typography variant="button" className="w-min" fontSize={16}>
