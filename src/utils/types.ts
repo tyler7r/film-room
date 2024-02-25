@@ -1,9 +1,12 @@
 export type TeamAffiliationType = {
-  id: string;
-  name: string;
-  city: string;
-  division: string;
-  logo: string | null;
+  team: {
+    id: string;
+    name: string;
+    city: string;
+    division: string;
+    logo: string | null;
+  };
+  role: string;
 };
 
 export type UserSession = {
@@ -55,3 +58,38 @@ export type GameListType = {
     name: string;
   } | null;
 };
+
+export type PlayDirectoryType = {
+  profile_id: string | null;
+  game_id: string | null;
+  highlight: boolean;
+  id: string;
+  note: string;
+  team_id: string | null;
+  author_name: string;
+  author_role: string;
+  start_time: number;
+  end_time: number;
+  title: string;
+}[];
+
+export type PlayType = {
+  profile_id: string | null;
+  game_id: string | null;
+  highlight: boolean;
+  id: string;
+  note: string;
+  team_id: string | null;
+  author_name: string;
+  author_role: string;
+  start_time: number;
+  end_time: number;
+  title: string;
+};
+
+export type PlayerType = {
+  user_id: string;
+  profiles: {
+    name: string | null;
+  } | null;
+}[];

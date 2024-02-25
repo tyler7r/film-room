@@ -33,12 +33,13 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
   const fetchAffiliations = async () => {
     const { data } = await supabase
       .from("affiliations")
-      .select(`teams!inner(id, name, city, division, logo)`)
+      .select(`role, teams!inner(id, name, city, division, logo)`)
       .match({ user_id: `${user.userId}`, verified: true });
-    if (data) {
-      const typedAffiliations: TeamAffiliationType[] = data.map(
-        (tm) => tm.teams!,
-      );
+    if (data && data.length > 0) {
+      const typedAffiliations: TeamAffiliationType[] = data.map((tm) => ({
+        team: tm.teams!,
+        role: tm.role,
+      }));
       setAffiliations(typedAffiliations);
     }
   };

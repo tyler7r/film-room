@@ -9,7 +9,7 @@ export type ChildrenNavProps = {
 };
 
 export const Navbar = () => {
-  const isMobile = useMobileContext();
+  const { isMobile } = useMobileContext();
   const router = useRouter();
 
   const logout = async () => {

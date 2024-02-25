@@ -10,30 +10,41 @@ type MobileProps = {
   children: ReactNode;
 };
 
-export const IsMobileContext = createContext<boolean | undefined>(false);
+type MobileContextType = {
+  isMobile: boolean;
+  screenWidth: number;
+};
+
+export const IsMobileContext = createContext<MobileContextType>({
+  isMobile: false,
+  screenWidth: 0,
+});
 
 export const IsMobile = ({ children }: MobileProps) => {
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<MobileContextType>({
+    isMobile: false,
+    screenWidth: 0,
+  });
 
   useEffect(() => {
     if (window.innerWidth <= 480) {
-      setIsMobile(true);
+      setIsMobile({ isMobile: true, screenWidth: window.innerWidth });
     } else {
-      setIsMobile(false);
+      setIsMobile({ isMobile: false, screenWidth: window.innerWidth });
     }
     window.addEventListener("resize", () => {
       if (window.innerWidth <= 480) {
-        setIsMobile(true);
+        setIsMobile({ isMobile: true, screenWidth: window.innerWidth });
       } else {
-        setIsMobile(false);
+        setIsMobile({ isMobile: false, screenWidth: window.innerWidth });
       }
     });
     return () =>
       window.removeEventListener("resize", () => {
         if (window.innerWidth <= 480) {
-          setIsMobile(true);
+          setIsMobile({ isMobile: true, screenWidth: window.innerWidth });
         } else {
-          setIsMobile(false);
+          setIsMobile({ isMobile: false, screenWidth: window.innerWidth });
         }
       });
   }, []);

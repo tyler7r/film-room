@@ -27,7 +27,7 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
           {user.isLoggedIn ? (
             <div className="flex items-center justify-center gap-3 px-1 py-2">
               {user.currentAffiliation && (
-                <TeamLogo team={user.currentAffiliation} />
+                <TeamLogo tm={user.currentAffiliation} />
               )}
               <Button variant="contained" size="small" onClick={logout}>
                 Logout

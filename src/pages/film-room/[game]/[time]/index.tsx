@@ -1,3 +1,5 @@
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Button,
   Checkbox,
@@ -8,11 +10,13 @@ import {
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
+import PlayDirectory from "~/components/play-directory";
 import Mentions from "~/components/play-mentions";
 import { useAuthContext } from "~/contexts/auth";
+import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { type GameListType } from "~/utils/types";
+import type { GameListType, PlayerType } from "~/utils/types";
 
 type PlayType = {
   start: number | null | undefined;
@@ -20,27 +24,25 @@ type PlayType = {
 };
 
 type NoteType = {
+  title: string;
   note: string;
   highlight: boolean;
 };
 
-export type PlayerType = {
-  user_id: string;
-  profiles: {
-    name: string | null;
-  } | null;
-}[];
-
 const FilmRoom = () => {
   const router = useRouter();
+  const { screenWidth } = useMobileContext();
   const { borderStyle } = useIsDarkContext();
   const { user } = useAuthContext();
   const [game, setGame] = useState<GameListType | null>(null);
-  //   const [playIndex, setPlayIndex] = useState<string[]>([]);
+  const [isPlayDirectoryOpen, setIsPlayDirectoryOpen] =
+    useState<boolean>(false);
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
-  const [players, setPlayers] = useState<PlayerType | null>(null);
+  const [affiliatedPlayers, setAffiliatedPlayers] = useState<PlayerType | null>(
+    null,
+  );
   const [mentions, setMentions] = useState<string[]>([]);
 
   const [isClipStarted, setIsClipStarted] = useState(false);
@@ -50,6 +52,7 @@ const FilmRoom = () => {
   });
   const [noteOpen, setNoteOpen] = useState<boolean>(false);
   const [noteDetails, setNoteDetails] = useState<NoteType>({
+    title: "",
     note: "",
     highlight: false,
   });
@@ -64,24 +67,15 @@ const FilmRoom = () => {
       .eq("id", router.query.game as string)
       .single();
     if (data) setGame(data);
-    const gamePlays = await supabase
-      .from("plays")
-      .select()
-      .match({
-        game_id: router.query.game as string,
-        team_id: `${user.currentAffiliation?.id}`,
-      });
-    // if (gamePlays.data) setPlayIndex(gamePlays.data);
-    console.log(gamePlays.data);
   };
 
   const fetchPlayers = async () => {
     const { data } = await supabase
       .from("affiliations")
       .select(`user_id, profiles (name)`)
-      .neq("user_id", user.userId);
-    //   .match({ team_id: user.currentAffiliation?.id });
-    if (data) setPlayers(data);
+      .neq("user_id", user.userId)
+      .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
+    if (data) setAffiliatedPlayers(data);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,26 +95,33 @@ const FilmRoom = () => {
   const videoOnReady = (e: YouTubeEvent) => {
     const video = e.target;
     setPlayer(video);
+    const time = Number(router.query.time);
+    if (time) {
+      void player?.seekTo(time, true);
+    }
   };
 
   const startClip = async () => {
     setIsClipStarted(true);
     const time = await player?.getCurrentTime();
-    setPlay({ ...play, start: time });
+    const roundedTime = Math.round(time!);
+    setPlay({ ...play, start: roundedTime });
     void player?.playVideo();
   };
 
   const endClip = async () => {
     setIsClipStarted(false);
     const time = await getCurrentTime();
+    const roundedTime = Math.round(time!);
     void player?.pauseVideo();
-    setPlay({ ...play, end: time });
+    setPlay({ ...play, end: roundedTime });
     setNoteOpen(true);
   };
 
   const resetPlay = async () => {
     setNoteOpen(false);
     setNoteDetails({
+      title: "",
       note: "",
       highlight: false,
     });
@@ -144,18 +145,24 @@ const FilmRoom = () => {
     const { data } = await supabase
       .from("plays")
       .insert({
-        team_id: user.currentAffiliation?.id,
-        author_id: user.userId,
-        game_id: game?.id,
+        team_id: user.currentAffiliation?.team.id,
+        profile_id: user.userId,
+        game_id: `${game?.id}`,
         highlight: noteDetails.highlight,
+        title: noteDetails.title,
         note: noteDetails.note,
-        timestamp: { start: play.start, end: play.end },
+        start_time: play.start!,
+        end_time: play.end!,
+        author_role: `${user.currentAffiliation?.role}`,
+        author_name: `${user.name}`,
       })
       .select()
       .single();
     if (data) {
       mentions.forEach((mention) => {
-        const player = players?.find((v) => v.profiles?.name === mention);
+        const player = affiliatedPlayers?.find(
+          (v) => v.profiles?.name === mention,
+        );
         if (player) {
           void handleMention(player.user_id, data.id);
         }
@@ -168,7 +175,8 @@ const FilmRoom = () => {
     if (
       typeof play.end !== "number" ||
       typeof play.start !== "number" ||
-      noteDetails.note === ""
+      noteDetails.note === "" ||
+      noteDetails.title === ""
     ) {
       setIsValidPlay(false);
     } else {
@@ -186,9 +194,9 @@ const FilmRoom = () => {
   }, [noteDetails, play]);
 
   useEffect(() => {
-    void fetchGame();
-    void fetchPlayers();
-  }, []);
+    if (router.query.game) void fetchGame();
+    if (user.currentAffiliation) void fetchPlayers();
+  }, [router.query.game]);
 
   return (
     game && (
@@ -214,6 +222,17 @@ const FilmRoom = () => {
             className="flex w-4/5 flex-col items-center justify-center gap-4 rounded-md border-solid p-4"
           >
             <TextField
+              className="w-4/5"
+              name="title"
+              autoComplete="title"
+              required
+              id="title"
+              label="Title (100 characters max)"
+              onChange={handleInput}
+              value={noteDetails.title}
+              inputProps={{ maxLength: 100 }}
+            />
+            <TextField
               className="w-full"
               name="note"
               autoComplete="note"
@@ -224,7 +243,7 @@ const FilmRoom = () => {
               value={noteDetails.note}
             />
             <Mentions
-              players={players}
+              players={affiliatedPlayers}
               mentions={mentions}
               setMentions={setMentions}
             />
@@ -254,28 +273,54 @@ const FilmRoom = () => {
             </div>
           </form>
         ) : !isClipStarted ? (
-          <Button onClick={() => startClip()}>Start Clip</Button>
+          <Button onClick={() => startClip()} size="large">
+            Start Clip
+          </Button>
         ) : (
-          <Button onClick={() => endClip()}>End Clip</Button>
+          <Button onClick={() => endClip()} size="large">
+            End Clip
+          </Button>
         )}
         {game.link && (
-          <div className="relative">
-            <Youtube
-              opts={{
-                playerVars: {
-                  enablejsapi: 1,
-                  playsinline: 1,
-                  fs: 0,
-                  rel: 0,
-                  color: "red",
-                  origin: "https://www.youtube.com",
-                },
-              }}
-              id="player"
-              videoId={game.link.split("v=")[1]?.split("&")[0]}
-              onReady={videoOnReady}
-            />
+          <Youtube
+            opts={{
+              width: `${screenWidth * 0.8}`,
+              height: `${(screenWidth * 0.8) / 1.778}`,
+              playerVars: {
+                enablejsapi: 1,
+                playsinline: 1,
+                fs: 1,
+                rel: 0,
+                color: "red",
+                origin: "https://www.youtube.com",
+              },
+            }}
+            id="player"
+            videoId={game.link.split("v=")[1]?.split("&")[0]}
+            onReady={videoOnReady}
+          />
+        )}
+        {isPlayDirectoryOpen ? (
+          <div className="flex w-full flex-col items-center justify-center gap-4">
+            <Button
+              variant="text"
+              onClick={() => setIsPlayDirectoryOpen(false)}
+              endIcon={<ExpandLessIcon />}
+              size="large"
+            >
+              Close Play Directory
+            </Button>
+            <PlayDirectory gameId={game.id} player={player} />
           </div>
+        ) : (
+          <Button
+            variant="text"
+            onClick={() => setIsPlayDirectoryOpen(true)}
+            endIcon={<ExpandMoreIcon />}
+            size="large"
+          >
+            Open Play Directory
+          </Button>
         )}
       </div>
     )
