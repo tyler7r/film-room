@@ -24,6 +24,7 @@ type PlayType = {
 };
 
 type NoteType = {
+  title: string;
   note: string;
   highlight: boolean;
 };
@@ -51,6 +52,7 @@ const FilmRoom = () => {
   });
   const [noteOpen, setNoteOpen] = useState<boolean>(false);
   const [noteDetails, setNoteDetails] = useState<NoteType>({
+    title: "",
     note: "",
     highlight: false,
   });
@@ -119,6 +121,7 @@ const FilmRoom = () => {
   const resetPlay = async () => {
     setNoteOpen(false);
     setNoteDetails({
+      title: "",
       note: "",
       highlight: false,
     });
@@ -146,11 +149,12 @@ const FilmRoom = () => {
         profile_id: user.userId,
         game_id: `${game?.id}`,
         highlight: noteDetails.highlight,
+        title: noteDetails.title,
         note: noteDetails.note,
         start_time: play.start!,
         end_time: play.end!,
-        author_role: user.currentAffiliation?.role,
-        author_name: user.name,
+        author_role: `${user.currentAffiliation?.role}`,
+        author_name: `${user.name}`,
       })
       .select()
       .single();
@@ -171,7 +175,8 @@ const FilmRoom = () => {
     if (
       typeof play.end !== "number" ||
       typeof play.start !== "number" ||
-      noteDetails.note === ""
+      noteDetails.note === "" ||
+      noteDetails.title === ""
     ) {
       setIsValidPlay(false);
     } else {
@@ -216,6 +221,17 @@ const FilmRoom = () => {
             style={borderStyle}
             className="flex w-4/5 flex-col items-center justify-center gap-4 rounded-md border-solid p-4"
           >
+            <TextField
+              className="w-4/5"
+              name="title"
+              autoComplete="title"
+              required
+              id="title"
+              label="Title (100 characters max)"
+              onChange={handleInput}
+              value={noteDetails.title}
+              inputProps={{ maxLength: 100 }}
+            />
             <TextField
               className="w-full"
               name="note"
