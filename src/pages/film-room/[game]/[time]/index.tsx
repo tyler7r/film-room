@@ -4,7 +4,7 @@ import { Button, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
-import PlayDirectory from "~/components/play-directory";
+import PlayIndex from "~/components/play-index";
 import PlayModal from "~/components/play-modal";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
@@ -19,8 +19,7 @@ const FilmRoom = () => {
 
   const [isPlayModalOpen, setIsPlayModalOpen] = useState<boolean>(false);
 
-  const [isPlayDirectoryOpen, setIsPlayDirectoryOpen] =
-    useState<boolean>(false);
+  const [isPlayIndexOpen, setIsPlayIndexOpen] = useState<boolean>(false);
 
   const fetchGame = async () => {
     const { data } = await supabase
@@ -88,26 +87,26 @@ const FilmRoom = () => {
             onReady={videoOnReady}
           />
         )}
-        {isPlayDirectoryOpen ? (
+        {isPlayIndexOpen ? (
           <div className="flex w-full flex-col items-center justify-center gap-4">
             <Button
               variant="text"
-              onClick={() => setIsPlayDirectoryOpen(false)}
+              onClick={() => setIsPlayIndexOpen(false)}
               endIcon={<ExpandLessIcon />}
               size="large"
             >
-              Close Play Directory
+              Close Play Index
             </Button>
-            <PlayDirectory gameId={game.id} player={player} />
+            <PlayIndex gameId={game.id} player={player} />
           </div>
         ) : (
           <Button
             variant="text"
-            onClick={() => setIsPlayDirectoryOpen(true)}
+            onClick={() => setIsPlayIndexOpen(true)}
             endIcon={<ExpandMoreIcon />}
             size="large"
           >
-            Open Play Directory
+            Open Play Index
           </Button>
         )}
       </div>

@@ -11,27 +11,31 @@ import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { type PlayDirectoryType } from "~/utils/types";
+import { type PlayIndexType } from "~/utils/types";
 import Plays from "./plays";
 
-type PlayDirectoryProps = {
+type PlayIndexProps = {
   player: YouTubePlayer | null;
   gameId: string;
 };
 
-type PlayIndexType = {
+type ActivePlayFilterType = {
   name: string;
   count: number;
 };
 
-const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
+const PlayIndex = ({ player, gameId }: PlayIndexProps) => {
   const { user } = useAuthContext();
-  const [plays, setPlays] = useState<PlayDirectoryType | null>(null);
-  const [filteredPlays, setFilteredPlays] = useState<PlayDirectoryType | null>(
+
+  const [plays, setPlays] = useState<PlayIndexType | null>(null);
+  const [filteredPlays, setFilteredPlays] = useState<PlayIndexType | null>(
     null,
   );
-  const [playIndex, setPlayIndex] = useState<PlayIndexType[] | null>(null);
-  const [filter, setFilter] = useState<string>("");
+
+  const [activePlayFilters, setActivePlayFilters] = useState<
+    ActivePlayFilterType[] | null
+  >(null);
+  const [currentFilter, setCurrentFilter] = useState<string>("");
 
   const fetchPlays = async () => {
     const { data } = await supabase
@@ -42,7 +46,7 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
         team_id: `${user.currentAffiliation?.team.id}`,
       })
       .order("start_time");
-    const arr: PlayIndexType[] = [
+    const arr: ActivePlayFilterType[] = [
       { name: "Coaches", count: 0 },
       { name: "Players", count: 0 },
       { name: "Highlights", count: 0 },
@@ -61,12 +65,12 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
         }
       });
     }
-    setPlayIndex(arr);
+    setActivePlayFilters(arr);
   };
 
   const handleChange = (e: SelectChangeEvent) => {
     const f = e.target.value;
-    setFilter(f);
+    setCurrentFilter(f);
     const copy = plays;
     if (f === "Players") {
       const result = copy?.filter((v) => v.author_role === "player");
@@ -91,9 +95,9 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
     <div className="flex w-4/5 flex-col gap-3">
       <FormControl className="mb-2 w-1/2 self-center">
         <InputLabel>Filter</InputLabel>
-        <Select value={filter} onChange={handleChange} label="Filter">
+        <Select value={currentFilter} onChange={handleChange} label="Filter">
           <MenuItem value="">No Filter</MenuItem>
-          {playIndex?.map((i) => (
+          {activePlayFilters?.map((i) => (
             <MenuItem key={i.name} value={i.name}>
               {i.name === "Highlights" ? "Highlights" : `Notes by ${i.name}`} (
               {i.count})
@@ -107,7 +111,7 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
           = Highlight Play
         </Typography>
       </div>
-      {filter !== "" ? (
+      {currentFilter !== "" ? (
         <Plays plays={filteredPlays} player={player} />
       ) : (
         <Plays player={player} plays={plays} />
@@ -116,4 +120,4 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
   );
 };
 
-export default PlayDirectory;
+export default PlayIndex;

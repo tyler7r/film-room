@@ -7,7 +7,7 @@ import { supabase } from "~/utils/supabase";
 import { PlayerType } from "~/utils/types";
 import Mentions from "../play-mentions";
 
-type CreatePlayProps = {
+type PlayModalProps = {
   player: YouTubePlayer | null;
   gameId: string;
   isPlayModalOpen: boolean;
@@ -27,7 +27,7 @@ const PlayModal = ({
   gameId,
   setIsPlayModalOpen,
   isPlayModalOpen,
-}: CreatePlayProps) => {
+}: PlayModalProps) => {
   const { user } = useAuthContext();
   const { borderStyle } = useIsDarkContext();
   const [isPlayStarted, setIsPlayStarted] = useState(false);

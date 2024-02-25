@@ -1,10 +1,10 @@
 import { Typography } from "@mui/material";
 import type { YouTubePlayer } from "react-youtube";
-import type { PlayDirectoryType } from "~/utils/types";
+import type { PlayIndexType } from "~/utils/types";
 import Play from "../play";
 
 type PlaysProps = {
-  plays: PlayDirectoryType | null;
+  plays: PlayIndexType | null;
   player: YouTubePlayer | null;
 };
 

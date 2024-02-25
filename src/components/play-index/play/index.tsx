@@ -13,8 +13,9 @@ type PlayProps = {
 };
 
 const Play = ({ player, play }: PlayProps) => {
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const { backgroundStyle } = useIsDarkContext();
+
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   return (
     <div>

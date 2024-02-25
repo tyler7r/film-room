@@ -59,7 +59,7 @@ export type GameListType = {
   } | null;
 };
 
-export type PlayDirectoryType = {
+export type PlayIndexType = {
   profile_id: string | null;
   game_id: string | null;
   highlight: boolean;
