@@ -1,9 +1,11 @@
+import StarIcon from "@mui/icons-material/Star";
 import {
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
+  Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
@@ -99,6 +101,12 @@ const PlayDirectory = ({ player, gameId }: PlayDirectoryProps) => {
           ))}
         </Select>
       </FormControl>
+      <div className="flex items-center justify-center text-center">
+        <StarIcon color="secondary" />
+        <Typography fontSize={14} variant="overline">
+          = Highlight Play
+        </Typography>
+      </div>
       {filter !== "" ? (
         <Plays plays={filteredPlays} player={player} />
       ) : (

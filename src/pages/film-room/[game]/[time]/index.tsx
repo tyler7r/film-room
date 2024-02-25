@@ -257,9 +257,13 @@ const FilmRoom = () => {
             </div>
           </form>
         ) : !isClipStarted ? (
-          <Button onClick={() => startClip()}>Start Clip</Button>
+          <Button onClick={() => startClip()} size="large">
+            Start Clip
+          </Button>
         ) : (
-          <Button onClick={() => endClip()}>End Clip</Button>
+          <Button onClick={() => endClip()} size="large">
+            End Clip
+          </Button>
         )}
         {game.link && (
           <Youtube
