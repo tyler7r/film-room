@@ -30,12 +30,26 @@ const Play = ({ player, play, scrollToPlayer }: PlayProps) => {
         className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2"
         onClick={() => handleClick(play.start_time)}
       >
-        <Typography variant="button" className="w-min" fontSize={16}>
+        <Typography variant="button" className="w-min" fontSize={18}>
           {play.author_name}
         </Typography>
         <Divider orientation="vertical" flexItem className="ml-2 mr-2" />
         {play.highlight && <StarIcon color="secondary" />}
-        <div className="grow text-lg tracking-wide">{play.title}</div>
+        <div className="flex grow flex-col">
+          <div className="text-lg tracking-wide">{play.title}</div>
+          {play.mentions.length > 0 && (
+            <div className="flex w-full flex-col">
+              <Divider flexItem className="my-1" />
+              <div className="flex gap-2">
+                {play.mentions.map((m) => (
+                  <div className="text-sm font-bold" key={m.profiles?.name}>
+                    {m.profiles?.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
         <div
           onClick={(e) => {
             e.stopPropagation();

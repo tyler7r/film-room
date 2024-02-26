@@ -40,8 +40,10 @@ const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
 
   const fetchPlays = async () => {
     const { data } = await supabase
-      .from("plays")
-      .select(`*`)
+      .from(`plays`)
+      .select(
+        `*, mentions:play_mentions(profiles!play_mentions_receiver_id_fkey(name))`,
+      )
       .match({
         game_id: gameId,
         team_id: `${user.currentAffiliation?.team.id}`,
