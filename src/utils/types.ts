@@ -72,9 +72,7 @@ export type PlayIndexType = {
   end_time: number;
   title: string;
   mentions: {
-    profiles: {
-      name: string | null;
-    } | null;
+    receiver_name: string;
   }[];
 }[];
 
@@ -91,9 +89,7 @@ export type PlayType = {
   end_time: number;
   title: string;
   mentions: {
-    profiles: {
-      name: string | null;
-    } | null;
+    receiver_name: string;
   }[];
 };
 

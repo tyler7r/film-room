@@ -32,48 +32,36 @@ const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
   const [filteredPlays, setFilteredPlays] = useState<PlayIndexType | null>(
     null,
   );
+  const [playsWithMentions, setPlaysWithMentions] =
+    useState<PlayIndexType | null>(null);
 
   const [activePlayFilters, setActivePlayFilters] = useState<
     ActivePlayFilterType[] | null
   >(null);
+  const [activePlayMentions, setActivePlayMentions] = useState<
+    ActivePlayFilterType[] | null
+  >(null);
   const [currentFilter, setCurrentFilter] = useState<string>("");
+  const [currentMentionFilter, setCurrentMentionFilter] = useState<string>("");
 
   const fetchPlays = async () => {
     const { data } = await supabase
       .from(`plays`)
-      .select(
-        `*, mentions:play_mentions(profiles!play_mentions_receiver_id_fkey(name))`,
-      )
+      .select(`*, mentions:play_mentions (receiver_name)`)
       .match({
         game_id: gameId,
         team_id: `${user.currentAffiliation?.team.id}`,
       })
       .order("start_time");
-    const arr: ActivePlayFilterType[] = [
-      { name: "Coaches", count: 0 },
-      { name: "Players", count: 0 },
-      { name: "Highlights", count: 0 },
-    ];
     if (data) {
       setPlays(data);
-      data.forEach((play) => {
-        const authorRole = play.author_role === "player" ? arr[1] : arr[0];
-        if (authorRole) authorRole.count++;
-        if (play.highlight && arr[2]) arr[2].count++;
-        const isRepeatAuthor = arr.find((p) => p.name === play.author_name);
-        if (isRepeatAuthor) {
-          isRepeatAuthor.count++;
-        } else {
-          arr.push({ name: play.author_name, count: 1 });
-        }
-      });
     }
-    setActivePlayFilters(arr);
   };
 
   const handleChange = (e: SelectChangeEvent) => {
     const f = e.target.value;
     setCurrentFilter(f);
+    setCurrentMentionFilter("");
     const copy = plays;
     if (f === "Players") {
       const result = copy?.filter((v) => v.author_role === "player");
@@ -90,9 +78,64 @@ const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
     }
   };
 
+  const handleMentionFilterChange = (e: SelectChangeEvent) => {
+    const filt = e.target.value;
+    console.log(filt);
+    setCurrentMentionFilter(filt);
+    const copy = playsWithMentions;
+    console.log(copy);
+    const result = copy?.filter(
+      (p) => p.mentions.filter((m) => m.receiver_name === filt).length > 0,
+    );
+    if (result) {
+      setCurrentFilter("");
+      setFilteredPlays(result);
+    }
+  };
+
+  const createPlayFilters = () => {
+    const arr: ActivePlayFilterType[] = [
+      { name: "Coaches", count: 0 },
+      { name: "Players", count: 0 },
+      { name: "Highlights", count: 0 },
+    ];
+    const mentionArr: ActivePlayFilterType[] = [];
+    const arr3: PlayIndexType = [];
+    plays?.forEach((play) => {
+      const authorRole = play.author_role === "player" ? arr[1] : arr[0];
+      if (authorRole) authorRole.count++;
+      if (play.highlight && arr[2]) arr[2].count++;
+      const isRepeatAuthor = arr.find((p) => p.name === play.author_name);
+      if (isRepeatAuthor) {
+        isRepeatAuthor.count++;
+      } else {
+        arr.push({ name: play.author_name, count: 1 });
+      }
+      if (play.mentions.length > 0) {
+        arr3.push(play);
+        play.mentions.forEach((mention) => {
+          const name = mention.receiver_name as string;
+          const isAlreadyMentioned = mentionArr.find((p) => p.name === name);
+          if (isAlreadyMentioned) {
+            isAlreadyMentioned.count++;
+          } else {
+            mentionArr.push({ name, count: 1 });
+          }
+        });
+      }
+    });
+    setActivePlayFilters(arr);
+    setActivePlayMentions(mentionArr);
+    setPlaysWithMentions(arr3);
+  };
+
   useEffect(() => {
     if (user.currentAffiliation) void fetchPlays();
   }, []);
+
+  useEffect(() => {
+    createPlayFilters();
+  }, [plays]);
 
   return (
     <div className="flex w-4/5 flex-col gap-3">
@@ -108,13 +151,28 @@ const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
           ))}
         </Select>
       </FormControl>
+      <FormControl className="mb-2 w-1/2 self-center">
+        <InputLabel>Filter by Mentions</InputLabel>
+        <Select
+          value={currentMentionFilter}
+          onChange={handleMentionFilterChange}
+          label="Filter by Mentions"
+        >
+          <MenuItem value="">No Filter</MenuItem>
+          {activePlayMentions?.map((i) => (
+            <MenuItem key={i.name} value={i.name}>
+              {i.name} ({i.count})
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <div className="flex items-center justify-center text-center">
         <StarIcon color="secondary" />
         <Typography fontSize={14} variant="overline">
           = Highlight Play
         </Typography>
       </div>
-      {currentFilter !== "" ? (
+      {currentFilter !== "" || currentMentionFilter !== "" ? (
         <Plays
           scrollToPlayer={scrollToPlayer}
           plays={filteredPlays}

@@ -48,7 +48,6 @@ const PlayModal = ({
     const { data } = await supabase
       .from("affiliations")
       .select(`user_id, profiles (name)`)
-      .neq("user_id", user.userId)
       .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
     if (data) setAffiliatedPlayers(data);
   };
@@ -90,13 +89,15 @@ const PlayModal = ({
     setMentions([]);
   };
 
-  const handleMention = async (player: string, play: string) => {
+  const handleMention = async (player: string, name: string, play: string) => {
     await supabase
       .from("play_mentions")
       .insert({
         play_id: play,
         sender_id: `${user.userId}`,
         receiver_id: player,
+        receiver_name: name,
+        sender_name: `${user.name}`,
       })
       .select()
       .single();
@@ -125,7 +126,7 @@ const PlayModal = ({
           (v) => v.profiles?.name === mention,
         );
         if (player) {
-          void handleMention(player.user_id, data.id);
+          void handleMention(player.user_id, mention, data.id);
         }
       });
       void resetPlay();

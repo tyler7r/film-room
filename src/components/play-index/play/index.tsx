@@ -42,8 +42,8 @@ const Play = ({ player, play, scrollToPlayer }: PlayProps) => {
               <Divider flexItem className="my-1" />
               <div className="flex gap-2">
                 {play.mentions.map((m) => (
-                  <div className="text-sm font-bold" key={m.profiles?.name}>
-                    {m.profiles?.name}
+                  <div className="text-sm font-bold" key={m.receiver_name}>
+                    {m.receiver_name}
                   </div>
                 ))}
               </div>
