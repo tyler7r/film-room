@@ -12,7 +12,12 @@ type PlaysProps = {
 const Plays = ({ plays, player, scrollToPlayer }: PlaysProps) => {
   return plays && plays.length > 0 ? (
     plays.map((play) => (
-      <Play scrollToPlayer={scrollToPlayer} play={play} player={player} />
+      <Play
+        key={play.id}
+        scrollToPlayer={scrollToPlayer}
+        play={play}
+        player={player}
+      />
     ))
   ) : (
     <Typography variant="caption" className="text-center" fontSize={18}>

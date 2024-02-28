@@ -18,6 +18,7 @@ const FilmRoom = () => {
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
+  const [videoDuration, setVideoDuration] = useState<number>(0);
 
   const [isPlayModalOpen, setIsPlayModalOpen] = useState<boolean>(false);
 
@@ -34,12 +35,14 @@ const FilmRoom = () => {
     if (data) setGame(data);
   };
 
-  const videoOnReady = (e: YouTubeEvent) => {
+  const videoOnReady = async (e: YouTubeEvent) => {
     const video = e.target;
     setPlayer(video);
+    const duration = await video.getDuration();
+    setVideoDuration(duration);
     const time = Number(router.query.time);
     if (time) {
-      void player?.seekTo(time, true);
+      void video.seekTo(time, true);
     }
   };
 
@@ -109,6 +112,7 @@ const FilmRoom = () => {
               gameId={game.id}
               player={player}
               scrollToPlayer={scrollToPlayer}
+              duration={videoDuration}
             />
           </div>
         ) : (

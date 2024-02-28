@@ -1,4 +1,5 @@
 import { Button, Checkbox, FormControlLabel, TextField } from "@mui/material";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
@@ -28,6 +29,7 @@ const PlayModal = ({
   setIsPlayModalOpen,
   isPlayModalOpen,
 }: PlayModalProps) => {
+  const router = useRouter();
   const { user } = useAuthContext();
   const { borderStyle } = useIsDarkContext();
   const [isPlayStarted, setIsPlayStarted] = useState(false);
@@ -61,6 +63,7 @@ const PlayModal = ({
   };
 
   const startPlay = async () => {
+    if (!user.isLoggedIn) router.push("/login");
     setIsPlayStarted(true);
     const time = await player?.getCurrentTime();
     const roundedTime = Math.round(time!);

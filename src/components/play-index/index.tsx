@@ -12,12 +12,14 @@ import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { type PlayIndexType } from "~/utils/types";
+import PlayBar from "./play-bar";
 import Plays from "./plays";
 
 type PlayIndexProps = {
   player: YouTubePlayer | null;
   gameId: string;
   scrollToPlayer: () => void;
+  duration: number;
 };
 
 type ActivePlayFilterType = {
@@ -25,9 +27,15 @@ type ActivePlayFilterType = {
   count: number;
 };
 
-const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
+const PlayIndex = ({
+  player,
+  gameId,
+  scrollToPlayer,
+  duration,
+}: PlayIndexProps) => {
   const { user } = useAuthContext();
 
+  const [page, setPage] = useState<number>(0);
   const [plays, setPlays] = useState<PlayIndexType | null>(null);
   const [filteredPlays, setFilteredPlays] = useState<PlayIndexType | null>(
     null,
@@ -44,7 +52,20 @@ const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
   const [currentFilter, setCurrentFilter] = useState<string>("");
   const [currentMentionFilter, setCurrentMentionFilter] = useState<string>("");
 
+  const getFromAndTo = () => {
+    const itemPerPage = 4;
+    let from = page * 5;
+    let to = from + itemPerPage;
+
+    if (page > 0) {
+      from += 1;
+    }
+
+    return { from, to };
+  };
+
   const fetchPlays = async () => {
+    const { from, to } = getFromAndTo();
     const { data } = await supabase
       .from(`plays`)
       .select(`*, mentions:play_mentions (receiver_name)`)
@@ -52,9 +73,11 @@ const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
         game_id: gameId,
         team_id: `${user.currentAffiliation?.team.id}`,
       })
-      .order("start_time");
+      .order("start_time")
+      .range(from, to);
     if (data) {
-      setPlays(data);
+      setPlays(plays ? [...plays, ...data] : data);
+      setPage(page + 1);
     }
   };
 
@@ -80,10 +103,8 @@ const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
 
   const handleMentionFilterChange = (e: SelectChangeEvent) => {
     const filt = e.target.value;
-    console.log(filt);
     setCurrentMentionFilter(filt);
     const copy = playsWithMentions;
-    console.log(copy);
     const result = copy?.filter(
       (p) => p.mentions.filter((m) => m.receiver_name === filt).length > 0,
     );
@@ -131,7 +152,7 @@ const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
 
   useEffect(() => {
     if (user.currentAffiliation) void fetchPlays();
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     createPlayFilters();
@@ -139,6 +160,12 @@ const PlayIndex = ({ player, gameId, scrollToPlayer }: PlayIndexProps) => {
 
   return (
     <div className="flex w-4/5 flex-col gap-3">
+      <PlayBar
+        plays={plays}
+        player={player}
+        scrollToPlayer={scrollToPlayer}
+        duration={duration}
+      />
       <FormControl className="mb-2 w-1/2 self-center">
         <InputLabel>Filter</InputLabel>
         <Select value={currentFilter} onChange={handleChange} label="Filter">
