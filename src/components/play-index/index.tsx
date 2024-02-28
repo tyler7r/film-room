@@ -35,7 +35,6 @@ const PlayIndex = ({
 }: PlayIndexProps) => {
   const { user } = useAuthContext();
 
-  const [page, setPage] = useState<number>(0);
   const [plays, setPlays] = useState<PlayIndexType | null>(null);
   const [filteredPlays, setFilteredPlays] = useState<PlayIndexType | null>(
     null,
@@ -52,20 +51,7 @@ const PlayIndex = ({
   const [currentFilter, setCurrentFilter] = useState<string>("");
   const [currentMentionFilter, setCurrentMentionFilter] = useState<string>("");
 
-  const getFromAndTo = () => {
-    const itemPerPage = 4;
-    let from = page * 5;
-    let to = from + itemPerPage;
-
-    if (page > 0) {
-      from += 1;
-    }
-
-    return { from, to };
-  };
-
   const fetchPlays = async () => {
-    const { from, to } = getFromAndTo();
     const { data } = await supabase
       .from(`plays`)
       .select(`*, mentions:play_mentions (receiver_name)`)
@@ -73,11 +59,9 @@ const PlayIndex = ({
         game_id: gameId,
         team_id: `${user.currentAffiliation?.team.id}`,
       })
-      .order("start_time")
-      .range(from, to);
+      .order("start_time");
     if (data) {
-      setPlays(plays ? [...plays, ...data] : data);
-      setPage(page + 1);
+      setPlays(data);
     }
   };
 
@@ -152,7 +136,7 @@ const PlayIndex = ({
 
   useEffect(() => {
     if (user.currentAffiliation) void fetchPlays();
-  }, [page]);
+  }, []);
 
   useEffect(() => {
     createPlayFilters();
