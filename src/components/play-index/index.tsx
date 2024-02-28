@@ -119,7 +119,7 @@ const PlayIndex = ({
       if (play.mentions.length > 0) {
         arr3.push(play);
         play.mentions.forEach((mention) => {
-          const name = mention.receiver_name as string;
+          const name = mention.receiver_name;
           const isAlreadyMentioned = mentionArr.find((p) => p.name === name);
           if (isAlreadyMentioned) {
             isAlreadyMentioned.count++;

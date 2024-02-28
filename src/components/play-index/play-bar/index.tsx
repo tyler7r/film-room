@@ -1,6 +1,6 @@
 import type { YouTubePlayer } from "react-youtube";
 import { useMobileContext } from "~/contexts/mobile";
-import { PlayIndexType } from "~/utils/types";
+import type { PlayIndexType } from "~/utils/types";
 
 type PlayBarProps = {
   plays: PlayIndexType | null;
@@ -9,7 +9,7 @@ type PlayBarProps = {
   duration: number;
 };
 
-const PlayBar = ({ player, plays, scrollToPlayer, duration }: PlayBarProps) => {
+const PlayBar = ({ plays, duration }: PlayBarProps) => {
   const { screenWidth } = useMobileContext();
 
   return (

@@ -5,7 +5,7 @@ import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { PlayerType } from "~/utils/types";
+import type { PlayerType } from "~/utils/types";
 import Mentions from "../play-mentions";
 
 type PlayModalProps = {
@@ -63,7 +63,7 @@ const PlayModal = ({
   };
 
   const startPlay = async () => {
-    if (!user.isLoggedIn) router.push("/login");
+    if (!user.isLoggedIn) void router.push("/login");
     setIsPlayStarted(true);
     const time = await player?.getCurrentTime();
     const roundedTime = Math.round(time!);
