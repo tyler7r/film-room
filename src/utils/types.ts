@@ -59,7 +59,7 @@ export type GameListType = {
   } | null;
 };
 
-export type PlayDirectoryType = {
+export type PlayIndexType = {
   profile_id: string | null;
   game_id: string | null;
   highlight: boolean;
@@ -71,6 +71,9 @@ export type PlayDirectoryType = {
   start_time: number;
   end_time: number;
   title: string;
+  mentions: {
+    receiver_name: string;
+  }[];
 }[];
 
 export type PlayType = {
@@ -85,6 +88,9 @@ export type PlayType = {
   start_time: number;
   end_time: number;
   title: string;
+  mentions: {
+    receiver_name: string;
+  }[];
 };
 
 export type PlayerType = {
