@@ -5,11 +5,14 @@ import TeamPageButton from "../team-profile-btn";
 
 type MainMenuProps = {
   size: "small" | "medium" | "large";
+  isInboxOpen: boolean;
+  setIsInboxOpen: () => void;
 };
 
-const MainMenu = ({ size }: MainMenuProps) => {
+const MainMenu = ({ size, isInboxOpen, setIsInboxOpen }: MainMenuProps) => {
   const router = useRouter();
   const { backgroundStyle } = useIsDarkContext();
+
   return (
     <div style={backgroundStyle} className="flex items-center justify-around">
       <Button
@@ -23,7 +26,14 @@ const MainMenu = ({ size }: MainMenuProps) => {
         Highlight Factory
       </Button>
       <TeamPageButton />
-      <Button variant="text" size={size}>
+      <Button
+        variant="text"
+        size={size}
+        onClick={() => {
+          console.log(isInboxOpen);
+          setIsInboxOpen();
+        }}
+      >
         Inbox
       </Button>
     </div>

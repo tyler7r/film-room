@@ -6,12 +6,17 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import Inbox from "../inbox";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 import TeamLogo from "../team-logo";
 import { type ChildrenNavProps } from "./navbar";
 
-const MobileNav = ({ logout }: ChildrenNavProps) => {
+const MobileNav = ({
+  logout,
+  isInboxOpen,
+  setIsInboxOpen,
+}: ChildrenNavProps) => {
   const { user } = useAuthContext();
   const { isDark, setIsDark } = useIsDarkContext();
   const router = useRouter();
@@ -67,7 +72,16 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
           </div>
         </div>
       </div>
-      {menuOpen && <MainMenu size="medium" />}
+      {menuOpen && (
+        <MainMenu
+          size="medium"
+          isInboxOpen={isInboxOpen}
+          setIsInboxOpen={setIsInboxOpen}
+        />
+      )}
+      {isInboxOpen && (
+        <Inbox isInboxOpen={isInboxOpen} setIsInboxOpen={setIsInboxOpen} />
+      )}
     </div>
   );
 };
