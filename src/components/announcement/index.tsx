@@ -1,5 +1,6 @@
 import { Button, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { type MessageType, type TeamHubType } from "~/utils/types";
 import FormMessage from "../form-message";
@@ -10,6 +11,7 @@ type AnnouncementProps = {
 };
 
 const Announcement = ({ toggleOpen, team }: AnnouncementProps) => {
+  const { user } = useAuthContext();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
     status: "error",
@@ -27,8 +29,10 @@ const Announcement = ({ toggleOpen, team }: AnnouncementProps) => {
     const { data } = await supabase
       .from("announcements")
       .insert({
-        team_id: team?.id,
+        team_id: team?.id as string,
         text: announcement,
+        author_name: user.name as string,
+        author_id: user.userId,
       })
       .select();
     if (data) {
