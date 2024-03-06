@@ -86,6 +86,7 @@ export type Database = {
           link: string | null
           one_id: string
           season: string | null
+          title: string
           tournament: string | null
           two_id: string
         }
@@ -94,6 +95,7 @@ export type Database = {
           link?: string | null
           one_id: string
           season?: string | null
+          title: string
           tournament?: string | null
           two_id: string
         }
@@ -102,6 +104,7 @@ export type Database = {
           link?: string | null
           one_id?: string
           season?: string | null
+          title?: string
           tournament?: string | null
           two_id?: string
         }
