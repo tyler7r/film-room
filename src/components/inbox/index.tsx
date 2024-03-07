@@ -1,4 +1,5 @@
-import { Divider, Drawer, Typography } from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Button, Divider, Drawer, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
@@ -30,6 +31,15 @@ type MentionType = {
   } | null;
 }[];
 
+type AnnouncementType = {
+  author_id: string;
+  author_name: string;
+  created_at: string;
+  id: string;
+  team_id: string;
+  text: string;
+};
+
 const Inbox = ({ isInboxOpen, setIsInboxOpen }: InboxProps) => {
   const { user } = useAuthContext();
   const { screenWidth } = useMobileContext();
@@ -37,6 +47,9 @@ const Inbox = ({ isInboxOpen, setIsInboxOpen }: InboxProps) => {
   const router = useRouter();
 
   const [mentions, setMentions] = useState<MentionType | null>(null);
+  const [announcement, setAnnouncement] = useState<AnnouncementType | null>(
+    null,
+  );
 
   const fetchMentions = async () => {
     const { data } = await supabase
@@ -49,26 +62,54 @@ const Inbox = ({ isInboxOpen, setIsInboxOpen }: InboxProps) => {
     if (data) setMentions(data);
   };
 
+  const fetchLastAnnouncement = async () => {
+    const { data } = await supabase
+      .from("announcements")
+      .select()
+      .order("created_at")
+      .limit(1)
+      .single();
+    if (data) setAnnouncement(data);
+  };
+
   useEffect(() => {
     if (user.isLoggedIn) void fetchMentions();
+    if (user.isLoggedIn && user.currentAffiliation)
+      void fetchLastAnnouncement();
   }, []);
 
   return (
     <Drawer open={isInboxOpen} anchor="right" onClose={() => setIsInboxOpen()}>
       <div className="p-2" style={{ width: screenWidth * 0.5 }}>
-        <Typography className="p-2 text-center" variant="h2" fontStyle="italic">
+        <Typography className="p-2 text-center" variant="h3" fontStyle="italic">
           Inbox
         </Typography>
         <div className="flex flex-col gap-3">
+          <div className="flex flex-col items-start gap-2">
+            <Typography variant="h5">Last Team Announcement</Typography>
+            <div>
+              <strong>{announcement?.author_name}:</strong> {announcement?.text}
+            </div>
+            <Button
+              endIcon={<ArrowForwardIcon />}
+              onClick={() => {
+                router.push(`/team-hub/${announcement?.team_id}`);
+                setIsInboxOpen();
+              }}
+            >
+              Go to Team Hub
+            </Button>
+          </div>
+          <Divider></Divider>
           <Typography variant="h5" className="">
-            Your Mentions
+            Recent Mentions
           </Typography>
           {mentions?.map((mention) => (
             <div
               key={mention.play_id + mention.created_at}
               onClick={() => {
                 router.push(
-                  `film-room/${mention.plays?.game_id}/${mention.plays?.start_time}`,
+                  `/film-room/${mention.plays?.game_id}/${mention.plays?.start_time}`,
                 );
                 setIsInboxOpen();
               }}
@@ -82,10 +123,6 @@ const Inbox = ({ isInboxOpen, setIsInboxOpen }: InboxProps) => {
               </div>
             </div>
           ))}
-          <Divider></Divider>
-          <Typography variant="h5" className="">
-            Team Announcements
-          </Typography>
         </div>
       </div>
     </Drawer>

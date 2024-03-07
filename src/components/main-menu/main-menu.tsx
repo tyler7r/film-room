@@ -30,7 +30,6 @@ const MainMenu = ({ size, isInboxOpen, setIsInboxOpen }: MainMenuProps) => {
         variant="text"
         size={size}
         onClick={() => {
-          console.log(isInboxOpen);
           setIsInboxOpen();
         }}
       >
