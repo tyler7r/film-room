@@ -3,6 +3,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import { Button, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "~/contexts/auth";
+import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import Inbox from "../inbox";
 import { Logo } from "../logo/logo";
@@ -10,12 +11,9 @@ import MainMenu from "../main-menu/main-menu";
 import TeamLogo from "../team-logo";
 import { type ChildrenNavProps } from "./navbar";
 
-const DesktopNav = ({
-  logout,
-  isInboxOpen,
-  setIsInboxOpen,
-}: ChildrenNavProps) => {
+const DesktopNav = ({ logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
+  const { isOpen } = useInboxContext();
   const { isDark, setIsDark } = useIsDarkContext();
   const router = useRouter();
 
@@ -60,14 +58,8 @@ const DesktopNav = ({
           />
         </div>
       </div>
-      <MainMenu
-        size="large"
-        isInboxOpen={isInboxOpen}
-        setIsInboxOpen={setIsInboxOpen}
-      />
-      {isInboxOpen && (
-        <Inbox isInboxOpen={isInboxOpen} setIsInboxOpen={setIsInboxOpen} />
-      )}
+      <MainMenu size="large" />
+      {isOpen && <Inbox />}
     </div>
   );
 };

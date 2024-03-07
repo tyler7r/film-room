@@ -1,17 +1,17 @@
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import TeamPageButton from "../team-profile-btn";
 
 type MainMenuProps = {
   size: "small" | "medium" | "large";
-  isInboxOpen: boolean;
-  setIsInboxOpen: () => void;
 };
 
-const MainMenu = ({ size, isInboxOpen, setIsInboxOpen }: MainMenuProps) => {
+const MainMenu = ({ size }: MainMenuProps) => {
   const router = useRouter();
   const { backgroundStyle } = useIsDarkContext();
+  const { isOpen, setIsOpen } = useInboxContext();
 
   return (
     <div style={backgroundStyle} className="flex items-center justify-around">
@@ -30,7 +30,7 @@ const MainMenu = ({ size, isInboxOpen, setIsInboxOpen }: MainMenuProps) => {
         variant="text"
         size={size}
         onClick={() => {
-          setIsInboxOpen();
+          setIsOpen(!isOpen);
         }}
       >
         Inbox
