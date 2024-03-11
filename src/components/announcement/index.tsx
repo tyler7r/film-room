@@ -29,9 +29,9 @@ const Announcement = ({ toggleOpen, team }: AnnouncementProps) => {
     const { data } = await supabase
       .from("announcements")
       .insert({
-        team_id: team?.id as string,
+        team_id: `${team?.id}`,
         text: announcement,
-        author_name: user.name as string,
+        author_name: user.name!,
         author_id: user.userId,
       })
       .select();

@@ -52,7 +52,7 @@ const InboxMentions = () => {
   const getFromAndTo = () => {
     const itemPerPage = 4;
     let from = page * itemPerPage;
-    let to = from + itemPerPage;
+    const to = from + itemPerPage;
 
     if (page > 0) {
       from += 1;
@@ -92,7 +92,7 @@ const InboxMentions = () => {
           <div
             key={mention.play_id + mention.created_at}
             onClick={() => {
-              router.push(
+              void router.push(
                 `/film-room/${mention.plays?.game_id}/${mention.plays?.start_time}`,
               );
               setIsOpen(false);

@@ -1,87 +1,17 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Button, Divider, Drawer, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
-import { supabase } from "~/utils/supabase";
 import TeamLogo from "../team-logo";
 import InboxMentions from "./mentions";
 
-type MentionType = {
-  created_at: string;
-  play_id: string;
-  receiver_id: string;
-  receiver_name: string;
-  sender_id: string;
-  sender_name: string;
-  plays: {
-    start_time: number;
-    game_id: string;
-    title: string;
-    games: {
-      tournament: string | null;
-      season: string | null;
-      title: string;
-    } | null;
-  } | null;
-}[];
-
 const Inbox = () => {
-  const { isOpen, setIsOpen, page, setPage } = useInboxContext();
+  const { isOpen, setIsOpen } = useInboxContext();
   const { user } = useAuthContext();
   const { screenWidth } = useMobileContext();
   const router = useRouter();
-
-  const [mentions, setMentions] = useState<MentionType | null>(null);
-
-  const fetchMentions = async () => {
-    const { from, to } = getFromAndTo();
-    const { data } = await supabase
-      .from(`play_mentions`)
-      .select(
-        `*, plays(start_time, game_id, title, games(tournament, season, title))`,
-      )
-      .eq("receiver_id", `${user.userId}`)
-      .order("created_at", { ascending: false })
-      .range(from, to);
-    setPage(page + 1);
-    if (data) setMentions(mentions ? [...mentions, ...data] : data);
-  };
-
-  const getFromAndTo = () => {
-    const itemPerPage = 2;
-    let from = page * itemPerPage;
-    let to = from + itemPerPage;
-
-    if (page > 0) {
-      from += 1;
-    }
-
-    return { from, to };
-  };
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("affiliation_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_mentions" },
-        () => {
-          void fetchMentions();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (user.isLoggedIn) void fetchMentions();
-  }, []);
 
   return (
     <Drawer open={isOpen} anchor="right" onClose={() => setIsOpen(false)}>
@@ -106,7 +36,7 @@ const Inbox = () => {
                 <Button
                   endIcon={<ArrowForwardIcon />}
                   onClick={() => {
-                    router.push(
+                    void router.push(
                       `/team-hub/${user.currentAffiliation?.team.id}`,
                     );
                     setIsOpen(false);
