@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
+import TeamLogo from "../team-logo";
 import InboxMentions from "./mentions";
 
 type MentionType = {
@@ -28,26 +28,13 @@ type MentionType = {
   } | null;
 }[];
 
-type AnnouncementType = {
-  author_id: string;
-  author_name: string;
-  created_at: string;
-  id: string;
-  team_id: string;
-  text: string;
-};
-
 const Inbox = () => {
   const { isOpen, setIsOpen, page, setPage } = useInboxContext();
   const { user } = useAuthContext();
   const { screenWidth } = useMobileContext();
-  const { backgroundStyle } = useIsDarkContext();
   const router = useRouter();
 
   const [mentions, setMentions] = useState<MentionType | null>(null);
-  const [announcement, setAnnouncement] = useState<AnnouncementType | null>(
-    null,
-  );
 
   const fetchMentions = async () => {
     const { from, to } = getFromAndTo();
@@ -61,16 +48,6 @@ const Inbox = () => {
       .range(from, to);
     setPage(page + 1);
     if (data) setMentions(mentions ? [...mentions, ...data] : data);
-  };
-
-  const fetchLastAnnouncement = async () => {
-    const { data } = await supabase
-      .from("announcements")
-      .select()
-      .order("created_at")
-      .limit(1)
-      .single();
-    if (data) setAnnouncement(data);
   };
 
   const getFromAndTo = () => {
@@ -104,39 +81,41 @@ const Inbox = () => {
 
   useEffect(() => {
     if (user.isLoggedIn) void fetchMentions();
-    if (user.isLoggedIn && user.currentAffiliation)
-      void fetchLastAnnouncement();
   }, []);
 
   return (
     <Drawer open={isOpen} anchor="right" onClose={() => setIsOpen(false)}>
       <div className="p-2" style={{ width: screenWidth * 0.5 }}>
-        <Typography className="p-2 text-center font-extrabold" variant="h3">
+        <Typography className="p-2 text-center font-extrabold" variant="h2">
           Inbox
         </Typography>
         <div className="flex flex-col gap-3">
           <div className="flex flex-col items-start gap-2">
-            <Typography variant="h5" className="font-bold">
-              Last Team Announcement
-            </Typography>
-            {announcement ? (
-              <div className="text-lg">
-                <strong>{announcement?.author_name}:</strong>{" "}
-                {announcement?.text}
-              </div>
-            ) : (
-              <div className="pl-2 font-bold">No team announcements</div>
-            )}
             {user.currentAffiliation?.team && (
-              <Button
-                endIcon={<ArrowForwardIcon />}
-                onClick={() => {
-                  router.push(`/team-hub/${announcement?.team_id}`);
-                  setIsOpen(false);
-                }}
-              >
-                Go to Team Hub
-              </Button>
+              <div className="flex w-full flex-col items-center justify-center gap-1">
+                <div className="flex items-center justify-center gap-3">
+                  <TeamLogo tm={user.currentAffiliation} size={55}></TeamLogo>
+                  <Typography
+                    variant="h5"
+                    className="text-lg font-bold md:text-2xl lg:text-4xl"
+                  >
+                    {`${user.currentAffiliation.team.city}
+                    ${user.currentAffiliation.team.name}`}
+                  </Typography>
+                </div>
+                <Button
+                  endIcon={<ArrowForwardIcon />}
+                  onClick={() => {
+                    router.push(
+                      `/team-hub/${user.currentAffiliation?.team.id}`,
+                    );
+                    setIsOpen(false);
+                  }}
+                  className="lg:text-lg"
+                >
+                  Go to Team Hub
+                </Button>
+              </div>
             )}
           </div>
           <Divider></Divider>

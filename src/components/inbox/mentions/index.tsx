@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button, Divider, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
@@ -50,7 +50,7 @@ const InboxMentions = () => {
   };
 
   const getFromAndTo = () => {
-    const itemPerPage = 2;
+    const itemPerPage = 4;
     let from = page * itemPerPage;
     let to = from + itemPerPage;
 
@@ -84,10 +84,10 @@ const InboxMentions = () => {
 
   return (
     <div className="flex flex-col gap-1">
-      <Typography variant="h5" className="font-bold">
+      <Typography variant="h5" className="font-bold lg:mb-2 lg:text-3xl">
         Recent Mentions
       </Typography>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 md:px-2 lg:px-4">
         {mentions?.map((mention) => (
           <div
             key={mention.play_id + mention.created_at}
@@ -97,11 +97,13 @@ const InboxMentions = () => {
               );
               setIsOpen(false);
             }}
-            className="flex w-full cursor-pointer flex-col gap-1 border-solid border-white p-2 hover:border-solid hover:border-purple-400"
+            className="flex w-full cursor-pointer flex-col gap-1 border-solid border-transparent p-2 hover:border-solid hover:border-purple-400"
             style={backgroundStyle}
           >
-            <div className="text-lg">{mention.plays?.games?.title}</div>
-            {/* <Divider></Divider> */}
+            <div className="text-center text-lg lg:text-start lg:text-xl">
+              {mention.plays?.games?.title}
+            </div>
+            <Divider className="mx-3"></Divider>
             <div>
               <strong>{mention.sender_name}:</strong> {mention.plays?.title}
             </div>

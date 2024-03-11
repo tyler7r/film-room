@@ -5,9 +5,10 @@ import { type TeamAffiliationType } from "~/utils/types";
 
 type TeamLogoProps = {
   tm: TeamAffiliationType;
+  size?: number;
 };
 
-const TeamLogo = ({ tm }: TeamLogoProps) => {
+const TeamLogo = ({ tm, size }: TeamLogoProps) => {
   const { team } = tm;
   const { colorBackground } = useIsDarkContext();
 
@@ -15,8 +16,8 @@ const TeamLogo = ({ tm }: TeamLogoProps) => {
     <Image
       alt="team-logo"
       src={team.logo}
-      height={35}
-      width={35}
+      height={size ? size : 45}
+      width={size ? size : 45}
       className="rounded-full"
     />
   ) : (
