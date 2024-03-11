@@ -7,11 +7,7 @@ import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-
-// type InboxProps = {
-//   isInboxOpen: boolean;
-//   setIsInboxOpen: () => void;
-// };
+import InboxMentions from "./mentions";
 
 type MentionType = {
   created_at: string;
@@ -115,53 +111,36 @@ const Inbox = () => {
   return (
     <Drawer open={isOpen} anchor="right" onClose={() => setIsOpen(false)}>
       <div className="p-2" style={{ width: screenWidth * 0.5 }}>
-        <Typography className="p-2 text-center" variant="h3" fontStyle="italic">
+        <Typography className="p-2 text-center font-extrabold" variant="h3">
           Inbox
         </Typography>
         <div className="flex flex-col gap-3">
           <div className="flex flex-col items-start gap-2">
-            <Typography variant="h5">Last Team Announcement</Typography>
-            <div>
-              <strong>{announcement?.author_name}:</strong> {announcement?.text}
-            </div>
-            <Button
-              endIcon={<ArrowForwardIcon />}
-              onClick={() => {
-                router.push(`/team-hub/${announcement?.team_id}`);
-                setIsOpen(false);
-              }}
-            >
-              Go to Team Hub
-            </Button>
+            <Typography variant="h5" className="font-bold">
+              Last Team Announcement
+            </Typography>
+            {announcement ? (
+              <div className="text-lg">
+                <strong>{announcement?.author_name}:</strong>{" "}
+                {announcement?.text}
+              </div>
+            ) : (
+              <div className="pl-2 font-bold">No team announcements</div>
+            )}
+            {user.currentAffiliation?.team && (
+              <Button
+                endIcon={<ArrowForwardIcon />}
+                onClick={() => {
+                  router.push(`/team-hub/${announcement?.team_id}`);
+                  setIsOpen(false);
+                }}
+              >
+                Go to Team Hub
+              </Button>
+            )}
           </div>
           <Divider></Divider>
-          <div className="flex flex-col gap-2">
-            <Typography variant="h5" className="">
-              Recent Mentions
-            </Typography>
-            <div className="flex flex-col gap-2">
-              {mentions?.map((mention) => (
-                <div
-                  key={mention.play_id + mention.created_at}
-                  onClick={() => {
-                    router.push(
-                      `/film-room/${mention.plays?.game_id}/${mention.plays?.start_time}`,
-                    );
-                    setIsOpen(false);
-                  }}
-                  className="flex w-full cursor-pointer flex-col border-solid border-white p-2 hover:border-solid hover:border-purple-400"
-                  style={backgroundStyle}
-                >
-                  <div className="text-lg">{mention.plays?.games?.title}</div>
-                  <div>
-                    <strong>{mention.sender_name}:</strong>{" "}
-                    {mention.plays?.title}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Button onClick={() => void fetchMentions()}>Load More</Button>
-          </div>
+          <InboxMentions />
         </div>
       </div>
     </Drawer>
