@@ -5,7 +5,9 @@ import { Button, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
+import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
+import Inbox from "../inbox";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 import TeamLogo from "../team-logo";
@@ -13,6 +15,7 @@ import { type ChildrenNavProps } from "./navbar";
 
 const MobileNav = ({ logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
+  const { isOpen } = useInboxContext();
   const { isDark, setIsDark } = useIsDarkContext();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -68,6 +71,7 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
         </div>
       </div>
       {menuOpen && <MainMenu size="medium" />}
+      {isOpen && <Inbox />}
     </div>
   );
 };

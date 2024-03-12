@@ -10,6 +10,7 @@ import { createContext, useContext, useState } from "react";
 import { Navbar } from "~/components/navbar/navbar";
 import { IsAffiliated } from "~/contexts/affiliations";
 import { IsAuth } from "~/contexts/auth";
+import { TheInbox } from "~/contexts/inbox";
 import { IsMobile } from "~/contexts/mobile";
 import { darkTheme, lightTheme } from "~/contexts/theme";
 import "~/styles/globals.css";
@@ -63,8 +64,10 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <IsAuth>
           <IsMobile>
             <IsAffiliated>
-              <Navbar />
-              <Component {...pageProps} />
+              <TheInbox>
+                <Navbar />
+                <Component {...pageProps} />
+              </TheInbox>
             </IsAffiliated>
           </IsMobile>
         </IsAuth>

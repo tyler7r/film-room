@@ -66,7 +66,6 @@ const MultiInput = ({
           disabled={!isValid}
           onClick={() => {
             handleNewItem(inputType);
-            console.log(values);
           }}
         >
           Add Keyword

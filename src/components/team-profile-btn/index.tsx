@@ -34,7 +34,12 @@ const TeamPageButton = () => {
 
   return (
     <div>
-      <Button variant="text" onClick={handleClick} endIcon={<ExpandMoreIcon />}>
+      <Button
+        variant="text"
+        onClick={handleClick}
+        endIcon={<ExpandMoreIcon />}
+        className="lg:text-xl"
+      >
         Team Hub
       </Button>
       {affiliations && (

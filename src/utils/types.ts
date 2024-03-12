@@ -46,6 +46,7 @@ export type GameListType = {
   one_id: string;
   season: string | null;
   tournament: string | null;
+  title: string | null;
   two_id: string;
   one: {
     id: string;

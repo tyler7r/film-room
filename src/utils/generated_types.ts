@@ -53,21 +53,27 @@ export type Database = {
       }
       announcements: {
         Row: {
+          author_id: string
+          author_name: string
           created_at: string
           id: string
-          team_id: string | null
+          team_id: string
           text: string
         }
         Insert: {
+          author_id?: string
+          author_name: string
           created_at?: string
           id?: string
-          team_id?: string | null
+          team_id: string
           text: string
         }
         Update: {
+          author_id?: string
+          author_name?: string
           created_at?: string
           id?: string
-          team_id?: string | null
+          team_id?: string
           text?: string
         }
         Relationships: [
@@ -76,6 +82,13 @@ export type Database = {
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_announcements_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]
@@ -86,6 +99,7 @@ export type Database = {
           link: string | null
           one_id: string
           season: string | null
+          title: string
           tournament: string | null
           two_id: string
         }
@@ -94,6 +108,7 @@ export type Database = {
           link?: string | null
           one_id: string
           season?: string | null
+          title: string
           tournament?: string | null
           two_id: string
         }
@@ -102,6 +117,7 @@ export type Database = {
           link?: string | null
           one_id?: string
           season?: string | null
+          title?: string
           tournament?: string | null
           two_id?: string
         }

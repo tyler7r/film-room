@@ -105,7 +105,7 @@ const Login = () => {
             <Checkbox
               checked={showPwd}
               onChange={() => setShowPwd(!showPwd)}
-              size="small"
+              size="medium"
             />
           }
           labelPlacement="end"
@@ -117,6 +117,7 @@ const Login = () => {
           size="large"
           type="submit"
           disabled={!isValidForm}
+          className="text-xl"
         >
           Login
         </Button>
@@ -125,8 +126,9 @@ const Login = () => {
         <div className="">Need to make an account?</div>
         <Button
           variant="outlined"
-          size="small"
+          size="medium"
           onClick={() => router.push("/signup")}
+          className="lg:text-lg"
         >
           Signup
         </Button>

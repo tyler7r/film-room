@@ -92,16 +92,18 @@ const Signup = () => {
           size="large"
           type="submit"
           disabled={!isValidForm}
+          className="text-xl"
         >
           Signup
         </Button>
       </form>
       <div className="mt-2 flex flex-col items-center justify-center gap-2">
-        <div className="">Already have an account?</div>
+        <div className="lg:text-lg">Already have an account?</div>
         <Button
           variant="outlined"
-          size="small"
+          size="medium"
           onClick={() => router.push("/login")}
+          className="lg:text-lg"
         >
           Login
         </Button>
