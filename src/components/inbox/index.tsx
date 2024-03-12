@@ -1,11 +1,10 @@
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Button, Divider, Drawer, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
-import TeamLogo from "../team-logo";
 import InboxMentions from "./mentions";
+import TeamHeader from "./team-header";
 
 const Inbox = () => {
   const { isOpen, setIsOpen } = useInboxContext();
@@ -20,38 +19,11 @@ const Inbox = () => {
           Inbox
         </Typography>
         <div className="flex flex-col gap-3">
-          <div className="flex flex-col items-start gap-2">
-            {user.currentAffiliation?.team && (
-              <div className="flex w-full flex-col items-center justify-center gap-1">
-                <div className="flex items-center justify-center gap-3">
-                  <TeamLogo tm={user.currentAffiliation} size={55}></TeamLogo>
-                  <Typography
-                    variant="h5"
-                    className="text-lg font-bold md:text-2xl lg:text-4xl"
-                  >
-                    {`${user.currentAffiliation.team.city}
-                    ${user.currentAffiliation.team.name}`}
-                  </Typography>
-                </div>
-                <Button
-                  endIcon={<ArrowForwardIcon />}
-                  onClick={() => {
-                    void router.push(
-                      `/team-hub/${user.currentAffiliation?.team.id}`,
-                    );
-                    setIsOpen(false);
-                  }}
-                  className="lg:text-lg"
-                >
-                  Go to Team Hub
-                </Button>
-              </div>
-            )}
-          </div>
+          <TeamHeader />
           <Divider></Divider>
           <InboxMentions />
           {!user.isLoggedIn && (
-            <div className="flex gap-2">
+            <div className="mt-2 flex items-center justify-center gap-2">
               <Button
                 variant="contained"
                 size="medium"
