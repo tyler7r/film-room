@@ -27,7 +27,12 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
               {user.currentAffiliation && (
                 <TeamLogo tm={user.currentAffiliation} />
               )}
-              <Button variant="contained" size="medium" onClick={logout}>
+              <Button
+                variant="contained"
+                size="medium"
+                onClick={logout}
+                className="lg:text-xl"
+              >
                 Logout
               </Button>
             </div>
@@ -37,6 +42,7 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                 variant="contained"
                 size="medium"
                 onClick={() => router.push("/signup")}
+                className="lg:text-xl"
               >
                 Signup
               </Button>
@@ -45,13 +51,14 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                 disabled={false}
                 size="medium"
                 onClick={() => router.push("/login")}
+                className="lg:text-xl"
               >
                 Login
               </Button>
             </div>
           )}
           <Switch
-            className="items-center justify-center"
+            className="items-center justify-center lg:text-xl"
             icon={<LightModeIcon color="primary" fontSize="small" />}
             onChange={() => setIsDark(!isDark)}
             checkedIcon={<DarkModeIcon fontSize="small" />}

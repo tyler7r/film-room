@@ -19,14 +19,16 @@ const MainMenu = ({ size }: MainMenuProps) => {
         variant="text"
         size={size}
         onClick={() => router.push("/film-room")}
+        className="lg:text-xl"
       >
         Film Room
       </Button>
-      <Button variant="text" size={size}>
+      <Button variant="text" size={size} className="lg:text-xl">
         Highlight Factory
       </Button>
       <TeamPageButton />
       <Button
+        className="lg:text-xl"
         variant="text"
         size={size}
         onClick={() => {

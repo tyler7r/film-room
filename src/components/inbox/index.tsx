@@ -50,6 +50,33 @@ const Inbox = () => {
           </div>
           <Divider></Divider>
           <InboxMentions />
+          {!user.isLoggedIn && (
+            <div className="flex gap-2">
+              <Button
+                variant="contained"
+                size="medium"
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/signup");
+                }}
+                className="lg:text-xl"
+              >
+                Signup
+              </Button>
+              <Button
+                variant="outlined"
+                disabled={false}
+                size="medium"
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/login");
+                }}
+                className="lg:text-xl"
+              >
+                Login
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </Drawer>
