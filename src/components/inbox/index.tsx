@@ -29,7 +29,7 @@ const Inbox = () => {
                 size="medium"
                 onClick={() => {
                   setIsOpen(false);
-                  router.push("/signup");
+                  void router.push("/signup");
                 }}
                 className="lg:text-xl"
               >
@@ -41,7 +41,7 @@ const Inbox = () => {
                 size="medium"
                 onClick={() => {
                   setIsOpen(false);
-                  router.push("/login");
+                  void router.push("/login");
                 }}
                 className="lg:text-xl"
               >
