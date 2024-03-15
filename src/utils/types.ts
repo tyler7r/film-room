@@ -40,29 +40,21 @@ export type TeamHubType = {
   owner: string | null;
 } | null;
 
-export type GameListType = {
+export type VideoType = {
+  exclusive_to: string | null;
   id: string;
   link: string | null;
-  one_id: string;
+  private: boolean;
   season: string | null;
+  title: string;
   tournament: string | null;
-  title: string | null;
-  two_id: string;
-  one: {
-    id: string;
-    city: string;
-    name: string;
-  } | null;
-  two: {
-    id: string;
-    city: string;
-    name: string;
-  } | null;
+  uploaded_at: string;
+  week: string | null;
 };
 
 export type PlayIndexType = {
   profile_id: string | null;
-  game_id: string | null;
+  video_id: string | null;
   highlight: boolean;
   id: string;
   note: string;
@@ -79,7 +71,7 @@ export type PlayIndexType = {
 
 export type PlayType = {
   profile_id: string | null;
-  game_id: string | null;
+  video_id: string | null;
   highlight: boolean;
   id: string;
   note: string;

@@ -93,51 +93,6 @@ export type Database = {
           }
         ]
       }
-      games: {
-        Row: {
-          id: string
-          link: string | null
-          one_id: string
-          season: string | null
-          title: string
-          tournament: string | null
-          two_id: string
-        }
-        Insert: {
-          id?: string
-          link?: string | null
-          one_id: string
-          season?: string | null
-          title: string
-          tournament?: string | null
-          two_id: string
-        }
-        Update: {
-          id?: string
-          link?: string | null
-          one_id?: string
-          season?: string | null
-          title?: string
-          tournament?: string | null
-          two_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "games_one_id_fkey"
-            columns: ["one_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_two_id_fkey"
-            columns: ["two_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       play_mentions: {
         Row: {
           created_at: string
@@ -192,7 +147,6 @@ export type Database = {
           author_name: string
           author_role: string
           end_time: number
-          game_id: string
           highlight: boolean
           id: string
           note: string
@@ -200,12 +154,12 @@ export type Database = {
           start_time: number
           team_id: string | null
           title: string
+          video_id: string
         }
         Insert: {
           author_name: string
           author_role: string
           end_time: number
-          game_id: string
           highlight?: boolean
           id?: string
           note: string
@@ -213,12 +167,12 @@ export type Database = {
           start_time: number
           team_id?: string | null
           title: string
+          video_id: string
         }
         Update: {
           author_name?: string
           author_role?: string
           end_time?: number
-          game_id?: string
           highlight?: boolean
           id?: string
           note?: string
@@ -226,13 +180,14 @@ export type Database = {
           start_time?: number
           team_id?: string | null
           title?: string
+          video_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "plays_game_id_fkey"
-            columns: ["game_id"]
+            columns: ["video_id"]
             isOneToOne: false
-            referencedRelation: "games"
+            referencedRelation: "videos"
             referencedColumns: ["id"]
           },
           {
@@ -277,6 +232,39 @@ export type Database = {
           }
         ]
       }
+      team_videos: {
+        Row: {
+          id: string
+          team_id: string
+          video_id: string
+        }
+        Insert: {
+          id?: string
+          team_id?: string
+          video_id?: string
+        }
+        Update: {
+          id?: string
+          team_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_team_videos_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_team_videos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       teams: {
         Row: {
           city: string
@@ -308,6 +296,50 @@ export type Database = {
             columns: ["owner"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      videos: {
+        Row: {
+          exclusive_to: string | null
+          id: string
+          link: string | null
+          private: boolean
+          season: string | null
+          title: string
+          tournament: string | null
+          uploaded_at: string
+          week: string | null
+        }
+        Insert: {
+          exclusive_to?: string | null
+          id?: string
+          link?: string | null
+          private?: boolean
+          season?: string | null
+          title: string
+          tournament?: string | null
+          uploaded_at?: string
+          week?: string | null
+        }
+        Update: {
+          exclusive_to?: string | null
+          id?: string
+          link?: string | null
+          private?: boolean
+          season?: string | null
+          title?: string
+          tournament?: string | null
+          uploaded_at?: string
+          week?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_videos_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           }
         ]

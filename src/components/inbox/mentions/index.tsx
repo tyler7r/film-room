@@ -15,9 +15,9 @@ type MentionType = {
   sender_name: string;
   plays: {
     start_time: number;
-    game_id: string;
+    video_id: string;
     title: string;
-    games: {
+    videos: {
       tournament: string | null;
       season: string | null;
       title: string;
@@ -39,7 +39,7 @@ const InboxMentions = () => {
     const { data } = await supabase
       .from(`play_mentions`)
       .select(
-        `*, plays(start_time, game_id, title, games(tournament, season, title))`,
+        `*, plays(start_time, video_id, title, videos(tournament, season, title))`,
       )
       .eq("receiver_id", `${user.userId}`)
       .order("created_at", { ascending: false })
@@ -87,21 +87,21 @@ const InboxMentions = () => {
       <Typography variant="h5" className="font-bold lg:mb-2 lg:text-3xl">
         Recent Mentions
       </Typography>
-      <div className="flex flex-col gap-2 md:px-2 lg:px-4">
+      <div className="flex flex-col gap-5 md:px-2 lg:px-4">
         {mentions?.map((mention) => (
           <div
             key={mention.play_id + mention.created_at}
             onClick={() => {
               void router.push(
-                `/film-room/${mention.plays?.game_id}/${mention.plays?.start_time}`,
+                `/film-room/${mention.plays?.video_id}/${mention.plays?.start_time}`,
               );
               setIsOpen(false);
             }}
-            className="flex w-full cursor-pointer flex-col gap-1 border-solid border-transparent p-2 hover:border-solid hover:border-purple-400"
+            className="flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 hover:border-solid hover:border-purple-400"
             style={backgroundStyle}
           >
             <div className="text-center text-lg lg:text-start lg:text-xl">
-              {mention.plays?.games?.title}
+              {mention.plays?.videos?.title}
             </div>
             <Divider className="mx-3"></Divider>
             <div>

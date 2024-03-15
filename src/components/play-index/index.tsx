@@ -17,7 +17,7 @@ import Plays from "./plays";
 
 type PlayIndexProps = {
   player: YouTubePlayer | null;
-  gameId: string;
+  videoId: string;
   scrollToPlayer: () => void;
   duration: number;
 };
@@ -29,7 +29,7 @@ type ActivePlayFilterType = {
 
 const PlayIndex = ({
   player,
-  gameId,
+  videoId,
   scrollToPlayer,
   duration,
 }: PlayIndexProps) => {
@@ -56,7 +56,7 @@ const PlayIndex = ({
       .from(`plays`)
       .select(`*, mentions:play_mentions (receiver_name)`)
       .match({
-        game_id: gameId,
+        video_id: videoId,
         team_id: `${user.currentAffiliation?.team.id}`,
       })
       .order("start_time");

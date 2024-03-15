@@ -147,7 +147,7 @@ const TeamHub = ({
         <Roster team={team} role={role} />
         <div>
           <Typography variant="h2" fontSize={42}>
-            Recent Games
+            Recent Videos
           </Typography>
         </div>
       </div>
