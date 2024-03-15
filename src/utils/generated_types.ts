@@ -152,7 +152,7 @@ export type Database = {
           note: string
           profile_id: string | null
           start_time: number
-          team_id: string | null
+          team_id: string
           title: string
           video_id: string
         }
@@ -165,7 +165,7 @@ export type Database = {
           note: string
           profile_id?: string | null
           start_time: number
-          team_id?: string | null
+          team_id: string
           title: string
           video_id: string
         }
@@ -178,18 +178,11 @@ export type Database = {
           note?: string
           profile_id?: string | null
           start_time?: number
-          team_id?: string | null
+          team_id?: string
           title?: string
           video_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "plays_game_id_fkey"
-            columns: ["video_id"]
-            isOneToOne: false
-            referencedRelation: "videos"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "plays_profile_id_fkey"
             columns: ["profile_id"]
@@ -198,10 +191,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "plays_team_id_fkey"
+            foreignKeyName: "public_plays_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
             referencedColumns: ["id"]
           }
         ]
@@ -304,7 +304,7 @@ export type Database = {
         Row: {
           exclusive_to: string | null
           id: string
-          link: string | null
+          link: string
           private: boolean
           season: string | null
           title: string
@@ -315,7 +315,7 @@ export type Database = {
         Insert: {
           exclusive_to?: string | null
           id?: string
-          link?: string | null
+          link: string
           private?: boolean
           season?: string | null
           title: string
@@ -326,7 +326,7 @@ export type Database = {
         Update: {
           exclusive_to?: string | null
           id?: string
-          link?: string | null
+          link?: string
           private?: boolean
           season?: string | null
           title?: string

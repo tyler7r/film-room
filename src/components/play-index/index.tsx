@@ -12,7 +12,6 @@ import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { type PlayIndexType } from "~/utils/types";
-import PlayBar from "./play-bar";
 import Plays from "./plays";
 
 type PlayIndexProps = {
@@ -144,12 +143,12 @@ const PlayIndex = ({
 
   return (
     <div className="flex w-4/5 flex-col gap-3">
-      <PlayBar
+      {/* <PlayBar
         plays={plays}
         player={player}
         scrollToPlayer={scrollToPlayer}
         duration={duration}
-      />
+      /> */}
       <FormControl className="mb-2 w-1/2 self-center">
         <InputLabel>Filter</InputLabel>
         <Select value={currentFilter} onChange={handleChange} label="Filter">

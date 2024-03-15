@@ -110,7 +110,7 @@ const PlayModal = ({
     const { data } = await supabase
       .from("plays")
       .insert({
-        team_id: user.currentAffiliation?.team.id,
+        team_id: `${user.currentAffiliation?.team.id}`,
         profile_id: user.userId,
         video_id: videoId,
         highlight: playDetails.highlight,

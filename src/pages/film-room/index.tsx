@@ -1,12 +1,19 @@
 import { Typography, useTheme } from "@mui/material";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { VideoType } from "~/utils/types";
 import { useIsDarkContext } from "../_app";
 
 export const getServerSideProps = (async () => {
-  const videosData = await supabase.from("videos").select(`*`);
+  const { user } = useAuthContext();
+  const videosData = await supabase
+    .from("videos")
+    .select(`*`)
+    .or(`private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`)
+    .order("uploaded_at");
   const videos: VideoType[] | null = videosData.data;
   return { props: { videos } };
 }) satisfies GetServerSideProps<{ videos: VideoType[] | null }>;
@@ -18,6 +25,10 @@ const FilmRoomHome = ({
   const theme = useTheme();
 
   const router = useRouter();
+
+  useEffect(() => {
+    console.log(videos);
+  }, []);
 
   return (
     <div className="my-4 flex w-full flex-col items-center justify-center gap-4">
@@ -43,33 +54,7 @@ const FilmRoomHome = ({
               <div>{v.season}</div>
               <div>{v.tournament}</div>
             </Typography>
-            <div className="flex items-center gap-4">
-              {/* <Typography
-                variant="button"
-                className="text-center"
-                fontWeight="bold"
-                color="primary"
-                fontSize={20}
-              >
-                {v.one?.city} {v.one?.name}
-              </Typography>
-              <Typography
-                variant="overline"
-                fontSize={16}
-                color={isDark ? "white" : "black"}
-              >
-                vs
-              </Typography>
-              <Typography
-                variant="button"
-                className="text-center"
-                fontWeight="bold"
-                color="primary"
-                fontSize={20}
-              >
-                {v.two?.city} {v.two?.name}
-              </Typography> */}
-            </div>
+            <div className="flex items-center gap-4"></div>
           </div>
         ))}
       </div>
