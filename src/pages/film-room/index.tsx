@@ -1,6 +1,7 @@
 import { Divider, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import VideoUpload from "~/components/video-upload";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { VideoType } from "~/utils/types";
@@ -46,16 +47,16 @@ const FilmRoomHome = () => {
 
   useEffect(() => {
     void fetchVideos();
-    console.log(videos);
   }, []);
 
   return (
     <div className="my-4 flex w-full flex-col items-center justify-center">
-      <Typography variant="h1" fontSize={64} className="m-2">
+      <Typography variant="h1" fontSize={64} className="m-2 text-center">
         The Film Room
       </Typography>
       <Divider flexItem variant="middle" className="mb-4"></Divider>
-      <div className="flex w-4/5 w-full flex-wrap items-center justify-center gap-6">
+      {user.isLoggedIn && <VideoUpload />}
+      <div className="flex w-4/5 flex-wrap items-center justify-center gap-6">
         {!videos && <Typography>No videos in the Film Room!</Typography>}
         {videos?.map((v) => (
           <div
@@ -69,12 +70,12 @@ const FilmRoomHome = () => {
               component="span"
               className="flex flex-col items-center justify-center gap-1"
             >
-              <div className="flex gap-2 text-xl font-medium tracking-wider">
+              <div className="flex gap-2 text-center text-xl font-medium tracking-wider">
                 {v.season && <div>{v.season}</div>}
                 {v.tournament && <div>{v.tournament}</div>}
                 {v.week && <div>{v.week}</div>}
               </div>
-              <div className="text-2xl font-extrabold tracking-tighter lg:text-3xl">
+              <div className="text-center text-2xl font-extrabold tracking-tighter lg:text-3xl">
                 {v.title}
               </div>
             </Typography>

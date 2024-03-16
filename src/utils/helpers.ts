@@ -37,3 +37,12 @@ export const isItemUnique = (item: string, array: string[] | null) => {
     return true;
   }
 };
+
+export const isValidYoutubeLink = (link: string) => {
+  const youtubeRegEx = new RegExp(
+    /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|watch\?.+&v=))((\w|-){11})(?:\S+)?$/,
+  );
+  const isValid = youtubeRegEx.test(link);
+  if (isValid) return true;
+  else return false;
+};

@@ -92,3 +92,13 @@ export type PlayerType = {
     name: string | null;
   } | null;
 }[];
+
+export type VideoUploadType = {
+  link: string;
+  title: string;
+  private: boolean;
+  exclusive_to: string | null;
+  week: string | null;
+  season: string | null;
+  tournament: string | null;
+};
