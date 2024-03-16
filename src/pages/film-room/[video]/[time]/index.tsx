@@ -59,17 +59,7 @@ const FilmRoom = () => {
           {video.season} {video.tournament}
         </Typography>
         <Typography>{video.title}</Typography>
-        <div className="flex items-center justify-center gap-4 text-center">
-          {/* <Typography variant="h1" fontSize={36}>
-            {video.one?.city} {video.one?.name}
-          </Typography>
-          <Typography variant="overline" fontSize={14}>
-            vs
-          </Typography>
-          <Typography variant="h1" fontSize={36}>
-            {video.two?.city} {video.two?.name}
-          </Typography> */}
-        </div>
+        <div className="flex items-center justify-center gap-4 text-center"></div>
         <PlayModal
           player={player}
           videoId={video.id}

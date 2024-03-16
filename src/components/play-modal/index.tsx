@@ -63,7 +63,10 @@ const PlayModal = ({
   };
 
   const startPlay = async () => {
-    if (!user.isLoggedIn) void router.push("/login");
+    if (!user.isLoggedIn) {
+      void router.push("/login");
+      return;
+    }
     setIsPlayStarted(true);
     const time = await player?.getCurrentTime();
     const roundedTime = Math.round(time!);

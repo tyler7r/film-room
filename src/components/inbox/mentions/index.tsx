@@ -97,7 +97,7 @@ const InboxMentions = () => {
               );
               setIsOpen(false);
             }}
-            className="flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 hover:border-solid hover:border-purple-400"
+            className="flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-sm hover:border-solid hover:border-purple-400 hover:delay-100"
             style={backgroundStyle}
           >
             <div className="text-center text-lg lg:text-start lg:text-xl">
