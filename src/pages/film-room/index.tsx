@@ -1,7 +1,7 @@
 import { Divider, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import VideoUpload from "~/components/video-upload";
+import AddVideo from "~/components/add-video";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { VideoType } from "~/utils/types";
@@ -55,7 +55,7 @@ const FilmRoomHome = () => {
         The Film Room
       </Typography>
       <Divider flexItem variant="middle" className="mb-4"></Divider>
-      {user.isLoggedIn && <VideoUpload />}
+      {user.isLoggedIn && <AddVideo />}
       <div className="flex w-4/5 flex-wrap items-center justify-center gap-6">
         {!videos && <Typography>No videos in the Film Room!</Typography>}
         {videos?.map((v) => (

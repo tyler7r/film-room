@@ -99,6 +99,6 @@ export type VideoUploadType = {
   private: boolean;
   exclusive_to: string | null;
   week: string | null;
-  season: string | null;
+  season: string;
   tournament: string | null;
 };

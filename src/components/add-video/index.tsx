@@ -13,7 +13,7 @@ import { supabase } from "~/utils/supabase";
 import { MessageType, VideoUploadType } from "~/utils/types";
 import FormMessage from "../form-message";
 
-const VideoUpload = () => {
+const AddVideo = () => {
   const { user } = useAuthContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<MessageType>({
@@ -24,10 +24,10 @@ const VideoUpload = () => {
     link: "",
     title: "",
     private: false,
-    exclusive_to: null,
-    week: null,
-    season: null,
-    tournament: null,
+    exclusive_to: "",
+    week: "",
+    season: "",
+    tournament: "",
   });
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
 
@@ -43,18 +43,18 @@ const VideoUpload = () => {
     setVideoData({
       link: "",
       title: "",
-      private: true,
-      exclusive_to: null,
-      week: null,
-      season: null,
-      tournament: null,
+      private: false,
+      exclusive_to: "",
+      week: "",
+      season: "",
+      tournament: "",
     });
     setIsOpen(false);
   };
 
   useEffect(() => {
     // Update form validity and form message as necessary
-    const { link, title } = videoData;
+    const { link, title, season } = videoData;
     const isValidLink = isValidYoutubeLink(link);
 
     if (title === "") {
@@ -69,36 +69,74 @@ const VideoUpload = () => {
         text: "Please enter a valid video link!",
       });
       setIsValidForm(false);
+    } else if (season === "") {
+      setMessage({
+        status: "error",
+        text: "Please enter a valid season/year!",
+      });
     } else {
       setMessage({ status: "error", text: undefined });
       setIsValidForm(true);
     }
   }, [videoData]);
 
+  const checkIfDuplicateVideo = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { data } = await supabase
+      .from("videos")
+      .select()
+      .match(
+        videoData.private
+          ? {
+              link: videoData.link,
+              exclusive_to: user.currentAffiliation?.team.id,
+              private: videoData.private,
+            }
+          : { link: videoData.link, private: videoData.private },
+      )
+      .single();
+    if (data) return true;
+    else return false;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const isVideoDuplicated = await checkIfDuplicateVideo(e);
     e.preventDefault();
     const { title, link, season, week, tournament } = videoData;
+    if (isVideoDuplicated) {
+      setMessage({
+        status: "error",
+        text: `This ${
+          videoData.private ? "private" : "public"
+        } video already exists!`,
+      });
+      setIsValidForm(false);
+      return;
+    }
     const { data } = await supabase
       .from("videos")
       .insert({
         title,
         link,
         season,
-        week,
-        tournament,
+        week: week === "" ? null : week,
+        tournament: tournament === "" ? null : tournament,
         private: videoData.private,
-        exclusive_to: `${
-          videoData.private ? user.currentAffiliation?.team.id : null
-        }`,
+        exclusive_to: videoData.private
+          ? user.currentAffiliation?.team.id
+          : null,
       })
+      .select()
       .single();
-    if (data) console.log(data);
+    if (data) {
+      reset();
+    }
   };
 
   return isOpen ? (
     <div className="flex w-full flex-col items-center justify-center">
       <Typography className="text-3xl font-bold tracking-wider">
-        Upload a Video
+        Add a Video
       </Typography>
       <form
         onSubmit={handleSubmit}
@@ -130,7 +168,8 @@ const VideoUpload = () => {
             name="season"
             autoComplete="season"
             id="season"
-            label="Season (if applicable)"
+            label="Season/Year"
+            required
             onChange={handleInput}
             value={videoData.season}
           />
@@ -156,14 +195,13 @@ const VideoUpload = () => {
         {user.currentAffiliation?.team.id && (
           <div className="flex items-center justify-center">
             <div className="text-xl font-bold tracking-tight">
-              Keep this video private for:{" "}
-              {`${user.currentAffiliation?.team.city} ${user.currentAffiliation?.team.name}`}
+              Keep this video private to{" "}
+              {`${user.currentAffiliation?.team.city} ${user.currentAffiliation?.team.name}`}{" "}
             </div>
             <Checkbox
               checked={videoData.private}
               onChange={() => {
                 setVideoData({ ...videoData, private: !videoData.private });
-                console.log(videoData);
               }}
               size="medium"
             />
@@ -177,7 +215,7 @@ const VideoUpload = () => {
             type="submit"
             disabled={!isValidForm}
           >
-            Upload Video
+            Add Video
           </Button>
           <Button type="button" onClick={reset} size="large">
             Cancel
@@ -194,9 +232,9 @@ const VideoUpload = () => {
       endIcon={<AddIcon />}
       onClick={() => setIsOpen(true)}
     >
-      Upload New Video
+      Add New Video
     </Button>
   );
 };
 
-export default VideoUpload;
+export default AddVideo;

@@ -306,7 +306,7 @@ export type Database = {
           id: string
           link: string
           private: boolean
-          season: string | null
+          season: string
           title: string
           tournament: string | null
           uploaded_at: string
@@ -317,7 +317,7 @@ export type Database = {
           id?: string
           link: string
           private?: boolean
-          season?: string | null
+          season: string
           title: string
           tournament?: string | null
           uploaded_at?: string
@@ -328,7 +328,7 @@ export type Database = {
           id?: string
           link?: string
           private?: boolean
-          season?: string | null
+          season?: string
           title?: string
           tournament?: string | null
           uploaded_at?: string
