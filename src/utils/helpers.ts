@@ -46,3 +46,13 @@ export const isValidYoutubeLink = (link: string) => {
   if (isValid) return true;
   else return false;
 };
+
+export const getNumberOfPages = (isMobile: boolean, count: number) => {
+  if (isMobile) {
+    if (count % 5 !== 0) return Math.floor(count / 5) + 1;
+    else return count / 5;
+  } else {
+    if (count % 10 !== 0) return Math.floor(count / 10) + 1;
+    else return count / 10;
+  }
+};

@@ -1,53 +1,66 @@
-import { Divider, Typography } from "@mui/material";
+import PublicIcon from "@mui/icons-material/Public";
+import { Divider, Pagination, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
 import { useAuthContext } from "~/contexts/auth";
+import { useMobileContext } from "~/contexts/mobile";
+import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { VideoType } from "~/utils/types";
 import { useIsDarkContext } from "../_app";
 
-// export const getServerSideProps = (async () => {
-//   const { user } = useAuthContext();
-//   const videosData = await supabase
-//     .from("videos")
-//     .select(`*`)
-//     .or(`private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`)
-//     .order("uploaded_at");
-//   const videos: VideoType[] | null = videosData.data;
-//   return { props: { videos } };
-// }) satisfies GetServerSideProps<{ videos: VideoType[] | null }>;
-
 const FilmRoomHome = () => {
   const { user } = useAuthContext();
+  const { isMobile } = useMobileContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
   const [videos, setVideos] = useState<VideoType[] | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [videoCount, setVideoCount] = useState<number | null>(null);
 
   const router = useRouter();
 
   const fetchVideos = async () => {
+    const { from, to } = getFromAndTo();
     if (user.isLoggedIn && user.currentAffiliation?.team.id) {
-      const { data } = await supabase
+      const { data, count } = await supabase
         .from("videos")
-        .select(`*`)
+        .select(`*`, { count: "exact" })
         .or(
           `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
         )
-        .order("uploaded_at");
+        .order("uploaded_at")
+        .range(from, to);
+      if (count) setVideoCount(count);
       if (data) setVideos(data);
     } else {
-      const { data } = await supabase
+      const { data, count } = await supabase
         .from("videos")
-        .select(`*`)
+        .select(`*`, { count: "exact" })
         .eq("private", false)
-        .order("uploaded_at");
+        .order("uploaded_at")
+        .range(from, to);
+      if (count) setVideoCount(count);
       if (data && data.length > 0) setVideos(data);
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<unknown>, value: number) => {
+    e.preventDefault();
+    setPage(value);
+  };
+
+  const getFromAndTo = () => {
+    const itemPerPage = isMobile ? 5 : 10;
+    let from = (page - 1) * itemPerPage;
+    let to = from + itemPerPage - 1;
+
+    return { from, to };
+  };
+
   useEffect(() => {
     void fetchVideos();
-  }, []);
+  }, [page, isMobile]);
 
   return (
     <div className="my-4 flex w-full flex-col items-center justify-center">
@@ -70,7 +83,15 @@ const FilmRoomHome = () => {
               component="span"
               className="flex flex-col items-center justify-center gap-1"
             >
-              <div className="flex gap-2 text-center text-xl font-medium tracking-wider">
+              {!v.private && (
+                <div className="mb-1 flex items-center justify-end gap-1">
+                  <div className="lg:text-md text-sm tracking-tighter">
+                    PUBLIC
+                  </div>
+                  <PublicIcon fontSize="small" />
+                </div>
+              )}
+              <div className="flex gap-2 text-center text-xl font-medium tracking-wide">
                 {v.season && <div>{v.season}</div>}
                 {v.tournament && <div>{v.tournament}</div>}
                 {v.week && <div>{v.week}</div>}
@@ -79,10 +100,22 @@ const FilmRoomHome = () => {
                 {v.title}
               </div>
             </Typography>
-            <div className="flex items-center gap-4"></div>
           </div>
         ))}
       </div>
+      {videos && videoCount && (
+        <Pagination
+          showFirstButton
+          showLastButton
+          className="mt-6"
+          size="large"
+          variant="text"
+          shape="rounded"
+          count={getNumberOfPages(isMobile, videoCount)}
+          page={page}
+          onChange={handleChange}
+        />
+      )}
     </div>
   );
 };
