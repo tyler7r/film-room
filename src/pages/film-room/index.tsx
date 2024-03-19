@@ -1,8 +1,10 @@
 import PublicIcon from "@mui/icons-material/Public";
 import { Divider, Pagination, Typography } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
+import Search from "~/components/search";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
@@ -14,6 +16,8 @@ const FilmRoomHome = () => {
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
+
+  const query = useSearchParams().get("query") || "";
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [videoCount, setVideoCount] = useState<number | null>(null);
@@ -26,6 +30,7 @@ const FilmRoomHome = () => {
       const { data, count } = await supabase
         .from("videos")
         .select(`*`, { count: "exact" })
+        .ilike("title", `%${query}%`)
         .or(
           `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
         )
@@ -38,6 +43,7 @@ const FilmRoomHome = () => {
         .from("videos")
         .select(`*`, { count: "exact" })
         .eq("private", false)
+        .ilike("title", `%${query}%`)
         .order("uploaded_at")
         .range(from, to);
       if (count) setVideoCount(count);
@@ -60,7 +66,7 @@ const FilmRoomHome = () => {
 
   useEffect(() => {
     void fetchVideos();
-  }, [page, isMobile]);
+  }, [page, isMobile, query]);
 
   return (
     <div className="my-4 flex w-full flex-col items-center justify-center">
@@ -68,6 +74,7 @@ const FilmRoomHome = () => {
         The Film Room
       </Typography>
       <Divider flexItem variant="middle" className="mb-4"></Divider>
+      <Search placeholder="Search videos..." />
       {user.isLoggedIn && <AddVideo />}
       <div className="flex w-4/5 flex-wrap items-center justify-center gap-6">
         {!videos && <Typography>No videos in the Film Room!</Typography>}
