@@ -34,7 +34,7 @@ const FilmRoomHome = () => {
         .or(
           `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
         )
-        .order("uploaded_at")
+        .order("uploaded_at", { ascending: false })
         .range(from, to);
       if (count) setVideoCount(count);
       if (data) setVideos(data);
@@ -44,7 +44,7 @@ const FilmRoomHome = () => {
         .select(`*`, { count: "exact" })
         .eq("private", false)
         .ilike("title", `%${query}%`)
-        .order("uploaded_at")
+        .order("uploaded_at", { ascending: false })
         .range(from, to);
       if (count) setVideoCount(count);
       if (data && data.length > 0) setVideos(data);
@@ -63,6 +63,23 @@ const FilmRoomHome = () => {
 
     return { from, to };
   };
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("video_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "videos" },
+        () => {
+          void fetchVideos();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     void fetchVideos();
