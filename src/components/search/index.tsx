@@ -2,18 +2,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import { InputAdornment, TextField } from "@mui/material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
-import { useIsDarkContext } from "~/pages/_app";
 
-type SearchProps = {
-  placeholder: string;
-};
-
-const Search = ({ placeholder }: SearchProps) => {
-  const { borderStyle } = useIsDarkContext();
-
+const Search = () => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { replace } = useRouter();
+  const router = useRouter();
 
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
@@ -22,7 +15,7 @@ const Search = ({ placeholder }: SearchProps) => {
     } else {
       params.delete("query");
     }
-    replace(`${pathname}?${params.toString()}`);
+    void router.replace(`${pathname}?${params.toString()}`);
   }, 500);
 
   return (

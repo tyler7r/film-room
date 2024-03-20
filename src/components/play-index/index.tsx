@@ -26,12 +26,7 @@ type ActivePlayFilterType = {
   count: number;
 };
 
-const PlayIndex = ({
-  player,
-  videoId,
-  scrollToPlayer,
-  duration,
-}: PlayIndexProps) => {
+const PlayIndex = ({ player, videoId, scrollToPlayer }: PlayIndexProps) => {
   const { user } = useAuthContext();
 
   const [plays, setPlays] = useState<PlayIndexType | null>(null);

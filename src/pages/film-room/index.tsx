@@ -10,7 +10,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { VideoType } from "~/utils/types";
+import type { VideoType } from "~/utils/types";
 import { useIsDarkContext } from "../_app";
 
 const FilmRoomHome = () => {
@@ -18,7 +18,7 @@ const FilmRoomHome = () => {
   const { isMobile } = useMobileContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
 
-  const query = useSearchParams().get("query") || "";
+  const query = useSearchParams().get("query") ?? "";
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [videoCount, setVideoCount] = useState<number | null>(null);
@@ -59,8 +59,8 @@ const FilmRoomHome = () => {
 
   const getFromAndTo = () => {
     const itemPerPage = isMobile ? 5 : 10;
-    let from = (page - 1) * itemPerPage;
-    let to = from + itemPerPage - 1;
+    const from = (page - 1) * itemPerPage;
+    const to = from + itemPerPage - 1;
 
     return { from, to };
   };
@@ -92,7 +92,7 @@ const FilmRoomHome = () => {
         The Film Room
       </Typography>
       <Divider flexItem variant="middle" className="mb-4"></Divider>
-      <Search placeholder="Search videos..." />
+      <Search />
       {user.isLoggedIn && <AddVideo />}
       <div className="flex w-4/5 flex-col items-center justify-center gap-6">
         {!videos && <Typography>No videos in the Film Room!</Typography>}

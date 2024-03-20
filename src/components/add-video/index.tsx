@@ -12,11 +12,11 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { isValidYoutubeLink } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { MessageType, VideoUploadType } from "~/utils/types";
+import type { MessageType, VideoUploadType } from "~/utils/types";
 import FormMessage from "../form-message";
 
 const style = {
-  position: "absolute" as "absolute",
+  position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
