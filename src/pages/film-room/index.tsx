@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
 import Search from "~/components/search";
+import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
@@ -93,13 +94,13 @@ const FilmRoomHome = () => {
       <Divider flexItem variant="middle" className="mb-4"></Divider>
       <Search placeholder="Search videos..." />
       {user.isLoggedIn && <AddVideo />}
-      <div className="flex w-4/5 flex-wrap items-center justify-center gap-6">
+      <div className="flex w-4/5 flex-col items-center justify-center gap-6">
         {!videos && <Typography>No videos in the Film Room!</Typography>}
         {videos?.map((v) => (
           <div
             style={backgroundStyle}
             key={v.id}
-            className="flex cursor-pointer flex-col flex-wrap gap-1 border-2 border-solid border-transparent p-2 px-10 transition ease-in-out hover:rounded-sm hover:border-solid hover:border-purple-400 hover:delay-100"
+            className="flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 px-10 transition ease-in-out hover:rounded-sm hover:border-solid hover:border-purple-400 hover:delay-100"
             onClick={() => router.push(`/film-room/${v.id}/0`)}
           >
             <Typography
@@ -108,11 +109,19 @@ const FilmRoomHome = () => {
               className="flex flex-col items-center justify-center gap-1"
             >
               {!v.private && (
-                <div className="mb-1 flex items-center justify-end gap-1">
+                <div className="mb-1 flex items-center justify-center gap-1">
                   <div className="lg:text-md text-sm tracking-tighter">
                     PUBLIC
                   </div>
                   <PublicIcon fontSize="small" />
+                </div>
+              )}
+              {v.private && user.currentAffiliation && (
+                <div className="justify mb-1 flex items-center justify-center gap-2">
+                  <div className="lg:text-md text-sm tracking-tighter">
+                    PRIVATE TO:{" "}
+                  </div>
+                  <TeamLogo tm={user.currentAffiliation} size={20} />
                 </div>
               )}
               <div className="flex gap-2 text-center text-xl font-medium tracking-wide">
