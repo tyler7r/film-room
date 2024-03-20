@@ -105,7 +105,7 @@ const TeamHub = ({
           )}
           <div className="flex flex-col items-center justify-center gap-2 text-center">
             <Typography variant="h1" fontSize={64}>
-              {team.city} {team.name}
+              {team.full_name}
             </Typography>
             <Typography variant="caption" fontWeight="bold" fontSize={18}>
               Division: {team.division}

@@ -70,11 +70,9 @@ const TeamPageButton = () => {
                   1,
                 )}`}</Typography>
               )}
-              <Typography
-                variant="overline"
-                fontWeight="bold"
-                fontSize="small"
-              >{`${aff.team.city} ${aff.team.name}`}</Typography>
+              <Typography variant="overline" fontWeight="bold" fontSize="small">
+                {aff.team.full_name}
+              </Typography>
             </MenuItem>
           ))}
           <MenuItem

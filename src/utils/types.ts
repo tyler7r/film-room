@@ -5,6 +5,7 @@ export type TeamAffiliationType = {
     city: string;
     division: string;
     logo: string | null;
+    full_name: string;
   };
   role: string;
 };
@@ -24,6 +25,7 @@ export type TeamType = {
   logo: string | null;
   name: string | null;
   owner: string | null;
+  full_name: string;
 };
 
 export type MessageType = {
@@ -38,6 +40,7 @@ export type TeamHubType = {
   logo: string | null;
   name: string;
   owner: string | null;
+  full_name: string;
 } | null;
 
 export type VideoType = {

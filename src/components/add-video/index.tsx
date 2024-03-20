@@ -225,7 +225,7 @@ const AddVideo = () => {
             <div className="flex items-center justify-center">
               <div className="text-xl font-bold tracking-tight">
                 Keep this video private to{" "}
-                {`${user.currentAffiliation?.team.city} ${user.currentAffiliation?.team.name}`}{" "}
+                {`${user.currentAffiliation?.team.full_name} `}
               </div>
               <Checkbox
                 checked={videoData.private}

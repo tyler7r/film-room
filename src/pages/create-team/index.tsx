@@ -120,6 +120,7 @@ const CreateTeam = () => {
         division: details.division,
         logo: pubURL,
         owner: `${user.userId}`,
+        full_name: `${details.city} ${details.name}`,
       })
       .select()
       .single();

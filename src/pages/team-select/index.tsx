@@ -107,7 +107,7 @@ const TeamSelect = () => {
 
       if (!error) {
         setMessage({
-          text: `Successfully sent join request to ${teamFind.city} ${teamFind.name}. Team's account owner must approve your request.`,
+          text: `Successfully sent join request to ${teamFind.full_name}. Team's account owner must approve your request.`,
           status: "success",
         });
         setTimeout(() => {
@@ -115,7 +115,7 @@ const TeamSelect = () => {
         }, 1000);
       } else {
         setMessage({
-          text: `There was an issue sending your request to ${teamFind.city} ${teamFind.name}.`,
+          text: `There was an issue sending your request to ${teamFind.full_name}.`,
           status: "error",
         });
         setIsValidForm(true);
@@ -190,7 +190,7 @@ const TeamSelect = () => {
                 .filter((t) => t.id !== team.id)
                 .map((tm) => (
                   <MenuItem value={tm.id} key={tm.id}>
-                    {tm.city} {tm.name}
+                    {tm.full_name}
                   </MenuItem>
                 ))}
             </Select>
