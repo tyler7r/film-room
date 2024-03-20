@@ -100,7 +100,9 @@ const FilmRoomHome = () => {
           <div
             style={backgroundStyle}
             key={v.id}
-            className="flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 px-10 transition ease-in-out hover:rounded-sm hover:border-solid hover:border-purple-400 hover:delay-100"
+            className={`${
+              isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
+            } flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 px-10 transition ease-in-out hover:rounded-sm hover:border-solid hover:delay-100`}
             onClick={() => router.push(`/film-room/${v.id}/0`)}
           >
             <Typography

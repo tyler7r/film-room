@@ -28,7 +28,7 @@ type MentionType = {
 const InboxMentions = () => {
   const { user } = useAuthContext();
   const { setIsOpen, page, setPage } = useInboxContext();
-  const { backgroundStyle } = useIsDarkContext();
+  const { backgroundStyle, isDark } = useIsDarkContext();
   const router = useRouter();
 
   const [mentions, setMentions] = useState<MentionType | null>(null);
@@ -97,7 +97,9 @@ const InboxMentions = () => {
               );
               setIsOpen(false);
             }}
-            className="flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-sm hover:border-solid hover:border-purple-400 hover:delay-100"
+            className={`flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-sm hover:border-solid ${
+              isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
+            } hover:delay-100`}
             style={backgroundStyle}
           >
             <div className="text-center text-lg lg:text-start lg:text-xl">

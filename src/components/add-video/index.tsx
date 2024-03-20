@@ -80,7 +80,7 @@ const AddVideo = () => {
     } else if (link === "" || !isValidLink) {
       setMessage({
         status: "error",
-        text: "Please enter a valid video link!",
+        text: "Please enter a valid YouTube video link!",
       });
       setIsValidForm(false);
     } else if (season === "") {
@@ -165,9 +165,7 @@ const AddVideo = () => {
           Add a Video
         </Typography> */}
         <Divider flexItem variant="middle" className="m-2 mx-16">
-          <Typography className="text-3xl font-bold tracking-wider">
-            Add a Video
-          </Typography>
+          <Typography className="text-3xl font-bold">ADD A VIDEO</Typography>
         </Divider>
         <form
           onSubmit={handleSubmit}
