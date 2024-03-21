@@ -3,9 +3,9 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
+  type SelectChangeEvent,
 } from "@mui/material";
-import { SearchOptions } from "~/pages/film-room";
+import type { SearchOptions } from "~/pages/film-room";
 import { divisions, recentYears } from "~/utils/helpers";
 
 type VideoSearchFilterProps = {

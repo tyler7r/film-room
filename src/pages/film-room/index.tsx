@@ -56,16 +56,16 @@ const FilmRoomHome = () => {
         )
       : videos.eq("private", false);
     if (options?.title) {
-      videos.ilike("title", `%${options.title}%`);
+      void videos.ilike("title", `%${options.title}%`);
     }
     if (options?.division) {
-      videos.ilike("division", `%${options.division}`);
+      void videos.ilike("division", `%${options.division}`);
     }
     if (options?.tournament) {
-      videos.ilike("tournament", `%${options.tournament}%`);
+      void videos.ilike("tournament", `%${options.tournament}%`);
     }
     if (options?.season) {
-      videos.ilike("season", `%${options.season}%`);
+      void videos.ilike("season", `%${options.season}%`);
     }
 
     const { data, count } = await videos;

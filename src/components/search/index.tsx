@@ -1,7 +1,7 @@
 import SearchIcon from "@mui/icons-material/Search";
 import { InputAdornment, TextField } from "@mui/material";
 import React from "react";
-import { SearchOptions } from "~/pages/film-room";
+import type { SearchOptions } from "~/pages/film-room";
 
 type VideoSearchFilterProps = {
   searchOptions: SearchOptions;
