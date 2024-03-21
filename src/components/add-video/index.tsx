@@ -78,7 +78,7 @@ const AddVideo = () => {
 
   useEffect(() => {
     // Update form validity and form message as necessary
-    const { link, title, season } = videoData;
+    const { link, title, season, division } = videoData;
     const isValidLink = isValidYoutubeLink(link);
 
     if (title === "") {
@@ -93,6 +93,11 @@ const AddVideo = () => {
         text: "Please enter a valid YouTube video link!",
       });
       setIsValidForm(false);
+    } else if (division === "") {
+      setMessage({
+        status: "error",
+        text: "Please select a valid division!",
+      });
     } else if (season === "") {
       setMessage({
         status: "error",
@@ -205,7 +210,7 @@ const AddVideo = () => {
                 label="Division"
                 required
               >
-                <MenuItem value="">No Filter</MenuItem>
+                <MenuItem value="">No Division</MenuItem>
                 {divisions.map((div) => (
                   <MenuItem key={div} value={div}>
                     {div}
