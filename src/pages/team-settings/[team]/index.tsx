@@ -126,6 +126,7 @@ const TeamSettings = ({
           name: details.name,
           city: details.city,
           division: details.division,
+          full_name: `${details.city} ${details.name}`,
         })
         .eq("id", `${details.id}`)
         .select()

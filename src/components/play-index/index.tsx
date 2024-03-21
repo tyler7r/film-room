@@ -12,12 +12,11 @@ import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { type PlayIndexType } from "~/utils/types";
-import PlayBar from "./play-bar";
 import Plays from "./plays";
 
 type PlayIndexProps = {
   player: YouTubePlayer | null;
-  gameId: string;
+  videoId: string;
   scrollToPlayer: () => void;
   duration: number;
 };
@@ -27,12 +26,7 @@ type ActivePlayFilterType = {
   count: number;
 };
 
-const PlayIndex = ({
-  player,
-  gameId,
-  scrollToPlayer,
-  duration,
-}: PlayIndexProps) => {
+const PlayIndex = ({ player, videoId, scrollToPlayer }: PlayIndexProps) => {
   const { user } = useAuthContext();
 
   const [plays, setPlays] = useState<PlayIndexType | null>(null);
@@ -56,7 +50,7 @@ const PlayIndex = ({
       .from(`plays`)
       .select(`*, mentions:play_mentions (receiver_name)`)
       .match({
-        game_id: gameId,
+        video_id: videoId,
         team_id: `${user.currentAffiliation?.team.id}`,
       })
       .order("start_time");
@@ -144,12 +138,12 @@ const PlayIndex = ({
 
   return (
     <div className="flex w-4/5 flex-col gap-3">
-      <PlayBar
+      {/* <PlayBar
         plays={plays}
         player={player}
         scrollToPlayer={scrollToPlayer}
         duration={duration}
-      />
+      /> */}
       <FormControl className="mb-2 w-1/2 self-center">
         <InputLabel>Filter</InputLabel>
         <Select value={currentFilter} onChange={handleChange} label="Filter">

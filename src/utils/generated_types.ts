@@ -48,7 +48,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       announcements: {
@@ -90,52 +90,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
-        ]
-      }
-      games: {
-        Row: {
-          id: string
-          link: string | null
-          one_id: string
-          season: string | null
-          title: string
-          tournament: string | null
-          two_id: string
-        }
-        Insert: {
-          id?: string
-          link?: string | null
-          one_id: string
-          season?: string | null
-          title: string
-          tournament?: string | null
-          two_id: string
-        }
-        Update: {
-          id?: string
-          link?: string | null
-          one_id?: string
-          season?: string | null
-          title?: string
-          tournament?: string | null
-          two_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "games_one_id_fkey"
-            columns: ["one_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "games_two_id_fkey"
-            columns: ["two_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          }
         ]
       }
       play_mentions: {
@@ -184,7 +139,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       plays: {
@@ -192,49 +147,42 @@ export type Database = {
           author_name: string
           author_role: string
           end_time: number
-          game_id: string
           highlight: boolean
           id: string
           note: string
           profile_id: string | null
           start_time: number
-          team_id: string | null
+          team_id: string
           title: string
+          video_id: string
         }
         Insert: {
           author_name: string
           author_role: string
           end_time: number
-          game_id: string
           highlight?: boolean
           id?: string
           note: string
           profile_id?: string | null
           start_time: number
-          team_id?: string | null
+          team_id: string
           title: string
+          video_id: string
         }
         Update: {
           author_name?: string
           author_role?: string
           end_time?: number
-          game_id?: string
           highlight?: boolean
           id?: string
           note?: string
           profile_id?: string | null
           start_time?: number
-          team_id?: string | null
+          team_id?: string
           title?: string
+          video_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "plays_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "plays_profile_id_fkey"
             columns: ["profile_id"]
@@ -243,12 +191,19 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "plays_team_id_fkey"
+            foreignKeyName: "public_plays_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
-          }
+          },
+          {
+            foreignKeyName: "public_plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -274,13 +229,47 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
+        ]
+      }
+      team_videos: {
+        Row: {
+          id: string
+          team_id: string
+          video_id: string
+        }
+        Insert: {
+          id?: string
+          team_id?: string
+          video_id?: string
+        }
+        Update: {
+          id?: string
+          team_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_team_videos_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_team_videos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       teams: {
         Row: {
           city: string
           division: string
+          full_name: string
           id: string
           logo: string | null
           name: string
@@ -289,6 +278,7 @@ export type Database = {
         Insert: {
           city: string
           division: string
+          full_name: string
           id?: string
           logo?: string | null
           name: string
@@ -297,6 +287,7 @@ export type Database = {
         Update: {
           city?: string
           division?: string
+          full_name?: string
           id?: string
           logo?: string | null
           name?: string
@@ -309,7 +300,54 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
+        ]
+      }
+      videos: {
+        Row: {
+          division: string
+          exclusive_to: string | null
+          id: string
+          link: string
+          private: boolean
+          season: string
+          title: string
+          tournament: string | null
+          uploaded_at: string
+          week: string | null
+        }
+        Insert: {
+          division: string
+          exclusive_to?: string | null
+          id?: string
+          link: string
+          private?: boolean
+          season: string
+          title: string
+          tournament?: string | null
+          uploaded_at?: string
+          week?: string | null
+        }
+        Update: {
+          division?: string
+          exclusive_to?: string | null
+          id?: string
+          link?: string
+          private?: boolean
+          season?: string
+          title?: string
+          tournament?: string | null
+          uploaded_at?: string
+          week?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_videos_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -328,14 +366,16 @@ export type Database = {
   }
 }
 
+type PublicSchema = Database[Extract<keyof Database, "public">]
+
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -343,67 +383,67 @@ export type Tables<
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
-      Database["public"]["Views"])
-  ? (Database["public"]["Tables"] &
-      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
-    | keyof Database["public"]["Enums"]
+    | keyof PublicSchema["Enums"]
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
-  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
-  : never
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never

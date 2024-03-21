@@ -19,8 +19,7 @@ const TeamHeader = () => {
             variant="h5"
             className="text-lg font-bold md:text-2xl lg:text-4xl"
           >
-            {`${user.currentAffiliation.team.city}
-                    ${user.currentAffiliation.team.name}`}
+            {user.currentAffiliation.team.full_name}
           </Typography>
         </div>
         <Button

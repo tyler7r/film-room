@@ -10,7 +10,7 @@ import Mentions from "../play-mentions";
 
 type PlayModalProps = {
   player: YouTubePlayer | null;
-  gameId: string;
+  videoId: string;
   isPlayModalOpen: boolean;
   setIsPlayModalOpen: (status: boolean) => void;
 };
@@ -25,7 +25,7 @@ type PlayType = {
 
 const PlayModal = ({
   player,
-  gameId,
+  videoId,
   setIsPlayModalOpen,
   isPlayModalOpen,
 }: PlayModalProps) => {
@@ -63,7 +63,10 @@ const PlayModal = ({
   };
 
   const startPlay = async () => {
-    if (!user.isLoggedIn) void router.push("/login");
+    if (!user.isLoggedIn) {
+      void router.push("/login");
+      return;
+    }
     setIsPlayStarted(true);
     const time = await player?.getCurrentTime();
     const roundedTime = Math.round(time!);
@@ -110,9 +113,9 @@ const PlayModal = ({
     const { data } = await supabase
       .from("plays")
       .insert({
-        team_id: user.currentAffiliation?.team.id,
+        team_id: `${user.currentAffiliation?.team.id}`,
         profile_id: user.userId,
-        game_id: gameId,
+        video_id: videoId,
         highlight: playDetails.highlight,
         title: playDetails.title,
         note: playDetails.note,
@@ -160,7 +163,7 @@ const PlayModal = ({
 
   useEffect(() => {
     if (user.currentAffiliation) void fetchAffiliatedPlayers();
-  }, [gameId]);
+  }, [videoId]);
 
   return isPlayModalOpen ? (
     <form

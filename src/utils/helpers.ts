@@ -20,12 +20,18 @@ export const divisions = [
   "Women's",
   "PUL",
   "WUL",
-  "AUDL",
+  "UFA",
   "D1 College Men's",
   "D1 College Women's",
   "D3 College Men's",
   "D3 College Women's",
   "Other",
+];
+
+export const proDivs = ["UFA", "WUL", "PUL"];
+
+export const recentYears = [
+  2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014,
 ];
 
 export const isItemUnique = (item: string, array: string[] | null) => {
@@ -35,5 +41,24 @@ export const isItemUnique = (item: string, array: string[] | null) => {
     else return true;
   } else {
     return true;
+  }
+};
+
+export const isValidYoutubeLink = (link: string) => {
+  const youtubeRegEx = new RegExp(
+    /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|watch\?.+&v=))((\w|-){11})(?:\S+)?$/,
+  );
+  const isValid = youtubeRegEx.test(link);
+  if (isValid) return true;
+  else return false;
+};
+
+export const getNumberOfPages = (isMobile: boolean, count: number) => {
+  if (isMobile) {
+    if (count % 5 !== 0) return Math.floor(count / 5) + 1;
+    else return count / 5;
+  } else {
+    if (count % 10 !== 0) return Math.floor(count / 10) + 1;
+    else return count / 10;
   }
 };

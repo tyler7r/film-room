@@ -5,6 +5,7 @@ export type TeamAffiliationType = {
     city: string;
     division: string;
     logo: string | null;
+    full_name: string;
   };
   role: string;
 };
@@ -24,6 +25,7 @@ export type TeamType = {
   logo: string | null;
   name: string | null;
   owner: string | null;
+  full_name: string;
 };
 
 export type MessageType = {
@@ -38,31 +40,25 @@ export type TeamHubType = {
   logo: string | null;
   name: string;
   owner: string | null;
+  full_name: string;
 } | null;
 
-export type GameListType = {
+export type VideoType = {
+  exclusive_to: string | null;
   id: string;
   link: string | null;
-  one_id: string;
+  private: boolean;
   season: string | null;
+  title: string;
   tournament: string | null;
-  title: string | null;
-  two_id: string;
-  one: {
-    id: string;
-    city: string;
-    name: string;
-  } | null;
-  two: {
-    id: string;
-    city: string;
-    name: string;
-  } | null;
+  uploaded_at: string;
+  week: string | null;
+  division: string;
 };
 
 export type PlayIndexType = {
   profile_id: string | null;
-  game_id: string | null;
+  video_id: string | null;
   highlight: boolean;
   id: string;
   note: string;
@@ -79,7 +75,7 @@ export type PlayIndexType = {
 
 export type PlayType = {
   profile_id: string | null;
-  game_id: string | null;
+  video_id: string | null;
   highlight: boolean;
   id: string;
   note: string;
@@ -100,3 +96,14 @@ export type PlayerType = {
     name: string | null;
   } | null;
 }[];
+
+export type VideoUploadType = {
+  link: string;
+  title: string;
+  private: boolean;
+  exclusive_to: string | null;
+  week: string | null;
+  season: string;
+  tournament: string | null;
+  division: string;
+};

@@ -8,13 +8,13 @@ import PlayIndex from "~/components/play-index";
 import PlayModal from "~/components/play-modal";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
-import type { GameListType } from "~/utils/types";
+import type { VideoType } from "~/utils/types";
 
 const FilmRoom = () => {
   const router = useRouter();
   const { screenWidth } = useMobileContext();
 
-  const [game, setGame] = useState<GameListType | null>(null);
+  const [video, setVideo] = useState<VideoType | null>(null);
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
@@ -24,15 +24,13 @@ const FilmRoom = () => {
 
   const [isPlayIndexOpen, setIsPlayIndexOpen] = useState<boolean>(false);
 
-  const fetchGame = async () => {
+  const fetchVideo = async () => {
     const { data } = await supabase
-      .from("games")
-      .select(
-        `*, one: teams!games_one_id_fkey(id, city, name), two: teams!games_two_id_fkey(id, city, name)`,
-      )
-      .eq("id", router.query.game as string)
+      .from("videos")
+      .select(`*`)
+      .eq("id", router.query.video as string)
       .single();
-    if (data) setGame(data);
+    if (data) setVideo(data);
   };
 
   const videoOnReady = async (e: YouTubeEvent) => {
@@ -51,34 +49,24 @@ const FilmRoom = () => {
   };
 
   useEffect(() => {
-    if (router.query.game) void fetchGame();
-  }, [router.query.game]);
+    if (router.query.video) void fetchVideo();
+  }, [router.query.video]);
 
   return (
-    game && (
+    video && (
       <div className="m-4 flex flex-col items-center justify-center gap-2">
         <Typography variant="h6">
-          {game.season} {game.tournament}
+          {video.season} {video.tournament}
         </Typography>
-        <Typography>{game.title}</Typography>
-        <div className="flex items-center justify-center gap-4 text-center">
-          <Typography variant="h1" fontSize={36}>
-            {game.one?.city} {game.one?.name}
-          </Typography>
-          <Typography variant="overline" fontSize={14}>
-            vs
-          </Typography>
-          <Typography variant="h1" fontSize={36}>
-            {game.two?.city} {game.two?.name}
-          </Typography>
-        </div>
+        <Typography>{video.title}</Typography>
+        <div className="flex items-center justify-center gap-4 text-center"></div>
         <PlayModal
           player={player}
-          gameId={game.id}
+          videoId={video.id}
           isPlayModalOpen={isPlayModalOpen}
           setIsPlayModalOpen={setIsPlayModalOpen}
         />
-        {game.link && (
+        {video.link && (
           <div ref={playerRef}>
             <Youtube
               opts={{
@@ -94,7 +82,7 @@ const FilmRoom = () => {
                 },
               }}
               id="player"
-              videoId={game.link.split("v=")[1]?.split("&")[0]}
+              videoId={video.link.split("v=")[1]?.split("&")[0]}
               onReady={videoOnReady}
             />
           </div>
@@ -110,7 +98,7 @@ const FilmRoom = () => {
               Close Play Index
             </Button>
             <PlayIndex
-              gameId={game.id}
+              videoId={video.id}
               player={player}
               scrollToPlayer={scrollToPlayer}
               duration={videoDuration}
