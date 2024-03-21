@@ -53,6 +53,7 @@ export type VideoType = {
   tournament: string | null;
   uploaded_at: string;
   week: string | null;
+  division: string;
 };
 
 export type PlayIndexType = {
@@ -104,4 +105,5 @@ export type VideoUploadType = {
   week: string | null;
   season: string;
   tournament: string | null;
+  division: string;
 };

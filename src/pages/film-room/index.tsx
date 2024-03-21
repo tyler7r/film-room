@@ -13,6 +13,14 @@ import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
 import { useIsDarkContext } from "../_app";
 
+type SearchOptions = {
+  title?: string | null;
+  season?: number | null;
+  week?: string | null;
+  tournament?: string | null;
+  currentAffiliation?: string | null;
+};
+
 const FilmRoomHome = () => {
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
@@ -22,34 +30,64 @@ const FilmRoomHome = () => {
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [videoCount, setVideoCount] = useState<number | null>(null);
+  const [searchOptions, setSearchOptions] = useState<SearchOptions>({
+    title: query,
+    season: null,
+    week: "",
+    tournament: "",
+    currentAffiliation: "",
+  });
 
   const router = useRouter();
 
-  const fetchVideos = async () => {
+  const fetchVideos = async (options?: SearchOptions) => {
     const { from, to } = getFromAndTo();
-    if (user.isLoggedIn && user.currentAffiliation?.team.id) {
-      const { data, count } = await supabase
-        .from("videos")
-        .select(`*`, { count: "exact" })
-        .ilike("title", `%${query}%`)
-        .or(
+    let videos = supabase
+      .from("videos")
+      .select("*", { count: "exact" })
+      .order("uploaded_at", { ascending: false })
+      .range(from, to);
+    videos = options?.currentAffiliation
+      ? videos.or(
           `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
         )
-        .order("uploaded_at", { ascending: false })
-        .range(from, to);
-      if (count) setVideoCount(count);
-      if (data) setVideos(data);
-    } else {
-      const { data, count } = await supabase
-        .from("videos")
-        .select(`*`, { count: "exact" })
-        .eq("private", false)
-        .ilike("title", `%${query}%`)
-        .order("uploaded_at", { ascending: false })
-        .range(from, to);
-      if (count) setVideoCount(count);
-      if (data && data.length > 0) setVideos(data);
+      : videos.eq("private", false);
+    if (options?.title) {
+      videos.ilike("title", `%${options.title}%`);
     }
+    if (options?.tournament) {
+      videos.ilike("tournament", `%${options.tournament}%`);
+    }
+    if (options?.season) {
+      videos.ilike("season", `%${options.season}%`);
+    }
+
+    const { data, count } = await videos;
+    if (data) setVideos(data);
+    if (count) setVideoCount(count);
+    // if (user.isLoggedIn && user.currentAffiliation?.team.id) {
+    //   const { data, count } = await supabase
+    //     .from("videos")
+    //     .select(`*`, { count: "exact" })
+    //     .ilike("title", `%${query}%`)
+    //     .or(
+    //       `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
+    //     )
+    //     .order("uploaded_at", { ascending: false })
+    //     .range(from, to);
+    //   if (count) setVideoCount(count);
+    //   if (data) setVideos(data);
+    // } else {
+    //   const { data, count } = await supabase
+    //     .from("videos")
+    //     .select(`*`, { count: "exact" })
+    //     .eq("private", false)
+    //     .ilike("title", `%${query}%`)
+    //     .order("uploaded_at", { ascending: false })
+    //     .range(from, to);
+    //   if (count) setVideoCount(count);
+    //   if (data) setVideos(data);
+    // }
   };
 
   const handleChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -83,7 +121,7 @@ const FilmRoomHome = () => {
   }, []);
 
   useEffect(() => {
-    void fetchVideos();
+    void fetchVideos({ title: query });
   }, [page, isMobile, query]);
 
   return (
@@ -93,7 +131,7 @@ const FilmRoomHome = () => {
       </Typography>
       <Divider flexItem variant="middle" className="mb-4"></Divider>
       <Search />
-      {user.isLoggedIn && <AddVideo />}
+      <AddVideo />
       <div className="flex w-4/5 flex-col items-center justify-center gap-6">
         {!videos && <Typography>No videos in the Film Room!</Typography>}
         {videos?.map((v) => (

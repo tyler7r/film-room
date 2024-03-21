@@ -4,13 +4,19 @@ import {
   Button,
   Checkbox,
   Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Modal,
+  Select,
+  SelectChangeEvent,
   TextField,
   Typography,
 } from "@mui/material";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
-import { isValidYoutubeLink } from "~/utils/helpers";
+import { divisions, isValidYoutubeLink, proDivs } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { MessageType, VideoUploadType } from "~/utils/types";
 import FormMessage from "../form-message";
@@ -28,6 +34,7 @@ const style = {
 };
 
 const AddVideo = () => {
+  const router = useRouter();
   const { user } = useAuthContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<MessageType>({
@@ -42,8 +49,17 @@ const AddVideo = () => {
     week: "",
     season: "",
     tournament: "",
+    division: "",
   });
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
+
+  const handleOpen = () => {
+    if (user.isLoggedIn) {
+      setIsOpen(true);
+    } else {
+      void router.push("/login");
+    }
+  };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,6 +67,11 @@ const AddVideo = () => {
       ...videoData,
       [name]: value,
     });
+  };
+
+  const handleDivision = (e: SelectChangeEvent) => {
+    const div = e.target.value;
+    setVideoData({ ...videoData, division: div });
   };
 
   const reset = () => {
@@ -62,6 +83,7 @@ const AddVideo = () => {
       week: "",
       season: "",
       tournament: "",
+      division: "",
     });
     setIsOpen(false);
   };
@@ -116,7 +138,7 @@ const AddVideo = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const isVideoDuplicated = await checkIfDuplicateVideo(e);
     e.preventDefault();
-    const { title, link, season, week, tournament } = videoData;
+    const { title, link, season, week, tournament, division } = videoData;
     if (isVideoDuplicated) {
       setMessage({
         status: "error",
@@ -133,6 +155,7 @@ const AddVideo = () => {
         title,
         link,
         season,
+        division,
         week: week === "" ? null : week,
         tournament: tournament === "" ? null : tournament,
         private: videoData.private,
@@ -161,9 +184,6 @@ const AddVideo = () => {
         >
           X
         </Button>
-        {/* <Typography className="text-3xl font-bold tracking-wider">
-          Add a Video
-        </Typography> */}
         <Divider flexItem variant="middle" className="m-2 mx-16">
           <Typography className="text-3xl font-bold">ADD A VIDEO</Typography>
         </Divider>
@@ -191,7 +211,23 @@ const AddVideo = () => {
             onChange={handleInput}
             value={videoData.link}
           />
-          <div className="flex gap-4">
+          <div className="flex w-full gap-4 text-start">
+            <FormControl className="w-full" required>
+              <InputLabel>Division</InputLabel>
+              <Select
+                value={videoData.division}
+                onChange={handleDivision}
+                label="Division"
+                required
+              >
+                <MenuItem value="">No Filter</MenuItem>
+                {divisions.map((div) => (
+                  <MenuItem key={div} value={div}>
+                    {div}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
               className="w-full"
               name="season"
@@ -202,6 +238,8 @@ const AddVideo = () => {
               onChange={handleInput}
               value={videoData.season}
             />
+          </div>
+          {proDivs.includes(videoData.division) ? (
             <TextField
               className="w-full"
               name="week"
@@ -211,16 +249,17 @@ const AddVideo = () => {
               onChange={handleInput}
               value={videoData.week}
             />
-          </div>
-          <TextField
-            className="w-full"
-            name="tournament"
-            autoComplete="tournament"
-            id="tournament"
-            label="Tournament  (if applicable)"
-            onChange={handleInput}
-            value={videoData.tournament}
-          />
+          ) : (
+            <TextField
+              className="w-full"
+              name="tournament"
+              autoComplete="tournament"
+              id="tournament"
+              label="Tournament  (if applicable)"
+              onChange={handleInput}
+              value={videoData.tournament}
+            />
+          )}
           {user.currentAffiliation?.team.id && (
             <div className="flex items-center justify-center">
               <div className="text-xl font-bold tracking-tight">
@@ -251,7 +290,6 @@ const AddVideo = () => {
             </Button>
           </div>
         </form>
-        {/* <Divider flexItem variant="middle" className="mb-4"></Divider> */}
       </Box>
     </Modal>
   ) : (
@@ -260,7 +298,7 @@ const AddVideo = () => {
       type="button"
       size="large"
       endIcon={<AddIcon />}
-      onClick={() => setIsOpen(true)}
+      onClick={handleOpen}
     >
       Add New Video
     </Button>

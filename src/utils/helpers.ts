@@ -20,13 +20,15 @@ export const divisions = [
   "Women's",
   "PUL",
   "WUL",
-  "AUDL",
+  "UFA",
   "D1 College Men's",
   "D1 College Women's",
   "D3 College Men's",
   "D3 College Women's",
   "Other",
 ];
+
+export const proDivs = ["UFA", "WUL", "PUL"];
 
 export const isItemUnique = (item: string, array: string[] | null) => {
   if (array) {
