@@ -18,10 +18,9 @@ import { useIsDarkContext } from "../_app";
 export type SearchOptions = {
   title?: string;
   season?: string;
-  week?: string;
-  tournament?: string;
   currentAffiliation?: string;
   division?: string;
+  privateOnly?: boolean;
 };
 
 const FilmRoomHome = () => {
@@ -37,10 +36,9 @@ const FilmRoomHome = () => {
   const [searchOptions, setSearchOptions] = useState<SearchOptions>({
     title: "",
     season: "",
-    week: "",
-    tournament: "",
     currentAffiliation: user.currentAffiliation?.team.id,
     division: "",
+    privateOnly: false,
   });
 
   const fetchVideos = async (options?: SearchOptions) => {
@@ -61,11 +59,11 @@ const FilmRoomHome = () => {
     if (options?.division) {
       void videos.ilike("division", `%${options.division}`);
     }
-    if (options?.tournament) {
-      void videos.ilike("tournament", `%${options.tournament}%`);
-    }
     if (options?.season) {
       void videos.ilike("season", `%${options.season}%`);
+    }
+    if (options?.privateOnly) {
+      void videos.eq("private", true);
     }
 
     const { data, count } = await videos;
@@ -87,7 +85,13 @@ const FilmRoomHome = () => {
   };
 
   const clearSearchOptions = () => {
-    setSearchOptions({ ...searchOptions, division: "", season: "", title: "" });
+    setSearchOptions({
+      ...searchOptions,
+      division: "",
+      season: "",
+      title: "",
+      privateOnly: false,
+    });
   };
 
   useEffect(() => {
@@ -108,8 +112,7 @@ const FilmRoomHome = () => {
   }, []);
 
   useEffect(() => {
-    const { title, division, season, currentAffiliation } = searchOptions;
-    void fetchVideos({ title, division, season, currentAffiliation });
+    void fetchVideos(searchOptions);
   }, [page, isMobile, query, searchOptions]);
 
   return (
