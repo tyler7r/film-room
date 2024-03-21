@@ -1,11 +1,13 @@
+import DeleteIcon from "@mui/icons-material/Delete";
 import PublicIcon from "@mui/icons-material/Public";
-import { Divider, Pagination, Typography } from "@mui/material";
+import { Button, Divider, Pagination, Typography } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
 import Search from "~/components/search";
 import TeamLogo from "~/components/team-logo";
+import VideoSearchFilters from "~/components/video-search-filters";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
@@ -13,32 +15,33 @@ import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
 import { useIsDarkContext } from "../_app";
 
-type SearchOptions = {
-  title?: string | null;
-  season?: number | null;
-  week?: string | null;
-  tournament?: string | null;
-  currentAffiliation?: string | null;
+export type SearchOptions = {
+  title?: string;
+  season?: string;
+  week?: string;
+  tournament?: string;
+  currentAffiliation?: string;
+  division?: string;
 };
 
 const FilmRoomHome = () => {
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
+  const router = useRouter();
 
   const query = useSearchParams().get("query") ?? "";
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [videoCount, setVideoCount] = useState<number | null>(null);
   const [searchOptions, setSearchOptions] = useState<SearchOptions>({
-    title: query,
-    season: null,
+    title: "",
+    season: "",
     week: "",
     tournament: "",
-    currentAffiliation: "",
+    currentAffiliation: user.currentAffiliation?.team.id,
+    division: "",
   });
-
-  const router = useRouter();
 
   const fetchVideos = async (options?: SearchOptions) => {
     const { from, to } = getFromAndTo();
@@ -55,6 +58,9 @@ const FilmRoomHome = () => {
     if (options?.title) {
       videos.ilike("title", `%${options.title}%`);
     }
+    if (options?.division) {
+      videos.ilike("division", `%${options.division}`);
+    }
     if (options?.tournament) {
       videos.ilike("tournament", `%${options.tournament}%`);
     }
@@ -65,29 +71,6 @@ const FilmRoomHome = () => {
     const { data, count } = await videos;
     if (data) setVideos(data);
     if (count) setVideoCount(count);
-    // if (user.isLoggedIn && user.currentAffiliation?.team.id) {
-    //   const { data, count } = await supabase
-    //     .from("videos")
-    //     .select(`*`, { count: "exact" })
-    //     .ilike("title", `%${query}%`)
-    //     .or(
-    //       `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
-    //     )
-    //     .order("uploaded_at", { ascending: false })
-    //     .range(from, to);
-    //   if (count) setVideoCount(count);
-    //   if (data) setVideos(data);
-    // } else {
-    //   const { data, count } = await supabase
-    //     .from("videos")
-    //     .select(`*`, { count: "exact" })
-    //     .eq("private", false)
-    //     .ilike("title", `%${query}%`)
-    //     .order("uploaded_at", { ascending: false })
-    //     .range(from, to);
-    //   if (count) setVideoCount(count);
-    //   if (data) setVideos(data);
-    // }
   };
 
   const handleChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -101,6 +84,10 @@ const FilmRoomHome = () => {
     const to = from + itemPerPage - 1;
 
     return { from, to };
+  };
+
+  const clearSearchOptions = () => {
+    setSearchOptions({ ...searchOptions, division: "", season: "", title: "" });
   };
 
   useEffect(() => {
@@ -121,8 +108,9 @@ const FilmRoomHome = () => {
   }, []);
 
   useEffect(() => {
-    void fetchVideos({ title: query });
-  }, [page, isMobile, query]);
+    const { title, division, season, currentAffiliation } = searchOptions;
+    void fetchVideos({ title, division, season, currentAffiliation });
+  }, [page, isMobile, query, searchOptions]);
 
   return (
     <div className="my-4 flex w-full flex-col items-center justify-center">
@@ -130,10 +118,30 @@ const FilmRoomHome = () => {
         The Film Room
       </Typography>
       <Divider flexItem variant="middle" className="mb-4"></Divider>
-      <Search />
+      <Search
+        searchOptions={searchOptions}
+        setSearchOptions={setSearchOptions}
+      />
+      <VideoSearchFilters
+        searchOptions={searchOptions}
+        setSearchOptions={setSearchOptions}
+      />
+      <Button endIcon={<DeleteIcon />} onClick={clearSearchOptions}>
+        Clear Filters
+      </Button>
       <AddVideo />
       <div className="flex w-4/5 flex-col items-center justify-center gap-6">
-        {!videos && <Typography>No videos in the Film Room!</Typography>}
+        {!videos ||
+          (videos.length === 0 && (
+            <div className="flex flex-col items-center justify-center gap-1">
+              <div className="text-4xl font-bold tracking-tight">
+                No videos in the Film Room!
+              </div>
+              <div className="text-2xl font-bold tracking-wide">
+                Try a new search.
+              </div>
+            </div>
+          ))}
         {videos?.map((v) => (
           <div
             style={backgroundStyle}

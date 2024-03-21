@@ -21,18 +21,6 @@ import { supabase } from "~/utils/supabase";
 import type { MessageType, VideoUploadType } from "~/utils/types";
 import FormMessage from "../form-message";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "1px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
 const AddVideo = () => {
   const router = useRouter();
   const { user } = useAuthContext();
@@ -172,10 +160,7 @@ const AddVideo = () => {
 
   return isOpen ? (
     <Modal open={isOpen} onClose={reset}>
-      <Box
-        sx={style}
-        className="relative flex w-4/5 flex-col items-center justify-center rounded-md p-4"
-      >
+      <Box className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid bg-white p-4">
         <Button
           variant="text"
           size="large"

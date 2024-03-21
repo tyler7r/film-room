@@ -1,22 +1,36 @@
 import SearchIcon from "@mui/icons-material/Search";
 import { InputAdornment, TextField } from "@mui/material";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useDebouncedCallback } from "use-debounce";
+import React from "react";
+import { SearchOptions } from "~/pages/film-room";
 
-const Search = () => {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
+type VideoSearchFilterProps = {
+  searchOptions: SearchOptions;
+  setSearchOptions: (options: SearchOptions) => void;
+};
 
-  const handleSearch = useDebouncedCallback((term: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set("query", term);
-    } else {
-      params.delete("query");
-    }
-    void router.replace(`${pathname}?${params.toString()}`);
-  }, 500);
+const Search = ({
+  searchOptions,
+  setSearchOptions,
+}: VideoSearchFilterProps) => {
+  // const searchParams = useSearchParams();
+  // const pathname = usePathname();
+  // const router = useRouter();
+
+  // useEffect(() => {
+  //   const { title } = searchOptions;
+  //   const params = new URLSearchParams(searchParams);
+  //   if (title) {
+  //     params.set("query", title);
+  //   } else {
+  //     params.delete("query");
+  //   }
+  //   void router.replace(`${pathname}?${params.toString()}`);
+  // }, [searchOptions.title]);
+
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setSearchOptions({ ...searchOptions, title: value });
+  };
 
   return (
     <div className="relative mb-4 flex w-4/5 flex-1 flex-shrink-0">
@@ -36,8 +50,8 @@ const Search = () => {
         name="search"
         autoComplete="search"
         id="search"
-        onChange={(e) => handleSearch(e.target.value)}
-        defaultValue={searchParams.get("query")?.toString()}
+        onChange={changeHandler}
+        value={searchOptions.title}
       />
     </div>
   );
