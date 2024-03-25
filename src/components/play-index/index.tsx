@@ -85,6 +85,7 @@ const PlayIndex = ({ player, videoId, scrollToPlayer }: PlayIndexProps) => {
       <PlaySearchFilters
         searchOptions={searchOptions}
         setSearchOptions={setSearchOptions}
+        setPage={setPage}
       />
       <div className="flex items-center justify-center gap-1 text-center">
         <StarIcon color="secondary" fontSize="large" />

@@ -12,14 +12,17 @@ import { divisions, recentYears } from "~/utils/helpers";
 type VideoSearchFilterProps = {
   searchOptions: SearchOptions;
   setSearchOptions: (options: SearchOptions) => void;
+  setPage: (page: number) => void;
 };
 
 const VideoSearchFilters = ({
   searchOptions,
   setSearchOptions,
+  setPage,
 }: VideoSearchFilterProps) => {
   const handleChange = (e: SelectChangeEvent) => {
     const { name, value } = e.target;
+    setPage(1);
     setSearchOptions({ ...searchOptions, [name]: value });
   };
 
@@ -68,6 +71,7 @@ const VideoSearchFilters = ({
         <Checkbox
           checked={searchOptions.privateOnly}
           onChange={() => {
+            setPage(1);
             setSearchOptions({
               ...searchOptions,
               privateOnly: !searchOptions.privateOnly,

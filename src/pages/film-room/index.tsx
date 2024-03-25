@@ -126,6 +126,7 @@ const FilmRoomHome = () => {
       <VideoSearchFilters
         searchOptions={searchOptions}
         setSearchOptions={setSearchOptions}
+        setPage={setPage}
       />
       <Button endIcon={<DeleteIcon />} onClick={clearSearchOptions}>
         Clear Filters

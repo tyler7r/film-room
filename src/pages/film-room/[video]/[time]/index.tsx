@@ -1,24 +1,28 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Button, Divider, Typography } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import PlayIndex from "~/components/play-index";
+import Play from "~/components/play-index/play";
 import PlayModal from "~/components/play-modal";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
-import type { VideoType } from "~/utils/types";
+import { PlayType, type VideoType } from "~/utils/types";
 
 const FilmRoom = () => {
   const router = useRouter();
   const { screenWidth } = useMobileContext();
+  const playParam = useSearchParams().get("play") || null;
 
   const [video, setVideo] = useState<VideoType | null>(null);
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
   const [videoDuration, setVideoDuration] = useState<number>(0);
+  const [activePlay, setActivePlay] = useState<PlayType | null>(null);
 
   const [isPlayModalOpen, setIsPlayModalOpen] = useState<boolean>(false);
 
@@ -33,12 +37,24 @@ const FilmRoom = () => {
     if (data) setVideo(data);
   };
 
+  const fetchActivePlay = async () => {
+    if (playParam) {
+      const { data } = await supabase
+        .from("plays")
+        .select(`*, mentions:play_mentions (receiver_name)`, { count: "exact" })
+        .eq("id", playParam)
+        .single();
+      if (data) setActivePlay(data);
+    }
+  };
+
   const videoOnReady = async (e: YouTubeEvent) => {
     const video = e.target;
     setPlayer(video);
     const duration = await video.getDuration();
     setVideoDuration(duration);
     const time = Number(router.query.time);
+    console.log(time);
     if (time) {
       void video.seekTo(time, true);
     }
@@ -49,9 +65,13 @@ const FilmRoom = () => {
   };
 
   useEffect(() => {
-    if (router.query.video) void fetchVideo();
+    console.log(playParam);
+    if (router.query.video) {
+      void fetchVideo();
+      void fetchActivePlay();
+    }
     setIsPlayIndexOpen(false);
-  }, [router.query.video]);
+  }, [router.query.video, playParam]);
 
   return (
     video && (
@@ -90,6 +110,18 @@ const FilmRoom = () => {
               id="player"
               videoId={video.link.split("v=")[1]?.split("&")[0]}
               onReady={videoOnReady}
+            />
+          </div>
+        )}
+        {activePlay && (
+          <div className="flex w-11/12 flex-col items-center justify-center gap-2">
+            <div className="tracking-tightest text-xl font-bold">
+              Active Play
+            </div>
+            <Play
+              player={player}
+              scrollToPlayer={scrollToPlayer}
+              play={activePlay}
             />
           </div>
         )}

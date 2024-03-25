@@ -2,6 +2,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import StarIcon from "@mui/icons-material/Star";
 import { Divider, Typography } from "@mui/material";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useIsDarkContext } from "~/pages/_app";
@@ -18,9 +19,20 @@ const Play = ({ player, play, scrollToPlayer }: PlayProps) => {
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  const handleClick = (playTime: number) => {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handleClick = (playTime: number, id: string) => {
     scrollToPlayer();
     void player?.seekTo(playTime, true);
+    const params = new URLSearchParams(searchParams);
+    if (id) {
+      params.set("play", id);
+    } else {
+      params.delete("play");
+    }
+    void router.replace(`${pathname}?${params.toString()}`);
   };
 
   return (
@@ -28,7 +40,7 @@ const Play = ({ player, play, scrollToPlayer }: PlayProps) => {
       <div
         style={backgroundStyle}
         className="flex cursor-pointer items-center gap-2 rounded-md p-4"
-        onClick={() => handleClick(play.start_time)}
+        onClick={() => handleClick(play.start_time, play.id)}
       >
         <Typography className="w-min text-center text-xl font-bold tracking-tight">
           {play.author_name}

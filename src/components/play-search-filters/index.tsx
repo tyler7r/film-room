@@ -11,14 +11,17 @@ import { PlaySearchOptions } from "../play-index";
 type PlaySearchFilterProps = {
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
+  setPage: (page: number) => void;
 };
 
 const PlaySearchFilters = ({
   searchOptions,
   setSearchOptions,
+  setPage,
 }: PlaySearchFilterProps) => {
   const handleChange = (e: SelectChangeEvent) => {
     const { name, value } = e.target;
+    setPage(1);
     setSearchOptions({ ...searchOptions, [name]: value });
   };
 

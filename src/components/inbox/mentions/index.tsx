@@ -1,5 +1,5 @@
 import { Button, Divider, Typography } from "@mui/material";
-import { useRouter } from "next/router";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
@@ -29,6 +29,8 @@ const InboxMentions = () => {
   const { user } = useAuthContext();
   const { setIsOpen, page, setPage } = useInboxContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const router = useRouter();
 
   const [mentions, setMentions] = useState<MentionType | null>(null);
@@ -80,6 +82,20 @@ const InboxMentions = () => {
     };
   }, []);
 
+  const handleClick = (
+    videoId: string | undefined,
+    playId: string,
+    start: number | undefined,
+  ) => {
+    const params = new URLSearchParams(searchParams);
+    console.log(pathname);
+    if (videoId && start) {
+      params.set("play", playId);
+    }
+    void router.push(`/film-room/${videoId}/${start}?${params.toString()}`);
+    setIsOpen(false);
+  };
+
   useEffect(() => {
     if (user.isLoggedIn) void fetchMentions();
   }, []);
@@ -93,12 +109,13 @@ const InboxMentions = () => {
         {mentions?.map((mention) => (
           <div
             key={mention.play_id + mention.created_at}
-            onClick={() => {
-              void router.push(
-                `/film-room/${mention.plays?.video_id}/${mention.plays?.start_time}`,
-              );
-              setIsOpen(false);
-            }}
+            onClick={() =>
+              handleClick(
+                mention.plays?.video_id,
+                mention.play_id,
+                mention.plays?.start_time,
+              )
+            }
             className={`flex w-full cursor-pointer flex-col gap-1 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
               isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
             } hover:delay-100`}
