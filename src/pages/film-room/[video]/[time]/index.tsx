@@ -1,6 +1,6 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Button, Typography } from "@mui/material";
+import { Button, Divider, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
@@ -50,15 +50,21 @@ const FilmRoom = () => {
 
   useEffect(() => {
     if (router.query.video) void fetchVideo();
+    setIsPlayIndexOpen(false);
   }, [router.query.video]);
 
   return (
     video && (
       <div className="m-4 flex flex-col items-center justify-center gap-2">
-        <Typography variant="h6">
-          {video.season} {video.tournament}
-        </Typography>
-        <Typography>{video.title}</Typography>
+        <div className="flex flex-col items-center justify-center gap-1 text-center">
+          <Typography variant="h6" className="text-xl leading-5 tracking-wider">
+            {video.season} {video.tournament}
+          </Typography>
+          <Typography className="text-4xl font-bold tracking-tight lg:text-5xl">
+            {video.title}
+          </Typography>
+        </div>
+        <Divider flexItem variant="middle" className="mx-4 mt-1"></Divider>
         <div className="flex items-center justify-center gap-4 text-center"></div>
         <PlayModal
           player={player}

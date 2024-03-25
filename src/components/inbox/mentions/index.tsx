@@ -41,7 +41,9 @@ const InboxMentions = () => {
       .select(
         `*, plays(start_time, video_id, title, videos(tournament, season, title))`,
       )
-      .eq("receiver_id", `${user.userId}`)
+      .match({
+        receiver_id: `${user.userId}`,
+      })
       .order("created_at", { ascending: false })
       .range(from, to);
     setPage(page + 1);
@@ -97,7 +99,7 @@ const InboxMentions = () => {
               );
               setIsOpen(false);
             }}
-            className={`flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-sm hover:border-solid ${
+            className={`flex w-full cursor-pointer flex-col gap-1 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
               isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
             } hover:delay-100`}
             style={backgroundStyle}

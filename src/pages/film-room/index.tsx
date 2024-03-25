@@ -136,7 +136,7 @@ const FilmRoomHome = () => {
       <div className="flex w-4/5 flex-col items-center justify-center gap-6">
         {!videos ||
           (videos.length === 0 && (
-            <div className="flex flex-col items-center justify-center gap-1">
+            <div className="flex flex-col items-center justify-center gap-1 text-center">
               <div className="text-4xl font-bold tracking-tight">
                 No videos in the Film Room!
               </div>

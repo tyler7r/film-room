@@ -26,8 +26,8 @@ const Mentions = ({ mentions, setMentions, players }: MentionsProps) => {
 
   return (
     players && (
-      <div className="w-4/5">
-        <FormControl className="w-full ">
+      <div className="w-full">
+        <FormControl className="w-full text-start">
           <InputLabel>Player Mentions</InputLabel>
           <Select
             multiple
@@ -35,7 +35,7 @@ const Mentions = ({ mentions, setMentions, players }: MentionsProps) => {
             onChange={handleChange}
             input={<OutlinedInput label="Player Mentions" />}
             renderValue={(selected) => selected.join(", ")}
-            className=""
+            multiline={true}
           >
             {players.map(
               (player) =>
