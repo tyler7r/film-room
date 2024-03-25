@@ -88,11 +88,11 @@ const InboxMentions = () => {
     start: number | undefined,
   ) => {
     const params = new URLSearchParams(searchParams);
-    console.log(pathname);
     if (videoId && start) {
       params.set("play", playId);
+      params.set("start", `${start}`);
     }
-    void router.push(`/film-room/${videoId}/${start}?${params.toString()}`);
+    void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
   };
 

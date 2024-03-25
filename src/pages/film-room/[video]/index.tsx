@@ -8,6 +8,7 @@ import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import PlayIndex from "~/components/play-index";
 import Play from "~/components/play-index/play";
 import PlayModal from "~/components/play-modal";
+import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
 import { PlayType, type VideoType } from "~/utils/types";
@@ -15,7 +16,9 @@ import { PlayType, type VideoType } from "~/utils/types";
 const FilmRoom = () => {
   const router = useRouter();
   const { screenWidth } = useMobileContext();
+  const { user } = useAuthContext();
   const playParam = useSearchParams().get("play") || null;
+  const startParam = useSearchParams().get("start") || null;
 
   const [video, setVideo] = useState<VideoType | null>(null);
 
@@ -38,7 +41,7 @@ const FilmRoom = () => {
   };
 
   const fetchActivePlay = async () => {
-    if (playParam) {
+    if (playParam && user.isLoggedIn) {
       const { data } = await supabase
         .from("plays")
         .select(`*, mentions:play_mentions (receiver_name)`, { count: "exact" })
@@ -53,8 +56,7 @@ const FilmRoom = () => {
     setPlayer(video);
     const duration = await video.getDuration();
     setVideoDuration(duration);
-    const time = Number(router.query.time);
-    console.log(time);
+    const time = Number(startParam);
     if (time) {
       void video.seekTo(time, true);
     }
@@ -65,13 +67,17 @@ const FilmRoom = () => {
   };
 
   useEffect(() => {
-    console.log(playParam);
     if (router.query.video) {
       void fetchVideo();
       void fetchActivePlay();
     }
     setIsPlayIndexOpen(false);
   }, [router.query.video, playParam]);
+
+  useEffect(() => {
+    const time = Number(startParam);
+    if (time && player) void player.seekTo(time, true);
+  }, [startParam]);
 
   return (
     video && (
@@ -119,9 +125,10 @@ const FilmRoom = () => {
               Active Play
             </div>
             <Play
-              player={player}
               scrollToPlayer={scrollToPlayer}
               play={activePlay}
+              player={player}
+              setActivePlay={setActivePlay}
             />
           </div>
         )}
@@ -136,10 +143,11 @@ const FilmRoom = () => {
               Close Play Index
             </Button>
             <PlayIndex
-              videoId={video.id}
               player={player}
+              videoId={video.id}
               scrollToPlayer={scrollToPlayer}
               duration={videoDuration}
+              setActivePlay={setActivePlay}
             />
           </div>
         ) : (

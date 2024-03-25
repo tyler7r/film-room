@@ -2,7 +2,6 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import StarIcon from "@mui/icons-material/Star";
 import { Divider, Typography } from "@mui/material";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useIsDarkContext } from "~/pages/_app";
@@ -12,27 +11,18 @@ type PlayProps = {
   player: YouTubePlayer | null;
   play: PlayType;
   scrollToPlayer: () => void;
+  setActivePlay: (play: PlayType) => void;
 };
 
-const Play = ({ player, play, scrollToPlayer }: PlayProps) => {
+const Play = ({ player, play, scrollToPlayer, setActivePlay }: PlayProps) => {
   const { backgroundStyle } = useIsDarkContext();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
-
-  const handleClick = (playTime: number, id: string) => {
+  const handleClick = (playTime: number, play: PlayType) => {
     scrollToPlayer();
     void player?.seekTo(playTime, true);
-    const params = new URLSearchParams(searchParams);
-    if (id) {
-      params.set("play", id);
-    } else {
-      params.delete("play");
-    }
-    void router.replace(`${pathname}?${params.toString()}`);
+    setActivePlay(play);
   };
 
   return (
@@ -40,7 +30,7 @@ const Play = ({ player, play, scrollToPlayer }: PlayProps) => {
       <div
         style={backgroundStyle}
         className="flex cursor-pointer items-center gap-2 rounded-md p-4"
-        onClick={() => handleClick(play.start_time, play.id)}
+        onClick={() => handleClick(play.start_time, play)}
       >
         <Typography className="w-min text-center text-xl font-bold tracking-tight">
           {play.author_name}

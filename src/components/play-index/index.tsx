@@ -6,7 +6,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { type PlayIndexType } from "~/utils/types";
+import { PlayType, type PlayIndexType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
 import Plays from "./plays";
 
@@ -15,6 +15,7 @@ type PlayIndexProps = {
   videoId: string;
   scrollToPlayer: () => void;
   duration: number;
+  setActivePlay: (play: PlayType) => void;
 };
 
 export type PlaySearchOptions = {
@@ -24,7 +25,12 @@ export type PlaySearchOptions = {
   receiver_name?: string | undefined;
 };
 
-const PlayIndex = ({ player, videoId, scrollToPlayer }: PlayIndexProps) => {
+const PlayIndex = ({
+  setActivePlay,
+  player,
+  videoId,
+  scrollToPlayer,
+}: PlayIndexProps) => {
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
 
@@ -58,7 +64,6 @@ const PlayIndex = ({ player, videoId, scrollToPlayer }: PlayIndexProps) => {
     }
 
     const { data, count } = await plays;
-    console.log({ data, count });
     if (data) setPlays(data);
     if (count) setPlayCount(count);
   };
@@ -93,7 +98,12 @@ const PlayIndex = ({ player, videoId, scrollToPlayer }: PlayIndexProps) => {
           = Highlight Play
         </Typography>
       </div>
-      <Plays scrollToPlayer={scrollToPlayer} player={player} plays={plays} />
+      <Plays
+        scrollToPlayer={scrollToPlayer}
+        player={player}
+        plays={plays}
+        setActivePlay={setActivePlay}
+      />
       {plays && playCount && (
         <Pagination
           showFirstButton
