@@ -27,22 +27,29 @@ const Play = ({ player, play, scrollToPlayer }: PlayProps) => {
     <div>
       <div
         style={backgroundStyle}
-        className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2"
+        className="flex cursor-pointer items-center gap-2 rounded-md p-4"
         onClick={() => handleClick(play.start_time)}
       >
-        <Typography variant="button" className="w-min" fontSize={18}>
+        <Typography className="w-min text-center text-xl font-bold tracking-tight">
           {play.author_name}
         </Typography>
-        <Divider orientation="vertical" flexItem className="ml-2 mr-2" />
-        {play.highlight && <StarIcon color="secondary" />}
-        <div className="flex grow flex-col">
-          <div className="text-lg tracking-wide">{play.title}</div>
+        <Divider orientation="vertical" flexItem className="mx-2" />
+        {play.highlight && (
+          <StarIcon color="secondary" fontSize="large" className="mr-4" />
+        )}
+        <div className="flex grow flex-col items-center">
+          <div className="text-center text-xl tracking-wide md:text-2xl">
+            {play.title}
+          </div>
           {play.mentions.length > 0 && (
             <div className="flex w-full flex-col">
               <Divider flexItem className="my-1" />
-              <div className="flex gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-3">
                 {play.mentions.map((m) => (
-                  <div className="text-sm font-bold" key={m.receiver_name}>
+                  <div
+                    className="text-center text-sm font-bold even:text-slate-500 md:text-base"
+                    key={m.receiver_name}
+                  >
                     {m.receiver_name}
                   </div>
                 ))}

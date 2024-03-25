@@ -1,7 +1,6 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider, Pagination, Typography } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
@@ -29,7 +28,6 @@ const FilmRoomHome = () => {
   const { backgroundStyle, isDark } = useIsDarkContext();
   const router = useRouter();
 
-  const query = useSearchParams().get("query") ?? "";
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [videoCount, setVideoCount] = useState<number | null>(null);
@@ -113,7 +111,7 @@ const FilmRoomHome = () => {
 
   useEffect(() => {
     void fetchVideos(searchOptions);
-  }, [page, isMobile, query, searchOptions]);
+  }, [page, isMobile, searchOptions]);
 
   return (
     <div className="my-4 flex w-full flex-col items-center justify-center">
