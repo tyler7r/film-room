@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType } from "~/utils/types";
 import Mentions from "../play-mentions";
@@ -39,7 +38,6 @@ const PlayModal = ({
 }: PlayModalProps) => {
   const router = useRouter();
   const { user } = useAuthContext();
-  const { borderStyle } = useIsDarkContext();
   const [isPlayStarted, setIsPlayStarted] = useState(false);
   const [playDetails, setPlayDetails] = useState<PlayType>({
     title: "",
@@ -57,7 +55,8 @@ const PlayModal = ({
   const fetchAffiliatedPlayers = async () => {
     const { data } = await supabase
       .from("affiliations")
-      .select(`user_id, profiles (name)`)
+      .select(`id, profiles (name)`)
+      // .select(`user_id, profiles (name)`)
       .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
     if (data) setAffiliatedPlayers(data);
   };
@@ -140,7 +139,7 @@ const PlayModal = ({
           (v) => v.profiles?.name === mention,
         );
         if (player) {
-          void handleMention(player.user_id, mention, data.id);
+          void handleMention(player.id, mention, data.id);
         }
       });
       void resetPlay();

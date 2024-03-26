@@ -104,10 +104,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          play_id: string
-          receiver_id: string
+          play_id?: string
+          receiver_id?: string
           receiver_name: string
-          sender_id: string
+          sender_id?: string
           sender_name: string
         }
         Update: {
@@ -120,24 +120,24 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "play_mentions_play_id_fkey"
+            foreignKeyName: "public_play_mentions2_play_id_fkey"
             columns: ["play_id"]
             isOneToOne: false
             referencedRelation: "plays"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "play_mentions_receiver_id_fkey"
+            foreignKeyName: "public_play_mentions2_receiver_id_fkey"
             columns: ["receiver_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "affiliations"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "play_mentions_sender_id_fkey"
+            foreignKeyName: "public_play_mentions2_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "affiliations"
             referencedColumns: ["id"]
           },
         ]
