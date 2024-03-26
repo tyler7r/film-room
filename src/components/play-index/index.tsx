@@ -8,7 +8,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { PlayType, type PlayIndexType } from "~/utils/types";
+import type { PlayIndexType, PlayType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
 import Plays from "./plays";
 
@@ -48,7 +48,7 @@ const PlayIndex = ({
 
   const fetchPlays = async (options?: PlaySearchOptions) => {
     const { from, to } = getFromAndTo();
-    let plays = supabase
+    const plays = supabase
       .from(`plays`)
       .select(`*, mentions:play_mentions!inner(receiver_name)`, {
         count: "exact",

@@ -5,7 +5,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { MentionType } from "~/utils/types";
+import type { MentionType } from "~/utils/types";
 
 const InboxMentions = () => {
   const { user } = useAuthContext();

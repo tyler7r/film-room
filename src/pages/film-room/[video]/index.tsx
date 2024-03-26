@@ -9,14 +9,14 @@ import PlayModal from "~/components/play-modal";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
-import { PlayType, type VideoType } from "~/utils/types";
+import type { PlayType, VideoType } from "~/utils/types";
 
 const FilmRoom = () => {
   const router = useRouter();
   const { screenWidth } = useMobileContext();
   const { user } = useAuthContext();
-  const playParam = useSearchParams().get("play") || null;
-  const startParam = useSearchParams().get("start") || null;
+  const playParam = useSearchParams().get("play") ?? null;
+  const startParam = useSearchParams().get("start") ?? null;
 
   const [video, setVideo] = useState<VideoType | null>(null);
 

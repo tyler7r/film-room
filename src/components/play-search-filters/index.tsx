@@ -12,7 +12,7 @@ import {
   type SelectChangeEvent,
 } from "@mui/material";
 import { useAuthContext } from "~/contexts/auth";
-import { PlaySearchOptions } from "../play-index";
+import type { PlaySearchOptions } from "../play-index";
 
 type PlaySearchFilterProps = {
   searchOptions: PlaySearchOptions;
@@ -35,10 +35,6 @@ const PlaySearchFilters = ({
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSearchOptions({ ...searchOptions, receiver_name: value });
-  };
-
-  const clearMentionSearch = () => {
-    setSearchOptions({ ...searchOptions, receiver_name: "" });
   };
 
   const handleYourMentionsBtnClick = () => {
