@@ -98,12 +98,14 @@ const Signup = () => {
         </Button>
       </form>
       <div className="mt-2 flex flex-col items-center justify-center gap-2">
-        <div className="lg:text-lg">Already have an account?</div>
+        <div className="text-xl font-light tracking-tight">
+          Already have an account?
+        </div>
         <Button
           variant="outlined"
-          size="medium"
+          size="large"
           onClick={() => router.push("/login")}
-          className="lg:text-lg"
+          className="text-lg font-light"
         >
           Login
         </Button>

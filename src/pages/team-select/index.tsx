@@ -162,12 +162,12 @@ const TeamSelect = () => {
                 <Checkbox
                   checked={team.isCoach}
                   onChange={() => setTeam({ ...team, isCoach: !team.isCoach })}
-                  size="small"
+                  size="medium"
                 />
               }
               labelPlacement="start"
               label={
-                <Typography fontSize={12} variant="button">
+                <Typography fontSize={12} variant="button" className="text-lg">
                   Are you a coach?
                 </Typography>
               }
@@ -202,12 +202,16 @@ const TeamSelect = () => {
                     onChange={() =>
                       setTeam2({ ...team2, isCoach: !team2.isCoach })
                     }
-                    size="small"
+                    size="medium"
                   />
                 }
                 labelPlacement="start"
                 label={
-                  <Typography fontSize={12} variant="button">
+                  <Typography
+                    fontSize={12}
+                    variant="button"
+                    className="text-lg"
+                  >
                     Are you a coach?
                   </Typography>
                 }

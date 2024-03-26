@@ -42,9 +42,9 @@ const TeamPageButton = () => {
       >
         Team Hub
       </Button>
-      {affiliations && (
-        <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
-          {affiliations.map((aff) => (
+      <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
+        {affiliations &&
+          affiliations.map((aff) => (
             <MenuItem
               key={aff.team.id}
               className="flex items-center justify-center gap-2"
@@ -75,20 +75,19 @@ const TeamPageButton = () => {
               </Typography>
             </MenuItem>
           ))}
-          <MenuItem
-            className="flex items-center justify-center gap-2"
-            onClick={() => {
-              handleClose();
-              router.push(`/team-select`);
-            }}
-          >
-            <AddIcon />
-            <Typography variant="overline" fontWeight="bold" fontSize="small">
-              Join a New Team
-            </Typography>
-          </MenuItem>
-        </Menu>
-      )}
+        <MenuItem
+          className="flex items-center justify-center gap-2"
+          onClick={() => {
+            handleClose();
+            router.push(`/team-select`);
+          }}
+        >
+          <AddIcon />
+          <Typography variant="overline" fontWeight="bold" fontSize="small">
+            Join a New Team
+          </Typography>
+        </MenuItem>
+      </Menu>
     </div>
   );
 };
