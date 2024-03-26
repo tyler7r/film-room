@@ -40,7 +40,7 @@ const Mentions = ({ mentions, setMentions, players }: MentionsProps) => {
             {players.map(
               (player) =>
                 player.profiles?.name && (
-                  <MenuItem key={player.user_id} value={player.profiles.name}>
+                  <MenuItem key={player.id} value={player.profiles.name}>
                     <Checkbox
                       checked={mentions.indexOf(player.profiles.name) > -1}
                     />

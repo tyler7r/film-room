@@ -52,10 +52,11 @@ const FilmRoomHome = () => {
         )
       : videos.eq("private", false);
     if (options?.title) {
+      console.log(options.title);
       void videos.ilike("title", `%${options.title}%`);
     }
     if (options?.division) {
-      void videos.ilike("division", `%${options.division}`);
+      void videos.ilike("division", `%${options.division}%`);
     }
     if (options?.season) {
       void videos.ilike("season", `%${options.season}%`);

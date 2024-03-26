@@ -1,6 +1,4 @@
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Button, Divider, Typography } from "@mui/material";
+import { Divider, Typography } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -28,8 +26,6 @@ const FilmRoom = () => {
   const [activePlay, setActivePlay] = useState<PlayType | null>(null);
 
   const [isPlayModalOpen, setIsPlayModalOpen] = useState<boolean>(false);
-
-  const [isPlayIndexOpen, setIsPlayIndexOpen] = useState<boolean>(false);
 
   const fetchVideo = async () => {
     const { data } = await supabase
@@ -71,7 +67,6 @@ const FilmRoom = () => {
       void fetchVideo();
       void fetchActivePlay();
     }
-    setIsPlayIndexOpen(false);
   }, [router.query.video, playParam]);
 
   useEffect(() => {
@@ -130,9 +125,17 @@ const FilmRoom = () => {
               player={player}
               setActivePlay={setActivePlay}
             />
+            <Divider className="my-4" flexItem></Divider>
           </div>
         )}
-        {isPlayIndexOpen ? (
+        <PlayIndex
+          player={player}
+          videoId={video.id}
+          scrollToPlayer={scrollToPlayer}
+          duration={videoDuration}
+          setActivePlay={setActivePlay}
+        />
+        {/* {isPlayIndexOpen ? (
           <div className="flex w-full flex-col items-center justify-center gap-4">
             <Button
               variant="text"
@@ -159,7 +162,7 @@ const FilmRoom = () => {
           >
             Open Play Index
           </Button>
-        )}
+        )} */}
       </div>
     )
   );

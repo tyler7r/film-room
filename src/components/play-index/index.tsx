@@ -1,5 +1,7 @@
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import StarIcon from "@mui/icons-material/Star";
-import { Pagination, Typography } from "@mui/material";
+import { Button, Pagination, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
@@ -21,8 +23,7 @@ type PlayIndexProps = {
 export type PlaySearchOptions = {
   role?: string | undefined;
   only_highlights?: boolean;
-  sender_name?: string | undefined;
-  receiver_name?: string | undefined;
+  receiver_name?: string;
 };
 
 const PlayIndex = ({
@@ -37,11 +38,11 @@ const PlayIndex = ({
   const [plays, setPlays] = useState<PlayIndexType | null>(null);
   const [page, setPage] = useState<number>(1);
   const [playCount, setPlayCount] = useState<number | null>(null);
+  const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
 
   const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
     only_highlights: false,
     role: "",
-    sender_name: "",
     receiver_name: "",
   });
 
@@ -49,11 +50,19 @@ const PlayIndex = ({
     const { from, to } = getFromAndTo();
     let plays = supabase
       .from(`plays`)
-      .select(`*, mentions:play_mentions (receiver_name)`, { count: "exact" })
+      .select(`*, mentions:play_mentions!inner(receiver_name)`, {
+        count: "exact",
+      })
       .match({
         video_id: videoId,
         team_id: `${user.currentAffiliation?.team.id}`,
       })
+      .ilike(
+        "play_mentions.receiver_name",
+        options?.receiver_name && options.receiver_name !== ""
+          ? `%${options?.receiver_name}%`
+          : "%%",
+      )
       .order("start_time")
       .range(from, to);
     if (options?.only_highlights) {
@@ -86,12 +95,33 @@ const PlayIndex = ({
   }, [searchOptions, videoId, page, isMobile]);
 
   return (
-    <div className="flex w-4/5 flex-col items-center justify-center gap-4">
-      <PlaySearchFilters
-        searchOptions={searchOptions}
-        setSearchOptions={setSearchOptions}
-        setPage={setPage}
-      />
+    <div className="flex w-full flex-col items-center justify-center gap-4">
+      {isFiltersOpen ? (
+        <div className="flex w-full flex-col items-center justify-center gap-2">
+          <Button
+            variant="outlined"
+            onClick={() => setIsFiltersOpen(false)}
+            endIcon={<ExpandLessIcon />}
+            className="mb-2"
+          >
+            Close Filters
+          </Button>
+          <PlaySearchFilters
+            searchOptions={searchOptions}
+            setSearchOptions={setSearchOptions}
+            setPage={setPage}
+          />
+        </div>
+      ) : (
+        <Button
+          variant="outlined"
+          onClick={() => setIsFiltersOpen(true)}
+          endIcon={<ExpandMoreIcon />}
+          size="medium"
+        >
+          Open Filters
+        </Button>
+      )}
       <div className="flex items-center justify-center gap-1 text-center">
         <StarIcon color="secondary" fontSize="large" />
         <Typography fontSize={16} variant="overline">
