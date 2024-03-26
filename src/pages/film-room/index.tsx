@@ -1,7 +1,6 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider, Pagination, Typography } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
@@ -29,7 +28,6 @@ const FilmRoomHome = () => {
   const { backgroundStyle, isDark } = useIsDarkContext();
   const router = useRouter();
 
-  const query = useSearchParams().get("query") ?? "";
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [videoCount, setVideoCount] = useState<number | null>(null);
@@ -54,10 +52,11 @@ const FilmRoomHome = () => {
         )
       : videos.eq("private", false);
     if (options?.title) {
+      console.log(options.title);
       void videos.ilike("title", `%${options.title}%`);
     }
     if (options?.division) {
-      void videos.ilike("division", `%${options.division}`);
+      void videos.ilike("division", `%${options.division}%`);
     }
     if (options?.season) {
       void videos.ilike("season", `%${options.season}%`);
@@ -113,7 +112,7 @@ const FilmRoomHome = () => {
 
   useEffect(() => {
     void fetchVideos(searchOptions);
-  }, [page, isMobile, query, searchOptions]);
+  }, [page, isMobile, searchOptions]);
 
   return (
     <div className="my-4 flex w-full flex-col items-center justify-center">
@@ -128,6 +127,7 @@ const FilmRoomHome = () => {
       <VideoSearchFilters
         searchOptions={searchOptions}
         setSearchOptions={setSearchOptions}
+        setPage={setPage}
       />
       <Button endIcon={<DeleteIcon />} onClick={clearSearchOptions}>
         Clear Filters
@@ -136,11 +136,11 @@ const FilmRoomHome = () => {
       <div className="flex w-4/5 flex-col items-center justify-center gap-6">
         {!videos ||
           (videos.length === 0 && (
-            <div className="flex flex-col items-center justify-center gap-1">
-              <div className="text-4xl font-bold tracking-tight">
+            <div className="flex flex-col items-center justify-center gap-1 text-center">
+              <div className="text-2xl font-bold tracking-tight">
                 No videos in the Film Room!
               </div>
-              <div className="text-2xl font-bold tracking-wide">
+              <div className="text-xl font-bold tracking-wide">
                 Try a new search.
               </div>
             </div>
@@ -152,7 +152,7 @@ const FilmRoomHome = () => {
             className={`${
               isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
             } flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 px-10 transition ease-in-out hover:rounded-sm hover:border-solid hover:delay-100`}
-            onClick={() => router.push(`/film-room/${v.id}/0`)}
+            onClick={() => router.push(`/film-room/${v.id}`)}
           >
             <Typography
               color={isDark ? `white` : `black`}

@@ -8,6 +8,7 @@ export type TeamAffiliationType = {
     full_name: string;
   };
   role: string;
+  affId: string;
 };
 
 export type UserSession = {
@@ -90,8 +91,27 @@ export type PlayType = {
   }[];
 };
 
+export type MentionType = {
+  created_at: string;
+  play_id: string;
+  receiver_id: string;
+  receiver_name: string;
+  sender_id: string;
+  sender_name: string;
+  plays: {
+    start_time: number;
+    video_id: string;
+    title: string;
+    videos: {
+      tournament: string | null;
+      season: string | null;
+      title: string;
+    } | null;
+  } | null;
+}[];
+
 export type PlayerType = {
-  user_id: string;
+  id: string;
   profiles: {
     name: string | null;
   } | null;

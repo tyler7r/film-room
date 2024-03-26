@@ -1,17 +1,15 @@
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import StarIcon from "@mui/icons-material/Star";
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-  type SelectChangeEvent,
-} from "@mui/material";
+import { Button, Pagination, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
+import { useMobileContext } from "~/contexts/mobile";
+import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { type PlayIndexType } from "~/utils/types";
+import type { PlayIndexType, PlayType } from "~/utils/types";
+import PlaySearchFilters from "../play-search-filters";
 import Plays from "./plays";
 
 type PlayIndexProps = {
@@ -19,172 +17,135 @@ type PlayIndexProps = {
   videoId: string;
   scrollToPlayer: () => void;
   duration: number;
+  setActivePlay: (play: PlayType) => void;
 };
 
-type ActivePlayFilterType = {
-  name: string;
-  count: number;
+export type PlaySearchOptions = {
+  role?: string | undefined;
+  only_highlights?: boolean;
+  receiver_name?: string;
 };
 
-const PlayIndex = ({ player, videoId, scrollToPlayer }: PlayIndexProps) => {
+const PlayIndex = ({
+  setActivePlay,
+  player,
+  videoId,
+  scrollToPlayer,
+}: PlayIndexProps) => {
   const { user } = useAuthContext();
+  const { isMobile } = useMobileContext();
 
   const [plays, setPlays] = useState<PlayIndexType | null>(null);
-  const [filteredPlays, setFilteredPlays] = useState<PlayIndexType | null>(
-    null,
-  );
-  const [playsWithMentions, setPlaysWithMentions] =
-    useState<PlayIndexType | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [playCount, setPlayCount] = useState<number | null>(null);
+  const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
 
-  const [activePlayFilters, setActivePlayFilters] = useState<
-    ActivePlayFilterType[] | null
-  >(null);
-  const [activePlayMentions, setActivePlayMentions] = useState<
-    ActivePlayFilterType[] | null
-  >(null);
-  const [currentFilter, setCurrentFilter] = useState<string>("");
-  const [currentMentionFilter, setCurrentMentionFilter] = useState<string>("");
+  const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
+    only_highlights: false,
+    role: "",
+    receiver_name: "",
+  });
 
-  const fetchPlays = async () => {
-    const { data } = await supabase
+  const fetchPlays = async (options?: PlaySearchOptions) => {
+    const { from, to } = getFromAndTo();
+    const plays = supabase
       .from(`plays`)
-      .select(`*, mentions:play_mentions (receiver_name)`)
+      .select(`*, mentions:play_mentions!inner(receiver_name)`, {
+        count: "exact",
+      })
       .match({
         video_id: videoId,
         team_id: `${user.currentAffiliation?.team.id}`,
       })
-      .order("start_time");
-    if (data) {
-      setPlays(data);
+      .ilike(
+        "play_mentions.receiver_name",
+        options?.receiver_name && options.receiver_name !== ""
+          ? `%${options?.receiver_name}%`
+          : "%%",
+      )
+      .order("start_time")
+      .range(from, to);
+    if (options?.only_highlights) {
+      void plays.eq("highlight", true);
     }
+    if (options?.role) {
+      void plays.eq("author_role", options.role);
+    }
+
+    const { data, count } = await plays;
+    if (data) setPlays(data);
+    if (count) setPlayCount(count);
   };
 
-  const handleChange = (e: SelectChangeEvent) => {
-    const f = e.target.value;
-    setCurrentFilter(f);
-    setCurrentMentionFilter("");
-    const copy = plays;
-    if (f === "Players") {
-      const result = copy?.filter((v) => v.author_role === "player");
-      if (result) setFilteredPlays(result);
-    } else if (f === "Coaches") {
-      const result = copy?.filter((v) => v.author_role === "coach");
-      if (result) setFilteredPlays(result);
-    } else if (f === "Highlights") {
-      const result = copy?.filter((v) => v.highlight);
-      if (result) setFilteredPlays(result);
-    } else {
-      const result = copy?.filter((v) => v.author_name === f);
-      if (result) setFilteredPlays(result);
-    }
+  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
+    e.preventDefault();
+    setPage(value);
   };
 
-  const handleMentionFilterChange = (e: SelectChangeEvent) => {
-    const filt = e.target.value;
-    setCurrentMentionFilter(filt);
-    const copy = playsWithMentions;
-    const result = copy?.filter(
-      (p) => p.mentions.filter((m) => m.receiver_name === filt).length > 0,
-    );
-    if (result) {
-      setCurrentFilter("");
-      setFilteredPlays(result);
-    }
-  };
+  const getFromAndTo = () => {
+    const itemPerPage = isMobile ? 5 : 10;
+    const from = (page - 1) * itemPerPage;
+    const to = from + itemPerPage - 1;
 
-  const createPlayFilters = () => {
-    const arr: ActivePlayFilterType[] = [
-      { name: "Coaches", count: 0 },
-      { name: "Players", count: 0 },
-      { name: "Highlights", count: 0 },
-    ];
-    const mentionArr: ActivePlayFilterType[] = [];
-    const arr3: PlayIndexType = [];
-    plays?.forEach((play) => {
-      const authorRole = play.author_role === "player" ? arr[1] : arr[0];
-      if (authorRole) authorRole.count++;
-      if (play.highlight && arr[2]) arr[2].count++;
-      const isRepeatAuthor = arr.find((p) => p.name === play.author_name);
-      if (isRepeatAuthor) {
-        isRepeatAuthor.count++;
-      } else {
-        arr.push({ name: play.author_name, count: 1 });
-      }
-      if (play.mentions.length > 0) {
-        arr3.push(play);
-        play.mentions.forEach((mention) => {
-          const name = mention.receiver_name;
-          const isAlreadyMentioned = mentionArr.find((p) => p.name === name);
-          if (isAlreadyMentioned) {
-            isAlreadyMentioned.count++;
-          } else {
-            mentionArr.push({ name, count: 1 });
-          }
-        });
-      }
-    });
-    setActivePlayFilters(arr);
-    setActivePlayMentions(mentionArr);
-    setPlaysWithMentions(arr3);
+    return { from, to };
   };
 
   useEffect(() => {
-    if (user.currentAffiliation) void fetchPlays();
-  }, []);
-
-  useEffect(() => {
-    createPlayFilters();
-  }, [plays]);
+    if (user.currentAffiliation) void fetchPlays(searchOptions);
+  }, [searchOptions, videoId, page, isMobile]);
 
   return (
-    <div className="flex w-4/5 flex-col gap-3">
-      {/* <PlayBar
-        plays={plays}
-        player={player}
-        scrollToPlayer={scrollToPlayer}
-        duration={duration}
-      /> */}
-      <FormControl className="mb-2 w-1/2 self-center">
-        <InputLabel>Filter</InputLabel>
-        <Select value={currentFilter} onChange={handleChange} label="Filter">
-          <MenuItem value="">No Filter</MenuItem>
-          {activePlayFilters?.map((i) => (
-            <MenuItem key={i.name} value={i.name}>
-              {i.name === "Highlights" ? "Highlights" : `Notes by ${i.name}`} (
-              {i.count})
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl className="mb-2 w-1/2 self-center">
-        <InputLabel>Filter by Mentions</InputLabel>
-        <Select
-          value={currentMentionFilter}
-          onChange={handleMentionFilterChange}
-          label="Filter by Mentions"
+    <div className="flex w-full flex-col items-center justify-center gap-4">
+      {isFiltersOpen ? (
+        <div className="flex w-full flex-col items-center justify-center gap-2">
+          <Button
+            variant="outlined"
+            onClick={() => setIsFiltersOpen(false)}
+            endIcon={<ExpandLessIcon />}
+            className="mb-2"
+          >
+            Close Filters
+          </Button>
+          <PlaySearchFilters
+            searchOptions={searchOptions}
+            setSearchOptions={setSearchOptions}
+            setPage={setPage}
+          />
+        </div>
+      ) : (
+        <Button
+          variant="outlined"
+          onClick={() => setIsFiltersOpen(true)}
+          endIcon={<ExpandMoreIcon />}
+          size="medium"
         >
-          <MenuItem value="">No Filter</MenuItem>
-          {activePlayMentions?.map((i) => (
-            <MenuItem key={i.name} value={i.name}>
-              {i.name} ({i.count})
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <div className="flex items-center justify-center text-center">
-        <StarIcon color="secondary" />
-        <Typography fontSize={14} variant="overline">
+          Open Filters
+        </Button>
+      )}
+      <div className="flex items-center justify-center gap-1 text-center">
+        <StarIcon color="secondary" fontSize="large" />
+        <Typography fontSize={16} variant="overline">
           = Highlight Play
         </Typography>
       </div>
-      {currentFilter !== "" || currentMentionFilter !== "" ? (
-        <Plays
-          scrollToPlayer={scrollToPlayer}
-          plays={filteredPlays}
-          player={player}
+      <Plays
+        scrollToPlayer={scrollToPlayer}
+        player={player}
+        plays={plays}
+        setActivePlay={setActivePlay}
+      />
+      {plays && playCount && (
+        <Pagination
+          showFirstButton
+          showLastButton
+          className="mt-6"
+          size="large"
+          variant="text"
+          shape="rounded"
+          count={getNumberOfPages(isMobile, playCount)}
+          page={page}
+          onChange={handlePageChange}
         />
-      ) : (
-        <Plays scrollToPlayer={scrollToPlayer} player={player} plays={plays} />
       )}
     </div>
   );

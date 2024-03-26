@@ -1,9 +1,16 @@
-import { Button, Checkbox, FormControlLabel, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType } from "~/utils/types";
 import Mentions from "../play-mentions";
@@ -31,7 +38,6 @@ const PlayModal = ({
 }: PlayModalProps) => {
   const router = useRouter();
   const { user } = useAuthContext();
-  const { borderStyle } = useIsDarkContext();
   const [isPlayStarted, setIsPlayStarted] = useState(false);
   const [playDetails, setPlayDetails] = useState<PlayType>({
     title: "",
@@ -49,7 +55,7 @@ const PlayModal = ({
   const fetchAffiliatedPlayers = async () => {
     const { data } = await supabase
       .from("affiliations")
-      .select(`user_id, profiles (name)`)
+      .select(`id, profiles (name)`)
       .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
     if (data) setAffiliatedPlayers(data);
   };
@@ -96,17 +102,13 @@ const PlayModal = ({
   };
 
   const handleMention = async (player: string, name: string, play: string) => {
-    await supabase
-      .from("play_mentions")
-      .insert({
-        play_id: play,
-        sender_id: `${user.userId}`,
-        receiver_id: player,
-        receiver_name: name,
-        sender_name: `${user.name}`,
-      })
-      .select()
-      .single();
+    await supabase.from("play_mentions").insert({
+      play_id: play,
+      sender_id: `${user.currentAffiliation?.affId}`,
+      receiver_id: player,
+      receiver_name: name,
+      sender_name: `${user.name}`,
+    });
   };
 
   const createPlay = async () => {
@@ -132,7 +134,7 @@ const PlayModal = ({
           (v) => v.profiles?.name === mention,
         );
         if (player) {
-          void handleMention(player.user_id, mention, data.id);
+          void handleMention(player.id, mention, data.id);
         }
       });
       void resetPlay();
@@ -166,69 +168,96 @@ const PlayModal = ({
   }, [videoId]);
 
   return isPlayModalOpen ? (
-    <form
-      onSubmit={handleSubmit}
-      style={borderStyle}
-      className="flex w-4/5 flex-col items-center justify-center gap-4 rounded-md border-solid p-4"
-    >
-      <TextField
-        className="w-4/5"
-        name="title"
-        autoComplete="title"
-        required
-        id="title"
-        label="Title (100 characters max)"
-        onChange={handleInput}
-        value={playDetails.title}
-        inputProps={{ maxLength: 100 }}
-      />
-      <TextField
-        className="w-full"
-        name="note"
-        autoComplete="note"
-        required
-        id="note"
-        label="Note"
-        onChange={handleInput}
-        value={playDetails.note}
-      />
-      <Mentions
-        players={affiliatedPlayers}
-        mentions={mentions}
-        setMentions={setMentions}
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={playDetails.highlight}
-            onChange={() =>
-              setPlayDetails({
-                ...playDetails,
-                highlight: !playDetails.highlight,
-              })
-            }
-            size="medium"
+    <Modal open={isPlayModalOpen} onClose={resetPlay}>
+      <Box className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid bg-white p-4">
+        <Button
+          variant="text"
+          size="large"
+          className="absolute right-0 top-0 text-2xl font-bold"
+          onClick={resetPlay}
+        >
+          X
+        </Button>
+        <Divider flexItem variant="middle" className="m-2 mx-16">
+          <Typography className="text-3xl font-bold">
+            CREATE NEW PLAY
+          </Typography>
+        </Divider>
+        <form
+          onSubmit={handleSubmit}
+          className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
+        >
+          <TextField
+            className="w-full"
+            name="title"
+            autoComplete="title"
+            required
+            id="title"
+            label="Title (100 characters max)"
+            onChange={handleInput}
+            value={playDetails.title}
+            inputProps={{ maxLength: 100 }}
           />
-        }
-        labelPlacement="end"
-        label="Highlight?"
-      />
-      <div className="flex items-center justify-center gap-2">
-        <Button type="submit" variant="contained" disabled={!isValidPlay}>
-          Submit
-        </Button>
-        <Button type="button" variant="text" onClick={() => resetPlay()}>
-          Cancel
-        </Button>
-      </div>
-    </form>
+          <TextField
+            className="w-full"
+            name="note"
+            autoComplete="note"
+            required
+            id="note"
+            label="Note"
+            onChange={handleInput}
+            value={playDetails.note}
+            multiline
+            maxRows={5}
+          />
+          <Mentions
+            players={affiliatedPlayers}
+            mentions={mentions}
+            setMentions={setMentions}
+          />
+          <div className="flex items-center justify-center">
+            <div className="text-xl font-bold tracking-tight">
+              Highlight Play?
+            </div>
+            <Checkbox
+              checked={playDetails.highlight}
+              onChange={() =>
+                setPlayDetails({
+                  ...playDetails,
+                  highlight: !playDetails.highlight,
+                })
+              }
+              size="medium"
+            />
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={!isValidPlay}
+              size="large"
+            >
+              Submit
+            </Button>
+            <Button
+              type="button"
+              variant="text"
+              onClick={() => resetPlay()}
+              size="large"
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Box>
+    </Modal>
   ) : !isPlayStarted ? (
     <Button onClick={() => startPlay()} size="large">
-      Start Play Clip
+      Start Recording
     </Button>
   ) : (
     <Button onClick={() => endPlay()} size="large">
-      End Play Clip
+      End Recording
     </Button>
   );
 };

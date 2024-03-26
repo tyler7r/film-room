@@ -11,38 +11,47 @@ type PlayProps = {
   player: YouTubePlayer | null;
   play: PlayType;
   scrollToPlayer: () => void;
+  setActivePlay: (play: PlayType) => void;
 };
 
-const Play = ({ player, play, scrollToPlayer }: PlayProps) => {
+const Play = ({ player, play, scrollToPlayer, setActivePlay }: PlayProps) => {
   const { backgroundStyle } = useIsDarkContext();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  const handleClick = (playTime: number) => {
+  const handleClick = (playTime: number, play: PlayType) => {
     scrollToPlayer();
     void player?.seekTo(playTime, true);
+    setActivePlay(play);
   };
 
   return (
     <div>
       <div
         style={backgroundStyle}
-        className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2"
-        onClick={() => handleClick(play.start_time)}
+        className="flex cursor-pointer items-center gap-2 rounded-md p-4"
+        onClick={() => handleClick(play.start_time, play)}
       >
-        <Typography variant="button" className="w-min" fontSize={18}>
+        <Typography className="w-min text-center text-xl font-bold tracking-tight">
           {play.author_name}
         </Typography>
-        <Divider orientation="vertical" flexItem className="ml-2 mr-2" />
-        {play.highlight && <StarIcon color="secondary" />}
-        <div className="flex grow flex-col">
-          <div className="text-lg tracking-wide">{play.title}</div>
+        <Divider orientation="vertical" flexItem className="mx-2" />
+        {play.highlight && (
+          <StarIcon color="secondary" fontSize="large" className="mr-4" />
+        )}
+        <div className="flex grow flex-col items-center">
+          <div className="text-center text-xl tracking-wide md:text-2xl">
+            {play.title}
+          </div>
           {play.mentions.length > 0 && (
             <div className="flex w-full flex-col">
               <Divider flexItem className="my-1" />
-              <div className="flex gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-3">
                 {play.mentions.map((m) => (
-                  <div className="text-sm font-bold" key={m.receiver_name}>
+                  <div
+                    className="text-center text-sm font-bold even:text-slate-500 md:text-base"
+                    key={m.receiver_name}
+                  >
                     {m.receiver_name}
                   </div>
                 ))}

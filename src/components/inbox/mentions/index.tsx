@@ -1,34 +1,18 @@
 import { Button, Divider, Typography } from "@mui/material";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-
-type MentionType = {
-  created_at: string;
-  play_id: string;
-  receiver_id: string;
-  receiver_name: string;
-  sender_id: string;
-  sender_name: string;
-  plays: {
-    start_time: number;
-    video_id: string;
-    title: string;
-    videos: {
-      tournament: string | null;
-      season: string | null;
-      title: string;
-    } | null;
-  } | null;
-}[];
+import type { MentionType } from "~/utils/types";
 
 const InboxMentions = () => {
   const { user } = useAuthContext();
-  const { setIsOpen, page, setPage } = useInboxContext();
+  const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
+
+  const searchParams = useSearchParams();
   const router = useRouter();
 
   const [mentions, setMentions] = useState<MentionType | null>(null);
@@ -36,15 +20,22 @@ const InboxMentions = () => {
 
   const fetchMentions = async () => {
     const { from, to } = getFromAndTo();
-    const { data } = await supabase
+    const { data, count } = await supabase
       .from(`play_mentions`)
       .select(
         `*, plays(start_time, video_id, title, videos(tournament, season, title))`,
+        { count: "exact" },
       )
-      .eq("receiver_id", `${user.userId}`)
+      .match({
+        receiver_id: `${user.currentAffiliation?.affId}`,
+      })
       .order("created_at", { ascending: false })
       .range(from, to);
     setPage(page + 1);
+    if (count) {
+      setMentionCount(count);
+      if (to >= count - 1) setIsBtnDisabled(true);
+    }
     if (data) setMentions(mentions ? [...mentions, ...data] : data);
     if (data?.length === 0) setIsBtnDisabled(true);
   };
@@ -78,6 +69,20 @@ const InboxMentions = () => {
     };
   }, []);
 
+  const handleClick = (
+    videoId: string | undefined,
+    playId: string,
+    start: number | undefined,
+  ) => {
+    const params = new URLSearchParams(searchParams);
+    if (videoId && start) {
+      params.set("play", playId);
+      params.set("start", `${start}`);
+    }
+    void router.push(`/film-room/${videoId}?${params.toString()}`);
+    setIsOpen(false);
+  };
+
   useEffect(() => {
     if (user.isLoggedIn) void fetchMentions();
   }, []);
@@ -91,13 +96,14 @@ const InboxMentions = () => {
         {mentions?.map((mention) => (
           <div
             key={mention.play_id + mention.created_at}
-            onClick={() => {
-              void router.push(
-                `/film-room/${mention.plays?.video_id}/${mention.plays?.start_time}`,
-              );
-              setIsOpen(false);
-            }}
-            className={`flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-sm hover:border-solid ${
+            onClick={() =>
+              handleClick(
+                mention.plays?.video_id,
+                mention.play_id,
+                mention.plays?.start_time,
+              )
+            }
+            className={`flex w-full cursor-pointer flex-col gap-1 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
               isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
             } hover:delay-100`}
             style={backgroundStyle}
@@ -112,7 +118,7 @@ const InboxMentions = () => {
           </div>
         ))}
       </div>
-      {mentions ? (
+      {mentions && mentions.length > 0 ? (
         <Button disabled={isBtnDisabled} onClick={() => void fetchMentions()}>
           Load More
         </Button>
