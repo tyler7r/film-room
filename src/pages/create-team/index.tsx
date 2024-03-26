@@ -128,7 +128,7 @@ const CreateTeam = () => {
     // When successfully created, create an owner affiliation of the team for the user
     if (data) {
       // Set team id to newly created teams' id
-      await supabase
+      const aff = await supabase
         .from("affiliations")
         .insert({
           team_id: `${details.id}`,
@@ -136,7 +136,8 @@ const CreateTeam = () => {
           verified: true,
           role: `${details.isCoach ? "coach" : "player"}`,
         })
-        .select();
+        .select()
+        .single();
       setMessage({ text: "Team successfully created!", status: "success" });
       setTimeout(() => {
         router.push("/");
@@ -146,6 +147,7 @@ const CreateTeam = () => {
         currentAffiliation: {
           team: data,
           role: details.isCoach ? "coach" : "player",
+          affId: `${aff.data?.id}`,
         },
       });
     } else {
