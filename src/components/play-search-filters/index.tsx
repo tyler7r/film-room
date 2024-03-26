@@ -50,8 +50,8 @@ const PlaySearchFilters = ({
   };
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-1">
-      <div className="relative mb-2 flex flex-1 flex-shrink-0">
+    <div className="flex w-4/5 flex-col items-center justify-center gap-1">
+      <div className="relative mb-2 flex w-full flex-1 flex-shrink-0">
         <label htmlFor="search" className="sr-only">
           Search
         </label>
@@ -62,16 +62,14 @@ const PlaySearchFilters = ({
                 <SearchIcon />
               </InputAdornment>
             ),
-            endAdornment: (
-              <div className="relative flex items-center justify-around">
-                <Button
-                  size="small"
-                  className="m-1"
-                  onClick={() => handleYourMentionsBtnClick()}
-                >
-                  Only Your Mentions
-                </Button>
-              </div>
+            endAdornment: user.isLoggedIn && user.name && (
+              <Button
+                size="small"
+                className="m-1"
+                onClick={() => handleYourMentionsBtnClick()}
+              >
+                Only Your Mentions
+              </Button>
             ),
           }}
           className="w-full"
