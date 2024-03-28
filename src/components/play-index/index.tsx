@@ -18,6 +18,7 @@ type PlayIndexProps = {
   scrollToPlayer: () => void;
   duration: number;
   setActivePlay: (play: PlayType) => void;
+  activePlayId: string | null;
 };
 
 export type PlaySearchOptions = {
@@ -31,6 +32,7 @@ const PlayIndex = ({
   player,
   videoId,
   scrollToPlayer,
+  activePlayId,
 }: PlayIndexProps) => {
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
@@ -71,6 +73,9 @@ const PlayIndex = ({
     if (options?.role) {
       void plays.eq("author_role", options.role);
     }
+    if (activePlayId) {
+      void plays.neq("id", activePlayId);
+    }
 
     const { data, count } = await plays;
     if (data) setPlays(data);
@@ -92,7 +97,7 @@ const PlayIndex = ({
 
   useEffect(() => {
     if (user.currentAffiliation) void fetchPlays(searchOptions);
-  }, [searchOptions, videoId, page, isMobile]);
+  }, [searchOptions, videoId, page, isMobile, activePlayId]);
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4">
