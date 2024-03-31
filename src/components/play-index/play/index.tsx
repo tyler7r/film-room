@@ -2,10 +2,13 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import StarIcon from "@mui/icons-material/Star";
-import { Divider, IconButton, Typography } from "@mui/material";
+import { Button, Divider, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
+import AddComment from "~/components/comment";
+import CommentIndex from "~/components/comment-index";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -32,6 +35,7 @@ const Play = ({
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
+  const [commentCount, setCommentCount] = useState<number>(0);
 
   const handleClick = async (playTime: number, play: PlayType) => {
     scrollToPlayer();
@@ -81,6 +85,11 @@ const Play = ({
     }
   };
 
+  const handleCommentClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(true);
+  };
+
   const fetchIfUserLiked = async () => {
     const { count } = await supabase
       .from("play_likes")
@@ -93,13 +102,25 @@ const Play = ({
     }
   };
 
+  const fetchInitialCommentNumber = async () => {
+    const { count } = await supabase
+      .from("comments")
+      .select("*", { count: "exact" })
+      .eq("play_id", play.id);
+    if (count) setCommentCount(count);
+  };
+
   useEffect(() => {
     void fetchLikeCount();
     void fetchIfUserLiked();
   }, [activePlay]);
 
+  useEffect(() => {
+    void fetchInitialCommentNumber();
+  }, []);
+
   return (
-    <div>
+    <div className="flex w-full grow flex-col self-center">
       <div
         style={backgroundStyle}
         className="flex cursor-pointer items-center gap-2 rounded-md p-4"
@@ -109,17 +130,25 @@ const Play = ({
           <Typography className="w-min text-center text-xl font-bold tracking-tight">
             {play.author_name}
           </Typography>
-          <div className="flex items-center justify-center">
-            {isLiked ? (
-              <IconButton onClick={(e) => void handleUnlike(e)}>
-                <FavoriteIcon color="primary" />
+          <div className="flex gap-1">
+            <div className="flex items-center justify-center">
+              {isLiked ? (
+                <IconButton onClick={(e) => void handleUnlike(e)}>
+                  <FavoriteIcon color="primary" />
+                </IconButton>
+              ) : (
+                <IconButton onClick={(e) => void handleLike(e)}>
+                  <FavoriteBorderIcon color="primary" />
+                </IconButton>
+              )}
+              <div className="text-lg font-bold">{likeCount}</div>
+            </div>
+            <div className="flex items-center justify-center">
+              <IconButton onClick={(e) => handleCommentClick(e)}>
+                <ModeCommentIcon color="primary" />
               </IconButton>
-            ) : (
-              <IconButton onClick={(e) => void handleLike(e)}>
-                <FavoriteBorderIcon color="primary" />
-              </IconButton>
-            )}
-            <div className="text-lg font-bold">{likeCount}</div>
+              <div className="text-lg font-bold">{commentCount}</div>
+            </div>
           </div>
         </div>
         <Divider orientation="vertical" flexItem className="mx-2" />
@@ -132,8 +161,8 @@ const Play = ({
           </div>
           {play.mentions.length > 0 && (
             <div className="flex w-full flex-col">
-              <Divider flexItem className="my-1" />
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <Divider flexItem className="m-2 mb-3" />
+              <div className="flex flex-grow flex-wrap items-center justify-center gap-3">
                 {play.mentions.map((m) => (
                   <div
                     className="text-center text-sm font-bold even:text-slate-500 md:text-base"
@@ -144,18 +173,6 @@ const Play = ({
                 ))}
               </div>
             </div>
-          )}
-        </div>
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsExpanded(!isExpanded);
-          }}
-        >
-          {isExpanded ? (
-            <ExpandLessIcon fontSize="large" color="primary" />
-          ) : (
-            <ExpandMoreIcon fontSize="large" color="primary" />
           )}
         </div>
         <div className="flex flex-col items-center justify-center">
@@ -170,8 +187,34 @@ const Play = ({
             {play.end_time - play.start_time}s
           </Typography>
         </div>
+        <div
+          className="self-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}
+        >
+          {isExpanded ? (
+            <Button startIcon={<ExpandLessIcon fontSize="large" />}>
+              Close
+            </Button>
+          ) : (
+            <Button startIcon={<ExpandMoreIcon fontSize="large" />}>
+              Open
+            </Button>
+          )}
+        </div>
       </div>
-      {isExpanded && <div className="p-2 pl-4 pr-4">{play.note}</div>}
+      {isExpanded && (
+        <div className="flex flex-col gap-4">
+          <div className="p-2 pl-4 pr-4">
+            <strong>Description: </strong>
+            {play.note}
+          </div>
+          <AddComment playId={play.id} />
+          <CommentIndex playId={play.id} setCommentCount={setCommentCount} />
+        </div>
+      )}
     </div>
   );
 };

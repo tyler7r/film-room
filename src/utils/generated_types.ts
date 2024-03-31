@@ -160,6 +160,7 @@ export type Database = {
           comment_author: string
           created_at: string
           id: string
+          play_id: string
           team_id: string | null
         }
         Insert: {
@@ -168,6 +169,7 @@ export type Database = {
           comment_author?: string
           created_at?: string
           id?: string
+          play_id?: string
           team_id?: string | null
         }
         Update: {
@@ -176,6 +178,7 @@ export type Database = {
           comment_author?: string
           created_at?: string
           id?: string
+          play_id?: string
           team_id?: string | null
         }
         Relationships: [
@@ -184,6 +187,20 @@ export type Database = {
             columns: ["comment_author"]
             isOneToOne: false
             referencedRelation: "affiliations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "plays"
             referencedColumns: ["id"]
           },
           {
