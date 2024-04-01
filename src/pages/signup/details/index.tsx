@@ -1,11 +1,7 @@
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  TextField,
-  Typography,
-} from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { Button, IconButton, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
@@ -34,6 +30,7 @@ const SignupDetails = () => {
   });
   const [isValidForm, setIsValidForm] = useState<boolean>(true);
   const [showPwd, setShowPwd] = useState<boolean>(false);
+  const [showConfirmPwd, setShowConfirmPwd] = useState<boolean>(false);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -162,6 +159,16 @@ const SignupDetails = () => {
           autoFocus
           onChange={handleInput}
           value={data.password}
+          InputProps={{
+            endAdornment: (
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={() => setShowPwd(!showPwd)}
+              >
+                {showPwd ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </IconButton>
+            ),
+          }}
         />
         <TextField
           className="w-full"
@@ -170,21 +177,20 @@ const SignupDetails = () => {
           required
           id="confirmPwd"
           label="Confirm Password"
-          type={showPwd ? "text" : "password"}
+          type={showConfirmPwd ? "text" : "password"}
           autoFocus
           onChange={handleInput}
           value={data.confirmPwd}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={showPwd}
-              onChange={() => setShowPwd(!showPwd)}
-              size="small"
-            />
-          }
-          labelPlacement="end"
-          label="Show Password?"
+          InputProps={{
+            endAdornment: (
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={() => setShowConfirmPwd(!showConfirmPwd)}
+              >
+                {showConfirmPwd ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </IconButton>
+            ),
+          }}
         />
         <FormMessage message={message} />
         <Button

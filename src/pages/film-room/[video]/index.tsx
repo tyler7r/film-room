@@ -123,6 +123,7 @@ const FilmRoom = () => {
               scrollToPlayer={scrollToPlayer}
               play={activePlay}
               player={player}
+              activePlay={activePlay}
               setActivePlay={setActivePlay}
             />
             <Divider className="my-4" flexItem></Divider>
@@ -134,35 +135,8 @@ const FilmRoom = () => {
           scrollToPlayer={scrollToPlayer}
           duration={videoDuration}
           setActivePlay={setActivePlay}
+          activePlayId={activePlay ? activePlay.id : null}
         />
-        {/* {isPlayIndexOpen ? (
-          <div className="flex w-full flex-col items-center justify-center gap-4">
-            <Button
-              variant="text"
-              onClick={() => setIsPlayIndexOpen(false)}
-              endIcon={<ExpandLessIcon />}
-              size="large"
-            >
-              Close Play Index
-            </Button>
-            <PlayIndex
-              player={player}
-              videoId={video.id}
-              scrollToPlayer={scrollToPlayer}
-              duration={videoDuration}
-              setActivePlay={setActivePlay}
-            />
-          </div>
-        ) : (
-          <Button
-            variant="text"
-            onClick={() => setIsPlayIndexOpen(true)}
-            endIcon={<ExpandMoreIcon />}
-            size="large"
-          >
-            Open Play Index
-          </Button>
-        )} */}
       </div>
     )
   );

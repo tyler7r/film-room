@@ -1,10 +1,6 @@
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  TextField,
-  Typography,
-} from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { Button, IconButton, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
@@ -99,17 +95,16 @@ const Login = () => {
           type={showPwd ? "text" : "password"}
           onChange={handleInput}
           value={formData.password}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={showPwd}
-              onChange={() => setShowPwd(!showPwd)}
-              size="medium"
-            />
-          }
-          labelPlacement="end"
-          label="Show Password?"
+          InputProps={{
+            endAdornment: (
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={() => setShowPwd(!showPwd)}
+              >
+                {showPwd ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </IconButton>
+            ),
+          }}
         />
         <FormMessage message={message} />
         <Button
@@ -117,18 +112,20 @@ const Login = () => {
           size="large"
           type="submit"
           disabled={!isValidForm}
-          className="text-xl"
+          className="text-2xl"
         >
           Login
         </Button>
       </form>
       <div className="mt-2 flex flex-col items-center justify-center gap-2">
-        <div className="">Need to make an account?</div>
+        <div className="text-xl font-light tracking-tight">
+          Need to make an account?
+        </div>
         <Button
           variant="outlined"
-          size="medium"
+          size="large"
           onClick={() => router.push("/signup")}
-          className="lg:text-lg"
+          className="text-lg font-light"
         >
           Signup
         </Button>

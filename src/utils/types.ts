@@ -127,3 +127,7 @@ export type VideoUploadType = {
   tournament: string | null;
   division: string;
 };
+
+export type LikeListType = {
+  user_name: string;
+}[];

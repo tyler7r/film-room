@@ -42,53 +42,51 @@ const TeamPageButton = () => {
       >
         Team Hub
       </Button>
-      {affiliations && (
-        <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
-          {affiliations.map((aff) => (
-            <MenuItem
-              key={aff.team.id}
-              className="flex items-center justify-center gap-2"
-              onClick={() => handleItemClick(aff)}
-            >
-              {aff.team.logo ? (
-                <Image
-                  alt="team-logo"
-                  src={aff.team.logo}
-                  height={35}
-                  width={35}
-                  className="rounded-full"
-                />
-              ) : (
-                <Typography
-                  variant="caption"
-                  fontSize="medium"
-                  fontWeight="bold"
-                  className="rounded-full p-1 text-white"
-                  style={colorBackground}
-                >{`${aff.team.city.slice(0, 1)}${aff.team.name.slice(
-                  0,
-                  1,
-                )}`}</Typography>
-              )}
-              <Typography variant="overline" fontWeight="bold" fontSize="small">
-                {aff.team.full_name}
-              </Typography>
-            </MenuItem>
-          ))}
+      <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
+        {affiliations?.map((aff) => (
           <MenuItem
+            key={aff.team.id}
             className="flex items-center justify-center gap-2"
-            onClick={() => {
-              handleClose();
-              router.push(`/team-select`);
-            }}
+            onClick={() => handleItemClick(aff)}
           >
-            <AddIcon />
+            {aff.team.logo ? (
+              <Image
+                alt="team-logo"
+                src={aff.team.logo}
+                height={35}
+                width={35}
+                className="rounded-full"
+              />
+            ) : (
+              <Typography
+                variant="caption"
+                fontSize="medium"
+                fontWeight="bold"
+                className="rounded-full p-1 text-white"
+                style={colorBackground}
+              >{`${aff.team.city.slice(0, 1)}${aff.team.name.slice(
+                0,
+                1,
+              )}`}</Typography>
+            )}
             <Typography variant="overline" fontWeight="bold" fontSize="small">
-              Join a New Team
+              {aff.team.full_name}
             </Typography>
           </MenuItem>
-        </Menu>
-      )}
+        ))}
+        <MenuItem
+          className="flex items-center justify-center gap-2"
+          onClick={() => {
+            handleClose();
+            router.push(`/team-select`);
+          }}
+        >
+          <AddIcon />
+          <Typography variant="overline" fontWeight="bold" fontSize="small">
+            Join a New Team
+          </Typography>
+        </MenuItem>
+      </Menu>
     </div>
   );
 };

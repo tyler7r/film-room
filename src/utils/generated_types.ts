@@ -46,6 +46,13 @@ export type Database = {
             foreignKeyName: "affiliations_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "affiliations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -88,6 +95,183 @@ export type Database = {
             foreignKeyName: "public_announcements_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "public_announcements_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comment_likes: {
+        Row: {
+          comment_id: string
+          created_at: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          comment_id?: string
+          created_at?: string
+          user_id?: string
+          user_name: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_comment_likes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_comment_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "public_comment_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          author_name: string
+          comment: string
+          comment_author: string
+          created_at: string
+          id: string
+          play_id: string
+          team_id: string | null
+        }
+        Insert: {
+          author_name: string
+          comment: string
+          comment_author?: string
+          created_at?: string
+          id?: string
+          play_id?: string
+          team_id?: string | null
+        }
+        Update: {
+          author_name?: string
+          comment?: string
+          comment_author?: string
+          created_at?: string
+          id?: string
+          play_id?: string
+          team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_comments_comment_author_fkey"
+            columns: ["comment_author"]
+            isOneToOne: false
+            referencedRelation: "affiliations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "plays"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_comments_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      play_comments: {
+        Row: {
+          comment_id: string
+          id: string
+          play_id: string
+        }
+        Insert: {
+          comment_id?: string
+          id?: string
+          play_id?: string
+        }
+        Update: {
+          comment_id?: string
+          id?: string
+          play_id?: string
+        }
+        Relationships: []
+      }
+      play_likes: {
+        Row: {
+          created_at: string
+          play_id: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          created_at?: string
+          play_id?: string
+          user_id?: string
+          user_name: string
+        }
+        Update: {
+          created_at?: string
+          play_id?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_play_likes_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_likes_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "plays"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_play_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "public_play_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -119,6 +303,13 @@ export type Database = {
           sender_name?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "public_play_mentions2_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["play_id"]
+          },
           {
             foreignKeyName: "public_play_mentions2_play_id_fkey"
             columns: ["play_id"]
@@ -183,6 +374,13 @@ export type Database = {
           video_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "plays_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["profile_id"]
+          },
           {
             foreignKeyName: "plays_profile_id_fkey"
             columns: ["profile_id"]
@@ -298,6 +496,13 @@ export type Database = {
             foreignKeyName: "teams_owner_fkey"
             columns: ["owner"]
             isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "teams_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -352,7 +557,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      p_likes: {
+        Row: {
+          play_id: string | null
+          profile_id: string | null
+          user_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
