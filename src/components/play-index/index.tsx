@@ -96,6 +96,23 @@ const PlayIndex = ({
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (user.currentAffiliation) void fetchPlays(searchOptions);
   }, [searchOptions, videoId, page, isMobile, activePlayId]);
 
