@@ -8,7 +8,9 @@ import { Button, Divider, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import AddComment from "~/components/add-comment";
+import { LikeListType } from "~/components/comment";
 import CommentIndex from "~/components/comment-index";
+import LikePopover from "~/components/like-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -37,6 +39,19 @@ const Play = ({
   const [likeCount, setLikeCount] = useState<number>(0);
   const [commentCount, setCommentCount] = useState<number>(0);
 
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [likeList, setLikeList] = useState<LikeListType | null>(null);
+
+  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
   const handleClick = async (playTime: number, play: PlayType) => {
     scrollToPlayer();
     void player?.seekTo(playTime, true);
@@ -44,12 +59,16 @@ const Play = ({
   };
 
   const fetchLikeCount = async () => {
-    const { count } = await supabase
+    const { data, count } = await supabase
       .from("play_likes")
-      .select("*", { count: "exact" })
+      .select("user_name", { count: "exact" })
       .eq("play_id", play.id);
+    if (data && data.length > 0) setLikeList(data);
     if (count) setLikeCount(count);
-    else setLikeCount(0);
+    else {
+      setLikeCount(0);
+      setLikeList(null);
+    }
   };
 
   const handleLike = async (e: React.MouseEvent) => {
@@ -133,16 +152,32 @@ const Play = ({
           <div className="flex gap-1">
             <div className="flex items-center justify-center">
               {isLiked ? (
-                <IconButton onClick={(e) => void handleUnlike(e)}>
+                <IconButton
+                  onMouseEnter={handlePopoverOpen}
+                  onMouseLeave={handlePopoverClose}
+                  onClick={(e) => void handleUnlike(e)}
+                >
                   <FavoriteIcon color="primary" />
                 </IconButton>
               ) : (
-                <IconButton onClick={(e) => void handleLike(e)}>
+                <IconButton
+                  onMouseEnter={handlePopoverOpen}
+                  onMouseLeave={handlePopoverClose}
+                  onClick={(e) => void handleLike(e)}
+                >
                   <FavoriteBorderIcon color="primary" />
                 </IconButton>
               )}
               <div className="text-lg font-bold">{likeCount}</div>
             </div>
+            {likeList && (
+              <LikePopover
+                open={open}
+                anchorEl={anchorEl}
+                handlePopoverClose={handlePopoverClose}
+                likeList={likeList}
+              />
+            )}
             <div className="flex items-center justify-center">
               <IconButton onClick={(e) => handleCommentClick(e)}>
                 <ModeCommentIcon color="primary" />

@@ -23,11 +23,9 @@ export type LikeListType = {
 
 type CommentProps = {
   comment: CommentType;
-  setPage: (page: number) => void;
-  page: number;
 };
 
-const Comment = ({ comment, setPage, page }: CommentProps) => {
+const Comment = ({ comment }: CommentProps) => {
   const { user } = useAuthContext();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 

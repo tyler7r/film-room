@@ -81,12 +81,7 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
       <div className="text-4xl font-bold tracking-tighter">Comments</div>
       <div className="flex flex-col gap-2 px-2">
         {index?.map((comment) => (
-          <Comment
-            key={comment.id}
-            comment={comment}
-            setPage={setPage}
-            page={page}
-          />
+          <Comment key={comment.id} comment={comment} />
         ))}
         {index ? (
           <Button
