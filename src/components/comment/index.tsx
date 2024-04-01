@@ -142,28 +142,29 @@ const Comment = ({ comment, setPage, page }: CommentProps) => {
         )}
         <div className="text-lg font-bold">{likeCount}</div>
       </div>
-      {isDeleteMenuOpen ? (
-        <div className="ml-4 flex gap-1">
-          <Button
-            size="small"
-            variant="contained"
-            onClick={() => void handleDelete()}
-          >
-            Delete
-          </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => setIsDeleteMenuOpen(false)}
-          >
-            Cancel
-          </Button>
-        </div>
-      ) : (
-        <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
-          <DeleteIcon color="error" />
-        </IconButton>
-      )}
+      {comment.comment_author === user.currentAffiliation?.affId &&
+        (isDeleteMenuOpen ? (
+          <div className="ml-4 flex gap-1">
+            <Button
+              size="small"
+              variant="contained"
+              onClick={() => void handleDelete()}
+            >
+              Delete
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setIsDeleteMenuOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
+            <DeleteIcon color="error" />
+          </IconButton>
+        ))}
       {likeList && (
         <LikePopover
           open={open}

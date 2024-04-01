@@ -52,7 +52,7 @@ const AddComment = ({ playId }: CommentProps) => {
         multiline
         maxRows={4}
         variant="filled"
-        label="Comment"
+        label="New Comment"
         name="comment"
         autoComplete="comment"
         id="comment"
