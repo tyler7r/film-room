@@ -5,6 +5,7 @@ import { Button, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
+import type { LikeListType } from "~/utils/types";
 import LikePopover from "../like-popover";
 
 type CommentType = {
@@ -16,10 +17,6 @@ type CommentType = {
   play_id: string;
   team_id: string | null;
 };
-
-export type LikeListType = {
-  user_name: string;
-}[];
 
 type CommentProps = {
   comment: CommentType;

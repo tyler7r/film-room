@@ -8,13 +8,12 @@ import { Button, Divider, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import AddComment from "~/components/add-comment";
-import { LikeListType } from "~/components/comment";
 import CommentIndex from "~/components/comment-index";
 import LikePopover from "~/components/like-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { PlayType } from "~/utils/types";
+import type { LikeListType, PlayType } from "~/utils/types";
 
 type PlayProps = {
   player: YouTubePlayer | null;

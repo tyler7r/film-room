@@ -1,6 +1,6 @@
 import { Popover } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
-import type { LikeListType } from "../comment";
+import type { LikeListType } from "~/utils/types";
 
 type LikePopoverProps = {
   open: boolean;
