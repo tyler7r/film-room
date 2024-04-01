@@ -4,6 +4,7 @@ import { IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
+import LikePopover from "../like-popover";
 
 type CommentType = {
   author_name: string;
@@ -15,7 +16,7 @@ type CommentType = {
   team_id: string | null;
 };
 
-type LikeListType = {
+export type LikeListType = {
   user_name: string;
 }[];
 
@@ -25,21 +26,35 @@ type CommentProps = {
 
 const Comment = ({ comment }: CommentProps) => {
   const { user } = useAuthContext();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
 
-  const [isLikeListOpen, setIsLikeListOpen] = useState<boolean>(false);
   const [likeList, setLikeList] = useState<LikeListType | null>(null);
+
+  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
+    console.log(likeList);
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
 
   const fetchLikeCount = async () => {
     const { data, count } = await supabase
       .from("comment_likes")
       .select("user_name", { count: "exact" })
       .eq("comment_id", comment.id);
-    if (data) setLikeList(data);
+    if (data && data.length > 0) setLikeList(data);
     if (count) setLikeCount(count);
-    else setLikeCount(0);
+    else {
+      setLikeCount(0);
+      setLikeList(null);
+    }
   };
 
   const fetchIfUserLiked = async () => {
@@ -101,8 +116,8 @@ const Comment = ({ comment }: CommentProps) => {
       <div className="flex items-center justify-center">
         {isLiked ? (
           <IconButton
-            onMouseEnter={() => setIsLikeListOpen(true)}
-            onMouseLeave={() => setIsLikeListOpen(false)}
+            onMouseEnter={handlePopoverOpen}
+            onMouseLeave={handlePopoverClose}
             size="small"
             onClick={(e) => void handleUnlike(e)}
           >
@@ -110,8 +125,8 @@ const Comment = ({ comment }: CommentProps) => {
           </IconButton>
         ) : (
           <IconButton
-            onMouseEnter={() => setIsLikeListOpen(true)}
-            onMouseLeave={() => setIsLikeListOpen(false)}
+            onMouseEnter={handlePopoverOpen}
+            onMouseLeave={handlePopoverClose}
             size="small"
             onClick={(e) => void handleLike(e)}
           >
@@ -120,12 +135,13 @@ const Comment = ({ comment }: CommentProps) => {
         )}
         <div className="text-lg font-bold">{likeCount}</div>
       </div>
-      {isLikeListOpen && (
-        <div className="bg-slate-200">
-          {likeList?.map((like) => (
-            <div key={like.user_name}>{like.user_name}</div>
-          ))}
-        </div>
+      {likeList && (
+        <LikePopover
+          open={open}
+          anchorEl={anchorEl}
+          handlePopoverClose={handlePopoverClose}
+          likeList={likeList}
+        />
       )}
     </div>
   );
