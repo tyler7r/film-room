@@ -1,4 +1,4 @@
-import { Divider, Typography } from "@mui/material";
+import { Button, Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import Comment from "../comment";
@@ -20,16 +20,39 @@ type CommentIndexType = {
 
 const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
   const [index, setIndex] = useState<CommentIndexType | null>(null);
+  const [page, setPage] = useState<number>(0);
+  const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState<boolean>(false);
 
   const fetchComments = async () => {
+    const { from, to } = getFromAndTo();
     const { data, count } = await supabase
       .from("comments")
       .select("*", { count: "exact" })
       .match({
         play_id: playId,
-      });
-    if (data && data.length > 0) setIndex(data);
-    if (count) setCommentCount(count);
+      })
+      .order("created_at", { ascending: false })
+      .range(from, to);
+    setPage(page + 1);
+    if (count) {
+      setCommentCount(count);
+      if (to >= count - 1) setIsLoadMoreDisabled(true);
+      else setIsLoadMoreDisabled(false);
+    }
+    if (data) setIndex(index ? [...index, ...data] : data);
+    if (data?.length === 0) setIsLoadMoreDisabled(true);
+  };
+
+  const getFromAndTo = () => {
+    const itemPerPage = 4;
+    let from = page * itemPerPage;
+    const to = from + itemPerPage;
+
+    if (page > 0) {
+      from += 1;
+    }
+
+    return { from, to };
   };
 
   useEffect(() => {
@@ -58,9 +81,22 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
       <div className="text-4xl font-bold tracking-tighter">Comments</div>
       <div className="flex flex-col gap-2 px-2">
         {index?.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
+          <Comment
+            key={comment.id}
+            comment={comment}
+            setPage={setPage}
+            page={page}
+          />
         ))}
-        {!index && (
+        {index ? (
+          <Button
+            disabled={isLoadMoreDisabled}
+            onClick={() => void fetchComments()}
+            className="self-center"
+          >
+            Load More
+          </Button>
+        ) : (
           <Typography className="text-xl font-bold tracking-tight">
             No comments!
           </Typography>

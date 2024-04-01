@@ -1,6 +1,7 @@
+import DeleteIcon from "@mui/icons-material/Delete";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import { IconButton } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
@@ -22,9 +23,11 @@ export type LikeListType = {
 
 type CommentProps = {
   comment: CommentType;
+  setPage: (page: number) => void;
+  page: number;
 };
 
-const Comment = ({ comment }: CommentProps) => {
+const Comment = ({ comment, setPage, page }: CommentProps) => {
   const { user } = useAuthContext();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -32,9 +35,9 @@ const Comment = ({ comment }: CommentProps) => {
   const [likeCount, setLikeCount] = useState<number>(0);
 
   const [likeList, setLikeList] = useState<LikeListType | null>(null);
+  const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
   const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    console.log(likeList);
     setAnchorEl(e.currentTarget);
   };
 
@@ -102,6 +105,10 @@ const Comment = ({ comment }: CommentProps) => {
     }
   };
 
+  const handleDelete = async () => {
+    await supabase.from("comments").delete().eq("id", comment.id);
+  };
+
   useEffect(() => {
     void fetchLikeCount();
     void fetchIfUserLiked();
@@ -135,6 +142,28 @@ const Comment = ({ comment }: CommentProps) => {
         )}
         <div className="text-lg font-bold">{likeCount}</div>
       </div>
+      {isDeleteMenuOpen ? (
+        <div className="ml-4 flex gap-1">
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => void handleDelete()}
+          >
+            Delete
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => setIsDeleteMenuOpen(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
+          <DeleteIcon color="error" />
+        </IconButton>
+      )}
       {likeList && (
         <LikePopover
           open={open}
