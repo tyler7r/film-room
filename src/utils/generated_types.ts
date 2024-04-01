@@ -111,21 +111,18 @@ export type Database = {
         Row: {
           comment_id: string
           created_at: string
-          id: string
           user_id: string
           user_name: string
         }
         Insert: {
           comment_id?: string
           created_at?: string
-          id?: string
           user_id?: string
           user_name: string
         }
         Update: {
           comment_id?: string
           created_at?: string
-          id?: string
           user_id?: string
           user_name?: string
         }

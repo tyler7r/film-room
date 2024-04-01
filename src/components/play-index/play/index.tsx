@@ -7,7 +7,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { Button, Divider, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
-import AddComment from "~/components/comment";
+import AddComment from "~/components/add-comment";
 import CommentIndex from "~/components/comment-index";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
@@ -18,7 +18,7 @@ type PlayProps = {
   player: YouTubePlayer | null;
   play: PlayType;
   scrollToPlayer: () => void;
-  activePlay: PlayType | null;
+  activePlay?: PlayType | null;
   setActivePlay: (play: PlayType) => void;
 };
 
@@ -206,9 +206,9 @@ const Play = ({
         </div>
       </div>
       {isExpanded && (
-        <div className="flex flex-col gap-4">
-          <div className="p-2 pl-4 pr-4">
-            <strong>Description: </strong>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="self-start p-2 pl-4 pr-4 text-xl">
+            <strong className="tracking-tight">Description: </strong>
             {play.note}
           </div>
           <AddComment playId={play.id} />

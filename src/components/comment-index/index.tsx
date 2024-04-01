@@ -1,6 +1,7 @@
+import { Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
+import Comment from "../comment";
 
 type CommentIndexProps = {
   playId: string;
@@ -18,7 +19,6 @@ type CommentIndexType = {
 }[];
 
 const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
-  const { user } = useAuthContext();
   const [index, setIndex] = useState<CommentIndexType | null>(null);
 
   const fetchComments = async () => {
@@ -26,10 +26,9 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
       .from("comments")
       .select("*", { count: "exact" })
       .match({
-        team_id: `${user.currentAffiliation?.team.id}`,
         play_id: playId,
       });
-    if (data) setIndex(data);
+    if (data && data.length > 0) setIndex(data);
     if (count) setCommentCount(count);
   };
 
@@ -54,12 +53,22 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
     void fetchComments();
   }, []);
 
-  return index?.map((comment) => (
-    <div key={comment.id}>
-      <div>{comment.author_name}</div>
-      <div>{comment.comment}</div>
+  return (
+    <div className="flex w-full flex-col gap-2 px-6">
+      <div className="text-4xl font-bold tracking-tighter">Comments</div>
+      <div className="flex flex-col gap-2 px-2">
+        {index?.map((comment) => (
+          <Comment key={comment.id} comment={comment} />
+        ))}
+        {!index && (
+          <Typography className="text-xl font-bold tracking-tight">
+            No comments!
+          </Typography>
+        )}
+      </div>
+      <Divider flexItem className="my-2" variant="middle"></Divider>
     </div>
-  ));
+  );
 };
 
 export default CommentIndex;
