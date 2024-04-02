@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import Announcement from "~/components/announcement";
 import Requests from "~/components/requests";
 import Roster from "~/components/roster";
+import TeamVideos from "~/components/team-videos";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { type TeamHubType } from "~/utils/types";
@@ -28,37 +29,13 @@ const TeamHub = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { user } = useAuthContext();
+  const role = user.currentAffiliation?.role ?? "";
   const [loading, setLoading] = useState<boolean>(true);
-  const [role, setRole] = useState<string>("");
-  const [isOwner, setIsOwner] = useState(false);
   const [modalStatus, setModalStatus] = useState({
     settings: false,
     announcement: false,
     requests: false,
   });
-
-  const fetchRole = async () => {
-    const { data } = await supabase
-      .from("affiliations")
-      .select("role")
-      .match({
-        user_id: `${user.userId}`,
-        team_id: router.query.team as string,
-      })
-      .single();
-    if (data) {
-      setRole(data.role);
-      setLoading(false);
-    }
-  };
-
-  const checkIfOwner = () => {
-    if (user.userId === team?.owner) {
-      setIsOwner(true);
-    } else {
-      setIsOwner(false);
-    }
-  };
 
   const handleModalToggle = (modal: string, open: boolean) => {
     if (modal === "roster") {
@@ -71,12 +48,8 @@ const TeamHub = ({
   };
 
   useEffect(() => {
-    if (user.isLoggedIn) {
-      void fetchRole();
-      checkIfOwner();
-    } else {
-      void router.push("/");
-    }
+    console.log(user.currentAffiliation?.role);
+    if (user.isLoggedIn && user.currentAffiliation?.role) setLoading(false);
   }, [user, router.query.team]);
 
   return loading ? (
@@ -112,7 +85,7 @@ const TeamHub = ({
             </Typography>
           </div>
         </div>
-        {(role === "coach" || isOwner) && (
+        {(role === "coach" || role === "owner") && (
           <div className="flex w-full justify-center gap-4">
             <Button
               variant={modalStatus.announcement ? "outlined" : "text"}
@@ -130,7 +103,7 @@ const TeamHub = ({
             >
               Handle Requests
             </Button>
-            {isOwner && (
+            {role === "owner" && (
               <Button
                 size="small"
                 onClick={() => router.push(`/team-settings/${team.id}`)}
@@ -145,10 +118,11 @@ const TeamHub = ({
         )}
         {modalStatus.requests && <Requests team={team} />}
         <Roster team={team} role={role} />
-        <div>
+        <div className="my-4 flex w-full flex-col items-center justify-center gap-4">
           <Typography variant="h2" fontSize={42}>
-            Recent Videos
+            Team Film
           </Typography>
+          <TeamVideos teamId={team.id} />
         </div>
       </div>
     )

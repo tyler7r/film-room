@@ -24,7 +24,7 @@ import type {
   VideoUploadType,
 } from "~/utils/types";
 import FormMessage from "../form-message";
-import TeamVideos from "../team-videos";
+import TeamMentions from "../team-mentions";
 
 const AddVideo = () => {
   const router = useRouter();
@@ -145,6 +145,7 @@ const AddVideo = () => {
     await supabase.from("team_videos").insert({
       team_id: teamId,
       video_id: video,
+      exclusive_to: videoData.private ? user.currentAffiliation?.team.id : null,
     });
   };
 
@@ -280,9 +281,9 @@ const AddVideo = () => {
               value={videoData.tournament}
             />
           )}
-          <TeamVideos
-            teamMentions={teamMentions}
-            setTeamMentions={setTeamMentions}
+          <TeamMentions
+            mentions={teamMentions}
+            setMentions={setTeamMentions}
             teams={teams}
           />
           {user.currentAffiliation?.team.id && (
