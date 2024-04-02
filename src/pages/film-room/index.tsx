@@ -114,10 +114,11 @@ const FilmRoomHome = () => {
   }, [page, isMobile, searchOptions]);
 
   return (
-    <div className="my-4 flex w-full flex-col items-center justify-center">
-      <Typography variant="h1" fontSize={64} className="m-2 text-center">
+    <div className="flex w-full flex-col items-center justify-center">
+      <Typography variant="h1" fontSize={64} className="mt-6 text-center">
         The Film Room
       </Typography>
+      <AddVideo />
       <Divider flexItem variant="middle" className="mb-4"></Divider>
       <Search
         searchOptions={searchOptions}
@@ -131,8 +132,7 @@ const FilmRoomHome = () => {
       <Button endIcon={<DeleteIcon />} onClick={clearSearchOptions}>
         Clear Filters
       </Button>
-      <AddVideo />
-      <div className="flex w-4/5 flex-col items-center justify-center gap-6">
+      <div className="mt-6 flex w-4/5 flex-col items-center justify-center gap-6">
         {!videos ||
           (videos.length === 0 && (
             <div className="flex flex-col items-center justify-center gap-1 text-center">

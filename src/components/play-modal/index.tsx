@@ -128,18 +128,15 @@ const PlayModal = ({
       })
       .select()
       .single();
-    console.log(data);
     if (data) {
-      if (mentions.length > 0) {
-        mentions.forEach((mention) => {
-          const player = affiliatedPlayers?.find(
-            (v) => v.profiles?.name === mention,
-          );
-          if (player) {
-            void handleMention(player.id, mention, data.id);
-          }
-        });
-      }
+      mentions.forEach((mention) => {
+        const player = affiliatedPlayers?.find(
+          (v) => v.profiles?.name === mention,
+        );
+        if (player) {
+          void handleMention(player.id, mention, data.id);
+        }
+      });
       void resetPlay();
     }
   };

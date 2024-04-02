@@ -24,7 +24,6 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
   const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState<boolean>(false);
 
   const fetchComments = async () => {
-    console.log("run");
     const { from, to } = getFromAndTo();
     const { data, count } = await supabase
       .from("comments")

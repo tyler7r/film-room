@@ -18,8 +18,13 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { divisions, isValidYoutubeLink, proDivs } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { MessageType, VideoUploadType } from "~/utils/types";
+import type {
+  MessageType,
+  TeamMentionType,
+  VideoUploadType,
+} from "~/utils/types";
 import FormMessage from "../form-message";
+import TeamVideos from "../team-videos";
 
 const AddVideo = () => {
   const router = useRouter();
@@ -39,6 +44,8 @@ const AddVideo = () => {
     tournament: "",
     division: "",
   });
+  const [teamMentions, setTeamMentions] = useState<string[]>([]);
+  const [teams, setTeams] = useState<TeamMentionType | null>(null);
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
 
   const handleOpen = () => {
@@ -47,6 +54,11 @@ const AddVideo = () => {
     } else {
       void router.push("/login");
     }
+  };
+
+  const fetchTeams = async () => {
+    const { data } = await supabase.from("teams").select("full_name, id");
+    if (data) setTeams(data);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,6 +85,7 @@ const AddVideo = () => {
       tournament: "",
       division: "",
     });
+    setTeamMentions([]);
     setIsOpen(false);
   };
 
@@ -128,6 +141,13 @@ const AddVideo = () => {
     else return false;
   };
 
+  const handleTeamMention = async (teamId: string, video: string) => {
+    await supabase.from("team_videos").insert({
+      team_id: teamId,
+      video_id: video,
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const isVideoDuplicated = await checkIfDuplicateVideo(e);
     e.preventDefault();
@@ -159,9 +179,19 @@ const AddVideo = () => {
       .select()
       .single();
     if (data) {
-      reset();
+      teamMentions.forEach((mention) => {
+        const team = teams?.find((t) => t.full_name === mention);
+        if (team) {
+          void handleTeamMention(team.id, data.id);
+        }
+      });
+      void reset();
     }
   };
+
+  useEffect(() => {
+    fetchTeams();
+  }, []);
 
   return isOpen ? (
     <Modal open={isOpen} onClose={reset}>
@@ -250,6 +280,11 @@ const AddVideo = () => {
               value={videoData.tournament}
             />
           )}
+          <TeamVideos
+            teamMentions={teamMentions}
+            setTeamMentions={setTeamMentions}
+            teams={teams}
+          />
           {user.currentAffiliation?.team.id && (
             <div className="flex items-center justify-center">
               <div className="text-xl font-bold tracking-tight">

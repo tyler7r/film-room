@@ -27,7 +27,7 @@ const VideoSearchFilters = ({
   };
 
   return (
-    <div className="mb-2 flex w-4/5 flex-col items-center justify-center gap-2">
+    <div className="flex w-4/5 flex-col items-center justify-center gap-2">
       <div className="flex w-full gap-2">
         <FormControl className="w-full">
           <InputLabel>Search by division...</InputLabel>

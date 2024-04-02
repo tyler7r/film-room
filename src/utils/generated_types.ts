@@ -432,17 +432,14 @@ export type Database = {
       }
       team_videos: {
         Row: {
-          id: string
           team_id: string
           video_id: string
         }
         Insert: {
-          id?: string
           team_id?: string
           video_id?: string
         }
         Update: {
-          id?: string
           team_id?: string
           video_id?: string
         }
