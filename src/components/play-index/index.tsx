@@ -52,21 +52,24 @@ const PlayIndex = ({
     const { from, to } = getFromAndTo();
     const plays = supabase
       .from(`plays`)
-      .select(`*, mentions:play_mentions!inner(receiver_name)`, {
+      .select(`*, mentions:play_mentions(receiver_name)`, {
         count: "exact",
       })
       .match({
         video_id: videoId,
         team_id: `${user.currentAffiliation?.team.id}`,
       })
-      .ilike(
+      .order("start_time")
+      .range(from, to);
+    if (options?.receiver_name) {
+      void plays.select(`*, mentions:play_mentions!inner(receiver_name)`);
+      void plays.ilike(
         "play_mentions.receiver_name",
         options?.receiver_name && options.receiver_name !== ""
           ? `%${options?.receiver_name}%`
           : "%%",
-      )
-      .order("start_time")
-      .range(from, to);
+      );
+    }
     if (options?.only_highlights) {
       void plays.eq("highlight", true);
     }

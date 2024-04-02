@@ -17,7 +17,7 @@ const Plays = ({
   scrollToPlayer,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
-    <div className="flex flex-col justify-center gap-4">
+    <div className="flex w-11/12 flex-col justify-center gap-4">
       {plays.map((play) => (
         <Play
           setActivePlay={setActivePlay}
