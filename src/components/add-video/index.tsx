@@ -191,7 +191,7 @@ const AddVideo = () => {
   };
 
   useEffect(() => {
-    fetchTeams();
+    void fetchTeams();
   }, []);
 
   return isOpen ? (

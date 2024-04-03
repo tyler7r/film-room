@@ -8,7 +8,7 @@ import {
   Select,
   type SelectChangeEvent,
 } from "@mui/material";
-import { TeamMentionType } from "~/utils/types";
+import type { TeamMentionType } from "~/utils/types";
 
 type TeamVideosProps = {
   mentions: string[];

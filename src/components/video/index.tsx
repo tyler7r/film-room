@@ -3,7 +3,7 @@ import { Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { VideoType } from "~/utils/types";
+import type { VideoType } from "~/utils/types";
 import TeamLogo from "../team-logo";
 
 type VideoProps = {
