@@ -131,3 +131,8 @@ export type VideoUploadType = {
 export type LikeListType = {
   user_name: string;
 }[];
+
+export type TeamMentionType = {
+  full_name: string;
+  id: string;
+}[];

@@ -1,18 +1,15 @@
 import DeleteIcon from "@mui/icons-material/Delete";
-import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider, Pagination, Typography } from "@mui/material";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
 import Search from "~/components/search";
-import TeamLogo from "~/components/team-logo";
+import Video from "~/components/video";
 import VideoSearchFilters from "~/components/video-search-filters";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
-import { useIsDarkContext } from "../_app";
 
 export type SearchOptions = {
   title?: string;
@@ -25,8 +22,6 @@ export type SearchOptions = {
 const FilmRoomHome = () => {
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
-  const { backgroundStyle, isDark } = useIsDarkContext();
-  const router = useRouter();
 
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [page, setPage] = useState<number>(1);
@@ -114,10 +109,11 @@ const FilmRoomHome = () => {
   }, [page, isMobile, searchOptions]);
 
   return (
-    <div className="my-4 flex w-full flex-col items-center justify-center">
-      <Typography variant="h1" fontSize={64} className="m-2 text-center">
+    <div className="mb-4 flex w-full flex-col items-center justify-center">
+      <Typography variant="h1" fontSize={64} className="mt-6 text-center">
         The Film Room
       </Typography>
+      <AddVideo />
       <Divider flexItem variant="middle" className="mb-4"></Divider>
       <Search
         searchOptions={searchOptions}
@@ -131,8 +127,7 @@ const FilmRoomHome = () => {
       <Button endIcon={<DeleteIcon />} onClick={clearSearchOptions}>
         Clear Filters
       </Button>
-      <AddVideo />
-      <div className="flex w-4/5 flex-col items-center justify-center gap-6">
+      <div className="mt-6 flex w-4/5 flex-col items-center justify-center gap-6">
         {!videos ||
           (videos.length === 0 && (
             <div className="flex flex-col items-center justify-center gap-1 text-center">
@@ -144,47 +139,7 @@ const FilmRoomHome = () => {
               </div>
             </div>
           ))}
-        {videos?.map((v) => (
-          <div
-            style={backgroundStyle}
-            key={v.id}
-            className={`${
-              isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
-            } flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 px-10 transition ease-in-out hover:rounded-sm hover:border-solid hover:delay-100`}
-            onClick={() => router.push(`/film-room/${v.id}`)}
-          >
-            <Typography
-              color={isDark ? `white` : `black`}
-              component="span"
-              className="flex flex-col items-center justify-center gap-1"
-            >
-              {!v.private && (
-                <div className="mb-1 flex items-center justify-center gap-1">
-                  <div className="lg:text-md text-sm tracking-tighter">
-                    PUBLIC
-                  </div>
-                  <PublicIcon fontSize="small" />
-                </div>
-              )}
-              {v.private && user.currentAffiliation && (
-                <div className="justify mb-1 flex items-center justify-center gap-2">
-                  <div className="lg:text-md text-sm tracking-tighter">
-                    PRIVATE TO:{" "}
-                  </div>
-                  <TeamLogo tm={user.currentAffiliation} size={20} />
-                </div>
-              )}
-              <div className="flex gap-2 text-center text-xl font-medium tracking-wide">
-                {v.season && <div>{v.season}</div>}
-                {v.tournament && <div>{v.tournament}</div>}
-                {v.week && <div>{v.week}</div>}
-              </div>
-              <div className="text-center text-2xl font-extrabold tracking-tighter lg:text-3xl">
-                {v.title}
-              </div>
-            </Typography>
-          </div>
-        ))}
+        {videos?.map((v) => <Video video={v} key={v.id} />)}
       </div>
       {videos && videoCount && (
         <Pagination

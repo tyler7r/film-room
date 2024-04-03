@@ -432,18 +432,21 @@ export type Database = {
       }
       team_videos: {
         Row: {
-          id: string
+          exclusive_to: string | null
           team_id: string
+          uploaded_at: string
           video_id: string
         }
         Insert: {
-          id?: string
+          exclusive_to?: string | null
           team_id?: string
+          uploaded_at?: string
           video_id?: string
         }
         Update: {
-          id?: string
+          exclusive_to?: string | null
           team_id?: string
+          uploaded_at?: string
           video_id?: string
         }
         Relationships: [
