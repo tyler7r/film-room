@@ -1,6 +1,7 @@
 import { Typography } from "@mui/material";
 import type { YouTubePlayer } from "react-youtube";
 import type { PlayIndexType, PlayType } from "~/utils/types";
+import { PlaySearchOptions } from "..";
 import Play from "../play";
 
 type PlaysProps = {
@@ -8,6 +9,8 @@ type PlaysProps = {
   player: YouTubePlayer | null;
   scrollToPlayer: () => void;
   setActivePlay: (play: PlayType) => void;
+  searchOptions: PlaySearchOptions;
+  setSearchOptions: (options: PlaySearchOptions) => void;
 };
 
 const Plays = ({
@@ -15,6 +18,8 @@ const Plays = ({
   plays,
   player,
   scrollToPlayer,
+  searchOptions,
+  setSearchOptions,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
     <div className="flex w-11/12 flex-col justify-center gap-4">
@@ -25,6 +30,8 @@ const Plays = ({
           scrollToPlayer={scrollToPlayer}
           play={play}
           player={player}
+          setSearchOptions={setSearchOptions}
+          searchOptions={searchOptions}
         />
       ))}
     </div>

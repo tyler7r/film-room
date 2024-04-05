@@ -6,6 +6,7 @@ import Comment from "../comment";
 type CommentIndexProps = {
   playId: string;
   setCommentCount: (count: number) => void;
+  isActivePlay: boolean;
 };
 
 type CommentIndexType = {
@@ -18,7 +19,11 @@ type CommentIndexType = {
   team_id: string | null;
 }[];
 
-const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
+const CommentIndex = ({
+  playId,
+  setCommentCount,
+  isActivePlay,
+}: CommentIndexProps) => {
   const [index, setIndex] = useState<CommentIndexType | null>(null);
   const [page, setPage] = useState<number>(0);
   const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState<boolean>(false);
@@ -97,7 +102,9 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
           </Typography>
         )}
       </div>
-      <Divider flexItem className="my-2" variant="middle"></Divider>
+      {!isActivePlay && (
+        <Divider flexItem className="my-2" variant="middle"></Divider>
+      )}
     </div>
   );
 };

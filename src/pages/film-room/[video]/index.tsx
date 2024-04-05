@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import PlayIndex from "~/components/play-index";
-import Play from "~/components/play-index/play";
 import PlayModal from "~/components/play-modal";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
@@ -40,7 +39,9 @@ const FilmRoom = () => {
     if (playParam && user.isLoggedIn) {
       const { data } = await supabase
         .from("plays")
-        .select(`*, mentions:play_mentions (receiver_name)`, { count: "exact" })
+        .select(`*, mentions:play_mentions (receiver_name), tags(title)`, {
+          count: "exact",
+        })
         .eq("id", playParam)
         .single();
       if (data) setActivePlay(data);
@@ -76,7 +77,7 @@ const FilmRoom = () => {
 
   return (
     video && (
-      <div className="m-4 flex flex-col items-center justify-center gap-2">
+      <div className="m-4 flex w-full flex-col items-center justify-center gap-2">
         <div className="flex flex-col items-center justify-center gap-1 text-center">
           <Typography variant="h6" className="text-xl leading-5 tracking-wider">
             {video.season} {video.tournament}
@@ -86,7 +87,6 @@ const FilmRoom = () => {
           </Typography>
         </div>
         <Divider flexItem variant="middle" className="mx-4 mt-1"></Divider>
-        <div className="flex items-center justify-center gap-4 text-center"></div>
         <PlayModal
           player={player}
           videoId={video.id}
@@ -114,28 +114,13 @@ const FilmRoom = () => {
             />
           </div>
         )}
-        {activePlay && (
-          <div className="flex w-11/12 flex-col items-center justify-center gap-2">
-            <div className="tracking-tightest text-xl font-bold">
-              Active Play
-            </div>
-            <Play
-              scrollToPlayer={scrollToPlayer}
-              play={activePlay}
-              player={player}
-              activePlay={activePlay}
-              setActivePlay={setActivePlay}
-            />
-            <Divider className="my-4" flexItem></Divider>
-          </div>
-        )}
         <PlayIndex
           player={player}
           videoId={video.id}
           scrollToPlayer={scrollToPlayer}
           duration={videoDuration}
           setActivePlay={setActivePlay}
-          activePlayId={activePlay ? activePlay.id : null}
+          activePlay={activePlay}
         />
       </div>
     )
