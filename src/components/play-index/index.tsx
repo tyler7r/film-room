@@ -135,6 +135,7 @@ const PlayIndex = ({
         <div className="flex w-11/12 flex-col items-center justify-center gap-2">
           <div className="tracking-tightest text-xl font-bold">Active Play</div>
           <Play
+            setIsFiltersOpen={setIsFiltersOpen}
             scrollToPlayer={scrollToPlayer}
             play={activePlay}
             player={player}
@@ -180,6 +181,7 @@ const PlayIndex = ({
           </Typography>
         </div>
         <Plays
+          setIsFiltersOpen={setIsFiltersOpen}
           scrollToPlayer={scrollToPlayer}
           player={player}
           plays={plays}

@@ -11,6 +11,7 @@ type PlaysProps = {
   setActivePlay: (play: PlayType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
+  setIsFiltersOpen: (isFiltersOpen: boolean) => void;
 };
 
 const Plays = ({
@@ -20,6 +21,7 @@ const Plays = ({
   scrollToPlayer,
   searchOptions,
   setSearchOptions,
+  setIsFiltersOpen,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
     <div className="flex w-11/12 flex-col justify-center gap-4">
@@ -32,6 +34,7 @@ const Plays = ({
           player={player}
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
+          setIsFiltersOpen={setIsFiltersOpen}
         />
       ))}
     </div>

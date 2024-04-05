@@ -24,6 +24,7 @@ type PlayProps = {
   setActivePlay: (play: PlayType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
+  setIsFiltersOpen: (isFiltersOpen: boolean) => void;
 };
 
 const Play = ({
@@ -34,8 +35,9 @@ const Play = ({
   activePlay,
   searchOptions,
   setSearchOptions,
+  setIsFiltersOpen,
 }: PlayProps) => {
-  const { backgroundStyle } = useIsDarkContext();
+  const { backgroundStyle, isDark } = useIsDarkContext();
   const { user } = useAuthContext();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -133,7 +135,14 @@ const Play = ({
     if (count) setCommentCount(count);
   };
 
+  const handleMentionClick = (e: React.MouseEvent, mention: string) => {
+    e.stopPropagation();
+    setIsFiltersOpen(true);
+    setSearchOptions({ ...searchOptions, receiver_name: mention });
+  };
+
   const handleTagClick = (tag: string) => {
+    setIsFiltersOpen(true);
     setSearchOptions({ ...searchOptions, tag: tag });
   };
 
@@ -208,8 +217,13 @@ const Play = ({
               <div className="flex flex-grow flex-wrap items-center justify-center gap-3">
                 {play.mentions.map((m) => (
                   <div
-                    className="text-center text-sm font-bold even:text-slate-500 md:text-base"
+                    className={`text-center text-sm font-bold even:text-slate-500 md:text-base ${
+                      isDark
+                        ? "hover:text-purple-400"
+                        : "hover:text-purple-A400"
+                    } hover:delay-100`}
                     key={m.receiver_name}
+                    onClick={(e) => handleMentionClick(e, m.receiver_name)}
                   >
                     {m.receiver_name}
                   </div>
