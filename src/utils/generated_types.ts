@@ -333,6 +333,43 @@ export type Database = {
           },
         ]
       }
+      play_tags: {
+        Row: {
+          play_id: string
+          tag_id: string
+        }
+        Insert: {
+          play_id?: string
+          tag_id?: string
+        }
+        Update: {
+          play_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "plays"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plays: {
         Row: {
           author_name: string
@@ -426,6 +463,35 @@ export type Database = {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tags: {
+        Row: {
+          exclusive_to: string | null
+          id: string
+          private: boolean
+          title: string
+        }
+        Insert: {
+          exclusive_to?: string | null
+          id?: string
+          private?: boolean
+          title: string
+        }
+        Update: {
+          exclusive_to?: string | null
+          id?: string
+          private?: boolean
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_tags_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]
