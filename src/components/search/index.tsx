@@ -12,21 +12,6 @@ const Search = ({
   searchOptions,
   setSearchOptions,
 }: VideoSearchFilterProps) => {
-  // const searchParams = useSearchParams();
-  // const pathname = usePathname();
-  // const router = useRouter();
-
-  // useEffect(() => {
-  //   const { title } = searchOptions;
-  //   const params = new URLSearchParams(searchParams);
-  //   if (title) {
-  //     params.set("query", title);
-  //   } else {
-  //     params.delete("query");
-  //   }
-  //   void router.replace(`${pathname}?${params.toString()}`);
-  // }, [searchOptions.title]);
-
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSearchOptions({ ...searchOptions, title: value });

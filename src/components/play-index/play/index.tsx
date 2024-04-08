@@ -163,9 +163,9 @@ const Play = ({
         onClick={() => handleClick(play.start_time, play)}
       >
         <div className="flex flex-col items-center justify-center gap-1">
-          <Typography className="w-min text-center text-xl font-bold tracking-tight">
+          <div className="w-min text-center text-xl font-bold tracking-tight">
             {play.author_name}
-          </Typography>
+          </div>
           <div className="flex gap-1">
             <div className="flex items-center justify-center">
               {isLiked ? (
@@ -203,7 +203,11 @@ const Play = ({
             </div>
           </div>
         </div>
-        <Divider orientation="vertical" flexItem className="mx-2" />
+        <Divider
+          orientation="vertical"
+          flexItem
+          sx={{ marginRight: "8px", marginLeft: "8px" }}
+        />
         {play.highlight && (
           <StarIcon color="secondary" fontSize="large" className="mr-4" />
         )}
@@ -213,7 +217,7 @@ const Play = ({
           </div>
           {play.mentions.length > 0 && (
             <div className="flex w-full flex-col">
-              <Divider flexItem className="m-2 mb-3" />
+              <Divider flexItem sx={{ margin: "8px", marginBottom: "12px" }} />
               <div className="flex flex-grow flex-wrap items-center justify-center gap-3">
                 {play.mentions.map((m) => (
                   <div

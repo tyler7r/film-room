@@ -38,7 +38,7 @@ const TeamPageButton = () => {
         variant="text"
         onClick={handleClick}
         endIcon={<ExpandMoreIcon />}
-        className="lg:text-xl"
+        sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
       >
         Team Hub
       </Button>
@@ -62,7 +62,7 @@ const TeamPageButton = () => {
                 variant="caption"
                 fontSize="medium"
                 fontWeight="bold"
-                className="rounded-full p-1 text-white"
+                sx={{ borderRadius: "9999px", padding: "4px", color: "white" }}
                 style={colorBackground}
               >{`${aff.team.city.slice(0, 1)}${aff.team.name.slice(
                 0,

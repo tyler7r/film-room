@@ -10,7 +10,6 @@ import {
   Modal,
   Select,
   TextField,
-  Typography,
   type SelectChangeEvent,
 } from "@mui/material";
 import { useRouter } from "next/router";
@@ -196,17 +195,33 @@ const AddVideo = () => {
 
   return isOpen ? (
     <Modal open={isOpen} onClose={reset}>
-      <Box className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid bg-white p-4">
+      <Box
+        className="border-1 inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid bg-white p-4"
+        sx={{
+          position: "relative",
+        }}
+      >
         <Button
           variant="text"
           size="large"
-          className="absolute right-0 top-0 text-2xl font-bold"
+          sx={{
+            position: "absolute",
+            top: "0",
+            right: "0",
+            fontSize: "1.5rem",
+            lineHeight: "2rem",
+            fontWeight: "bold",
+          }}
           onClick={reset}
         >
           X
         </Button>
-        <Divider flexItem variant="middle" className="m-2 mx-16">
-          <Typography className="text-3xl font-bold">ADD A VIDEO</Typography>
+        <Divider
+          flexItem
+          variant="middle"
+          sx={{ margin: "8px", marginLeft: "64px", marginRight: "64px" }}
+        >
+          <div className="text-3xl font-bold">ADD A VIDEO</div>
         </Divider>
         <form
           onSubmit={handleSubmit}
@@ -320,7 +335,7 @@ const AddVideo = () => {
     </Modal>
   ) : (
     <Button
-      className="mb-3 text-lg"
+      sx={{ marginBottom: "12px", fontSize: "18px", lineHeight: "28px" }}
       type="button"
       size="large"
       endIcon={<AddIcon />}

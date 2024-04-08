@@ -1,4 +1,4 @@
-import { Button, Divider, Typography } from "@mui/material";
+import { Button, Divider } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
@@ -89,9 +89,9 @@ const InboxMentions = () => {
 
   return (
     <div className="flex flex-col gap-1">
-      <Typography variant="h5" className="font-bold lg:mb-2 lg:text-3xl">
+      <div className="text-2xl font-bold lg:mb-2 lg:text-3xl">
         Recent Mentions
-      </Typography>
+      </div>
       <div className="flex flex-col gap-5 md:px-2 lg:px-4">
         {mentions?.map((mention) => (
           <div
@@ -111,7 +111,7 @@ const InboxMentions = () => {
             <div className="text-center text-lg lg:text-start lg:text-xl">
               {mention.plays?.videos?.title}
             </div>
-            <Divider className="mx-3"></Divider>
+            <Divider sx={{ marginLeft: "12px", marginRight: "12px" }}></Divider>
             <div>
               <strong>{mention.sender_name}:</strong> {mention.plays?.title}
             </div>

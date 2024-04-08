@@ -25,7 +25,7 @@ const TeamLogo = ({ tm, size }: TeamLogoProps) => {
       variant="caption"
       fontSize="large"
       fontWeight="bold"
-      className="rounded-full p-2 text-white"
+      sx={{ borderRadius: "9999px", padding: "8px", color: "white" }}
       style={colorBackground}
     >{`${team.city.slice(0, 1)}${team.name.slice(0, 1)}`}</Typography>
   );

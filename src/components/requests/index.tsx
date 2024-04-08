@@ -59,14 +59,9 @@ const Requests = ({ team }: RequestsProps) => {
   }, []);
 
   return (
-    <div className="m-2 flex flex-col gap-2">
+    <div className="m-2 flex flex-col gap-2 text-center">
       {!requests && (
-        <Typography
-          variant="button"
-          fontSize={14}
-          style={backgroundStyle}
-          className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
-        >
+        <Typography variant="button" fontSize={14} style={backgroundStyle}>
           No Join Requests
         </Typography>
       )}

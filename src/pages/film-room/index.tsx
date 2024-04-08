@@ -110,11 +110,19 @@ const FilmRoomHome = () => {
 
   return (
     <div className="mb-4 flex w-full flex-col items-center justify-center">
-      <Typography variant="h1" fontSize={64} className="mt-6 text-center">
+      <Typography
+        variant="h1"
+        fontSize={64}
+        sx={{ marginTop: "24px", textAlign: "center" }}
+      >
         The Film Room
       </Typography>
       <AddVideo />
-      <Divider flexItem variant="middle" className="mb-4"></Divider>
+      <Divider
+        flexItem
+        variant="middle"
+        sx={{ marginBottom: "16px" }}
+      ></Divider>
       <Search
         searchOptions={searchOptions}
         setSearchOptions={setSearchOptions}
@@ -145,7 +153,7 @@ const FilmRoomHome = () => {
         <Pagination
           showFirstButton
           showLastButton
-          className="mt-6"
+          sx={{ marginTop: "24px" }}
           size="large"
           variant="text"
           shape="rounded"

@@ -73,7 +73,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
         <Pagination
           showFirstButton
           showLastButton
-          className="mt-6"
+          sx={{ marginTop: "24px" }}
           size="large"
           variant="text"
           shape="rounded"

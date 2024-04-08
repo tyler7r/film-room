@@ -15,7 +15,11 @@ const Inbox = () => {
   return (
     <Drawer open={isOpen} anchor="right" onClose={() => setIsOpen(false)}>
       <div className="p-2" style={{ width: screenWidth * 0.5 }}>
-        <Typography className="p-2 text-center font-extrabold" variant="h2">
+        <Typography
+          className="p-2 text-center"
+          sx={{ fontWeight: "800" }}
+          variant="h2"
+        >
           Inbox
         </Typography>
         <div className="flex flex-col gap-3">
@@ -31,7 +35,7 @@ const Inbox = () => {
                   setIsOpen(false);
                   void router.push("/signup");
                 }}
-                className="lg:text-xl"
+                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
               >
                 Signup
               </Button>
@@ -43,7 +47,7 @@ const Inbox = () => {
                   setIsOpen(false);
                   void router.push("/login");
                 }}
-                className="lg:text-xl"
+                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
               >
                 Login
               </Button>

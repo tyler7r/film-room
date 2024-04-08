@@ -66,7 +66,7 @@ const PlaySearchFilters = ({
             endAdornment: user.isLoggedIn && user.name && (
               <Button
                 size="small"
-                className="m-1"
+                sx={{ margin: "4px" }}
                 onClick={() => handleYourMentionsBtnClick()}
               >
                 Only Your Mentions

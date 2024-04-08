@@ -144,7 +144,10 @@ const PlayIndex = ({
             searchOptions={searchOptions}
             setSearchOptions={setSearchOptions}
           />
-          <Divider className="my-4" flexItem></Divider>
+          <Divider
+            sx={{ marginTop: "16px", marginBottom: "16px" }}
+            flexItem
+          ></Divider>
         </div>
       )}
       <div className="flex w-full flex-col items-center justify-center gap-4">
@@ -154,7 +157,7 @@ const PlayIndex = ({
               variant="outlined"
               onClick={() => setIsFiltersOpen(false)}
               endIcon={<ExpandLessIcon />}
-              className="mb-2"
+              sx={{ marginBottom: "8px" }}
             >
               Close Filters
             </Button>
@@ -193,7 +196,7 @@ const PlayIndex = ({
           <Pagination
             showFirstButton
             showLastButton
-            className="mt-6"
+            sx={{ marginTop: "24px" }}
             size="large"
             variant="text"
             shape="rounded"

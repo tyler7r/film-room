@@ -112,7 +112,7 @@ const Login = () => {
           size="large"
           type="submit"
           disabled={!isValidForm}
-          className="text-2xl"
+          sx={{ fontSize: "24px", lineHeight: "32px" }}
         >
           Login
         </Button>
@@ -125,7 +125,7 @@ const Login = () => {
           variant="outlined"
           size="large"
           onClick={() => router.push("/signup")}
-          className="text-lg font-light"
+          sx={{ fontSize: "18px", lineHeight: "28px", fontWeight: "300" }}
         >
           Signup
         </Button>

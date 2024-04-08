@@ -1,4 +1,4 @@
-import { Divider, Typography } from "@mui/material";
+import { Divider } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -79,14 +79,18 @@ const FilmRoom = () => {
     video && (
       <div className="m-4 flex w-full flex-col items-center justify-center gap-2">
         <div className="flex flex-col items-center justify-center gap-1 text-center">
-          <Typography variant="h6" className="text-xl leading-5 tracking-wider">
+          <div className="text-xl leading-5 tracking-wider">
             {video.season} {video.tournament}
-          </Typography>
-          <Typography className="text-4xl font-bold tracking-tight lg:text-5xl">
+          </div>
+          <div className="text-4xl font-bold tracking-tight lg:text-5xl">
             {video.title}
-          </Typography>
+          </div>
         </div>
-        <Divider flexItem variant="middle" className="mx-4 mt-1"></Divider>
+        <Divider
+          flexItem
+          variant="middle"
+          sx={{ marginLeft: "8px", marginRight: "8px", marginTop: "4px" }}
+        ></Divider>
         <PlayModal
           player={player}
           videoId={video.id}
