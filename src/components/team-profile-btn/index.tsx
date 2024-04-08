@@ -1,18 +1,16 @@
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Button, Menu, MenuItem, Typography } from "@mui/material";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { type TeamAffiliationType } from "~/utils/types";
+import TeamLogo from "../team-logo";
 
 const TeamPageButton = () => {
   const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
-  const { colorBackground } = useIsDarkContext();
   const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -49,26 +47,7 @@ const TeamPageButton = () => {
             className="flex items-center justify-center gap-2"
             onClick={() => handleItemClick(aff)}
           >
-            {aff.team.logo ? (
-              <Image
-                alt="team-logo"
-                src={aff.team.logo}
-                height={35}
-                width={35}
-                className="rounded-full"
-              />
-            ) : (
-              <Typography
-                variant="caption"
-                fontSize="medium"
-                fontWeight="bold"
-                sx={{ borderRadius: "9999px", padding: "4px", color: "white" }}
-                style={colorBackground}
-              >{`${aff.team.city.slice(0, 1)}${aff.team.name.slice(
-                0,
-                1,
-              )}`}</Typography>
-            )}
+            <TeamLogo tm={aff.team} size={35} />
             <Typography variant="overline" fontWeight="bold" fontSize="small">
               {aff.team.full_name}
             </Typography>

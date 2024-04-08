@@ -41,7 +41,7 @@ const Video = ({ video }: VideoProps) => {
               <div className="lg:text-md text-sm tracking-tighter">
                 PRIVATE TO:{" "}
               </div>
-              <TeamLogo tm={user.currentAffiliation} size={20} />
+              <TeamLogo tm={user.currentAffiliation.team} size={20} />
             </div>
           )}
           <div className="flex gap-2 text-center text-xl font-medium tracking-wide">

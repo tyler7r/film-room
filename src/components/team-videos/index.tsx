@@ -33,6 +33,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
   const [videoCount, setVideoCount] = useState<number>(0);
 
   const fetchVideos = async () => {
+    console.log(teamId);
     const { from, to } = getFromAndTo();
     const { data, count } = await supabase
       .from("team_videos")
@@ -44,6 +45,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
       .range(from, to);
     console.log({ data, count });
     if (data && data.length > 0) setVideos(data);
+    else setVideos(null);
     if (count) setVideoCount(count);
   };
 
@@ -62,7 +64,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
 
   useEffect(() => {
     void fetchVideos();
-  }, []);
+  }, [teamId]);
 
   return (
     <div className="flex w-11/12 flex-col items-center justify-center">

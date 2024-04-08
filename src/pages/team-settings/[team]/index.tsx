@@ -74,6 +74,7 @@ const TeamSettings = ({
         .from("team_logos")
         .upload(`logos/${details.id}.png`, file, {
           upsert: true,
+          cacheControl: "60",
         });
       if (data) {
         const {

@@ -75,6 +75,7 @@ const CreateTeam = () => {
         .from("team_logos")
         .upload(`logos/${details.id}.png`, file, {
           upsert: true,
+          cacheControl: "60",
         });
       if (data) {
         const {
@@ -238,12 +239,13 @@ const CreateTeam = () => {
         >
           {imagePreview === "" ? "Upload Logo" : "Change Logo"}
           <input
+            onClick={() => console.log("clicked")}
             id="file_upload"
             type="file"
             onChange={(e) => {
               void handleImage((e.target as HTMLInputElement).files);
             }}
-            style={{ display: "none" }}
+            hidden
           />
         </Button>
         {imagePreview !== "" && (

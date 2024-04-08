@@ -40,7 +40,7 @@ export const IsAuth = ({ children }: AuthProps) => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event: string, session) => {
-        console.log(event);
+        console.log({ event: event, aff: user.currentAffiliation });
         if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
           setUser({
             currentAffiliation: user.currentAffiliation,
@@ -52,7 +52,7 @@ export const IsAuth = ({ children }: AuthProps) => {
         } else if (event === "INITIAL_SESSION" && session) {
           setUser({
             isLoggedIn: false,
-            userId: session.user.id,
+            userId: undefined,
             email: session.user.email,
             name: session.user.user_metadata.name as string,
             currentAffiliation: undefined,

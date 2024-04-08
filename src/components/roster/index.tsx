@@ -62,6 +62,7 @@ const Roster = ({ team, role }: RosterProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     const { data } = await supabase
       .from("affiliations")
       .update({

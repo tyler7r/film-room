@@ -6,6 +6,7 @@ export type TeamAffiliationType = {
     division: string;
     logo: string | null;
     full_name: string;
+    owner: string | null;
   };
   role: string;
   affId: string;
@@ -20,11 +21,11 @@ export type UserSession = {
 };
 
 export type TeamType = {
-  city: string | null;
-  division: string | null;
+  city: string;
+  division: string;
   id: string;
   logo: string | null;
-  name: string | null;
+  name: string;
   owner: string | null;
   full_name: string;
 };

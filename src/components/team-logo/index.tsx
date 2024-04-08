@@ -1,33 +1,28 @@
-import { Typography } from "@mui/material";
 import Image from "next/image";
 import { useIsDarkContext } from "~/pages/_app";
-import { type TeamAffiliationType } from "~/utils/types";
+import type { TeamType } from "~/utils/types";
 
 type TeamLogoProps = {
-  tm: TeamAffiliationType;
+  tm: TeamType;
   size?: number;
 };
 
 const TeamLogo = ({ tm, size }: TeamLogoProps) => {
-  const { team } = tm;
   const { colorBackground } = useIsDarkContext();
 
-  return team.logo ? (
+  return tm.logo ? (
     <Image
       alt="team-logo"
-      src={team.logo}
+      src={tm.logo}
       height={size ? size : 45}
       width={size ? size : 45}
       className="rounded-full"
     />
   ) : (
-    <Typography
-      variant="caption"
-      fontSize="large"
-      fontWeight="bold"
-      sx={{ borderRadius: "9999px", padding: "8px", color: "white" }}
+    <div
+      className="rounded-full p-3 text-3xl font-bold text-white"
       style={colorBackground}
-    >{`${team.city.slice(0, 1)}${team.name.slice(0, 1)}`}</Typography>
+    >{`${tm.city.slice(0, 1)}${tm.name.slice(0, 1)}`}</div>
   );
 };
 

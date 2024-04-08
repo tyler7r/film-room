@@ -31,19 +31,22 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
   >(undefined);
 
   const fetchAffiliations = async () => {
-    const { data } = await supabase
-      .from("affiliations")
-      .select(
-        `role, id, teams!inner(id, name, city, division, logo, full_name)`,
-      )
-      .match({ user_id: `${user.userId}`, verified: true });
-    if (data && data.length > 0) {
-      const typedAffiliations: TeamAffiliationType[] = data.map((tm) => ({
-        team: tm.teams!,
-        role: tm.role,
-        affId: tm.id,
-      }));
-      setAffiliations(typedAffiliations);
+    if (user.userId) {
+      const { data } = await supabase
+        .from("affiliations")
+        .select(
+          `role, id, teams!inner(id, name, city, division, logo, full_name, owner)`,
+        )
+        .match({ user_id: `${user.userId}`, verified: true });
+      if (data && data.length > 0) {
+        const typedAffiliations: TeamAffiliationType[] = data.map((tm) => ({
+          team: tm.teams!,
+          role: tm.role,
+          affId: tm.id,
+        }));
+        setAffiliations(typedAffiliations);
+        setUser({ ...user, currentAffiliation: typedAffiliations[0] });
+      }
     }
   };
 
@@ -65,13 +68,10 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
   }, []);
 
   useEffect(() => {
-    if (user.userId) {
+    if (user.isLoggedIn) {
       void fetchAffiliations();
-    }
-    if (user.isLoggedIn && affiliations && !user.currentAffiliation) {
-      setUser({ ...user, currentAffiliation: affiliations[0] });
-    }
-  }, [user]);
+    } else setAffiliations(undefined);
+  }, [user.isLoggedIn]);
 
   return (
     <isAffiliatedContext.Provider
