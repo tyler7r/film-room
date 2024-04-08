@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import type { YouTubePlayer } from "react-youtube";
 import type { PlayIndexType, PlayType } from "~/utils/types";
-import { PlaySearchOptions } from "..";
+import type { PlaySearchOptions } from "..";
 import Play from "../play";
 
 type PlaysProps = {

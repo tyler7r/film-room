@@ -14,7 +14,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { LikeListType, PlayType } from "~/utils/types";
-import { PlaySearchOptions } from "..";
+import type { PlaySearchOptions } from "..";
 
 type PlayProps = {
   player: YouTubePlayer | null;

@@ -1,5 +1,5 @@
 import { Autocomplete, TextField } from "@mui/material";
-import { SyntheticEvent } from "react";
+import type { SyntheticEvent } from "react";
 import { type PlayerType } from "~/utils/types";
 
 type MentionsProps = {

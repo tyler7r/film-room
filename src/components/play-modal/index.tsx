@@ -73,11 +73,11 @@ const PlayModal = ({
   const fetchTags = async () => {
     const tags = supabase.from("tags").select("title, id");
     if (user.currentAffiliation?.team.id) {
-      tags.or(
+      void tags.or(
         `private.eq.false, exclusive_to.eq.${user.currentAffiliation.team.id}`,
       );
     } else {
-      tags.eq("private", false);
+      void tags.eq("private", false);
     }
 
     const { data } = await tags;

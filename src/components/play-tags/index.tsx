@@ -1,7 +1,5 @@
 import {
   Autocomplete,
-  AutocompleteChangeDetails,
-  AutocompleteChangeReason,
   Button,
   Checkbox,
   Dialog,
@@ -11,11 +9,13 @@ import {
   DialogTitle,
   TextField,
   createFilterOptions,
+  type AutocompleteChangeDetails,
+  type AutocompleteChangeReason,
 } from "@mui/material";
-import { SyntheticEvent, useEffect, useState } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { TagType } from "../play-modal";
+import type { TagType } from "../play-modal";
 
 type NewTagType = {
   title: string;
@@ -57,9 +57,10 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
         private: false,
       });
     } else if (reason === "createOption") {
+      const t = newValue[newValue.length - 1] as string;
       toggleOpen(true);
       setNewTag({
-        title: `${details?.option}`,
+        title: t,
         private: false,
       });
     } else {
