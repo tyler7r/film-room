@@ -14,6 +14,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType } from "~/utils/types";
 import Mentions from "../play-mentions";
+import PlayTags from "../play-tags";
 
 type PlayModalProps = {
   player: YouTubePlayer | null;
@@ -28,6 +29,13 @@ type PlayType = {
   title: string;
   note: string;
   highlight: boolean;
+};
+
+export type TagType = {
+  title: string;
+  id?: string;
+  create?: boolean;
+  label?: string;
 };
 
 const PlayModal = ({
@@ -46,10 +54,12 @@ const PlayModal = ({
     start: null,
     end: null,
   });
-  const [mentions, setMentions] = useState<string[]>([]);
+  const [mentions, setMentions] = useState<PlayerType>([]);
   const [affiliatedPlayers, setAffiliatedPlayers] = useState<PlayerType | null>(
     null,
   );
+  const [playTags, setPlayTags] = useState<TagType[]>([]);
+  const [tags, setTags] = useState<TagType[] | null>(null);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   const fetchAffiliatedPlayers = async () => {
@@ -58,6 +68,20 @@ const PlayModal = ({
       .select(`id, profiles (name)`)
       .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
     if (data) setAffiliatedPlayers(data);
+  };
+
+  const fetchTags = async () => {
+    const tags = supabase.from("tags").select("title, id");
+    if (user.currentAffiliation?.team.id) {
+      void tags.or(
+        `private.eq.false, exclusive_to.eq.${user.currentAffiliation.team.id}`,
+      );
+    } else {
+      void tags.eq("private", false);
+    }
+
+    const { data } = await tags;
+    if (data) setTags(data);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,6 +123,7 @@ const PlayModal = ({
       end: null,
     });
     setMentions([]);
+    setPlayTags([]);
   };
 
   const handleMention = async (player: string, name: string, play: string) => {
@@ -108,6 +133,13 @@ const PlayModal = ({
       receiver_id: player,
       receiver_name: name,
       sender_name: `${user.name}`,
+    });
+  };
+
+  const handleTag = async (play: string, tag: string) => {
+    await supabase.from("play_tags").insert({
+      play_id: play,
+      tag_id: tag,
     });
   };
 
@@ -129,13 +161,12 @@ const PlayModal = ({
       .select()
       .single();
     if (data) {
-      mentions.forEach((mention) => {
-        const player = affiliatedPlayers?.find(
-          (v) => v.profiles?.name === mention,
-        );
-        if (player) {
-          void handleMention(player.id, mention, data.id);
-        }
+      mentions?.forEach((mention) => {
+        const name = mention.profiles?.name;
+        void handleMention(mention.id, `${name}`, data.id);
+      });
+      playTags.forEach((tag) => {
+        void handleTag(data.id, `${tag.id}`);
       });
       void resetPlay();
     }
@@ -160,11 +191,29 @@ const PlayModal = ({
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("tag_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tags" },
+        () => {
+          void fetchTags();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     checkValidPlay();
   }, [playDetails]);
 
   useEffect(() => {
     if (user.currentAffiliation) void fetchAffiliatedPlayers();
+    void fetchTags();
   }, [videoId]);
 
   return isPlayModalOpen ? (
@@ -210,11 +259,8 @@ const PlayModal = ({
             multiline
             maxRows={5}
           />
-          <Mentions
-            players={affiliatedPlayers}
-            mentions={mentions}
-            setMentions={setMentions}
-          />
+          <PlayTags tags={playTags} setTags={setPlayTags} allTags={tags} />
+          <Mentions players={affiliatedPlayers} setMentions={setMentions} />
           <div className="flex items-center justify-center">
             <div className="text-xl font-bold tracking-tight">
               Highlight Play?

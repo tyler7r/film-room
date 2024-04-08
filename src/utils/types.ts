@@ -72,6 +72,9 @@ export type PlayIndexType = {
   mentions: {
     receiver_name: string;
   }[];
+  tags: {
+    title: string;
+  }[];
 }[];
 
 export type PlayType = {
@@ -88,6 +91,9 @@ export type PlayType = {
   title: string;
   mentions: {
     receiver_name: string;
+  }[];
+  tags: {
+    title: string;
   }[];
 };
 

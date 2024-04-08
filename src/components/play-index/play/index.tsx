@@ -14,6 +14,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { LikeListType, PlayType } from "~/utils/types";
+import type { PlaySearchOptions } from "..";
 
 type PlayProps = {
   player: YouTubePlayer | null;
@@ -21,6 +22,9 @@ type PlayProps = {
   scrollToPlayer: () => void;
   activePlay?: PlayType | null;
   setActivePlay: (play: PlayType) => void;
+  searchOptions: PlaySearchOptions;
+  setSearchOptions: (options: PlaySearchOptions) => void;
+  setIsFiltersOpen: (isFiltersOpen: boolean) => void;
 };
 
 const Play = ({
@@ -29,8 +33,11 @@ const Play = ({
   scrollToPlayer,
   setActivePlay,
   activePlay,
+  searchOptions,
+  setSearchOptions,
+  setIsFiltersOpen,
 }: PlayProps) => {
-  const { backgroundStyle } = useIsDarkContext();
+  const { backgroundStyle, isDark } = useIsDarkContext();
   const { user } = useAuthContext();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -128,6 +135,17 @@ const Play = ({
     if (count) setCommentCount(count);
   };
 
+  const handleMentionClick = (e: React.MouseEvent, mention: string) => {
+    e.stopPropagation();
+    setIsFiltersOpen(true);
+    setSearchOptions({ ...searchOptions, receiver_name: mention });
+  };
+
+  const handleTagClick = (tag: string) => {
+    setIsFiltersOpen(true);
+    setSearchOptions({ ...searchOptions, tag: tag });
+  };
+
   useEffect(() => {
     void fetchLikeCount();
     void fetchIfUserLiked();
@@ -199,8 +217,13 @@ const Play = ({
               <div className="flex flex-grow flex-wrap items-center justify-center gap-3">
                 {play.mentions.map((m) => (
                   <div
-                    className="text-center text-sm font-bold even:text-slate-500 md:text-base"
+                    className={`text-center text-sm font-bold even:text-slate-500 md:text-base ${
+                      isDark
+                        ? "hover:text-purple-400"
+                        : "hover:text-purple-A400"
+                    } hover:delay-100`}
                     key={m.receiver_name}
+                    onClick={(e) => handleMentionClick(e, m.receiver_name)}
                   >
                     {m.receiver_name}
                   </div>
@@ -241,12 +264,29 @@ const Play = ({
       </div>
       {isExpanded && (
         <div className="flex flex-col items-center justify-center gap-4">
-          <div className="self-start p-2 pl-4 pr-4 text-xl">
-            <strong className="tracking-tight">Description: </strong>
-            {play.note}
+          <div className="flex w-full flex-col gap-1 self-start p-2 pl-4 pr-4 text-xl">
+            <div>
+              <strong className="tracking-tight">Description: </strong>
+              {play.note}
+            </div>
+            <div className="flex flex-wrap">
+              {play.tags.length > 0 &&
+                play.tags.map((tag) => (
+                  <Button
+                    key={tag.title}
+                    onClick={() => handleTagClick(tag.title)}
+                  >
+                    #{tag.title}
+                  </Button>
+                ))}
+            </div>
           </div>
           <AddComment playId={play.id} />
-          <CommentIndex playId={play.id} setCommentCount={setCommentCount} />
+          <CommentIndex
+            playId={play.id}
+            setCommentCount={setCommentCount}
+            isActivePlay={activePlay?.id === play.id ? true : false}
+          />
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import StarIcon from "@mui/icons-material/Star";
-import { Button, Pagination, Typography } from "@mui/material";
+import { Button, Divider, Pagination, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
@@ -10,6 +10,7 @@ import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayIndexType, PlayType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
+import Play from "./play";
 import Plays from "./plays";
 
 type PlayIndexProps = {
@@ -18,13 +19,14 @@ type PlayIndexProps = {
   scrollToPlayer: () => void;
   duration: number;
   setActivePlay: (play: PlayType) => void;
-  activePlayId: string | null;
+  activePlay: PlayType | null;
 };
 
 export type PlaySearchOptions = {
   role?: string | undefined;
   only_highlights?: boolean;
   receiver_name?: string;
+  tag?: string;
 };
 
 const PlayIndex = ({
@@ -32,7 +34,7 @@ const PlayIndex = ({
   player,
   videoId,
   scrollToPlayer,
-  activePlayId,
+  activePlay,
 }: PlayIndexProps) => {
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
@@ -45,14 +47,13 @@ const PlayIndex = ({
   const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
     only_highlights: false,
     role: "",
-    receiver_name: "",
   });
 
   const fetchPlays = async (options?: PlaySearchOptions) => {
     const { from, to } = getFromAndTo();
     const plays = supabase
       .from(`plays`)
-      .select(`*, mentions:play_mentions(receiver_name)`, {
+      .select(`*, mentions:play_mentions(receiver_name), tags(title)`, {
         count: "exact",
       })
       .match({
@@ -66,8 +67,17 @@ const PlayIndex = ({
       void plays.ilike(
         "play_mentions.receiver_name",
         options?.receiver_name && options.receiver_name !== ""
-          ? `%${options?.receiver_name}%`
+          ? `%${options.receiver_name}%`
           : "%%",
+      );
+    }
+    if (options?.tag) {
+      void plays.select(
+        `*, mentions:play_mentions(receiver_name), tags!inner(title))`,
+      );
+      void plays.ilike(
+        "tags.title",
+        options?.tag && options.tag !== "" ? `%${options.tag}%` : "%%",
       );
     }
     if (options?.only_highlights) {
@@ -76,8 +86,8 @@ const PlayIndex = ({
     if (options?.role) {
       void plays.eq("author_role", options.role);
     }
-    if (activePlayId) {
-      void plays.neq("id", activePlayId);
+    if (activePlay) {
+      void plays.neq("id", activePlay.id);
     }
 
     const { data, count } = await plays;
@@ -117,61 +127,82 @@ const PlayIndex = ({
 
   useEffect(() => {
     if (user.currentAffiliation) void fetchPlays(searchOptions);
-  }, [searchOptions, videoId, page, isMobile, activePlayId]);
+  }, [searchOptions, videoId, page, isMobile, activePlay]);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-4">
-      {isFiltersOpen ? (
-        <div className="flex w-full flex-col items-center justify-center gap-2">
-          <Button
-            variant="outlined"
-            onClick={() => setIsFiltersOpen(false)}
-            endIcon={<ExpandLessIcon />}
-            className="mb-2"
-          >
-            Close Filters
-          </Button>
-          <PlaySearchFilters
+    <div className="flex w-full flex-col items-center">
+      {activePlay && (
+        <div className="flex w-11/12 flex-col items-center justify-center gap-2">
+          <div className="tracking-tightest text-xl font-bold">Active Play</div>
+          <Play
+            setIsFiltersOpen={setIsFiltersOpen}
+            scrollToPlayer={scrollToPlayer}
+            play={activePlay}
+            player={player}
+            activePlay={activePlay}
+            setActivePlay={setActivePlay}
             searchOptions={searchOptions}
             setSearchOptions={setSearchOptions}
-            setPage={setPage}
           />
+          <Divider className="my-4" flexItem></Divider>
         </div>
-      ) : (
-        <Button
-          variant="outlined"
-          onClick={() => setIsFiltersOpen(true)}
-          endIcon={<ExpandMoreIcon />}
-          size="medium"
-        >
-          Open Filters
-        </Button>
       )}
-      <div className="flex items-center justify-center gap-1 text-center">
-        <StarIcon color="secondary" fontSize="large" />
-        <Typography fontSize={16} variant="overline">
-          = Highlight Play
-        </Typography>
-      </div>
-      <Plays
-        scrollToPlayer={scrollToPlayer}
-        player={player}
-        plays={plays}
-        setActivePlay={setActivePlay}
-      />
-      {plays && playCount && (
-        <Pagination
-          showFirstButton
-          showLastButton
-          className="mt-6"
-          size="large"
-          variant="text"
-          shape="rounded"
-          count={getNumberOfPages(isMobile, playCount)}
-          page={page}
-          onChange={handlePageChange}
+      <div className="flex w-full flex-col items-center justify-center gap-4">
+        {isFiltersOpen ? (
+          <div className="flex w-full flex-col items-center justify-center gap-2">
+            <Button
+              variant="outlined"
+              onClick={() => setIsFiltersOpen(false)}
+              endIcon={<ExpandLessIcon />}
+              className="mb-2"
+            >
+              Close Filters
+            </Button>
+            <PlaySearchFilters
+              searchOptions={searchOptions}
+              setSearchOptions={setSearchOptions}
+              setPage={setPage}
+            />
+          </div>
+        ) : (
+          <Button
+            variant="outlined"
+            onClick={() => setIsFiltersOpen(true)}
+            endIcon={<ExpandMoreIcon />}
+            size="medium"
+          >
+            Open Filters
+          </Button>
+        )}
+        <div className="flex items-center justify-center gap-1 text-center">
+          <StarIcon color="secondary" fontSize="large" />
+          <Typography fontSize={16} variant="overline">
+            = Highlight Play
+          </Typography>
+        </div>
+        <Plays
+          setIsFiltersOpen={setIsFiltersOpen}
+          scrollToPlayer={scrollToPlayer}
+          player={player}
+          plays={plays}
+          setActivePlay={setActivePlay}
+          setSearchOptions={setSearchOptions}
+          searchOptions={searchOptions}
         />
-      )}
+        {plays && playCount && (
+          <Pagination
+            showFirstButton
+            showLastButton
+            className="mt-6"
+            size="large"
+            variant="text"
+            shape="rounded"
+            count={getNumberOfPages(isMobile, playCount)}
+            page={page}
+            onChange={handlePageChange}
+          />
+        )}
+      </div>
     </div>
   );
 };

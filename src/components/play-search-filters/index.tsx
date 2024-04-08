@@ -33,8 +33,8 @@ const PlaySearchFilters = ({
   };
 
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setSearchOptions({ ...searchOptions, receiver_name: value });
+    const { value, name } = e.target;
+    setSearchOptions({ ...searchOptions, [name]: value });
   };
 
   const handleYourMentionsBtnClick = () => {
@@ -46,6 +46,7 @@ const PlaySearchFilters = ({
       only_highlights: false,
       role: "",
       receiver_name: "",
+      tag: "",
     });
   };
 
@@ -74,27 +75,38 @@ const PlaySearchFilters = ({
           }}
           className="w-full"
           placeholder="Search by mentions..."
-          name="search"
-          autoComplete="search"
-          id="search"
+          name="receiver_name"
+          autoComplete="search-by-mentions"
+          id="search-by-mentions"
           onChange={changeHandler}
           value={searchOptions.receiver_name}
         />
       </div>
-      <FormControl className="w-4/5">
-        <InputLabel>Search by author role...</InputLabel>
-        <Select
-          value={searchOptions.role}
-          onChange={handleChange}
-          label="Search by author role..."
-          name="role"
-          autoWidth
-        >
-          <MenuItem value="">All Notes</MenuItem>
-          <MenuItem value={"coach"}>Coach Notes</MenuItem>
-          <MenuItem value={"player"}>Player Notes</MenuItem>
-        </Select>
-      </FormControl>
+      <div className="flex w-full items-center justify-center gap-2">
+        <TextField
+          className="w-full"
+          placeholder="Search by tags..."
+          name="tag"
+          autoComplete="search-by-tag"
+          id="search-by-tag"
+          onChange={changeHandler}
+          value={searchOptions.tag}
+        />
+        <FormControl className="w-4/5">
+          <InputLabel>Search by author role...</InputLabel>
+          <Select
+            value={searchOptions.role}
+            onChange={handleChange}
+            label="Search by author role..."
+            name="role"
+            autoWidth
+          >
+            <MenuItem value="">All Notes</MenuItem>
+            <MenuItem value={"coach"}>Coach Notes</MenuItem>
+            <MenuItem value={"player"}>Player Notes</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
       <div className="flex items-center justify-center">
         <div className="text-xl font-bold tracking-tight">Highlights only?</div>
         <Checkbox
