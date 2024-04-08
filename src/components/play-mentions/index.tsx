@@ -1,55 +1,40 @@
-import {
-  Checkbox,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  type SelectChangeEvent,
-} from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
+import { SyntheticEvent } from "react";
 import { type PlayerType } from "~/utils/types";
 
 type MentionsProps = {
-  mentions: string[];
-  setMentions: (mentions: string[]) => void;
+  setMentions: (mentions: PlayerType) => void;
   players: PlayerType | null;
 };
 
-const Mentions = ({ mentions, setMentions, players }: MentionsProps) => {
-  const handleChange = (event: SelectChangeEvent<typeof mentions>) => {
-    const {
-      target: { value },
-    } = event;
-    setMentions(typeof value === "string" ? value.split(",") : value);
+const Mentions = ({ setMentions, players }: MentionsProps) => {
+  const handleChange = (
+    event: SyntheticEvent<Element, Event>,
+    newValue: PlayerType,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMentions(newValue);
   };
 
   return (
     players && (
       <div className="w-full">
-        <FormControl className="w-full text-start">
-          <InputLabel>Player Mentions</InputLabel>
-          <Select
-            multiple
-            value={mentions}
-            onChange={handleChange}
-            input={<OutlinedInput label="Player Mentions" />}
-            renderValue={(selected) => selected.join(", ")}
-            multiline={true}
-          >
-            {players.map(
-              (player) =>
-                player.profiles?.name && (
-                  <MenuItem key={player.id} value={player.profiles.name}>
-                    <Checkbox
-                      checked={mentions.indexOf(player.profiles.name) > -1}
-                    />
-                    <ListItemText primary={player.profiles.name} />
-                  </MenuItem>
-                ),
-            )}
-          </Select>
-        </FormControl>
+        <Autocomplete
+          onChange={(event, newValue) => handleChange(event, newValue)}
+          options={players}
+          getOptionLabel={(option) => `${option.profiles?.name}`}
+          filterSelectedOptions
+          multiple
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Player Mentions"
+              placeholder="Mentions..."
+            />
+          )}
+          limitTags={3}
+        />
       </div>
     )
   );

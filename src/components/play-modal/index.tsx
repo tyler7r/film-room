@@ -54,7 +54,7 @@ const PlayModal = ({
     start: null,
     end: null,
   });
-  const [mentions, setMentions] = useState<string[]>([]);
+  const [mentions, setMentions] = useState<PlayerType>([]);
   const [affiliatedPlayers, setAffiliatedPlayers] = useState<PlayerType | null>(
     null,
   );
@@ -162,12 +162,8 @@ const PlayModal = ({
       .single();
     if (data) {
       mentions?.forEach((mention) => {
-        const player = affiliatedPlayers?.find(
-          (v) => v.profiles?.name === mention,
-        );
-        if (player) {
-          void handleMention(player.id, mention, data.id);
-        }
+        const name = mention.profiles?.name;
+        void handleMention(mention.id, `${name}`, data.id);
       });
       playTags.forEach((tag) => {
         void handleTag(data.id, `${tag.id}`);
@@ -264,11 +260,7 @@ const PlayModal = ({
             maxRows={5}
           />
           <PlayTags tags={playTags} setTags={setPlayTags} allTags={tags} />
-          <Mentions
-            players={affiliatedPlayers}
-            mentions={mentions}
-            setMentions={setMentions}
-          />
+          <Mentions players={affiliatedPlayers} setMentions={setMentions} />
           <div className="flex items-center justify-center">
             <div className="text-xl font-bold tracking-tight">
               Highlight Play?

@@ -272,7 +272,10 @@ const Play = ({
             <div className="flex flex-wrap">
               {play.tags.length > 0 &&
                 play.tags.map((tag) => (
-                  <Button onClick={() => handleTagClick(tag.title)}>
+                  <Button
+                    key={tag.title}
+                    onClick={() => handleTagClick(tag.title)}
+                  >
                     #{tag.title}
                   </Button>
                 ))}
