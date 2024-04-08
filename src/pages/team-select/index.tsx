@@ -166,11 +166,7 @@ const TeamSelect = () => {
                 />
               }
               labelPlacement="start"
-              label={
-                <Typography fontSize={12} variant="button" className="text-lg">
-                  Are you a coach?
-                </Typography>
-              }
+              label={<div className="text-lg font-bold">Are you a coach?</div>}
             />
           )}
         </FormControl>
@@ -207,13 +203,7 @@ const TeamSelect = () => {
                 }
                 labelPlacement="start"
                 label={
-                  <Typography
-                    fontSize={12}
-                    variant="button"
-                    className="text-lg"
-                  >
-                    Are you a coach?
-                  </Typography>
+                  <div className="text-lg font-bold">Are you a coach?</div>
                 }
               />
             )}
@@ -233,7 +223,7 @@ const TeamSelect = () => {
             <Button
               type="submit"
               variant="contained"
-              className="mb-1"
+              sx={{ marginBottom: "4px" }}
               disabled={!isValidForm}
             >
               Submit
@@ -245,7 +235,7 @@ const TeamSelect = () => {
               <Button
                 size="small"
                 variant="outlined"
-                className="mt-0"
+                sx={{ marginTop: "0px" }}
                 disabled={!isValidForm}
                 onClick={() => setIsMultipleTeams(true)}
               >
@@ -270,7 +260,7 @@ const TeamSelect = () => {
       </form>
       <FormMessage message={message} />
       <div className="flex items-center justify-center gap-1 p-2">
-        <Typography variant="caption" fontSize="medium" className="">
+        <Typography variant="caption" fontSize="medium">
           Don't see your team's account?
         </Typography>
         <Button
@@ -284,9 +274,7 @@ const TeamSelect = () => {
       </div>
     </div>
   ) : (
-    <Typography className="mt-5 text-center" variant="h1" fontSize={48}>
-      Loading...
-    </Typography>
+    <div className="mt-5 text-center text-5xl">Loading...</div>
   );
 };
 

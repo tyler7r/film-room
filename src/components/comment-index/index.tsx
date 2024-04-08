@@ -1,4 +1,4 @@
-import { Button, Divider, Typography } from "@mui/material";
+import { Button, Divider } from "@mui/material";
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import Comment from "../comment";
@@ -92,18 +92,20 @@ const CommentIndex = ({
           <Button
             disabled={isLoadMoreDisabled}
             onClick={() => void fetchComments()}
-            className="self-center"
+            sx={{ alignSelf: "center" }}
           >
             Load More
           </Button>
         ) : (
-          <Typography className="text-xl font-bold tracking-tight">
-            No comments!
-          </Typography>
+          <div className="text-xl font-bold tracking-tight">No comments!</div>
         )}
       </div>
       {!isActivePlay && (
-        <Divider flexItem className="my-2" variant="middle"></Divider>
+        <Divider
+          flexItem
+          sx={{ marginTop: "8px", marginBottom: "8px" }}
+          variant="middle"
+        ></Divider>
       )}
     </div>
   );

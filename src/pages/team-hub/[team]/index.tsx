@@ -69,12 +69,10 @@ const TeamHub = ({
               width={150}
             />
           ) : (
-            <Typography
-              variant="caption"
-              fontSize={72}
-              fontWeight="bold"
-              className="rounded-full bg-fuchsia-500 p-3 text-white"
-            >{`${team.city.slice(0, 1)}${team.name.slice(0, 1)}`}</Typography>
+            <div className="rounded-full bg-fuchsia-500 p-3 text-4xl text-white">{`${team.city.slice(
+              0,
+              1,
+            )}${team.name.slice(0, 1)}`}</div>
           )}
           <div className="flex flex-col items-center justify-center gap-2 text-center">
             <Typography variant="h1" fontSize={64}>

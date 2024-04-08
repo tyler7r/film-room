@@ -5,7 +5,6 @@ import {
   Divider,
   Modal,
   TextField,
-  Typography,
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -222,15 +221,24 @@ const PlayModal = ({
         <Button
           variant="text"
           size="large"
-          className="absolute right-0 top-0 text-2xl font-bold"
+          sx={{
+            position: "absolute",
+            right: "0",
+            top: "0",
+            fontWeight: "bold",
+            fontSize: "24px",
+            lineHeight: "32px",
+          }}
           onClick={resetPlay}
         >
           X
         </Button>
-        <Divider flexItem variant="middle" className="m-2 mx-16">
-          <Typography className="text-3xl font-bold">
-            CREATE NEW PLAY
-          </Typography>
+        <Divider
+          flexItem
+          variant="middle"
+          sx={{ margin: "8px", marginLeft: "64px", marginRight: "64px" }}
+        >
+          <div className="text-3xl font-bold">CREATE NEW PLAY</div>
         </Divider>
         <form
           onSubmit={handleSubmit}

@@ -31,7 +31,7 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                 variant="contained"
                 size="medium"
                 onClick={logout}
-                className="lg:text-xl"
+                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
               >
                 Logout
               </Button>
@@ -42,7 +42,7 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                 variant="contained"
                 size="medium"
                 onClick={() => router.push("/signup")}
-                className="lg:text-xl"
+                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
               >
                 Signup
               </Button>
@@ -51,14 +51,15 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                 disabled={false}
                 size="medium"
                 onClick={() => router.push("/login")}
-                className="lg:text-xl"
+                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
               >
                 Login
               </Button>
             </div>
           )}
           <Switch
-            className="items-center justify-center lg:text-xl"
+            className="items-center justify-center"
+            sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
             icon={<LightModeIcon color="primary" fontSize="small" />}
             onChange={() => setIsDark(!isDark)}
             checkedIcon={<DarkModeIcon fontSize="small" />}

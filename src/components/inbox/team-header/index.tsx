@@ -1,5 +1,5 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 import { useRouter } from "next/router";
 import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
@@ -15,12 +15,9 @@ const TeamHeader = () => {
       <div className="flex w-full flex-col items-center justify-center gap-1">
         <div className="flex items-center justify-center gap-3">
           <TeamLogo tm={user.currentAffiliation} size={55}></TeamLogo>
-          <Typography
-            variant="h5"
-            className="text-lg font-bold md:text-2xl lg:text-4xl"
-          >
+          <div className="text-xl font-bold md:text-2xl lg:text-4xl">
             {user.currentAffiliation.team.full_name}
-          </Typography>
+          </div>
         </div>
         <Button
           endIcon={<ArrowForwardIcon />}
@@ -28,7 +25,7 @@ const TeamHeader = () => {
             void router.push(`/team-hub/${user.currentAffiliation?.team.id}`);
             setIsOpen(false);
           }}
-          className="lg:text-lg"
+          sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
         >
           Go to Team Hub
         </Button>

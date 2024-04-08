@@ -1,4 +1,3 @@
-import { Typography } from "@mui/material";
 import type { YouTubePlayer } from "react-youtube";
 import type { PlayIndexType, PlayType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
@@ -39,9 +38,9 @@ const Plays = ({
       ))}
     </div>
   ) : (
-    <Typography className="text-center text-2xl font-bold tracking-tight">
+    <div className="text-center text-2xl font-bold tracking-tight">
       Play directory is empty!
-    </Typography>
+    </div>
   );
 };
 

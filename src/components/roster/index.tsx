@@ -95,12 +95,7 @@ const Roster = ({ team, role }: RosterProps) => {
         Roster
       </Typography>
       {!roster && (
-        <Typography
-          variant="button"
-          fontSize={14}
-          style={backgroundStyle}
-          className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
-        >
+        <Typography variant="button" fontSize={14} style={backgroundStyle}>
           No Active Player Accounts
         </Typography>
       )}
