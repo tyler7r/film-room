@@ -12,6 +12,8 @@ export type Database = {
       affiliations: {
         Row: {
           id: string
+          last_watched: string | null
+          last_watched_time: number | null
           number: number | null
           role: string
           team_id: string
@@ -20,6 +22,8 @@ export type Database = {
         }
         Insert: {
           id?: string
+          last_watched?: string | null
+          last_watched_time?: number | null
           number?: number | null
           role?: string
           team_id: string
@@ -28,6 +32,8 @@ export type Database = {
         }
         Update: {
           id?: string
+          last_watched?: string | null
+          last_watched_time?: number | null
           number?: number | null
           role?: string
           team_id?: string
@@ -54,6 +60,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_affiliations_last_watched_fkey"
+            columns: ["last_watched"]
+            isOneToOne: false
+            referencedRelation: "videos"
             referencedColumns: ["id"]
           },
         ]

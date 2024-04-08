@@ -3,17 +3,34 @@ import { Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
 import TeamLogo from "../team-logo";
 
 type VideoProps = {
   video: VideoType | null;
+  startTime?: string | null;
 };
 
-const Video = ({ video }: VideoProps) => {
+const Video = ({ video, startTime }: VideoProps) => {
   const { backgroundStyle, isDark } = useIsDarkContext();
   const { user } = useAuthContext();
   const router = useRouter();
+
+  const handleClick = async (id: string) => {
+    if (!startTime) {
+      await supabase
+        .from("affiliations")
+        .update({
+          last_watched: id,
+          last_watched_time: 0,
+        })
+        .eq("id", `${user.currentAffiliation?.affId}`);
+      router.push(`/film-room/${id}`);
+    } else {
+      router.push(`/film-room/${id}?start=${startTime}`);
+    }
+  };
 
   return (
     video && (
@@ -23,7 +40,7 @@ const Video = ({ video }: VideoProps) => {
         className={`${
           isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
         } flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 px-10 transition ease-in-out hover:rounded-sm hover:border-solid hover:delay-100`}
-        onClick={() => router.push(`/film-room/${video.id}`)}
+        onClick={() => handleClick(video.id)}
       >
         <Typography
           color={isDark ? `white` : `black`}

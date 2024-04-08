@@ -70,7 +70,7 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
   useEffect(() => {
     if (user.isLoggedIn) {
       void fetchAffiliations();
-    } else setAffiliations(undefined);
+    }
   }, [user.isLoggedIn]);
 
   return (

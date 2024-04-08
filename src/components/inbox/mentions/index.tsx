@@ -69,6 +69,16 @@ const InboxMentions = () => {
     };
   }, []);
 
+  const updateLastWatched = async (video: string, time: number) => {
+    await supabase
+      .from("affiliations")
+      .update({
+        last_watched: video,
+        last_watched_time: time,
+      })
+      .eq("id", `${user.currentAffiliation?.affId}`);
+  };
+
   const handleClick = (
     videoId: string | undefined,
     playId: string,
@@ -78,6 +88,7 @@ const InboxMentions = () => {
     if (videoId && start) {
       params.set("play", playId);
       params.set("start", `${start}`);
+      void updateLastWatched(videoId, start);
     }
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);

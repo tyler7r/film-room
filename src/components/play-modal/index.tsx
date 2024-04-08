@@ -142,6 +142,16 @@ const PlayModal = ({
     });
   };
 
+  const updateLastWatched = async () => {
+    await supabase
+      .from("affiliations")
+      .update({
+        last_watched: videoId,
+        last_watched_time: playDetails.end,
+      })
+      .eq("id", `${user.currentAffiliation?.affId}`);
+  };
+
   const createPlay = async () => {
     const { data } = await supabase
       .from("plays")
@@ -167,6 +177,7 @@ const PlayModal = ({
       playTags.forEach((tag) => {
         void handleTag(data.id, `${tag.id}`);
       });
+      void updateLastWatched();
       void resetPlay();
     }
   };

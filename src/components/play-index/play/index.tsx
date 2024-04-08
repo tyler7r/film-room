@@ -25,6 +25,7 @@ type PlayProps = {
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
   setIsFiltersOpen: (isFiltersOpen: boolean) => void;
+  videoId: string;
 };
 
 const Play = ({
@@ -36,6 +37,7 @@ const Play = ({
   searchOptions,
   setSearchOptions,
   setIsFiltersOpen,
+  videoId,
 }: PlayProps) => {
   const { backgroundStyle, isDark } = useIsDarkContext();
   const { user } = useAuthContext();
@@ -58,9 +60,20 @@ const Play = ({
 
   const open = Boolean(anchorEl);
 
+  const updateLastWatched = async (time: number) => {
+    await supabase
+      .from("affiliations")
+      .update({
+        last_watched: videoId,
+        last_watched_time: time,
+      })
+      .eq("id", `${user.currentAffiliation?.affId}`);
+  };
+
   const handleClick = async (playTime: number, play: PlayType) => {
     scrollToPlayer();
     void player?.seekTo(playTime, true);
+    void updateLastWatched(playTime);
     setActivePlay(play);
   };
 
