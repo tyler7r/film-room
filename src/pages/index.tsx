@@ -34,7 +34,7 @@ export default function Home() {
       .select("last_watched, last_watched_time, videos(*)")
       .eq("id", `${user.currentAffiliation?.affId}`)
       .single();
-    if (data && data.last_watched) setLastWatched(data);
+    if (data?.last_watched) setLastWatched(data);
     else setLastWatched(null);
   };
 

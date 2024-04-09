@@ -26,9 +26,9 @@ const Video = ({ video, startTime }: VideoProps) => {
           last_watched_time: 0,
         })
         .eq("id", `${user.currentAffiliation?.affId}`);
-      router.push(`/film-room/${id}`);
+      void router.push(`/film-room/${id}`);
     } else {
-      router.push(`/film-room/${id}?start=${startTime}`);
+      void router.push(`/film-room/${id}?start=${startTime}`);
     }
   };
 
