@@ -157,7 +157,7 @@ const Comment = ({ comment }: CommentProps) => {
           </div>
         ) : (
           <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
-            <DeleteIcon color="error" />
+            <DeleteIcon color="action" />
           </IconButton>
         ))}
       {likeList && (

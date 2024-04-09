@@ -87,7 +87,6 @@ const InboxMentions = () => {
     start: number | undefined,
   ) => {
     const params = new URLSearchParams(searchParams);
-    console.log(videoId, start);
     if (videoId && typeof start === "number") {
       params.set("play", playId);
       params.set("start", `${start}`);
@@ -102,7 +101,7 @@ const InboxMentions = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-4">
       <div className="text-2xl font-bold lg:mb-2 lg:text-3xl">
         Recent Mentions
       </div>
