@@ -15,6 +15,7 @@ import {
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { divisions, isValidYoutubeLink, proDivs } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type {
@@ -28,6 +29,7 @@ import TeamMentions from "../team-mentions";
 const AddVideo = () => {
   const router = useRouter();
   const { user } = useAuthContext();
+  const { backgroundStyle } = useIsDarkContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<MessageType>({
     status: "error",
@@ -196,10 +198,11 @@ const AddVideo = () => {
   return isOpen ? (
     <Modal open={isOpen} onClose={reset}>
       <Box
-        className="border-1 inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid bg-white p-4"
-        sx={{
-          position: "relative",
-        }}
+        className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid p-4"
+        // sx={{
+        //   position: "relative",
+        // }}
+        sx={backgroundStyle}
       >
         <Button
           variant="text"
