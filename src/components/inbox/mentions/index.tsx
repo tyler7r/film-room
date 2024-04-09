@@ -70,13 +70,15 @@ const InboxMentions = () => {
   }, []);
 
   const updateLastWatched = async (video: string, time: number) => {
-    await supabase
+    const { data } = await supabase
       .from("affiliations")
       .update({
         last_watched: video,
         last_watched_time: time,
       })
-      .eq("id", `${user.currentAffiliation?.affId}`);
+      .eq("id", `${user.currentAffiliation?.affId}`)
+      .select();
+    console.log(data);
   };
 
   const handleClick = (
@@ -85,7 +87,8 @@ const InboxMentions = () => {
     start: number | undefined,
   ) => {
     const params = new URLSearchParams(searchParams);
-    if (videoId && start) {
+    console.log(videoId, start);
+    if (videoId && typeof start === "number") {
       params.set("play", playId);
       params.set("start", `${start}`);
       void updateLastWatched(videoId, start);

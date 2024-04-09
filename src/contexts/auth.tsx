@@ -7,6 +7,7 @@ import {
 } from "react";
 import { supabase } from "~/utils/supabase";
 import { type UserSession } from "~/utils/types";
+import { useAffiliatedContext } from "./affiliations";
 
 type AuthProps = {
   children: ReactNode;
@@ -29,6 +30,7 @@ export const isAuthContext = createContext<AuthContextProps>({
 });
 
 export const IsAuth = ({ children }: AuthProps) => {
+  const { setAffiliations } = useAffiliatedContext();
   const [user, setUser] = useState<UserSession>({
     isLoggedIn: false,
     userId: undefined,
@@ -53,8 +55,8 @@ export const IsAuth = ({ children }: AuthProps) => {
           setUser({
             isLoggedIn: false,
             userId: undefined,
-            email: session.user.email,
-            name: session.user.user_metadata.name as string,
+            email: undefined,
+            name: undefined,
             currentAffiliation: undefined,
           });
         } else {
@@ -65,6 +67,7 @@ export const IsAuth = ({ children }: AuthProps) => {
             name: undefined,
             currentAffiliation: undefined,
           });
+          setAffiliations(undefined);
         }
       },
     );

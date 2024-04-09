@@ -239,7 +239,6 @@ const CreateTeam = () => {
         >
           {imagePreview === "" ? "Upload Logo" : "Change Logo"}
           <input
-            onClick={() => console.log("clicked")}
             id="file_upload"
             type="file"
             onChange={(e) => {

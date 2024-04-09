@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import TeamLogo from "~/components/team-logo";
 import Video from "~/components/video";
+import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 
@@ -22,6 +24,7 @@ type LastWatchedType = {
 
 export default function Home() {
   const { user } = useAuthContext();
+  const { affiliations } = useAffiliatedContext();
   const [lastWatched, setLastWatched] = useState<LastWatchedType | null>(null);
 
   const fetchLastWatched = async () => {
@@ -30,24 +33,46 @@ export default function Home() {
       .select("last_watched, last_watched_time, videos(*)")
       .eq("id", `${user.currentAffiliation?.affId}`)
       .single();
-    if (data) setLastWatched(data);
+    if (data && data.last_watched) setLastWatched(data);
+    else setLastWatched(null);
   };
 
   useEffect(() => {
-    void fetchLastWatched();
+    if (user.currentAffiliation?.affId) void fetchLastWatched();
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center p-4">
-      <div className="text-5xl tracking-wide">Hello {user.name}!</div>
+    <div className="flex flex-col items-center justify-center gap-8 p-4">
+      <div className="text-5xl tracking-wide">
+        Hello {user.name ? user.name : "Fellow Film Fanatic"}!
+      </div>
       {lastWatched && (
-        <div>
-          <div>Continue Watching</div>
+        <div className="flex w-11/12 flex-col items-center justify-center gap-2">
+          <div className="text-xl font-bold">Continue Watching</div>
           <Video
             video={lastWatched.videos}
             startTime={`${lastWatched.last_watched_time}`}
           />
         </div>
+      )}
+      <div className="text-xl font-bold">Your Team Affiliations</div>
+      {affiliations ? (
+        <div className="flex flex-wrap gap-4">
+          {affiliations.map((aff) => (
+            <div
+              className="flex items-center justify-center gap-2"
+              key={aff.affId}
+            >
+              <TeamLogo tm={aff.team} />
+              <div className="text-xl font-bold">{aff.team.full_name}</div>
+              {aff.team.id === user.currentAffiliation?.team.id && (
+                <div>ACTIVE</div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div>No current affiliations</div>
       )}
     </div>
   );
