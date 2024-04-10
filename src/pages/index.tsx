@@ -1,10 +1,15 @@
+import AddIcon from "@mui/icons-material/Add";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { Button } from "@mui/material";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TeamLogo from "~/components/team-logo";
 import Video from "~/components/video";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
+import { TeamAffiliationType } from "~/utils/types";
+import { useIsDarkContext } from "./_app";
 
 type LastWatchedType = {
   last_watched: string | null;
@@ -24,8 +29,10 @@ type LastWatchedType = {
 };
 
 export default function Home() {
-  const { user } = useAuthContext();
+  const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
+  const { backgroundStyle, isDark } = useIsDarkContext();
+  const router = useRouter();
   const [lastWatched, setLastWatched] = useState<LastWatchedType | null>(null);
 
   const fetchLastWatched = async () => {
@@ -38,14 +45,27 @@ export default function Home() {
     else setLastWatched(null);
   };
 
+  const handleTeamClick = (aff: TeamAffiliationType) => {
+    setUser({ ...user, currentAffiliation: aff });
+    void router.push(`/team-hub/${aff.team.id}`);
+  };
+
+  const handleAddNewClick = (userId: string | undefined) => {
+    if (userId) {
+      void router.push(`/team-select`);
+    } else {
+      void router.push(`/signup`);
+    }
+  };
+
   useEffect(() => {
     if (user.currentAffiliation?.affId) void fetchLastWatched();
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-8 p-4">
-      <div className="text-5xl tracking-wide">
-        Hello {user.name ? user.name : "Fellow Film Fanatic"}!
+    <div className="mt-2 flex flex-col items-center justify-center gap-8 p-4">
+      <div className="text-6xl tracking-wide">
+        Hello {user.name ? user.name : "Guest"}!
       </div>
       {lastWatched && (
         <div className="flex w-11/12 flex-col items-center justify-center gap-3">
@@ -59,28 +79,44 @@ export default function Home() {
           />
         </div>
       )}
-      <div className="flex flex-col items-center justify-center gap-3">
-        <div className="text-xl font-bold">Your Team Affiliations</div>
+      <div className="flex flex-col items-center justify-center gap-4">
+        <div className="text-2xl font-bold">Your Team Affiliations</div>
         {affiliations ? (
           <div className="flex flex-wrap gap-6">
             {affiliations.map((aff) => (
               <div
-                className="flex items-center justify-center gap-2"
+                className={`flex cursor-pointer items-center justify-center gap-2 rounded-sm border-2 border-solid border-transparent p-4 px-6 transition ease-in-out hover:rounded-md hover:border-solid ${
+                  isDark
+                    ? "hover:border-purple-400"
+                    : "hover:border-purple-A400"
+                } hover:delay-100`}
                 key={aff.affId}
+                style={backgroundStyle}
+                onClick={() => handleTeamClick(aff)}
               >
-                <TeamLogo tm={aff.team} />
+                <TeamLogo tm={aff.team} size={60} />
                 <div className="flex flex-col items-center justify-center">
                   <div className="text-2xl font-bold">{aff.team.full_name}</div>
                   {aff.team.id === user.currentAffiliation?.team.id && (
-                    <div className="text-xs">ACTIVE</div>
+                    <div className="text-sm">ACTIVE</div>
                   )}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div>No current affiliations</div>
+          <div className="text-lg">No team affiliations!</div>
         )}
+        <Button
+          size="large"
+          sx={{ fontSize: "18px", lineHeight: "24px" }}
+          startIcon={<AddIcon />}
+          onClick={() => {
+            handleAddNewClick(user.userId);
+          }}
+        >
+          Add New Affiliation
+        </Button>
       </div>
     </div>
   );
