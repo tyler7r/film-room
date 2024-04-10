@@ -70,7 +70,7 @@ const InboxMentions = () => {
   }, []);
 
   const updateLastWatched = async (video: string, time: number) => {
-    const { data } = await supabase
+    await supabase
       .from("affiliations")
       .update({
         last_watched: video,
@@ -78,7 +78,6 @@ const InboxMentions = () => {
       })
       .eq("id", `${user.currentAffiliation?.affId}`)
       .select();
-    console.log(data);
   };
 
   const handleClick = (

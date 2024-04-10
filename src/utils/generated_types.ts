@@ -385,39 +385,39 @@ export type Database = {
       }
       plays: {
         Row: {
+          author_id: string
           author_name: string
           author_role: string
           end_time: number
           highlight: boolean
           id: string
           note: string
-          profile_id: string | null
           start_time: number
           team_id: string
           title: string
           video_id: string
         }
         Insert: {
+          author_id: string
           author_name: string
           author_role: string
           end_time: number
           highlight?: boolean
           id?: string
           note: string
-          profile_id?: string | null
           start_time: number
           team_id: string
           title: string
           video_id: string
         }
         Update: {
+          author_id?: string
           author_name?: string
           author_role?: string
           end_time?: number
           highlight?: boolean
           id?: string
           note?: string
-          profile_id?: string | null
           start_time?: number
           team_id?: string
           title?: string
@@ -425,17 +425,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "plays_profile_id_fkey"
-            columns: ["profile_id"]
+            foreignKeyName: "public_plays_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: "p_likes"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "plays_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "affiliations"
             referencedColumns: ["id"]
           },
           {
@@ -511,19 +504,16 @@ export type Database = {
       }
       team_videos: {
         Row: {
-          exclusive_to: string | null
           team_id: string
           uploaded_at: string
           video_id: string
         }
         Insert: {
-          exclusive_to?: string | null
           team_id?: string
           uploaded_at?: string
           video_id?: string
         }
         Update: {
-          exclusive_to?: string | null
           team_id?: string
           uploaded_at?: string
           video_id?: string

@@ -1,12 +1,12 @@
 import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import Video from "../video";
 
 export type TeamVideoType = {
-  exclusive_to: string | null;
   video: {
     division: string;
     exclusive_to: string | null;
@@ -27,6 +27,7 @@ type TeamVideosProps = {
 
 const TeamVideos = ({ teamId }: TeamVideosProps) => {
   const { isMobile } = useMobileContext();
+  const { user } = useAuthContext();
   const [page, setPage] = useState<number>(1);
 
   const [videos, setVideos] = useState<TeamVideoType | null>(null);
@@ -36,10 +37,14 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
     const { from, to } = getFromAndTo();
     const { data, count } = await supabase
       .from("team_videos")
-      .select(`exclusive_to, uploaded_at, video:videos!inner(*)`, {
+      .select(`uploaded_at, video:videos!inner(*)`, {
         count: "exact",
       })
-      .eq("team_id", teamId)
+      .match({ team_id: teamId })
+      .or(
+        `private.eq.false, exclusive_to.eq.${teamId}, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
+        { referencedTable: "videos" },
+      )
       .order("uploaded_at", { ascending: false })
       .range(from, to);
     if (data && data.length > 0) setVideos(data);

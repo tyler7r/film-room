@@ -4,6 +4,7 @@ import { Button } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TeamLogo from "~/components/team-logo";
+import UserStats from "~/components/user-stats";
 import Video from "~/components/video";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
@@ -46,8 +47,11 @@ export default function Home() {
   };
 
   const handleTeamClick = (aff: TeamAffiliationType) => {
-    setUser({ ...user, currentAffiliation: aff });
-    void router.push(`/team-hub/${aff.team.id}`);
+    if (aff.team.id === user.currentAffiliation?.team.id) {
+      void router.push(`/team-hub/${aff.team.id}`);
+    } else {
+      setUser({ ...user, currentAffiliation: aff });
+    }
   };
 
   const handleAddNewClick = (userId: string | undefined) => {
@@ -59,17 +63,18 @@ export default function Home() {
   };
 
   useEffect(() => {
+    console.log("run");
     if (user.currentAffiliation?.affId) void fetchLastWatched();
-  }, []);
+  }, [user]);
 
   return (
     <div className="mt-2 flex flex-col items-center justify-center gap-8 p-4">
-      <div className="text-6xl tracking-wide">
+      <div className="text-center text-6xl tracking-wide">
         Hello {user.name ? user.name : "Guest"}!
       </div>
       {lastWatched && (
         <div className="flex w-11/12 flex-col items-center justify-center gap-3">
-          <div className="flex items-center gap-2 text-xl font-bold">
+          <div className="flex items-center gap-2 text-2xl font-bold">
             <PlayArrowIcon />
             <div>Continue Watching</div>
           </div>
@@ -82,7 +87,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center gap-4">
         <div className="text-2xl font-bold">Your Team Affiliations</div>
         {affiliations ? (
-          <div className="flex flex-wrap gap-6">
+          <div className="align-center flex flex-wrap justify-center gap-6">
             {affiliations.map((aff) => (
               <div
                 className={`flex cursor-pointer items-center justify-center gap-2 rounded-sm border-2 border-solid border-transparent p-4 px-6 transition ease-in-out hover:rounded-md hover:border-solid ${
@@ -94,7 +99,7 @@ export default function Home() {
                 style={backgroundStyle}
                 onClick={() => handleTeamClick(aff)}
               >
-                <TeamLogo tm={aff.team} size={60} />
+                <TeamLogo tm={aff.team} size={55} />
                 <div className="flex flex-col items-center justify-center">
                   <div className="text-2xl font-bold">{aff.team.full_name}</div>
                   {aff.team.id === user.currentAffiliation?.team.id && (
@@ -118,6 +123,7 @@ export default function Home() {
           Add New Affiliation
         </Button>
       </div>
+      <UserStats />
     </div>
   );
 }

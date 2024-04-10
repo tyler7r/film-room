@@ -159,7 +159,7 @@ const PlayModal = ({
       .from("plays")
       .insert({
         team_id: `${user.currentAffiliation?.team.id}`,
-        profile_id: user.userId,
+        author_id: `${user.currentAffiliation?.affId}`,
         video_id: videoId,
         highlight: playDetails.highlight,
         title: playDetails.title,

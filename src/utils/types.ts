@@ -59,7 +59,7 @@ export type VideoType = {
 };
 
 export type PlayIndexType = {
-  profile_id: string | null;
+  author_id: string | null;
   video_id: string | null;
   highlight: boolean;
   id: string;
@@ -79,7 +79,7 @@ export type PlayIndexType = {
 }[];
 
 export type PlayType = {
-  profile_id: string | null;
+  author_id: string | null;
   video_id: string | null;
   highlight: boolean;
   id: string;

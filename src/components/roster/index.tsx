@@ -49,7 +49,8 @@ const Roster = ({ team, role }: RosterProps) => {
         team_id: team?.id,
         role: "player",
         verified: true,
-      });
+      })
+      .order("number");
     if (data && data.length > 0) {
       const roster: RosterType[] = data?.map((p) => {
         return { id: p.user_id, name: p.profiles?.name, num: p.number };
@@ -100,7 +101,7 @@ const Roster = ({ team, role }: RosterProps) => {
           No Active Player Accounts
         </Typography>
       )}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-4">
         {role === "player" &&
           roster?.map((p) => <Player key={p.id} player={p} />)}
         {role !== "player" &&
