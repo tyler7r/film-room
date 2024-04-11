@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType } from "~/utils/types";
 import Mentions from "../play-mentions";
@@ -45,6 +46,7 @@ const PlayModal = ({
 }: PlayModalProps) => {
   const router = useRouter();
   const { user } = useAuthContext();
+  const { backgroundStyle } = useIsDarkContext();
   const [isPlayStarted, setIsPlayStarted] = useState(false);
   const [playDetails, setPlayDetails] = useState<PlayType>({
     title: "",
@@ -142,12 +144,22 @@ const PlayModal = ({
     });
   };
 
+  const updateLastWatched = async () => {
+    await supabase
+      .from("affiliations")
+      .update({
+        last_watched: videoId,
+        last_watched_time: playDetails.end,
+      })
+      .eq("id", `${user.currentAffiliation?.affId}`);
+  };
+
   const createPlay = async () => {
     const { data } = await supabase
       .from("plays")
       .insert({
         team_id: `${user.currentAffiliation?.team.id}`,
-        profile_id: user.userId,
+        author_id: `${user.currentAffiliation?.affId}`,
         video_id: videoId,
         highlight: playDetails.highlight,
         title: playDetails.title,
@@ -167,6 +179,7 @@ const PlayModal = ({
       playTags.forEach((tag) => {
         void handleTag(data.id, `${tag.id}`);
       });
+      void updateLastWatched();
       void resetPlay();
     }
   };
@@ -217,7 +230,10 @@ const PlayModal = ({
 
   return isPlayModalOpen ? (
     <Modal open={isPlayModalOpen} onClose={resetPlay}>
-      <Box className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid bg-white p-4">
+      <Box
+        className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid p-4"
+        sx={backgroundStyle}
+      >
         <Button
           variant="text"
           size="large"

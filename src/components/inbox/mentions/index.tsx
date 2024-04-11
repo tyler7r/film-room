@@ -69,15 +69,27 @@ const InboxMentions = () => {
     };
   }, []);
 
+  const updateLastWatched = async (video: string, time: number) => {
+    await supabase
+      .from("affiliations")
+      .update({
+        last_watched: video,
+        last_watched_time: time,
+      })
+      .eq("id", `${user.currentAffiliation?.affId}`)
+      .select();
+  };
+
   const handleClick = (
     videoId: string | undefined,
     playId: string,
     start: number | undefined,
   ) => {
     const params = new URLSearchParams(searchParams);
-    if (videoId && start) {
+    if (videoId && typeof start === "number") {
       params.set("play", playId);
       params.set("start", `${start}`);
+      void updateLastWatched(videoId, start);
     }
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
@@ -88,7 +100,7 @@ const InboxMentions = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-4">
       <div className="text-2xl font-bold lg:mb-2 lg:text-3xl">
         Recent Mentions
       </div>

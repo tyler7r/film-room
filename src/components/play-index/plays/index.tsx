@@ -11,6 +11,7 @@ type PlaysProps = {
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
   setIsFiltersOpen: (isFiltersOpen: boolean) => void;
+  videoId: string;
 };
 
 const Plays = ({
@@ -21,6 +22,7 @@ const Plays = ({
   searchOptions,
   setSearchOptions,
   setIsFiltersOpen,
+  videoId,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
     <div className="flex w-11/12 flex-col justify-center gap-4">
@@ -34,6 +36,7 @@ const Plays = ({
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
           setIsFiltersOpen={setIsFiltersOpen}
+          videoId={videoId}
         />
       ))}
     </div>

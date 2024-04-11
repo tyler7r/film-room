@@ -48,9 +48,14 @@ const TeamPageButton = () => {
             onClick={() => handleItemClick(aff)}
           >
             <TeamLogo tm={aff.team} size={35} />
-            <Typography variant="overline" fontWeight="bold" fontSize="small">
-              {aff.team.full_name}
-            </Typography>
+            <div className="flex flex-col">
+              <Typography variant="overline" fontWeight="bold" fontSize="small">
+                {aff.team.full_name}
+              </Typography>
+              {aff.team.id === user.currentAffiliation?.team.id && (
+                <div className="text-center text-xs">ACTIVE</div>
+              )}
+            </div>
           </MenuItem>
         ))}
         <MenuItem

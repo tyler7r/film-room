@@ -143,6 +143,7 @@ const PlayIndex = ({
             setActivePlay={setActivePlay}
             searchOptions={searchOptions}
             setSearchOptions={setSearchOptions}
+            videoId={videoId}
           />
           <Divider
             sx={{ marginTop: "16px", marginBottom: "16px" }}
@@ -191,6 +192,7 @@ const PlayIndex = ({
           setActivePlay={setActivePlay}
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
+          videoId={videoId}
         />
         {plays && playCount && (
           <Pagination

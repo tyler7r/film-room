@@ -31,7 +31,6 @@ const AddComment = ({ playId }: CommentProps) => {
       })
       .select();
     if (data) {
-      console.log(data);
       setComment("");
     }
   };
