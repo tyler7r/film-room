@@ -4,12 +4,11 @@ import { Button } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TeamLogo from "~/components/team-logo";
-import UserStats from "~/components/user-stats";
 import Video from "~/components/video";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { TeamAffiliationType } from "~/utils/types";
+import type { TeamAffiliationType } from "~/utils/types";
 import { useIsDarkContext } from "./_app";
 
 type LastWatchedType = {
@@ -123,7 +122,6 @@ export default function Home() {
           Add New Affiliation
         </Button>
       </div>
-      <UserStats />
     </div>
   );
 }
