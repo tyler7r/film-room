@@ -7,23 +7,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-
-export type RealMentionType = {
-  author_name: string;
-  created_at: string;
-  highlight: boolean;
-  play_id: string;
-  play_title: string;
-  private: boolean;
-  receiver_id: string;
-  team_id: string;
-  title: string;
-  video_id: string;
-  team: {
-    logo: string | null;
-    full_name: string;
-  } | null;
-}[];
+import type { RealMentionType } from "~/utils/types";
 
 const InboxMentions = () => {
   const { user } = useAuthContext();
@@ -39,8 +23,8 @@ const InboxMentions = () => {
   const fetchMentions = async () => {
     const { from, to } = getFromAndTo();
     const { data, count } = await supabase
-      .from("real_mentions")
-      .select(`*, team: teams!affiliations_team_id_fkey(full_name, logo)`, {
+      .from("mentions_view")
+      .select(`*, team: teams!affiliations_team_id_fkey(*)`, {
         count: "exact",
       })
       .eq("receiver_id", `${user.userId}`)
@@ -51,7 +35,6 @@ const InboxMentions = () => {
       setMentionCount(count);
       if (to >= count - 1) setIsBtnDisabled(true);
     }
-    console.log(data);
     if (data) setMentions(mentions ? [...mentions, ...data] : data);
     if (data?.length === 0) setIsBtnDisabled(true);
   };
@@ -115,7 +98,7 @@ const InboxMentions = () => {
         Recent Mentions
       </div>
       <div className="flex flex-col gap-5 md:px-2 lg:px-4">
-        {mentions?.map((mention: any) => (
+        {mentions?.map((mention) => (
           <div
             key={mention.play_id + mention.created_at}
             onClick={() =>
@@ -134,12 +117,12 @@ const InboxMentions = () => {
                 <PublicIcon fontSize="small" />
               </div>
             )}
-            {mention.private && user.currentAffiliation && (
+            {mention.private && mention.team && (
               <div className="justify mb-1 flex items-center justify-center gap-2">
                 <div className="lg:text-md text-sm tracking-tighter">
                   PRIVATE TO:{" "}
                 </div>
-                <TeamLogo tm={user.currentAffiliation.team} size={20} />
+                <TeamLogo tm={mention.team} size={20} />
               </div>
             )}
             <div className="text-center text-lg lg:text-start lg:text-xl">

@@ -64,10 +64,19 @@ const PlayModal = ({
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   const fetchAffiliatedPlayers = async () => {
+    // const { data } = await supabase
+    //   .from("affiliations")
+    //   .select(`id, profiles (name)`)
+    //   .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
     const { data } = await supabase
-      .from("affiliations")
-      .select(`id, profiles (name)`)
-      .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
+      .from("player_view")
+      .select()
+      .match({
+        team_id: user.currentAffiliation?.team.id,
+        role: "player",
+        verified: true,
+      });
+    console.log(data);
     if (data) setAffiliatedPlayers(data);
   };
 
@@ -173,8 +182,7 @@ const PlayModal = ({
       .single();
     if (data) {
       mentions?.forEach((mention) => {
-        const name = mention.profiles?.name;
-        void handleMention(mention.id, `${name}`, data.id);
+        void handleMention(mention.id, mention.name, data.id);
       });
       playTags.forEach((tag) => {
         void handleTag(data.id, `${tag.id}`);

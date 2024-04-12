@@ -2,10 +2,10 @@ import { Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { type TeamHubType } from "~/utils/types";
+import { type TeamType } from "~/utils/types";
 
 type RequestsProps = {
-  team: TeamHubType;
+  team: TeamType | null;
 };
 
 type RequestType = {

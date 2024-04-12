@@ -23,7 +23,7 @@ const Mentions = ({ setMentions, players }: MentionsProps) => {
         <Autocomplete
           onChange={(event, newValue) => handleChange(event, newValue)}
           options={players}
-          getOptionLabel={(option) => `${option.profiles?.name}`}
+          getOptionLabel={(option) => `${option.name}`}
           filterSelectedOptions
           multiple
           renderInput={(params) => (

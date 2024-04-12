@@ -8,12 +8,12 @@ import TeamLogo from "~/components/team-logo";
 import TeamVideos from "~/components/team-videos";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { type TeamHubType } from "~/utils/types";
+import { type TeamType } from "~/utils/types";
 
 const TeamHub = () => {
   const router = useRouter();
   const { user } = useAuthContext();
-  const [team, setTeam] = useState<TeamHubType | null>(null);
+  const [team, setTeam] = useState<TeamType | null>(null);
 
   const role =
     team?.owner === user.userId ? "owner" : user.currentAffiliation?.role ?? "";

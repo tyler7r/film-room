@@ -3,11 +3,11 @@ import { Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { type TeamHubType } from "~/utils/types";
+import { type TeamType } from "~/utils/types";
 import Player from "../player";
 
 type RosterProps = {
-  team: TeamHubType;
+  team: TeamType | null;
   role: string;
 };
 

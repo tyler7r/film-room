@@ -2,11 +2,11 @@ import { Button, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { type MessageType, type TeamHubType } from "~/utils/types";
+import { type MessageType, type TeamType } from "~/utils/types";
 import FormMessage from "../form-message";
 
 type AnnouncementProps = {
-  team: TeamHubType;
+  team: TeamType | null;
   toggleOpen: (modal: string, open: boolean) => void;
 };
 
