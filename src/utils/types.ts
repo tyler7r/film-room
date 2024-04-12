@@ -1,3 +1,44 @@
+import { MergeDeep } from "type-fest";
+import { Database as GeneratedDatabase } from "./generated_types";
+
+export type Database = MergeDeep<
+  GeneratedDatabase,
+  {
+    public: {
+      Views: {
+        mention_filter: {
+          Row: {
+            author_name: string;
+            created_at: string;
+            highlight: boolean;
+            play_id: string;
+            play_title: string;
+            receiver_name: string;
+            start_time: number;
+            team_id: string;
+            user_id: string;
+            video_id: string;
+          };
+        };
+        real_mentions: {
+          Row: {
+            author_name: string;
+            created_at: string;
+            highlight: boolean;
+            play_id: string;
+            play_title: string;
+            private: boolean;
+            receiver_id: string;
+            team_id: string;
+            title: string;
+            video_id: string;
+          };
+        };
+      };
+    };
+  }
+>;
+
 export type TeamAffiliationType = {
   team: {
     id: string;

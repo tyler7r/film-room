@@ -743,17 +743,25 @@ export type Database = {
     Views: {
       mention_filter: {
         Row: {
-          author_name: string;
-          created_at: string;
-          highlight: boolean;
-          play_id: string;
-          play_title: string;
-          receiver_name: string;
-          start_time: number;
-          user_id: string;
-          video_id: string;
+          author_name: string | null;
+          created_at: string | null;
+          highlight: boolean | null;
+          play_id: string | null;
+          play_title: string | null;
+          receiver_name: string | null;
+          start_time: number | null;
+          team_id: string | null;
+          user_id: string | null;
+          video_id: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "affiliations_team_id_fkey";
+            columns: ["team_id"];
+            isOneToOne: false;
+            referencedRelation: "teams";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "affiliations_user_id_fkey";
             columns: ["user_id"];
@@ -809,31 +817,30 @@ export type Database = {
       };
       real_mentions: {
         Row: {
-          author_name: string;
-          created_at: string;
-          exclusive_to: string | null;
-          highlight: boolean;
-          start_time: number;
-          play_id: string;
-          play_title: string;
-          private: boolean;
-          receiver_id: string;
-          title: string;
-          video_id: string;
+          author_name: string | null;
+          created_at: string | null;
+          highlight: boolean | null;
+          play_id: string | null;
+          play_title: string | null;
+          private: boolean | null;
+          receiver_id: string | null;
+          team_id: string | null;
+          title: string | null;
+          video_id: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "affiliations_team_id_fkey";
+            columns: ["team_id"];
+            isOneToOne: false;
+            referencedRelation: "teams";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "profiles_id_fkey";
             columns: ["receiver_id"];
             isOneToOne: true;
             referencedRelation: "users";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "public_videos_exclusive_to_fkey";
-            columns: ["exclusive_to"];
-            isOneToOne: false;
-            referencedRelation: "teams";
             referencedColumns: ["id"];
           },
         ];
