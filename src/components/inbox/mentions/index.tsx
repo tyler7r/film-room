@@ -5,7 +5,24 @@ import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { MentionType } from "~/utils/types";
+
+export type RealMentionType = {
+  author_name: string;
+  created_at: string;
+  exclusive_to: string | null;
+  highlight: boolean;
+  play_id: string;
+  play_title: string;
+  private: boolean;
+  start_time: number;
+  receiver_id: string;
+  title: string;
+  video_id: string;
+  teams: {
+    logo: string | null;
+    full_name: string;
+  } | null;
+}[];
 
 const InboxMentions = () => {
   const { user } = useAuthContext();
@@ -15,27 +32,34 @@ const InboxMentions = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [mentions, setMentions] = useState<MentionType | null>(null);
+  const [mentions, setMentions] = useState<RealMentionType | null>(null);
   const [isBtnDisabled, setIsBtnDisabled] = useState<boolean>(false);
 
   const fetchMentions = async () => {
     const { from, to } = getFromAndTo();
     const { data, count } = await supabase
-      .from(`play_mentions`)
-      .select(
-        `*, plays(start_time, video_id, title, videos(tournament, season, title))`,
-        { count: "exact" },
-      )
-      .match({
-        receiver_id: `${user.currentAffiliation?.affId}`,
-      })
+      .from("real_mentions")
+      .select(`*, teams(logo, full_name)`, { count: "exact" })
+      .eq("receiver_id", `${user.userId}`)
       .order("created_at", { ascending: false })
-      .range(from, to);
+      .range(from, to)
+      .returns<RealMentionType | null>();
+    // .from(`play_mentions`)
+    // .select(
+    //   `*, plays(start_time, video_id, title, videos(tournament, season, title))`,
+    //   { count: "exact" },
+    // )
+    // .match({
+    //   receiver_id: `${user.currentAffiliation?.affId}`,
+    // })
+    // .order("created_at", { ascending: false })
+    // .range(from, to);
     setPage(page + 1);
     if (count) {
       setMentionCount(count);
       if (to >= count - 1) setIsBtnDisabled(true);
     }
+    console.log(data);
     if (data) setMentions(mentions ? [...mentions, ...data] : data);
     if (data?.length === 0) setIsBtnDisabled(true);
   };
@@ -109,11 +133,7 @@ const InboxMentions = () => {
           <div
             key={mention.play_id + mention.created_at}
             onClick={() =>
-              handleClick(
-                mention.plays?.video_id,
-                mention.play_id,
-                mention.plays?.start_time,
-              )
+              handleClick(mention.video_id, mention.play_id, mention.start_time)
             }
             className={`flex w-full cursor-pointer flex-col gap-1 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
               isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
@@ -121,11 +141,11 @@ const InboxMentions = () => {
             style={backgroundStyle}
           >
             <div className="text-center text-lg lg:text-start lg:text-xl">
-              {mention.plays?.videos?.title}
+              {mention.title}
             </div>
             <Divider sx={{ marginLeft: "12px", marginRight: "12px" }}></Divider>
             <div>
-              <strong>{mention.sender_name}:</strong> {mention.plays?.title}
+              <strong>{mention.author_name}:</strong> {mention.play_title}
             </div>
           </div>
         ))}
