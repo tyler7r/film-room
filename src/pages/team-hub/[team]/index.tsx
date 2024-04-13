@@ -15,14 +15,26 @@ const TeamHub = () => {
   const { user } = useAuthContext();
   const [team, setTeam] = useState<TeamType | null>(null);
 
-  const role =
-    team?.owner === user.userId ? "owner" : user.currentAffiliation?.role ?? "";
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [modalStatus, setModalStatus] = useState({
     settings: false,
     announcement: false,
     requests: false,
   });
+
+  const fetchUserRole = () => {
+    if (team?.owner === user.userId) {
+      setRole("owner");
+    } else if (
+      user.currentAffiliation &&
+      user.currentAffiliation?.team.id === team?.id
+    ) {
+      setRole(user.currentAffiliation.role);
+    } else {
+      setRole("guest");
+    }
+  };
 
   const fetchTeam = async () => {
     const tId = router.query.team as string;
@@ -45,10 +57,14 @@ const TeamHub = () => {
   };
 
   useEffect(() => {
-    if (user.isLoggedIn && user.currentAffiliation?.role) setLoading(false);
-  }, [user, router.query.team]);
+    if (team) {
+      setLoading(false);
+      void fetchUserRole();
+    }
+  }, [user, team]);
 
   useEffect(() => {
+    setLoading(true);
     void fetchTeam();
   }, [router.query.team]);
 
@@ -102,7 +118,7 @@ const TeamHub = () => {
           <Announcement team={team} toggleOpen={handleModalToggle} />
         )}
         {modalStatus.requests && <Requests team={team} />}
-        <Roster team={team} role={role} />
+        <Roster team={team} role={role ? role : "guest"} />
         <div className="my-4 flex w-full flex-col items-center justify-center gap-4">
           <Typography variant="h2" fontSize={42}>
             Team Film

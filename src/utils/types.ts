@@ -20,7 +20,7 @@ export type Database = MergeDeep<
             video_id: string;
           };
         };
-        mentions_view: {
+        inbox_mentions: {
           Row: {
             author_name: string;
             created_at: string;
@@ -39,6 +39,7 @@ export type Database = MergeDeep<
           Row: {
             id: string;
             name: string;
+            number: number | null;
             profile_id: string;
             role: string;
             team_id: string;
@@ -147,7 +148,8 @@ export type PlayerType = {
   role: string;
   team_id: string;
   verified: boolean;
-}[];
+  number: number | null;
+};
 
 export type VideoUploadType = {
   link: string;

@@ -1,95 +1,62 @@
-import CheckIcon from "@mui/icons-material/Check";
-import { Button, TextField, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { type TeamType } from "~/utils/types";
+import { PlayerType, type TeamType } from "~/utils/types";
 import Player from "../player";
+import PlayerEdit from "../player-edit";
 
 type RosterProps = {
-  team: TeamType | null;
+  team: TeamType;
   role: string;
 };
 
-export type RosterType = {
-  id: string;
-  name?: string | null;
-  num: number | null;
-};
+// type PlayerEditType = {
+//   id: string;
+//   num: number | null;
+// };
 
 const Roster = ({ team, role }: RosterProps) => {
   const { backgroundStyle } = useIsDarkContext();
-  const [roster, setRoster] = useState<RosterType[] | undefined>(undefined);
-  const [edit, setEdit] = useState<RosterType>({
-    id: "",
-    num: null,
-  });
-  const [isValidNumber, setIsValidNumber] = useState(false);
-
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEdit({
-      ...edit,
-      [name]: value,
-    });
-  };
-
-  const closeEdit = () => {
-    setEdit({
-      id: "",
-      num: null,
-    });
-  };
+  const [roster, setRoster] = useState<PlayerType[] | null>(null);
 
   const fetchRoster = async () => {
     const { data } = await supabase
-      .from("affiliations")
-      .select("number, user_id, profiles(name)")
+      .from("player_view")
+      .select("*")
       .match({
-        team_id: team?.id,
+        team_id: team.id,
         role: "player",
         verified: true,
       })
       .order("number");
     if (data && data.length > 0) {
-      const roster: RosterType[] = data?.map((p) => {
-        return { id: p.user_id, name: p.profiles?.name, num: p.number };
-      });
-      setRoster(roster);
+      setRoster(data);
     } else {
-      setRoster(undefined);
+      setRoster(null);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const { data } = await supabase
-      .from("affiliations")
-      .update({
-        number: edit.num,
-      })
-      .match({ team_id: team?.id, user_id: edit.id })
-      .select();
-    if (data) {
-      void fetchRoster();
-      setTimeout(() => {
-        closeEdit();
-      }, 300);
-    }
-  };
+  useEffect(() => {
+    const channel = supabase
+      .channel("roster_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "affiliations" },
+        () => {
+          void fetchRoster();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     void fetchRoster();
-  }, [team?.id]);
-
-  useEffect(() => {
-    if (edit.num === null || edit.num < 0) {
-      setIsValidNumber(false);
-    } else {
-      setIsValidNumber(true);
-    }
-  }, [edit.num]);
+  }, [team.id]);
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-2">
@@ -97,59 +64,13 @@ const Roster = ({ team, role }: RosterProps) => {
         Roster
       </Typography>
       {!roster && (
-        <Typography variant="button" fontSize={14} style={backgroundStyle}>
-          No Active Player Accounts
-        </Typography>
+        <div className="text-xl font-bold">No Active Player Accounts</div>
       )}
       <div className="flex flex-wrap items-center justify-center gap-4">
-        {role === "player" &&
+        {(role === "player" || role === "guest") &&
           roster?.map((p) => <Player key={p.id} player={p} />)}
-        {role !== "player" &&
-          roster?.map((p) =>
-            edit?.id !== p.id ? (
-              <div
-                key={p.id}
-                style={backgroundStyle}
-                className="flex items-center justify-center gap-2 rounded-lg px-2"
-              >
-                <Player player={p} />
-                <div className="flex">
-                  <Button size="small" onClick={() => setEdit(p)}>
-                    Edit
-                  </Button>
-                  <Button size="small">Delete</Button>
-                </div>
-              </div>
-            ) : (
-              <div
-                key={p.id}
-                className="flex items-center justify-center gap-4 rounded-lg p-2"
-                style={backgroundStyle}
-              >
-                <Typography>{p.name}</Typography>
-                <form onSubmit={handleSubmit}>
-                  <TextField
-                    size="small"
-                    name="num"
-                    autoComplete="num"
-                    required
-                    id="num"
-                    label="Jersey Number"
-                    type="number"
-                    autoFocus
-                    onChange={handleInput}
-                    value={edit.num ?? ""}
-                  />
-                  <Button type="submit" disabled={!isValidNumber}>
-                    <CheckIcon />
-                  </Button>
-                  <Button type="button" onClick={() => closeEdit()}>
-                    Cancel
-                  </Button>
-                </form>
-              </div>
-            ),
-          )}
+        {(role === "coach" || role === "owner") &&
+          roster?.map((p) => <PlayerEdit key={p.id} player={p} />)}
       </div>
     </div>
   );

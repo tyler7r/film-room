@@ -23,7 +23,7 @@ const InboxMentions = () => {
   const fetchMentions = async () => {
     const { from, to } = getFromAndTo();
     const { data, count } = await supabase
-      .from("mentions_view")
+      .from("inbox_mentions")
       .select(`*, team: teams!affiliations_team_id_fkey(*)`, {
         count: "exact",
       })
@@ -104,13 +104,13 @@ const InboxMentions = () => {
             onClick={() =>
               handleClick(mention.video_id, mention.play_id, mention.start_time)
             }
-            className={`flex w-full cursor-pointer flex-col gap-1 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
+            className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
               isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
             } hover:delay-100`}
             style={backgroundStyle}
           >
             {!mention.private && (
-              <div className="mb-1 flex items-center justify-center gap-1">
+              <div className="flex items-center justify-center gap-1">
                 <div className="lg:text-md text-sm tracking-tighter">
                   PUBLIC
                 </div>
@@ -118,7 +118,7 @@ const InboxMentions = () => {
               </div>
             )}
             {mention.private && mention.team && (
-              <div className="justify mb-1 flex items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <div className="lg:text-md text-sm tracking-tighter">
                   PRIVATE TO:{" "}
                 </div>

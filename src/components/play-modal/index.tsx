@@ -55,19 +55,15 @@ const PlayModal = ({
     start: null,
     end: null,
   });
-  const [mentions, setMentions] = useState<PlayerType>([]);
-  const [affiliatedPlayers, setAffiliatedPlayers] = useState<PlayerType | null>(
-    null,
-  );
+  const [mentions, setMentions] = useState<PlayerType[]>([]);
+  const [affiliatedPlayers, setAffiliatedPlayers] = useState<
+    PlayerType[] | null
+  >(null);
   const [playTags, setPlayTags] = useState<TagType[]>([]);
   const [tags, setTags] = useState<TagType[] | null>(null);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   const fetchAffiliatedPlayers = async () => {
-    // const { data } = await supabase
-    //   .from("affiliations")
-    //   .select(`id, profiles (name)`)
-    //   .match({ team_id: user.currentAffiliation?.team.id, role: "player" });
     const { data } = await supabase
       .from("player_view")
       .select()
@@ -76,7 +72,6 @@ const PlayModal = ({
         role: "player",
         verified: true,
       });
-    console.log(data);
     if (data) setAffiliatedPlayers(data);
   };
 
