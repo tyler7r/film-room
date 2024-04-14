@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import { divisions } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { type MessageType, type TeamHubType } from "~/utils/types";
+import { type MessageType, type TeamType } from "~/utils/types";
 
 export const getServerSideProps = (async (
   context: GetServerSidePropsContext,
@@ -32,9 +32,9 @@ export const getServerSideProps = (async (
     .select()
     .eq("id", context.query.team as string)
     .single();
-  const team: TeamHubType = teamData.data;
+  const team: TeamType | null = teamData.data;
   return { props: { team } };
-}) satisfies GetServerSideProps<{ team: TeamHubType }>;
+}) satisfies GetServerSideProps<{ team: TeamType | null }>;
 
 const TeamSettings = ({
   team,
@@ -45,7 +45,7 @@ const TeamSettings = ({
     status: "error",
   });
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
-  const [details, setDetails] = useState<TeamHubType | undefined>(team);
+  const [details, setDetails] = useState<TeamType | null | undefined>(team);
   const [imagePreview, setImagePreview] = useState<string>(team?.logo ?? "");
   const [pubURL, setPubURL] = useState<string | null>(team?.logo ?? null);
 

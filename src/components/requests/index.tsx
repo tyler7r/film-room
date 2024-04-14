@@ -1,36 +1,37 @@
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { type TeamHubType } from "~/utils/types";
+import { type TeamType } from "~/utils/types";
 
 type RequestsProps = {
-  team: TeamHubType;
+  team: TeamType;
+  setRequestCount: (count: number) => void;
+  isOpen: boolean;
 };
 
 type RequestType = {
-  user_id: string;
+  id: string;
+  name: string;
   role: string;
-  number: number | null;
-  profiles: {
-    name: string | null;
-  } | null;
-};
+  team_id: string;
+  profile_id: string;
+  verified: boolean;
+}[];
 
-const Requests = ({ team }: RequestsProps) => {
+const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
   const { backgroundStyle } = useIsDarkContext();
-  const [requests, setRequests] = useState<RequestType[] | undefined>(
-    undefined,
-  );
+  const [requests, setRequests] = useState<RequestType | null>(null);
 
   const fetchRequests = async () => {
-    const { data } = await supabase
-      .from("affiliations")
-      .select("role, number, user_id, profiles(name)")
-      .match({ team_id: team?.id, verified: false });
+    const { data, count } = await supabase
+      .from("player_view")
+      .select("*", { count: "exact" })
+      .match({ team_id: team.id, verified: false });
     if (data && data.length > 0) {
       setRequests(data);
-    } else setRequests(undefined);
+    } else setRequests(null);
+    if (count) setRequestCount(count);
   };
 
   const handleAccept = async (id: string) => {
@@ -39,7 +40,7 @@ const Requests = ({ team }: RequestsProps) => {
       .update({
         verified: true,
       })
-      .match({ team_id: team?.id, user_id: id })
+      .eq("id", id)
       .select();
     if (data) {
       void fetchRequests();
@@ -47,10 +48,7 @@ const Requests = ({ team }: RequestsProps) => {
   };
 
   const handleReject = async (id: string) => {
-    const { error } = await supabase
-      .from("affiliations")
-      .delete()
-      .match({ team_id: team?.id, user_id: id });
+    const { error } = await supabase.from("affiliations").delete().eq("id", id);
     if (!error) void fetchRequests();
   };
 
@@ -58,40 +56,37 @@ const Requests = ({ team }: RequestsProps) => {
     void fetchRequests();
   }, []);
 
-  return (
-    <div className="m-2 flex flex-col gap-2 text-center">
-      {!requests && (
-        <Typography variant="button" fontSize={14} style={backgroundStyle}>
-          No Join Requests
-        </Typography>
-      )}
+  return isOpen ? (
+    <div className="mt-4 flex flex-col gap-2 text-center">
+      {!requests && <div className="text-lg font-bold">No Join Requests</div>}
       {requests?.map((req) => (
         <div
-          key={req.user_id}
+          key={req.id}
           style={backgroundStyle}
           className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
         >
-          <div>
-            {req.profiles?.name} ({req.role})
+          <div className="flex items-center gap-1">
+            <div className="text-lg font-bold">{req.name}</div>
+            <div className="text-sm">({req.role})</div>
           </div>
           <Button
             type="button"
             color="success"
-            onClick={() => handleAccept(req.user_id)}
+            onClick={() => handleAccept(req.id)}
           >
             Accept
           </Button>
           <Button
             type="button"
             color="error"
-            onClick={() => handleReject(req.user_id)}
+            onClick={() => handleReject(req.id)}
           >
             Reject
           </Button>
         </div>
       ))}
     </div>
-  );
+  ) : null;
 };
 
 export default Requests;

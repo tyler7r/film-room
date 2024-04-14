@@ -62,7 +62,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log("run");
     if (user.currentAffiliation?.affId) void fetchLastWatched();
   }, [user]);
 

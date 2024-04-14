@@ -71,9 +71,11 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
 
   return (
     <div className="flex w-11/12 flex-col items-center justify-center">
-      {videos?.map((video) => (
-        <Video video={video.video} key={video.video?.id} />
-      ))}
+      <div className="flex w-full flex-col gap-4">
+        {videos?.map((video) => (
+          <Video video={video.video} key={video.video?.id} />
+        ))}
+      </div>
       {videos && videoCount && (
         <Pagination
           showFirstButton
@@ -86,6 +88,9 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
           page={page}
           onChange={handleChange}
         />
+      )}
+      {!videos && (
+        <div className="text-xl font-bold">No videos in the database!</div>
       )}
     </div>
   );

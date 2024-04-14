@@ -1,25 +1,19 @@
-import { Typography } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
-import { type RosterType } from "../roster";
+import type { PlayerType } from "~/utils/types";
 
 type PlayerProps = {
-  player: RosterType;
+  player: PlayerType;
 };
 
 const Player = ({ player }: PlayerProps) => {
   const { backgroundStyle } = useIsDarkContext();
   return (
     <div
-      key={player.id}
       style={backgroundStyle}
-      className="flex items-center justify-around gap-2 rounded-lg p-2"
+      className="flex items-center justify-around gap-2 rounded-lg p-2 font-bold"
     >
-      <Typography fontSize={18}>{player.name}</Typography>
-      {player.num && (
-        <Typography variant="overline" fontSize={14} fontWeight="bold">
-          #{player.num}
-        </Typography>
-      )}
+      <div className="text-lg">{player.name}</div>
+      {player.number && <div>#{player.number}</div>}
     </div>
   );
 };

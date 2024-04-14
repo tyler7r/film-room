@@ -3,14 +3,14 @@ import type { SyntheticEvent } from "react";
 import { type PlayerType } from "~/utils/types";
 
 type MentionsProps = {
-  setMentions: (mentions: PlayerType) => void;
-  players: PlayerType | null;
+  setMentions: (mentions: PlayerType[]) => void;
+  players: PlayerType[] | null;
 };
 
 const Mentions = ({ setMentions, players }: MentionsProps) => {
   const handleChange = (
     event: SyntheticEvent<Element, Event>,
-    newValue: PlayerType,
+    newValue: PlayerType[],
   ) => {
     event.preventDefault();
     event.stopPropagation();
@@ -23,7 +23,7 @@ const Mentions = ({ setMentions, players }: MentionsProps) => {
         <Autocomplete
           onChange={(event, newValue) => handleChange(event, newValue)}
           options={players}
-          getOptionLabel={(option) => `${option.profiles?.name}`}
+          getOptionLabel={(option) => `${option.name}`}
           filterSelectedOptions
           multiple
           renderInput={(params) => (

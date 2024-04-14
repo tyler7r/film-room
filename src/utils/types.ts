@@ -1,3 +1,56 @@
+import type { MergeDeep } from "type-fest";
+import type { Database as GeneratedDatabase } from "./generated_types";
+
+export type Database = MergeDeep<
+  GeneratedDatabase,
+  {
+    public: {
+      Views: {
+        transition_mention_view: {
+          Row: {
+            author_name: string;
+            created_at: string;
+            highlight: boolean;
+            play_id: string;
+            play_title: string;
+            receiver_name: string;
+            start_time: number;
+            team_id: string;
+            user_id: string;
+            video_id: string;
+          };
+        };
+        inbox_mentions: {
+          Row: {
+            author_name: string;
+            created_at: string;
+            highlight: boolean;
+            play_id: string;
+            play_title: string;
+            private: boolean;
+            start_time: number;
+            receiver_id: string;
+            team_id: string;
+            title: string;
+            video_id: string;
+          };
+        };
+        player_view: {
+          Row: {
+            id: string;
+            name: string;
+            number: number | null;
+            profile_id: string;
+            role: string;
+            team_id: string;
+            verified: boolean;
+          };
+        };
+      };
+    };
+  }
+>;
+
 export type TeamAffiliationType = {
   team: {
     id: string;
@@ -34,16 +87,6 @@ export type MessageType = {
   text: string | undefined;
   status: "error" | "success";
 };
-
-export type TeamHubType = {
-  city: string;
-  division: string;
-  id: string;
-  logo: string | null;
-  name: string;
-  owner: string | null;
-  full_name: string;
-} | null;
 
 export type VideoType = {
   exclusive_to: string | null;
@@ -98,31 +141,15 @@ export type PlayType = {
   }[];
 };
 
-export type MentionType = {
-  created_at: string;
-  play_id: string;
-  receiver_id: string;
-  receiver_name: string;
-  sender_id: string;
-  sender_name: string;
-  plays: {
-    start_time: number;
-    video_id: string;
-    title: string;
-    videos: {
-      tournament: string | null;
-      season: string | null;
-      title: string;
-    } | null;
-  } | null;
-}[];
-
 export type PlayerType = {
   id: string;
-  profiles: {
-    name: string | null;
-  } | null;
-}[];
+  name: string;
+  profile_id: string;
+  role: string;
+  team_id: string;
+  verified: boolean;
+  number: number | null;
+};
 
 export type VideoUploadType = {
   link: string;
@@ -143,3 +170,24 @@ export type TeamMentionType = {
   full_name: string;
   id: string;
 }[];
+
+export type RealMentionType = {
+  author_name: string;
+  created_at: string;
+  highlight: boolean;
+  play_id: string;
+  play_title: string;
+  private: boolean;
+  receiver_id: string;
+  start_time: number;
+  team_id: string;
+  title: string;
+  video_id: string;
+  team: TeamType | null;
+}[];
+
+export type TeamActionBarType = {
+  settings: boolean;
+  announcement: boolean;
+  requests: boolean;
+};

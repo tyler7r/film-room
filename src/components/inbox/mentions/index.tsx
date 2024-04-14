@@ -1,11 +1,13 @@
+import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { MentionType } from "~/utils/types";
+import type { RealMentionType } from "~/utils/types";
 
 const InboxMentions = () => {
   const { user } = useAuthContext();
@@ -15,22 +17,19 @@ const InboxMentions = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [mentions, setMentions] = useState<MentionType | null>(null);
+  const [mentions, setMentions] = useState<RealMentionType | null>(null);
   const [isBtnDisabled, setIsBtnDisabled] = useState<boolean>(false);
 
   const fetchMentions = async () => {
     const { from, to } = getFromAndTo();
     const { data, count } = await supabase
-      .from(`play_mentions`)
-      .select(
-        `*, plays(start_time, video_id, title, videos(tournament, season, title))`,
-        { count: "exact" },
-      )
-      .match({
-        receiver_id: `${user.currentAffiliation?.affId}`,
+      .from("inbox_mentions")
+      .select(`*, team: teams!affiliations_team_id_fkey(*)`, {
+        count: "exact",
       })
-      .order("created_at", { ascending: false })
-      .range(from, to);
+      .eq("receiver_id", `${user.userId}`)
+      .range(from, to)
+      .order("created_at", { ascending: false });
     setPage(page + 1);
     if (count) {
       setMentionCount(count);
@@ -80,17 +79,11 @@ const InboxMentions = () => {
       .select();
   };
 
-  const handleClick = (
-    videoId: string | undefined,
-    playId: string,
-    start: number | undefined,
-  ) => {
+  const handleClick = (videoId: string, playId: string, start: number) => {
     const params = new URLSearchParams(searchParams);
-    if (videoId && typeof start === "number") {
-      params.set("play", playId);
-      params.set("start", `${start}`);
-      void updateLastWatched(videoId, start);
-    }
+    params.set("play", playId);
+    params.set("start", `${start}`);
+    void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
   };
@@ -109,23 +102,35 @@ const InboxMentions = () => {
           <div
             key={mention.play_id + mention.created_at}
             onClick={() =>
-              handleClick(
-                mention.plays?.video_id,
-                mention.play_id,
-                mention.plays?.start_time,
-              )
+              handleClick(mention.video_id, mention.play_id, mention.start_time)
             }
-            className={`flex w-full cursor-pointer flex-col gap-1 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
+            className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
               isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
             } hover:delay-100`}
             style={backgroundStyle}
           >
+            {!mention.private && (
+              <div className="flex items-center justify-center gap-1">
+                <div className="lg:text-md text-sm tracking-tighter">
+                  PUBLIC
+                </div>
+                <PublicIcon fontSize="small" />
+              </div>
+            )}
+            {mention.private && mention.team && (
+              <div className="flex items-center justify-center gap-2">
+                <div className="lg:text-md text-sm tracking-tighter">
+                  PRIVATE TO:{" "}
+                </div>
+                <TeamLogo tm={mention.team} size={20} />
+              </div>
+            )}
             <div className="text-center text-lg lg:text-start lg:text-xl">
-              {mention.plays?.videos?.title}
+              {mention.title}
             </div>
             <Divider sx={{ marginLeft: "12px", marginRight: "12px" }}></Divider>
             <div>
-              <strong>{mention.sender_name}:</strong> {mention.plays?.title}
+              <strong>{mention.author_name}:</strong> {mention.play_title}
             </div>
           </div>
         ))}
