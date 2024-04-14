@@ -1,5 +1,5 @@
 import PublicIcon from "@mui/icons-material/Public";
-import { Button, Divider } from "@mui/material";
+import { Button, Divider, colors } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import TeamLogo from "~/components/team-logo";
@@ -11,12 +11,8 @@ import type { RealMentionType } from "~/utils/types";
 
 const InboxMentions = () => {
   const { user } = useAuthContext();
-  const {
-    setIsOpen,
-    page,
-    setPage,
-    setUnreadCount: setMentionCount,
-  } = useInboxContext();
+  const { setIsOpen, page, setPage, setMentionCount, setUnreadCount } =
+    useInboxContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
 
   const searchParams = useSearchParams();
@@ -84,10 +80,22 @@ const InboxMentions = () => {
       .select();
   };
 
-  const handleClick = (videoId: string, playId: string, start: number) => {
+  const updateMention = async (playId: string) => {
+    await supabase
+      .from("play_mentions")
+      .update({ viewed: true })
+      .eq("play_id", playId);
+  };
+
+  const handleClick = async (
+    videoId: string,
+    playId: string,
+    start: number,
+  ) => {
     const params = new URLSearchParams(searchParams);
     params.set("play", playId);
     params.set("start", `${start}`);
+    void updateMention(playId);
     void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
@@ -111,8 +119,12 @@ const InboxMentions = () => {
             }
             className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
               isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
-            } hover:delay-100`}
-            style={backgroundStyle}
+            } hover:delay-100 ${!mention.viewed ? "bg-purple-100" : ""}`}
+            style={
+              !mention.viewed
+                ? { backgroundColor: `${colors.purple[50]}` }
+                : backgroundStyle
+            }
           >
             {!mention.private && (
               <div className="flex items-center justify-center gap-1">
@@ -130,11 +142,11 @@ const InboxMentions = () => {
                 <TeamLogo tm={mention.team} size={20} />
               </div>
             )}
-            <div className="text-center text-lg lg:text-start lg:text-xl">
+            <div className="text-center text-lg lg:text-xl">
               {mention.title}
             </div>
             <Divider sx={{ marginLeft: "12px", marginRight: "12px" }}></Divider>
-            <div>
+            <div className="ml-1">
               <strong>{mention.author_name}:</strong> {mention.play_title}
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Badge, Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
@@ -11,7 +11,7 @@ type MainMenuProps = {
 const MainMenu = ({ size }: MainMenuProps) => {
   const router = useRouter();
   const { backgroundStyle } = useIsDarkContext();
-  const { isOpen, setIsOpen } = useInboxContext();
+  const { isOpen, setIsOpen, unreadCount } = useInboxContext();
 
   return (
     <div style={backgroundStyle} className="flex items-center justify-around">
@@ -32,14 +32,24 @@ const MainMenu = ({ size }: MainMenuProps) => {
       </Button>
       <TeamPageButton />
       <Button
-        sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+        sx={{
+          fontSize: { lg: "20px" },
+          lineHeight: { lg: "28px" },
+          display: "flex",
+          gap: 1,
+        }}
         variant="text"
         size={size}
         onClick={() => {
           setIsOpen(!isOpen);
         }}
       >
-        Inbox
+        <div>Inbox</div>
+        <Badge
+          badgeContent={unreadCount}
+          color="primary"
+          sx={{ alignSelf: "start" }}
+        />
       </Button>
     </div>
   );

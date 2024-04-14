@@ -184,6 +184,7 @@ export type RealMentionType = {
   team_id: string;
   title: string;
   video_id: string;
+  viewed: boolean;
   team: TeamType | null;
 }[];
 

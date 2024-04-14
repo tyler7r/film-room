@@ -23,8 +23,8 @@ export const Navbar = () => {
       .from("inbox_mentions")
       .select("*", { count: "exact" })
       .match({ receiver_id: `${user.userId}`, viewed: false });
-    console.log(count);
-    if (count) setUnreadCount(count);
+    if (count && count > 0) setUnreadCount(count);
+    else setUnreadCount(0);
   };
 
   const logout = async () => {
@@ -33,7 +33,25 @@ export const Navbar = () => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("mention_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
+        () => {
+          void fetchUnreadCount();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (user.isLoggedIn) void fetchUnreadCount();
+    else setUnreadCount(0);
   }, [user]);
 
   return isMobile ? (

@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Badge, Button } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import type { TeamActionBarType, TeamType } from "~/utils/types";
@@ -61,14 +61,17 @@ const TeamActionBar = ({
               onClick={() =>
                 handleModalToggle("requests", !actionBarStatus.requests)
               }
+              sx={{ display: "flex", gap: 1 }}
             >
-              Handle Requests
+              <div>Handle Requests</div>
+              {!actionBarStatus.requests && (
+                <Badge
+                  badgeContent={requestCount}
+                  color="primary"
+                  sx={{ alignSelf: "start" }}
+                />
+              )}
             </Button>
-            {requestCount > 0 && !actionBarStatus.requests && (
-              <div className="-ml-2 self-start text-xs font-bold">
-                {requestCount}
-              </div>
-            )}
           </div>
           <Button
             size="small"
