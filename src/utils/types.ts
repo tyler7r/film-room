@@ -33,6 +33,7 @@ export type Database = MergeDeep<
             team_id: string;
             title: string;
             video_id: string;
+            viewed: boolean;
           };
         };
         player_view: {

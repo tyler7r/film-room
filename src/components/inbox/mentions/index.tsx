@@ -11,7 +11,12 @@ import type { RealMentionType } from "~/utils/types";
 
 const InboxMentions = () => {
   const { user } = useAuthContext();
-  const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
+  const {
+    setIsOpen,
+    page,
+    setPage,
+    setUnreadCount: setMentionCount,
+  } = useInboxContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
 
   const searchParams = useSearchParams();

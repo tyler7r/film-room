@@ -396,6 +396,7 @@ export type Database = {
           receiver_name: string
           sender_id: string
           sender_name: string
+          viewed: boolean
         }
         Insert: {
           created_at?: string
@@ -404,6 +405,7 @@ export type Database = {
           receiver_name: string
           sender_id?: string
           sender_name: string
+          viewed?: boolean
         }
         Update: {
           created_at?: string
@@ -412,6 +414,7 @@ export type Database = {
           receiver_name?: string
           sender_id?: string
           sender_name?: string
+          viewed?: boolean
         }
         Relationships: [
           {
@@ -817,6 +820,7 @@ export type Database = {
           team_id: string | null
           title: string | null
           video_id: string | null
+          viewed: boolean | null
         }
         Relationships: [
           {
@@ -890,6 +894,7 @@ export type Database = {
           team_id: string | null
           user_id: string | null
           video_id: string | null
+          viewed: boolean | null
         }
         Relationships: [
           {
