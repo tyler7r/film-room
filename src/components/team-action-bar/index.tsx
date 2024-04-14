@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { useIsDarkContext } from "~/pages/_app";
 import { TeamActionBarType } from "~/pages/team-hub/[team]";
 import { TeamType } from "~/utils/types";
 import Announcement from "../announcement";
@@ -20,6 +21,7 @@ const TeamActionBar = ({
   team,
 }: TeamActionBarProps) => {
   const router = useRouter();
+  const { colorBackground } = useIsDarkContext();
   const [requestCount, setRequestCount] = useState<number>(0);
 
   const handleModalToggle = (modal: string, open: boolean) => {

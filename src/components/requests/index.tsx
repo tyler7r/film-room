@@ -57,7 +57,7 @@ const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
   }, []);
 
   return isOpen ? (
-    <div className="m-2 flex flex-col gap-2 text-center">
+    <div className="mt-4 flex flex-col gap-2 text-center">
       {!requests && <div className="text-lg font-bold">No Join Requests</div>}
       {requests?.map((req) => (
         <div
@@ -65,8 +65,9 @@ const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
           style={backgroundStyle}
           className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
         >
-          <div>
-            {req.name} ({req.role})
+          <div className="flex items-center gap-1">
+            <div className="text-lg font-bold">{req.name}</div>
+            <div className="text-sm">({req.role})</div>
           </div>
           <Button
             type="button"

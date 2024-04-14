@@ -1,5 +1,7 @@
 import CheckIcon from "@mui/icons-material/Check";
-import { Button, TextField } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { Button, IconButton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -15,6 +17,7 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [edit, setEdit] = useState<number | null>(player.number);
   const [isValidNumber, setIsValidNumber] = useState<boolean>(false);
+  const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -64,12 +67,33 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
     >
       <Player player={player} />
       <div className="flex">
-        <Button size="small" onClick={() => setIsOpen(true)}>
-          Edit
-        </Button>
-        <Button size="small" onClick={() => handleDelete()}>
-          Delete
-        </Button>
+        {isDeleteMenuOpen ? (
+          <div className="ml-4 flex gap-1">
+            <Button
+              size="small"
+              variant="contained"
+              onClick={() => void handleDelete()}
+            >
+              Remove
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setIsDeleteMenuOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <div className="flex">
+            <IconButton size="small" onClick={() => setIsOpen(true)}>
+              <EditIcon color="primary" />
+            </IconButton>
+            <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
+              <DeleteIcon color="action" />
+            </IconButton>
+          </div>
+        )}
       </div>
     </div>
   ) : (
@@ -85,7 +109,7 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
           autoComplete="num"
           required
           id="num"
-          label="Jersey Number"
+          label="Number"
           type="number"
           autoFocus
           onChange={handleInput}

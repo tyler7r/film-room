@@ -1,4 +1,3 @@
-import { Typography } from "@mui/material";
 import { useIsDarkContext } from "~/pages/_app";
 import { PlayerType } from "~/utils/types";
 
@@ -11,14 +10,10 @@ const Player = ({ player }: PlayerProps) => {
   return (
     <div
       style={backgroundStyle}
-      className="flex items-center justify-around gap-2 rounded-lg p-2"
+      className="flex items-center justify-around gap-2 rounded-lg p-2 font-bold"
     >
-      <Typography fontSize={18}>{player.name}</Typography>
-      {player.number && (
-        <Typography variant="overline" fontSize={14} fontWeight="bold">
-          #{player.number}
-        </Typography>
-      )}
+      <div className="text-lg">{player.name}</div>
+      {player.number && <div>#{player.number}</div>}
     </div>
   );
 };
