@@ -1,14 +1,19 @@
-import { Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Announcement from "~/components/announcement";
-import Requests from "~/components/requests";
 import Roster from "~/components/roster";
+import TeamActionBar from "~/components/team-action-bar";
 import TeamLogo from "~/components/team-logo";
 import TeamVideos from "~/components/team-videos";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { type TeamType } from "~/utils/types";
+
+export type TeamActionBarType = {
+  settings: boolean;
+  announcement: boolean;
+  requests: boolean;
+};
 
 const TeamHub = () => {
   const router = useRouter();
@@ -17,7 +22,7 @@ const TeamHub = () => {
 
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [modalStatus, setModalStatus] = useState({
+  const [actionBarStatus, setActionBarStatus] = useState<TeamActionBarType>({
     settings: false,
     announcement: false,
     requests: false,
@@ -44,16 +49,6 @@ const TeamHub = () => {
       .eq("id", tId)
       .single();
     if (data) setTeam(data);
-  };
-
-  const handleModalToggle = (modal: string, open: boolean) => {
-    if (modal === "roster") {
-      setModalStatus({ settings: open, announcement: false, requests: false });
-    } else if (modal === "announcement") {
-      setModalStatus({ settings: false, announcement: open, requests: false });
-    } else {
-      setModalStatus({ settings: false, announcement: false, requests: open });
-    }
   };
 
   useEffect(() => {
@@ -86,38 +81,12 @@ const TeamHub = () => {
             </Typography>
           </div>
         </div>
-        {(role === "coach" || role === "owner") && (
-          <div className="flex w-full justify-center gap-4">
-            <Button
-              variant={modalStatus.announcement ? "outlined" : "text"}
-              onClick={() =>
-                handleModalToggle("announcement", !modalStatus.announcement)
-              }
-            >
-              Send Announcement
-            </Button>
-            <Button
-              variant={modalStatus.requests ? "outlined" : "text"}
-              onClick={() =>
-                handleModalToggle("requests", !modalStatus.requests)
-              }
-            >
-              Handle Requests
-            </Button>
-            {role === "owner" && (
-              <Button
-                size="small"
-                onClick={() => router.push(`/team-settings/${team.id}`)}
-              >
-                Team Settings
-              </Button>
-            )}
-          </div>
-        )}
-        {modalStatus.announcement && (
-          <Announcement team={team} toggleOpen={handleModalToggle} />
-        )}
-        {modalStatus.requests && <Requests team={team} />}
+        <TeamActionBar
+          role={role ? role : "guest"}
+          actionBarStatus={actionBarStatus}
+          setActionBarStatus={setActionBarStatus}
+          team={team}
+        />
         <Roster team={team} role={role ? role : "guest"} />
         <div className="my-4 flex w-full flex-col items-center justify-center gap-4">
           <Typography variant="h2" fontSize={42}>

@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -6,6 +6,8 @@ import { type TeamType } from "~/utils/types";
 
 type RequestsProps = {
   team: TeamType;
+  setRequestCount: (count: number) => void;
+  isOpen: boolean;
 };
 
 type RequestType = {
@@ -17,18 +19,19 @@ type RequestType = {
   verified: boolean;
 }[];
 
-const Requests = ({ team }: RequestsProps) => {
+const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
   const { backgroundStyle } = useIsDarkContext();
   const [requests, setRequests] = useState<RequestType | null>(null);
 
   const fetchRequests = async () => {
-    const { data } = await supabase
+    const { data, count } = await supabase
       .from("player_view")
-      .select("*")
+      .select("*", { count: "exact" })
       .match({ team_id: team.id, verified: false });
     if (data && data.length > 0) {
       setRequests(data);
     } else setRequests(null);
+    if (count) setRequestCount(count);
   };
 
   const handleAccept = async (id: string) => {
@@ -53,13 +56,9 @@ const Requests = ({ team }: RequestsProps) => {
     void fetchRequests();
   }, []);
 
-  return (
+  return isOpen ? (
     <div className="m-2 flex flex-col gap-2 text-center">
-      {!requests && (
-        <Typography variant="button" fontSize={14} style={backgroundStyle}>
-          No Join Requests
-        </Typography>
-      )}
+      {!requests && <div className="text-lg font-bold">No Join Requests</div>}
       {requests?.map((req) => (
         <div
           key={req.id}
@@ -86,7 +85,7 @@ const Requests = ({ team }: RequestsProps) => {
         </div>
       ))}
     </div>
-  );
+  ) : null;
 };
 
 export default Requests;
