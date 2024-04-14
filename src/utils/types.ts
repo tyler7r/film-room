@@ -1,5 +1,5 @@
-import { MergeDeep } from "type-fest";
-import { Database as GeneratedDatabase } from "./generated_types";
+import type { MergeDeep } from "type-fest";
+import type { Database as GeneratedDatabase } from "./generated_types";
 
 export type Database = MergeDeep<
   GeneratedDatabase,
@@ -185,3 +185,9 @@ export type RealMentionType = {
   video_id: string;
   team: TeamType | null;
 }[];
+
+export type TeamActionBarType = {
+  settings: boolean;
+  announcement: boolean;
+  requests: boolean;
+};

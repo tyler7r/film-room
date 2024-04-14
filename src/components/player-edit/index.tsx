@@ -5,7 +5,7 @@ import { Button, IconButton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { PlayerType } from "~/utils/types";
+import type { PlayerType } from "~/utils/types";
 import Player from "../player";
 
 type PlayerEditProps = {

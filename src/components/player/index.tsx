@@ -1,5 +1,5 @@
 import { useIsDarkContext } from "~/pages/_app";
-import { PlayerType } from "~/utils/types";
+import type { PlayerType } from "~/utils/types";
 
 type PlayerProps = {
   player: PlayerType;

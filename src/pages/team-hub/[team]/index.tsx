@@ -7,13 +7,7 @@ import TeamLogo from "~/components/team-logo";
 import TeamVideos from "~/components/team-videos";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { type TeamType } from "~/utils/types";
-
-export type TeamActionBarType = {
-  settings: boolean;
-  announcement: boolean;
-  requests: boolean;
-};
+import type { TeamActionBarType, TeamType } from "~/utils/types";
 
 const TeamHub = () => {
   const router = useRouter();

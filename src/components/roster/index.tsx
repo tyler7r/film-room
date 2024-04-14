@@ -1,8 +1,7 @@
 import { Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { PlayerType, type TeamType } from "~/utils/types";
+import type { PlayerType, TeamType } from "~/utils/types";
 import Player from "../player";
 import PlayerEdit from "../player-edit";
 
@@ -11,13 +10,7 @@ type RosterProps = {
   role: string;
 };
 
-// type PlayerEditType = {
-//   id: string;
-//   num: number | null;
-// };
-
 const Roster = ({ team, role }: RosterProps) => {
-  const { backgroundStyle } = useIsDarkContext();
   const [roster, setRoster] = useState<PlayerType[] | null>(null);
 
   const fetchRoster = async () => {
