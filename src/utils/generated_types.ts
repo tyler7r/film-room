@@ -12,8 +12,6 @@ export type Database = {
       affiliations: {
         Row: {
           id: string
-          last_watched: string | null
-          last_watched_time: number | null
           number: number | null
           role: string
           team_id: string
@@ -22,8 +20,6 @@ export type Database = {
         }
         Insert: {
           id?: string
-          last_watched?: string | null
-          last_watched_time?: number | null
           number?: number | null
           role?: string
           team_id: string
@@ -32,8 +28,6 @@ export type Database = {
         }
         Update: {
           id?: string
-          last_watched?: string | null
-          last_watched_time?: number | null
           number?: number | null
           role?: string
           team_id?: string
@@ -74,20 +68,6 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_affiliations_last_watched_fkey"
-            columns: ["last_watched"]
-            isOneToOne: false
-            referencedRelation: "inbox_mentions"
-            referencedColumns: ["video_id"]
-          },
-          {
-            foreignKeyName: "public_affiliations_last_watched_fkey"
-            columns: ["last_watched"]
-            isOneToOne: false
-            referencedRelation: "videos"
             referencedColumns: ["id"]
           },
         ]
@@ -391,6 +371,7 @@ export type Database = {
       play_mentions: {
         Row: {
           created_at: string
+          id: string
           play_id: string
           receiver_id: string
           receiver_name: string
@@ -400,6 +381,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          id?: string
           play_id?: string
           receiver_id?: string
           receiver_name: string
@@ -409,6 +391,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          id?: string
           play_id?: string
           receiver_id?: string
           receiver_name?: string
@@ -608,16 +591,22 @@ export type Database = {
         Row: {
           email: string | null
           id: string
+          last_watched: string | null
+          last_watched_time: number | null
           name: string | null
         }
         Insert: {
           email?: string | null
           id: string
+          last_watched?: string | null
+          last_watched_time?: number | null
           name?: string | null
         }
         Update: {
           email?: string | null
           id?: string
+          last_watched?: string | null
+          last_watched_time?: number | null
           name?: string | null
         }
         Relationships: [
@@ -626,6 +615,20 @@ export type Database = {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_profiles_last_watched_fkey"
+            columns: ["last_watched"]
+            isOneToOne: false
+            referencedRelation: "inbox_mentions"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "public_profiles_last_watched_fkey"
+            columns: ["last_watched"]
+            isOneToOne: false
+            referencedRelation: "videos"
             referencedColumns: ["id"]
           },
         ]
@@ -812,6 +815,7 @@ export type Database = {
           author_name: string | null
           created_at: string | null
           highlight: boolean | null
+          mention_id: string | null
           play_id: string | null
           play_title: string | null
           private: boolean | null
@@ -887,6 +891,7 @@ export type Database = {
           author_name: string | null
           created_at: string | null
           highlight: boolean | null
+          mention_id: string | null
           play_id: string | null
           play_title: string | null
           receiver_name: string | null

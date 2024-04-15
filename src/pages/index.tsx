@@ -37,12 +37,26 @@ export default function Home() {
 
   const fetchLastWatched = async () => {
     const { data } = await supabase
-      .from("affiliations")
+      .from("profiles")
       .select("last_watched, last_watched_time, videos(*)")
-      .eq("id", `${user.currentAffiliation?.affId}`)
+      .eq("id", `${user.userId}`)
       .single();
+    console.log(data);
     if (data?.last_watched) setLastWatched(data);
     else setLastWatched(null);
+  };
+
+  const updateUserAffiliation = (teamId: string | null | undefined) => {
+    if (teamId) {
+      const team = affiliations?.find((aff) => aff.team.id === teamId);
+      if (user.currentAffiliation?.team.id === teamId) return;
+      else {
+        setUser({
+          ...user,
+          currentAffiliation: team ? team : user.currentAffiliation,
+        });
+      }
+    } else return;
   };
 
   const handleTeamClick = (aff: TeamAffiliationType) => {
@@ -62,7 +76,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (user.currentAffiliation?.affId) void fetchLastWatched();
+    if (user.userId) void fetchLastWatched();
   }, [user]);
 
   return (
@@ -76,10 +90,17 @@ export default function Home() {
             <PlayArrowIcon />
             <div>Continue Watching</div>
           </div>
-          <Video
-            video={lastWatched.videos}
-            startTime={`${lastWatched.last_watched_time}`}
-          />
+          <div
+            className="w-full"
+            onClick={() =>
+              updateUserAffiliation(lastWatched.videos?.exclusive_to)
+            }
+          >
+            <Video
+              video={lastWatched.videos}
+              startTime={`${lastWatched.last_watched_time}`}
+            />
+          </div>
         </div>
       )}
       <div className="flex flex-col items-center justify-center gap-4">
