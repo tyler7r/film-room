@@ -19,6 +19,10 @@ type InboxContextType = {
   setMentionCount: (mentionCount: number) => void;
   unreadCount: number;
   setUnreadCount: (unreadCount: number) => void;
+  unreadMentionCount: number;
+  setUnreadMentionCount: (unreadCount: number) => void;
+  unreadCommentCount: number;
+  setUnreadCommentCount: (unreadCount: number) => void;
 };
 
 export const InboxContext = createContext<InboxContextType>({
@@ -30,12 +34,20 @@ export const InboxContext = createContext<InboxContextType>({
   setUnreadCount: () => null,
   mentionCount: 0,
   setMentionCount: () => null,
+  unreadMentionCount: 0,
+  setUnreadMentionCount: () => null,
+  unreadCommentCount: 0,
+  setUnreadCommentCount: () => null,
 });
 
 export const TheInbox = ({ children }: InboxProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [page, setPage] = useState<number>(0);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [unreadMentionCount, setUnreadMentionCount] = useState<number>(0);
+  const [unreadCommentCount, setUnreadCommentCount] = useState<number>(0);
+  const [unreadCount, setUnreadCount] = useState<number>(
+    unreadCommentCount + unreadMentionCount,
+  );
   const [mentionCount, setMentionCount] = useState<number>(0);
 
   useEffect(() => {
@@ -44,6 +56,11 @@ export const TheInbox = ({ children }: InboxProps) => {
       setMentionCount(0);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    setUnreadCount(unreadCommentCount + unreadMentionCount);
+    console.log({ unreadCommentCount, unreadMentionCount, unreadCount });
+  }, [unreadCommentCount, unreadMentionCount, unreadCount]);
 
   return (
     <InboxContext.Provider
@@ -56,6 +73,10 @@ export const TheInbox = ({ children }: InboxProps) => {
         setUnreadCount,
         mentionCount,
         setMentionCount,
+        unreadCommentCount,
+        setUnreadCommentCount,
+        unreadMentionCount,
+        setUnreadMentionCount,
       }}
     >
       {children}
