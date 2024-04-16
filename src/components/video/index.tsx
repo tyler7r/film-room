@@ -1,10 +1,12 @@
 import PublicIcon from "@mui/icons-material/Public";
 import { Typography } from "@mui/material";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { VideoType } from "~/utils/types";
+import type { TeamType, VideoType } from "~/utils/types";
 import TeamLogo from "../team-logo";
 
 type VideoProps = {
@@ -14,23 +16,39 @@ type VideoProps = {
 
 const Video = ({ video, startTime }: VideoProps) => {
   const { backgroundStyle, isDark } = useIsDarkContext();
+  const { affiliations } = useAffiliatedContext();
   const { user } = useAuthContext();
   const router = useRouter();
+
+  const [exclusiveTeam, setExclusiveTeam] = useState<
+    TeamType | null | undefined
+  >(null);
+
+  const fetchExclusiveToTeam = () => {
+    if (video?.exclusive_to) {
+      const tm = affiliations?.find((t) => t.team.id === video.exclusive_to);
+      setExclusiveTeam(tm?.team);
+    } else setExclusiveTeam(null);
+  };
 
   const handleClick = async (id: string) => {
     if (!startTime) {
       await supabase
-        .from("affiliations")
+        .from("profiles")
         .update({
           last_watched: id,
           last_watched_time: 0,
         })
-        .eq("id", `${user.currentAffiliation?.affId}`);
+        .eq("id", `${user.userId}`);
       void router.push(`/film-room/${id}`);
     } else {
       void router.push(`/film-room/${id}?start=${startTime}`);
     }
   };
+
+  useEffect(() => {
+    void fetchExclusiveToTeam();
+  }, []);
 
   return (
     video && (
@@ -53,12 +71,12 @@ const Video = ({ video, startTime }: VideoProps) => {
               <PublicIcon fontSize="small" />
             </div>
           )}
-          {video.private && user.currentAffiliation && (
+          {video.private && exclusiveTeam && (
             <div className="justify mb-1 flex items-center justify-center gap-2">
               <div className="lg:text-md text-sm tracking-tighter">
                 PRIVATE TO:{" "}
               </div>
-              <TeamLogo tm={user.currentAffiliation.team} size={20} />
+              <TeamLogo tm={exclusiveTeam} size={20} />
             </div>
           )}
           <div className="flex gap-2 text-center text-xl font-medium tracking-wide">

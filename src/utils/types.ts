@@ -11,6 +11,7 @@ export type Database = MergeDeep<
             author_name: string;
             created_at: string;
             highlight: boolean;
+            mention_id: string;
             play_id: string;
             play_title: string;
             receiver_name: string;
@@ -18,6 +19,7 @@ export type Database = MergeDeep<
             team_id: string;
             user_id: string;
             video_id: string;
+            viewed: boolean;
           };
         };
         inbox_mentions: {
@@ -25,6 +27,7 @@ export type Database = MergeDeep<
             author_name: string;
             created_at: string;
             highlight: boolean;
+            mention_id: string;
             play_id: string;
             play_title: string;
             private: boolean;
@@ -33,6 +36,7 @@ export type Database = MergeDeep<
             team_id: string;
             title: string;
             video_id: string;
+            viewed: boolean;
           };
         };
         player_view: {
@@ -175,6 +179,7 @@ export type RealMentionType = {
   author_name: string;
   created_at: string;
   highlight: boolean;
+  mention_id: string;
   play_id: string;
   play_title: string;
   private: boolean;
@@ -183,6 +188,7 @@ export type RealMentionType = {
   team_id: string;
   title: string;
   video_id: string;
+  viewed: boolean;
   team: TeamType | null;
 }[];
 

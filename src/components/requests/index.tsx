@@ -31,7 +31,8 @@ const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
     if (data && data.length > 0) {
       setRequests(data);
     } else setRequests(null);
-    if (count) setRequestCount(count);
+    if (count && count > 0) setRequestCount(count);
+    else setRequestCount(0);
   };
 
   const handleAccept = async (id: string) => {

@@ -17,6 +17,8 @@ type InboxContextType = {
   setPage: (page: number) => void;
   mentionCount: number;
   setMentionCount: (mentionCount: number) => void;
+  unreadCount: number;
+  setUnreadCount: (unreadCount: number) => void;
 };
 
 export const InboxContext = createContext<InboxContextType>({
@@ -24,6 +26,8 @@ export const InboxContext = createContext<InboxContextType>({
   setIsOpen: () => null,
   page: 0,
   setPage: () => null,
+  unreadCount: 0,
+  setUnreadCount: () => null,
   mentionCount: 0,
   setMentionCount: () => null,
 });
@@ -31,6 +35,7 @@ export const InboxContext = createContext<InboxContextType>({
 export const TheInbox = ({ children }: InboxProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [page, setPage] = useState<number>(0);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const [mentionCount, setMentionCount] = useState<number>(0);
 
   useEffect(() => {
@@ -47,6 +52,8 @@ export const TheInbox = ({ children }: InboxProps) => {
         setIsOpen,
         page,
         setPage,
+        unreadCount,
+        setUnreadCount,
         mentionCount,
         setMentionCount,
       }}

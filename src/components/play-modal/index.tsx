@@ -150,12 +150,12 @@ const PlayModal = ({
 
   const updateLastWatched = async () => {
     await supabase
-      .from("affiliations")
+      .from("profiles")
       .update({
         last_watched: videoId,
         last_watched_time: playDetails.end,
       })
-      .eq("id", `${user.currentAffiliation?.affId}`);
+      .eq("id", `${user.userId}`);
   };
 
   const createPlay = async () => {

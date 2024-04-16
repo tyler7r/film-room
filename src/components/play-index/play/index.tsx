@@ -62,12 +62,12 @@ const Play = ({
 
   const updateLastWatched = async (time: number) => {
     await supabase
-      .from("affiliations")
+      .from("profiles")
       .update({
         last_watched: videoId,
         last_watched_time: time,
       })
-      .eq("id", `${user.currentAffiliation?.affId}`);
+      .eq("id", `${user.userId}`);
   };
 
   const handleClick = async (playTime: number, play: PlayType) => {
