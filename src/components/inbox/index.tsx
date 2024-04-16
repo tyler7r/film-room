@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
+import InboxComments from "./comments";
 import InboxMentions from "./mentions";
 import TeamHeader from "./team-header";
 
@@ -26,6 +27,7 @@ const Inbox = () => {
           <TeamHeader />
           <Divider></Divider>
           <InboxMentions />
+          <InboxComments />
           {!user.isLoggedIn && (
             <div className="mt-2 flex items-center justify-center gap-2">
               <Button

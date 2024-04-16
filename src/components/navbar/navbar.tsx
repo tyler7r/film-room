@@ -53,7 +53,7 @@ export const Navbar = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "play_mentions" },
         () => {
-          void fetchUnreadMentions();
+          if (user.isLoggedIn) void fetchUnreadMentions();
         },
       )
       .subscribe();
@@ -70,7 +70,7 @@ export const Navbar = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "comments" },
         () => {
-          void fetchUnreadComments();
+          if (user.isLoggedIn) void fetchUnreadComments();
         },
       )
       .subscribe();
