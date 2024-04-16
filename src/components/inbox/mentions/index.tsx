@@ -1,3 +1,5 @@
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MailIcon from "@mui/icons-material/Mail";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import PublicIcon from "@mui/icons-material/Public";
@@ -12,7 +14,12 @@ import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { RealMentionType } from "~/utils/types";
 
-const InboxMentions = () => {
+type InboxMentionsProps = {
+  hide: boolean;
+  setHide: (hide: boolean) => void;
+};
+
+const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
   const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
@@ -142,76 +149,101 @@ const InboxMentions = () => {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between text-2xl font-bold lg:mb-2 lg:text-3xl">
         <div>Recent Mentions</div>
-        <IconButton onClick={() => handleUnreadClick()}>
-          {isUnreadOnly ? (
-            <MailIcon color="primary" />
-          ) : (
-            <MailOutlineIcon color="primary" />
-          )}
-        </IconButton>
-      </div>
-      <div className="flex flex-col gap-5 md:px-2 lg:px-4">
-        {mentions &&
-          mentions.length > 0 &&
-          mentions.map((mention) => (
-            <div
-              key={mention.play_id + mention.created_at}
-              onClick={() =>
-                handleClick(
-                  mention.video_id,
-                  mention.play_id,
-                  mention.start_time,
-                  mention.mention_id,
-                  mention.team_id,
-                  mention.viewed,
-                )
-              }
-              className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
-                isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
-              } hover:delay-100 ${!mention.viewed ? "bg-purple-100" : ""}`}
-              style={
-                !mention.viewed
-                  ? { backgroundColor: `${colors.purple[50]}` }
-                  : backgroundStyle
-              }
+        {hide && (
+          <Button
+            variant="outlined"
+            size="small"
+            endIcon={<ExpandMoreIcon />}
+            onClick={() => setHide(false)}
+          >
+            Show
+          </Button>
+        )}
+        {!hide && (
+          <div>
+            <IconButton onClick={() => handleUnreadClick()}>
+              {isUnreadOnly ? (
+                <MailIcon color="primary" />
+              ) : (
+                <MailOutlineIcon color="primary" />
+              )}
+            </IconButton>
+            <Button
+              size="small"
+              variant="outlined"
+              endIcon={<ExpandLessIcon />}
+              onClick={() => setHide(true)}
             >
-              {!mention.private && (
-                <div className="flex items-center justify-center gap-1">
-                  <div className="lg:text-md text-sm tracking-tighter">
-                    PUBLIC
-                  </div>
-                  <PublicIcon fontSize="small" />
-                </div>
-              )}
-              {mention.private && mention.team && (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="lg:text-md text-sm tracking-tighter">
-                    PRIVATE TO:{" "}
-                  </div>
-                  <TeamLogo tm={mention.team} size={20} />
-                </div>
-              )}
-              <div className="text-center text-lg lg:text-xl">
-                {mention.title}
-              </div>
-              <Divider
-                sx={{ marginLeft: "12px", marginRight: "12px" }}
-              ></Divider>
-              <div className="ml-1">
-                <strong>{mention.author_name}:</strong> {mention.play_title}
-              </div>
-            </div>
-          ))}
+              Hide
+            </Button>
+          </div>
+        )}
       </div>
-      {mentions && mentions.length > 0 ? (
-        <Button
-          disabled={isBtnDisabled}
-          onClick={() => void fetchMentions(isUnreadOnly)}
-        >
-          Load More
-        </Button>
-      ) : (
-        <div className="-mt-4 pl-2 font-bold">No recent mentions</div>
+      {!hide && (
+        <>
+          <div className="flex flex-col gap-5 md:px-2 lg:px-4">
+            {mentions &&
+              mentions.length > 0 &&
+              mentions.map((mention) => (
+                <div key={mention.play_id + mention.created_at}>
+                  <div className="flex items-center gap-2">
+                    {mention.private && mention.team && (
+                      <TeamLogo tm={mention.team} size={20} />
+                    )}
+                    {!mention.private && <PublicIcon fontSize="small" />}
+                    <div>
+                      <strong>{mention.author_name}</strong> mentioned you on:
+                    </div>
+                  </div>
+                  <div
+                    onClick={() =>
+                      handleClick(
+                        mention.video_id,
+                        mention.play_id,
+                        mention.start_time,
+                        mention.mention_id,
+                        mention.team_id,
+                        mention.viewed,
+                      )
+                    }
+                    className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
+                      isDark
+                        ? "hover:border-purple-400"
+                        : "hover:border-purple-A400"
+                    } hover:delay-100 ${
+                      !mention.viewed ? "bg-purple-100" : ""
+                    }`}
+                    style={
+                      !mention.viewed
+                        ? { backgroundColor: `${colors.purple[50]}` }
+                        : backgroundStyle
+                    }
+                  >
+                    <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
+                      {mention.title}
+                    </div>
+                    <Divider
+                      sx={{
+                        marginLeft: "12px",
+                        marginRight: "12px",
+                      }}
+                    ></Divider>
+                    <div className="mx-4 text-center">{mention.play_title}</div>
+                  </div>
+                </div>
+              ))}
+          </div>
+          {mentions && mentions.length > 0 ? (
+            <Button
+              disabled={isBtnDisabled}
+              onClick={() => void fetchMentions(isUnreadOnly)}
+            >
+              Load More
+            </Button>
+          ) : (
+            <div className="-mt-4 pl-2 font-bold">No recent mentions</div>
+          )}
+        </>
       )}
     </div>
   );

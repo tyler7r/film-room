@@ -1,5 +1,6 @@
 import { Button, Divider, Drawer, Typography } from "@mui/material";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
@@ -12,6 +13,8 @@ const Inbox = () => {
   const { user } = useAuthContext();
   const { screenWidth } = useMobileContext();
   const router = useRouter();
+  const [hideMentions, setHideMentions] = useState<boolean>(false);
+  const [hideComments, setHideComments] = useState<boolean>(false);
 
   return (
     <Drawer open={isOpen} anchor="right" onClose={() => setIsOpen(false)}>
@@ -26,8 +29,9 @@ const Inbox = () => {
         <div className="flex flex-col gap-3">
           <TeamHeader />
           <Divider></Divider>
-          <InboxMentions />
-          <InboxComments />
+          <InboxMentions hide={hideMentions} setHide={setHideMentions} />
+          <Divider />
+          <InboxComments hide={hideComments} setHide={setHideComments} />
           {!user.isLoggedIn && (
             <div className="mt-2 flex items-center justify-center gap-2">
               <Button
