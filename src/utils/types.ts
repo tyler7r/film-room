@@ -50,6 +50,27 @@ export type Database = MergeDeep<
             verified: boolean;
           };
         };
+        comment_notification: {
+          Row: {
+            comment: string;
+            comment_author: string;
+            comment_author_name: string;
+            comment_id: string;
+            created_at: string;
+            highlight: boolean;
+            note: string;
+            play_author: string;
+            play_id: string;
+            play_title: string;
+            private: boolean;
+            start_time: number;
+            team_id: string;
+            user_id: string;
+            video_id: string;
+            video_title: string;
+            viewed_by_author: boolean;
+          };
+        };
       };
     };
   }
