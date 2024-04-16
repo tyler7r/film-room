@@ -6,7 +6,7 @@ import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { TeamType, type VideoType } from "~/utils/types";
+import type { TeamType, VideoType } from "~/utils/types";
 import TeamLogo from "../team-logo";
 
 type VideoProps = {

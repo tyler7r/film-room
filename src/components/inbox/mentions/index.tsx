@@ -15,8 +15,7 @@ import type { RealMentionType } from "~/utils/types";
 const InboxMentions = () => {
   const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
-  const { setIsOpen, page, setPage, setMentionCount, setUnreadCount } =
-    useInboxContext();
+  const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
 
   const searchParams = useSearchParams();
@@ -117,11 +116,12 @@ const InboxMentions = () => {
     start: number,
     mentionId: string,
     teamId: string,
+    viewed: boolean,
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set("play", playId);
     params.set("start", `${start}`);
-    void updateMention(mentionId);
+    if (!viewed) void updateMention(mentionId);
     void updateUserAffiliation(teamId);
     void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
@@ -163,6 +163,7 @@ const InboxMentions = () => {
                   mention.start_time,
                   mention.mention_id,
                   mention.team_id,
+                  mention.viewed,
                 )
               }
               className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${

@@ -51,7 +51,6 @@ export const Navbar = () => {
 
   useEffect(() => {
     if (user.isLoggedIn) void fetchUnreadCount();
-    else setUnreadCount(0);
   }, [user]);
 
   return isMobile ? (
