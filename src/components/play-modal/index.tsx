@@ -1,10 +1,13 @@
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   Box,
   Button,
   Checkbox,
   Divider,
+  IconButton,
   Modal,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -12,23 +15,24 @@ import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { PlayerType } from "~/utils/types";
+import type { PlayerType, VideoType } from "~/utils/types";
 import Mentions from "../play-mentions";
 import PlayTags from "../play-tags";
 
 type PlayModalProps = {
   player: YouTubePlayer | null;
-  videoId: string;
+  video: VideoType;
   isPlayModalOpen: boolean;
   setIsPlayModalOpen: (status: boolean) => void;
 };
 
-type PlayType = {
+type PlayDetailsType = {
   start: number | null | undefined;
   end: number | null | undefined;
   title: string;
   note: string;
   highlight: boolean;
+  private: boolean;
 };
 
 export type TagType = {
@@ -40,7 +44,7 @@ export type TagType = {
 
 const PlayModal = ({
   player,
-  videoId,
+  video,
   setIsPlayModalOpen,
   isPlayModalOpen,
 }: PlayModalProps) => {
@@ -48,12 +52,13 @@ const PlayModal = ({
   const { user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
   const [isPlayStarted, setIsPlayStarted] = useState(false);
-  const [playDetails, setPlayDetails] = useState<PlayType>({
+  const [playDetails, setPlayDetails] = useState<PlayDetailsType>({
     title: "",
     note: "",
     highlight: false,
     start: null,
     end: null,
+    private: false,
   });
   const [mentions, setMentions] = useState<PlayerType[]>([]);
   const [affiliatedPlayers, setAffiliatedPlayers] = useState<
@@ -126,6 +131,7 @@ const PlayModal = ({
       highlight: false,
       start: null,
       end: null,
+      private: false,
     });
     setMentions([]);
     setPlayTags([]);
@@ -152,19 +158,19 @@ const PlayModal = ({
     await supabase
       .from("profiles")
       .update({
-        last_watched: videoId,
+        last_watched: video.id,
         last_watched_time: playDetails.end,
       })
       .eq("id", `${user.userId}`);
   };
 
-  const createPlay = async () => {
+  const createPlay = async (isPrivate: boolean) => {
     const { data } = await supabase
       .from("plays")
       .insert({
-        team_id: `${user.currentAffiliation?.team.id}`,
+        exclusive_to: isPrivate ? `${user.currentAffiliation?.team.id}` : null,
         author_id: `${user.currentAffiliation?.affId}`,
-        video_id: videoId,
+        video_id: video.id,
         highlight: playDetails.highlight,
         title: playDetails.title,
         note: playDetails.note,
@@ -172,6 +178,7 @@ const PlayModal = ({
         end_time: playDetails.end!,
         author_role: `${user.currentAffiliation?.role}`,
         author_name: `${user.name}`,
+        private: isPrivate ? true : false,
       })
       .select()
       .single();
@@ -202,7 +209,12 @@ const PlayModal = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    void createPlay();
+    console.log("run");
+    if (video.private || playDetails.private) void createPlay(true);
+    else {
+      void createPlay(false);
+    }
+    void resetPlay();
   };
 
   useEffect(() => {
@@ -229,7 +241,7 @@ const PlayModal = ({
   useEffect(() => {
     if (user.currentAffiliation) void fetchAffiliatedPlayers();
     void fetchTags();
-  }, [videoId]);
+  }, [video]);
 
   return isPlayModalOpen ? (
     <Modal open={isPlayModalOpen} onClose={resetPlay}>
@@ -287,21 +299,61 @@ const PlayModal = ({
             maxRows={5}
           />
           <PlayTags tags={playTags} setTags={setPlayTags} allTags={tags} />
-          <Mentions players={affiliatedPlayers} setMentions={setMentions} />
-          <div className="flex items-center justify-center">
-            <div className="text-xl font-bold tracking-tight">
-              Highlight Play?
+          {user.currentAffiliation && (
+            <Mentions players={affiliatedPlayers} setMentions={setMentions} />
+          )}
+          <div className="flex w-full justify-around">
+            <div className="flex items-center justify-center">
+              <div className="text-xl font-bold tracking-tight">
+                Highlight Play?
+              </div>
+              <Checkbox
+                checked={playDetails.highlight}
+                onChange={() =>
+                  setPlayDetails({
+                    ...playDetails,
+                    highlight: !playDetails.highlight,
+                  })
+                }
+                size="medium"
+              />
             </div>
-            <Checkbox
-              checked={playDetails.highlight}
-              onChange={() =>
-                setPlayDetails({
-                  ...playDetails,
-                  highlight: !playDetails.highlight,
-                })
-              }
-              size="medium"
-            />
+            {!video.private && user.currentAffiliation && (
+              <div className="flex items-center justify-center">
+                <div className="text-xl font-bold tracking-tight">
+                  Private Play?
+                </div>
+                <Tooltip
+                  title="Private plays are only viewable by teammates and coaches. Public plays are viewable by all users."
+                  slotProps={{
+                    popper: {
+                      modifiers: [
+                        {
+                          name: "offset",
+                          options: {
+                            offset: [0, -14],
+                          },
+                        },
+                      ],
+                    },
+                  }}
+                >
+                  <IconButton>
+                    <InfoOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+                <Checkbox
+                  checked={playDetails.private}
+                  onChange={() =>
+                    setPlayDetails({
+                      ...playDetails,
+                      private: !playDetails.private,
+                    })
+                  }
+                  size="medium"
+                />
+              </div>
+            )}
           </div>
           <div className="flex items-center justify-center gap-2">
             <Button

@@ -125,33 +125,14 @@ export type VideoType = {
   division: string;
 };
 
-export type PlayIndexType = {
-  author_id: string | null;
-  video_id: string | null;
-  highlight: boolean;
-  id: string;
-  note: string;
-  team_id: string | null;
-  author_name: string;
-  author_role: string;
-  start_time: number;
-  end_time: number;
-  title: string;
-  mentions: {
-    receiver_name: string;
-  }[];
-  tags: {
-    title: string;
-  }[];
-}[];
-
 export type PlayType = {
   author_id: string | null;
   video_id: string | null;
   highlight: boolean;
   id: string;
   note: string;
-  team_id: string | null;
+  exclusive_to: string | null;
+  private: boolean;
   author_name: string;
   author_role: string;
   start_time: number;

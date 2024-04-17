@@ -224,7 +224,9 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
                     }`}
                     style={
                       !mention.viewed
-                        ? { backgroundColor: `${colors.purple[50]}` }
+                        ? isDark
+                          ? { backgroundColor: `${colors.purple[200]}` }
+                          : { backgroundColor: `${colors.purple[50]}` }
                         : backgroundStyle
                     }
                   >

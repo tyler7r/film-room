@@ -93,7 +93,7 @@ const FilmRoom = () => {
         ></Divider>
         <PlayModal
           player={player}
-          videoId={video.id}
+          video={video}
           isPlayModalOpen={isPlayModalOpen}
           setIsPlayModalOpen={setIsPlayModalOpen}
         />

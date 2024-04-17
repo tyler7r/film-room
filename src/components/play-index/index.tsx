@@ -8,7 +8,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { PlayIndexType, PlayType } from "~/utils/types";
+import type { PlayType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
 import Play from "./play";
 import Plays from "./plays";
@@ -39,7 +39,7 @@ const PlayIndex = ({
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
 
-  const [plays, setPlays] = useState<PlayIndexType | null>(null);
+  const [plays, setPlays] = useState<PlayType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [playCount, setPlayCount] = useState<number | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
@@ -56,10 +56,10 @@ const PlayIndex = ({
       .select(`*, mentions:play_mentions(receiver_name), tags(title)`, {
         count: "exact",
       })
-      .match({
-        video_id: videoId,
-        team_id: `${user.currentAffiliation?.team.id}`,
-      })
+      .eq("video_id", videoId)
+      .or(
+        `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
+      )
       .order("start_time")
       .range(from, to);
     if (options?.receiver_name) {
