@@ -58,7 +58,11 @@ export default function Home() {
     } else return;
   };
 
-  const handleTeamClick = (aff: TeamAffiliationType) => {
+  const handleTeamClick = (
+    e: React.MouseEvent<HTMLDivElement>,
+    aff: TeamAffiliationType,
+  ) => {
+    e.stopPropagation();
     if (aff.team.id === user.currentAffiliation?.team.id) {
       void router.push(`/team-hub/${aff.team.id}`);
     } else {
@@ -115,7 +119,7 @@ export default function Home() {
                 } hover:delay-100`}
                 key={aff.affId}
                 style={backgroundStyle}
-                onClick={() => handleTeamClick(aff)}
+                onClick={(e) => handleTeamClick(e, aff)}
               >
                 <TeamLogo tm={aff.team} size={55} />
                 <div className="flex flex-col items-center justify-center">

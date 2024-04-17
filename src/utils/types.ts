@@ -41,6 +41,7 @@ export type Database = MergeDeep<
         };
         player_view: {
           Row: {
+            email: string;
             id: string;
             name: string;
             number: number | null;
@@ -235,3 +236,13 @@ export type TeamActionBarType = {
   announcement: boolean;
   requests: boolean;
 };
+
+export type RequestType = {
+  email: string;
+  id: string;
+  name: string;
+  role: string;
+  team_id: string;
+  profile_id: string;
+  verified: boolean;
+}[];

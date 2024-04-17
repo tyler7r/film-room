@@ -1,11 +1,12 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import MailIcon from "@mui/icons-material/Mail";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider, IconButton, colors } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TeamLogo from "~/components/team-logo";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
@@ -27,6 +28,7 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
 
   const searchParams = useSearchParams();
   const router = useRouter();
+  const topRef = useRef<HTMLDivElement | null>(null);
 
   const [isUnreadOnly, setIsUnreadOnly] = useState(false);
   const [mentions, setMentions] = useState<RealMentionType | null>(null);
@@ -70,23 +72,6 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
 
     return { from, to };
   };
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("affiliation_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_mentions" },
-        () => {
-          void fetchMentions(isUnreadOnly);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
 
   const updateLastWatched = async (video: string, time: number) => {
     await supabase
@@ -141,13 +126,37 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
     setIsUnreadOnly(!isUnreadOnly);
   };
 
+  const scrollToTop = () => {
+    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("affiliation_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
+        () => {
+          void fetchMentions(isUnreadOnly);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
   useEffect(() => {
     if (user.isLoggedIn) void fetchMentions(isUnreadOnly);
   }, [isUnreadOnly]);
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between text-2xl font-bold lg:mb-2 lg:text-3xl">
+      <div
+        ref={topRef}
+        className="flex items-center justify-between text-2xl font-bold lg:mb-2 lg:text-3xl"
+      >
         <div>Recent Mentions</div>
         {hide && (
           <Button
@@ -234,12 +243,23 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
               ))}
           </div>
           {mentions && mentions.length > 0 ? (
-            <Button
-              disabled={isBtnDisabled}
-              onClick={() => void fetchMentions(isUnreadOnly)}
-            >
-              Load More
-            </Button>
+            <div className="flex flex-col items-center justify-center">
+              <Button
+                disabled={isBtnDisabled}
+                onClick={() => void fetchMentions(isUnreadOnly)}
+                style={{ width: "100%" }}
+              >
+                Load More
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                endIcon={<KeyboardDoubleArrowUpIcon />}
+                onClick={() => scrollToTop()}
+              >
+                Jump to Top
+              </Button>
+            </div>
           ) : (
             <div className="-mt-4 pl-2 font-bold">No recent mentions</div>
           )}
