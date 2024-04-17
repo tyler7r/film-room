@@ -41,6 +41,7 @@ export type Database = MergeDeep<
         };
         player_view: {
           Row: {
+            email: string;
             id: string;
             name: string;
             number: number | null;
@@ -48,6 +49,25 @@ export type Database = MergeDeep<
             role: string;
             team_id: string;
             verified: boolean;
+          };
+        };
+        comment_notifications: {
+          Row: {
+            comment: string;
+            comment_author_name: string;
+            comment_id: string;
+            created_at: string;
+            highlight: boolean;
+            note: string;
+            play_id: string;
+            play_title: string;
+            private: boolean;
+            start_time: number;
+            team_id: string;
+            play_author_id: string;
+            video_id: string;
+            video_title: string;
+            viewed_by_author: boolean;
           };
         };
       };
@@ -192,8 +212,37 @@ export type RealMentionType = {
   team: TeamType | null;
 }[];
 
+export type RealCommentType = {
+  comment: string;
+  comment_author_name: string;
+  comment_id: string;
+  created_at: string;
+  highlight: boolean;
+  note: string;
+  play_id: string;
+  play_title: string;
+  private: boolean;
+  start_time: number;
+  team_id: string;
+  play_author_id: string;
+  video_id: string;
+  video_title: string;
+  viewed_by_author: boolean;
+  team: TeamType | null;
+}[];
+
 export type TeamActionBarType = {
   settings: boolean;
   announcement: boolean;
   requests: boolean;
 };
+
+export type RequestType = {
+  email: string;
+  id: string;
+  name: string;
+  role: string;
+  team_id: string;
+  profile_id: string;
+  verified: boolean;
+}[];

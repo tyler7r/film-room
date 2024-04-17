@@ -13,18 +13,32 @@ export type ChildrenNavProps = {
 
 export const Navbar = () => {
   const { isMobile } = useMobileContext();
-  const { setUnreadCount } = useInboxContext();
+  const { setUnreadCommentCount, setUnreadMentionCount } = useInboxContext();
   const { user } = useAuthContext();
 
   const router = useRouter();
 
-  const fetchUnreadCount = async () => {
+  const fetchUnreadMentions = async () => {
     const { count } = await supabase
       .from("inbox_mentions")
       .select("*", { count: "exact" })
       .match({ receiver_id: `${user.userId}`, viewed: false });
-    if (count && count > 0) setUnreadCount(count);
-    else setUnreadCount(0);
+    if (count && count > 0) setUnreadMentionCount(count);
+    else setUnreadMentionCount(0);
+  };
+
+  const fetchUnreadComments = async () => {
+    const { count } = await supabase
+      .from("comment_notifications")
+      .select("*", { count: "exact" })
+      .match({ play_author_id: `${user.userId}`, viewed_by_author: false });
+    if (count && count > 0) setUnreadCommentCount(count);
+    else setUnreadCommentCount(0);
+  };
+
+  const fetchUnreadCount = async () => {
+    void fetchUnreadMentions();
+    void fetchUnreadComments();
   };
 
   const logout = async () => {
@@ -39,7 +53,24 @@ export const Navbar = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "play_mentions" },
         () => {
-          void fetchUnreadCount();
+          if (user.isLoggedIn) void fetchUnreadMentions();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("comment_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "comments" },
+        () => {
+          if (user.isLoggedIn) void fetchUnreadComments();
         },
       )
       .subscribe();

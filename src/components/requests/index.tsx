@@ -2,22 +2,13 @@ import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { type TeamType } from "~/utils/types";
+import type { RequestType, TeamType } from "~/utils/types";
 
 type RequestsProps = {
   team: TeamType;
   setRequestCount: (count: number) => void;
   isOpen: boolean;
 };
-
-type RequestType = {
-  id: string;
-  name: string;
-  role: string;
-  team_id: string;
-  profile_id: string;
-  verified: boolean;
-}[];
 
 const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
   const { backgroundStyle } = useIsDarkContext();
@@ -66,8 +57,11 @@ const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
           style={backgroundStyle}
           className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
         >
-          <div className="flex items-center gap-1">
-            <div className="text-lg font-bold">{req.name}</div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col">
+              <div className="text-lg font-bold">{req.name}</div>
+              <div className="text-xs">{req.email}</div>
+            </div>
             <div className="text-sm">({req.role})</div>
           </div>
           <Button

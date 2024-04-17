@@ -13,60 +13,62 @@ import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { RealMentionType } from "~/utils/types";
+import type { RealCommentType } from "~/utils/types";
 
-type InboxMentionsProps = {
+type InboxCommentsProps = {
   hide: boolean;
   setHide: (hide: boolean) => void;
 };
 
-const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
+const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
-  const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
+  const { setIsOpen, commentPage, setCommentPage, setCommentCount } =
+    useInboxContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
 
   const searchParams = useSearchParams();
   const router = useRouter();
+
   const topRef = useRef<HTMLDivElement | null>(null);
 
   const [isUnreadOnly, setIsUnreadOnly] = useState(false);
-  const [mentions, setMentions] = useState<RealMentionType | null>(null);
+  const [comments, setComments] = useState<RealCommentType | null>(null);
   const [isBtnDisabled, setIsBtnDisabled] = useState<boolean>(false);
 
-  const fetchMentions = async (unreadOnly: boolean) => {
+  const fetchComments = async (unreadOnly: boolean) => {
     const { from, to } = getFromAndTo();
-    const mtns = supabase
-      .from("inbox_mentions")
-      .select(`*, team: teams!affiliations_team_id_fkey(*)`, {
+    const cmts = supabase
+      .from("comment_notifications")
+      .select(`*, team: teams!inner(*)`, {
         count: "exact",
       })
-      .eq("receiver_id", `${user.userId}`)
+      .eq("play_author_id", `${user.userId}`)
       .range(from, to)
       .order("created_at", { ascending: false });
-    setPage(page + 1);
+    setCommentPage(commentPage + 1);
     if (unreadOnly) {
-      void mtns.eq("viewed", false);
+      void cmts.eq("viewed_by_author", false);
     }
-    const { data, count } = await mtns;
+    const { data, count } = await cmts;
     if (count) {
-      setMentionCount(count);
+      setCommentCount(count);
       if (to >= count - 1) setIsBtnDisabled(true);
-    } else setMentionCount(0);
+    } else setCommentCount(0);
     if (data && data.length > 0) {
-      setMentions(mentions ? [...mentions, ...data] : data);
+      setComments(comments ? [...comments, ...data] : data);
     } else {
       setIsBtnDisabled(true);
-      setMentions(null);
+      setComments(null);
     }
   };
 
   const getFromAndTo = () => {
     const itemPerPage = 4;
-    let from = page * itemPerPage;
+    let from = commentPage * itemPerPage;
     const to = from + itemPerPage;
 
-    if (page > 0) {
+    if (commentPage > 0) {
       from += 1;
     }
 
@@ -84,11 +86,11 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
       .select();
   };
 
-  const updateMention = async (mentionId: string) => {
+  const updateComment = async (commentId: string) => {
     await supabase
-      .from("play_mentions")
-      .update({ viewed: true })
-      .eq("id", mentionId);
+      .from("comments")
+      .update({ viewed_by_author: true })
+      .eq("id", commentId);
   };
 
   const updateUserAffiliation = (teamId: string) => {
@@ -106,14 +108,14 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
     videoId: string,
     playId: string,
     start: number,
-    mentionId: string,
+    commentId: string,
     teamId: string,
     viewed: boolean,
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set("play", playId);
     params.set("start", `${start}`);
-    if (!viewed) void updateMention(mentionId);
+    if (!viewed) void updateComment(commentId);
     void updateUserAffiliation(teamId);
     void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
@@ -121,8 +123,8 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   };
 
   const handleUnreadClick = () => {
-    setMentions(null);
-    setPage(0);
+    setComments(null);
+    setCommentPage(0);
     setIsUnreadOnly(!isUnreadOnly);
   };
 
@@ -132,12 +134,12 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
 
   useEffect(() => {
     const channel = supabase
-      .channel("affiliation_changes")
+      .channel("comment_changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "play_mentions" },
+        { event: "*", schema: "public", table: "comments" },
         () => {
-          void fetchMentions(isUnreadOnly);
+          void fetchComments(isUnreadOnly);
         },
       )
       .subscribe();
@@ -148,7 +150,7 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   }, []);
 
   useEffect(() => {
-    if (user.isLoggedIn) void fetchMentions(isUnreadOnly);
+    if (user.isLoggedIn) void fetchComments(isUnreadOnly);
   }, [isUnreadOnly]);
 
   return (
@@ -157,7 +159,7 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
         ref={topRef}
         className="flex items-center justify-between text-2xl font-bold lg:mb-2 lg:text-3xl"
       >
-        <div>Recent Mentions</div>
+        <div>Recent Comments</div>
         {hide && (
           <Button
             variant="outlined"
@@ -191,28 +193,29 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
       {!hide && (
         <>
           <div className="flex flex-col gap-5 md:px-2 lg:px-4">
-            {mentions &&
-              mentions.length > 0 &&
-              mentions.map((mention) => (
-                <div key={mention.play_id + mention.created_at}>
+            {comments &&
+              comments.length > 0 &&
+              comments.map((comment) => (
+                <div key={comment.play_id + comment.created_at}>
                   <div className="flex items-center gap-2">
-                    {mention.private && mention.team && (
-                      <TeamLogo tm={mention.team} size={20} />
+                    {comment.private && comment.team && (
+                      <TeamLogo tm={comment.team} size={20} />
                     )}
-                    {!mention.private && <PublicIcon fontSize="small" />}
+                    {!comment.private && <PublicIcon fontSize="small" />}
                     <div>
-                      <strong>{mention.author_name}</strong> mentioned you on:
+                      <strong>{comment.comment_author_name}</strong> commented
+                      on:
                     </div>
                   </div>
                   <div
                     onClick={() =>
                       handleClick(
-                        mention.video_id,
-                        mention.play_id,
-                        mention.start_time,
-                        mention.mention_id,
-                        mention.team_id,
-                        mention.viewed,
+                        comment.video_id,
+                        comment.play_id,
+                        comment.start_time,
+                        comment.comment_id,
+                        comment.team_id,
+                        comment.viewed_by_author,
                       )
                     }
                     className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
@@ -220,48 +223,45 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
                         ? "hover:border-purple-400"
                         : "hover:border-purple-A400"
                     } hover:delay-100 ${
-                      !mention.viewed ? "bg-purple-100" : ""
+                      !comment.viewed_by_author ? "bg-purple-100" : ""
                     }`}
                     style={
-                      !mention.viewed
+                      !comment.viewed_by_author
                         ? { backgroundColor: `${colors.purple[50]}` }
                         : backgroundStyle
                     }
                   >
                     <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
-                      {mention.title}
+                      {comment.video_title}
                     </div>
                     <Divider
-                      sx={{
-                        marginLeft: "12px",
-                        marginRight: "12px",
-                      }}
+                      sx={{ marginLeft: "12px", marginRight: "12px" }}
                     ></Divider>
-                    <div className="mx-4 text-center">{mention.play_title}</div>
+                    <div className="ml-1 text-center">{comment.play_title}</div>
                   </div>
                 </div>
               ))}
           </div>
-          {mentions && mentions.length > 0 ? (
-            <div className="flex flex-col items-center justify-center">
+          {comments && comments.length > 0 ? (
+            <div className="flex flex-col items-center justify-center gap-1">
               <Button
                 disabled={isBtnDisabled}
-                onClick={() => void fetchMentions(isUnreadOnly)}
-                style={{ width: "100%" }}
+                onClick={() => void fetchComments(isUnreadOnly)}
+                sx={{ width: "100%" }}
               >
                 Load More
               </Button>
               <Button
-                size="small"
                 variant="outlined"
                 endIcon={<KeyboardDoubleArrowUpIcon />}
                 onClick={() => scrollToTop()}
+                size="small"
               >
                 Jump to Top
               </Button>
             </div>
           ) : (
-            <div className="-mt-4 pl-2 font-bold">No recent mentions</div>
+            <div className="-mt-4 pl-2 font-bold">No recent comments</div>
           )}
         </>
       )}
@@ -269,4 +269,4 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   );
 };
 
-export default InboxMentions;
+export default InboxComments;
