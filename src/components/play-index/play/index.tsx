@@ -2,6 +2,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import LockIcon from "@mui/icons-material/Lock";
 import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import StarIcon from "@mui/icons-material/Star";
 import { Button, Divider, IconButton, Typography } from "@mui/material";
@@ -221,9 +222,10 @@ const Play = ({
           flexItem
           sx={{ marginRight: "8px", marginLeft: "8px" }}
         />
-        {play.highlight && (
-          <StarIcon color="secondary" fontSize="large" className="mr-4" />
-        )}
+        <div className="mr-2 flex flex-col items-center justify-center gap-2">
+          {play.highlight && <StarIcon color="secondary" fontSize="large" />}
+          {play.private && <LockIcon fontSize="large" color="action" />}
+        </div>
         <div className="flex grow flex-col items-center">
           <div className="text-center text-xl tracking-wide md:text-2xl">
             {play.title}

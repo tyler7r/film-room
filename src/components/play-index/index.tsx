@@ -1,5 +1,6 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LockIcon from "@mui/icons-material/Lock";
 import StarIcon from "@mui/icons-material/Star";
 import { Button, Divider, Pagination, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -8,7 +9,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { PlayIndexType, PlayType } from "~/utils/types";
+import type { PlayType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
 import Play from "./play";
 import Plays from "./plays";
@@ -27,6 +28,7 @@ export type PlaySearchOptions = {
   only_highlights?: boolean;
   receiver_name?: string;
   tag?: string;
+  private_only?: boolean;
 };
 
 const PlayIndex = ({
@@ -39,7 +41,7 @@ const PlayIndex = ({
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
 
-  const [plays, setPlays] = useState<PlayIndexType | null>(null);
+  const [plays, setPlays] = useState<PlayType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [playCount, setPlayCount] = useState<number | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
@@ -47,6 +49,8 @@ const PlayIndex = ({
   const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
     only_highlights: false,
     role: "",
+    private_only: false,
+    tag: "",
   });
 
   const fetchPlays = async (options?: PlaySearchOptions) => {
@@ -56,10 +60,10 @@ const PlayIndex = ({
       .select(`*, mentions:play_mentions(receiver_name), tags(title)`, {
         count: "exact",
       })
-      .match({
-        video_id: videoId,
-        team_id: `${user.currentAffiliation?.team.id}`,
-      })
+      .eq("video_id", videoId)
+      .or(
+        `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
+      )
       .order("start_time")
       .range(from, to);
     if (options?.receiver_name) {
@@ -82,6 +86,9 @@ const PlayIndex = ({
     }
     if (options?.only_highlights) {
       void plays.eq("highlight", true);
+    }
+    if (options?.private_only) {
+      void plays.eq("private", true);
     }
     if (options?.role) {
       void plays.eq("author_role", options.role);
@@ -178,11 +185,19 @@ const PlayIndex = ({
             Open Filters
           </Button>
         )}
-        <div className="flex items-center justify-center gap-1 text-center">
-          <StarIcon color="secondary" fontSize="large" />
-          <Typography fontSize={16} variant="overline">
-            = Highlight Play
-          </Typography>
+        <div className="flex gap-4">
+          <div className="flex items-center justify-center gap-1 text-center">
+            <StarIcon color="secondary" fontSize="large" />
+            <Typography fontSize={16} variant="overline">
+              = Highlight Play
+            </Typography>
+          </div>
+          <div className="flex items-center justify-center gap-1 text-center">
+            <LockIcon color="action" fontSize="large" />
+            <Typography fontSize={16} variant="overline">
+              = Private Play
+            </Typography>
+          </div>
         </div>
         <Plays
           setIsFiltersOpen={setIsFiltersOpen}

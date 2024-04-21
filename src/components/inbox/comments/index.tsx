@@ -222,12 +222,12 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
                       isDark
                         ? "hover:border-purple-400"
                         : "hover:border-purple-A400"
-                    } hover:delay-100 ${
-                      !comment.viewed_by_author ? "bg-purple-100" : ""
-                    }`}
+                    } hover:delay-100`}
                     style={
                       !comment.viewed_by_author
-                        ? { backgroundColor: `${colors.purple[50]}` }
+                        ? isDark
+                          ? { backgroundColor: `${colors.purple[200]}` }
+                          : { backgroundColor: `${colors.purple[50]}` }
                         : backgroundStyle
                     }
                   >

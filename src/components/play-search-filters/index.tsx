@@ -107,18 +107,37 @@ const PlaySearchFilters = ({
           </Select>
         </FormControl>
       </div>
-      <div className="flex items-center justify-center">
-        <div className="text-xl font-bold tracking-tight">Highlights only?</div>
-        <Checkbox
-          checked={searchOptions.only_highlights}
-          onChange={() => {
-            setSearchOptions({
-              ...searchOptions,
-              only_highlights: !searchOptions.only_highlights,
-            });
-          }}
-          size="medium"
-        />
+      <div className="flex gap-4">
+        <div className="flex items-center justify-center">
+          <div className="text-xl font-bold tracking-tight">
+            Private Plays Only?
+          </div>
+          <Checkbox
+            checked={searchOptions.private_only}
+            onChange={() => {
+              setSearchOptions({
+                ...searchOptions,
+                private_only: !searchOptions.private_only,
+              });
+            }}
+            size="medium"
+          />
+        </div>
+        <div className="flex items-center justify-center">
+          <div className="text-xl font-bold tracking-tight">
+            Highlights only?
+          </div>
+          <Checkbox
+            checked={searchOptions.only_highlights}
+            onChange={() => {
+              setSearchOptions({
+                ...searchOptions,
+                only_highlights: !searchOptions.only_highlights,
+              });
+            }}
+            size="medium"
+          />
+        </div>
       </div>
       <Button
         endIcon={<DeleteIcon />}
