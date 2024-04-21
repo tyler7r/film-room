@@ -1,5 +1,6 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LockIcon from "@mui/icons-material/Lock";
 import StarIcon from "@mui/icons-material/Star";
 import { Button, Divider, Pagination, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -27,6 +28,7 @@ export type PlaySearchOptions = {
   only_highlights?: boolean;
   receiver_name?: string;
   tag?: string;
+  private_only?: boolean;
 };
 
 const PlayIndex = ({
@@ -47,6 +49,8 @@ const PlayIndex = ({
   const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
     only_highlights: false,
     role: "",
+    private_only: false,
+    tag: "",
   });
 
   const fetchPlays = async (options?: PlaySearchOptions) => {
@@ -82,6 +86,9 @@ const PlayIndex = ({
     }
     if (options?.only_highlights) {
       void plays.eq("highlight", true);
+    }
+    if (options?.private_only) {
+      void plays.eq("private", true);
     }
     if (options?.role) {
       void plays.eq("author_role", options.role);
@@ -178,11 +185,19 @@ const PlayIndex = ({
             Open Filters
           </Button>
         )}
-        <div className="flex items-center justify-center gap-1 text-center">
-          <StarIcon color="secondary" fontSize="large" />
-          <Typography fontSize={16} variant="overline">
-            = Highlight Play
-          </Typography>
+        <div className="flex gap-4">
+          <div className="flex items-center justify-center gap-1 text-center">
+            <StarIcon color="secondary" fontSize="large" />
+            <Typography fontSize={16} variant="overline">
+              = Highlight Play
+            </Typography>
+          </div>
+          <div className="flex items-center justify-center gap-1 text-center">
+            <LockIcon color="action" fontSize="large" />
+            <Typography fontSize={16} variant="overline">
+              = Private Play
+            </Typography>
+          </div>
         </div>
         <Plays
           setIsFiltersOpen={setIsFiltersOpen}

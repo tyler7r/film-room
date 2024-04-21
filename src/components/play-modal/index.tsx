@@ -209,7 +209,6 @@ const PlayModal = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("run");
     if (video.private || playDetails.private) void createPlay(true);
     else {
       void createPlay(false);
@@ -377,13 +376,59 @@ const PlayModal = ({
       </Box>
     </Modal>
   ) : !isPlayStarted ? (
-    <Button onClick={() => startPlay()} size="large">
-      Start Recording
-    </Button>
+    <div>
+      <Button
+        sx={{ marginRight: "-8px" }}
+        onClick={() => startPlay()}
+        size="large"
+      >
+        Start Recording
+      </Button>
+      <Tooltip
+        title="Start your play recording, once your play ends make sure to click END RECORDING to complete your note!"
+        slotProps={{
+          popper: {
+            modifiers: [
+              {
+                name: "offset",
+                options: {
+                  offset: [0, -14],
+                },
+              },
+            ],
+          },
+        }}
+      >
+        <IconButton>
+          <InfoOutlinedIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    </div>
   ) : (
-    <Button onClick={() => endPlay()} size="large">
-      End Recording
-    </Button>
+    <div>
+      <Button onClick={() => endPlay()} size="large">
+        End Recording
+      </Button>
+      <Tooltip
+        title="End your play recording, once clicked you will be prompted to fill out the details of your play!"
+        slotProps={{
+          popper: {
+            modifiers: [
+              {
+                name: "offset",
+                options: {
+                  offset: [0, -14],
+                },
+              },
+            ],
+          },
+        }}
+      >
+        <IconButton>
+          <InfoOutlinedIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    </div>
   );
 };
 
