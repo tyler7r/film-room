@@ -42,7 +42,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
       })
       .match({ team_id: teamId })
       .or(
-        `private.eq.false, exclusive_to.eq.${teamId}, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
+        `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
         { referencedTable: "videos" },
       )
       .order("uploaded_at", { ascending: false })
