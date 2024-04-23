@@ -1,103 +1,177 @@
-import { Button, TextField } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { Button, Divider, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { type MessageType, type TeamType } from "~/utils/types";
-import FormMessage from "../form-message";
+import { AnnouncementType, LikeListType } from "~/utils/types";
+import LikePopover from "../like-popover";
 
 type AnnouncementProps = {
-  team: TeamType | null;
-  toggleOpen: (modal: string, open: boolean) => void;
+  annc: AnnouncementType;
 };
 
-const Announcement = ({ toggleOpen, team }: AnnouncementProps) => {
+const Announcement = ({ annc }: AnnouncementProps) => {
   const { user } = useAuthContext();
-  const [message, setMessage] = useState<MessageType>({
-    text: undefined,
-    status: "error",
-  });
-  const [announcement, setAnnouncement] = useState("");
-  const [isValidAnnouncement, setIsValidAnnouncement] = useState(false);
+  const { backgroundStyle } = useIsDarkContext();
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [likeCount, setLikeCount] = useState<number>(0);
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setAnnouncement(value);
+  const [likeList, setLikeList] = useState<LikeListType | null>(null);
+  const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
+
+  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget);
   };
 
-  const handleAnnouncement = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
+  const fetchLikeCount = async () => {
+    const { data, count } = await supabase
+      .from("announcement_likes")
+      .select("user_name", { count: "exact" })
+      .eq("announcement_id", annc.id);
+    console.log({ data, count });
+    if (data && data.length > 0) setLikeList(data);
+    if (count) setLikeCount(count);
+    else {
+      setLikeCount(0);
+      setLikeList(null);
+    }
+  };
+
+  const fetchIfUserLiked = async () => {
+    const { count } = await supabase
+      .from("announcement_likes")
+      .select("*", { count: "exact" })
+      .match({
+        announcement_id: annc.id,
+        user_id: user.userId,
+      });
+    if (count && count > 0) {
+      setIsLiked(true);
+    } else {
+      setIsLiked(false);
+    }
+  };
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     const { data } = await supabase
-      .from("announcements")
+      .from("announcement_likes")
       .insert({
-        team_id: `${team?.id}`,
-        text: announcement,
-        author_name: user.name!,
-        author_id: user.userId,
+        announcement_id: annc.id,
+        user_id: `${user.userId}`,
+        user_name: `${user.name}`,
       })
       .select();
     if (data) {
-      setMessage({ text: "Announcement sent!", status: "success" });
-      setTimeout(() => {
-        toggleOpen("announcement", false);
-        setIsValidAnnouncement(false);
-        setAnnouncement("");
-        setMessage({ text: undefined, status: "error" });
-      }, 1000);
-    } else {
-      setMessage({
-        text: "There was an error sending the announcement!",
-        status: "error",
-      });
-      setIsValidAnnouncement(true);
+      void fetchLikeCount();
+      void fetchIfUserLiked();
     }
   };
 
-  useEffect(() => {
-    if (announcement !== "") {
-      setIsValidAnnouncement(true);
-    } else {
-      setIsValidAnnouncement(false);
+  const handleUnlike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const { data } = await supabase
+      .from("announcement_likes")
+      .delete()
+      .match({
+        announcement_id: annc.id,
+        user_id: `${user.userId}`,
+        user_name: `${user.name}`,
+      })
+      .select();
+    if (data) {
+      void fetchLikeCount();
+      void fetchIfUserLiked();
     }
-  }, [announcement]);
+  };
+
+  const handleDelete = async () => {
+    await supabase.from("announcements").delete().eq("id", annc.id);
+  };
+
+  useEffect(() => {
+    void fetchLikeCount();
+    void fetchIfUserLiked();
+  }, []);
 
   return (
-    <form
-      onSubmit={handleAnnouncement}
-      className="m-2 flex w-full flex-col items-center justify-center gap-4 text-center"
+    <div
+      style={backgroundStyle}
+      className="flex w-4/5 cursor-default items-center justify-center gap-2 rounded-md p-4 text-lg"
     >
-      <TextField
-        multiline={true}
-        className="w-full"
-        name="announcement"
-        autoComplete="announcement"
-        required
-        id="announcement"
-        label="Announcement"
-        type={"textarea"}
-        autoFocus
-        onChange={handleInput}
-        value={announcement}
-      />
-      <FormMessage message={message} />
-      <div className="flex gap-2">
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={!isValidAnnouncement}
-        >
-          Send
-        </Button>
-        <Button
-          type="button"
-          onClick={() => {
-            toggleOpen("announcement", false);
-            setAnnouncement("");
-          }}
-        >
-          Close
-        </Button>
+      <div>
+        <strong className="tracking-tight">{`${annc.author_name}: `}</strong>
+        {annc.text}
       </div>
-    </form>
+      <Divider
+        flexItem
+        orientation="vertical"
+        style={{ marginLeft: "2px", marginRight: "2px" }}
+      />
+      <div className="flex items-center justify-center">
+        {isLiked ? (
+          <IconButton
+            onMouseEnter={handlePopoverOpen}
+            onMouseLeave={handlePopoverClose}
+            size="small"
+            onClick={(e) => void handleUnlike(e)}
+          >
+            <FavoriteIcon color="primary" />
+          </IconButton>
+        ) : (
+          <IconButton
+            onMouseEnter={handlePopoverOpen}
+            onMouseLeave={handlePopoverClose}
+            size="small"
+            onClick={(e) => void handleLike(e)}
+          >
+            <FavoriteBorderIcon color="primary" />
+          </IconButton>
+        )}
+        <div className="text-lg font-bold">{likeCount}</div>
+      </div>
+      {annc.author_id === user.currentAffiliation?.affId &&
+        (isDeleteMenuOpen ? (
+          <div className="ml-4 flex gap-1">
+            <Button
+              size="small"
+              variant="contained"
+              onClick={() => void handleDelete()}
+            >
+              Delete
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setIsDeleteMenuOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
+            <DeleteIcon color="action" />
+          </IconButton>
+        ))}
+      {likeList && (
+        <LikePopover
+          open={open}
+          anchorEl={anchorEl}
+          handlePopoverClose={handlePopoverClose}
+          likeList={likeList}
+        />
+      )}
+    </div>
   );
 };
 

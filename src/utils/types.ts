@@ -227,3 +227,12 @@ export type RequestType = {
   profile_id: string;
   verified: boolean;
 }[];
+
+export type AnnouncementType = {
+  author_id: string;
+  author_name: string;
+  created_at: string;
+  id: string;
+  team_id: string;
+  text: string;
+};
