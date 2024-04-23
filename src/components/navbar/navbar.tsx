@@ -13,7 +13,8 @@ export type ChildrenNavProps = {
 
 export const Navbar = () => {
   const { isMobile } = useMobileContext();
-  const { setUnreadCommentCount, setUnreadMentionCount } = useInboxContext();
+  const { setUnreadCommentCount, setUnreadMentionCount, isOpen } =
+    useInboxContext();
   const { user } = useAuthContext();
 
   const router = useRouter();
@@ -53,7 +54,8 @@ export const Navbar = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "play_mentions" },
         () => {
-          if (user.isLoggedIn) void fetchUnreadMentions();
+          console.log("mentions changed");
+          void fetchUnreadMentions();
         },
       )
       .subscribe();
@@ -70,7 +72,8 @@ export const Navbar = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "comments" },
         () => {
-          if (user.isLoggedIn) void fetchUnreadComments();
+          console.log("comments changed");
+          void fetchUnreadComments();
         },
       )
       .subscribe();
@@ -81,8 +84,8 @@ export const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    if (user.isLoggedIn) void fetchUnreadCount();
-  }, [user]);
+    void fetchUnreadCount();
+  }, [user, isOpen]);
 
   return isMobile ? (
     <MobileNav logout={logout} />

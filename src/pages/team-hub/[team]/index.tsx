@@ -1,6 +1,7 @@
 import { Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Announcements from "~/components/announcements";
 import Roster from "~/components/roster";
 import TeamActionBar from "~/components/team-action-bar";
 import TeamLogo from "~/components/team-logo";
@@ -63,7 +64,7 @@ const TeamHub = () => {
     </Typography>
   ) : (
     team && (
-      <div className="mx-2 my-4 flex flex-col items-center justify-center gap-4">
+      <div className="flex w-full flex-col items-center justify-center gap-4 p-2">
         <div className="m-2 flex items-center justify-center gap-5">
           <TeamLogo size={150} tm={team} />
           <div className="flex flex-col items-center justify-center gap-2 text-center">
@@ -81,6 +82,7 @@ const TeamHub = () => {
           setActionBarStatus={setActionBarStatus}
           team={team}
         />
+        {role !== "guest" && <Announcements teamId={team.id} />}
         <Roster team={team} role={role ? role : "guest"} />
         <div className="my-4 flex w-full flex-col items-center justify-center gap-4">
           <Typography variant="h2" fontSize={42}>

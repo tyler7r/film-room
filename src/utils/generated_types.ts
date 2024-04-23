@@ -72,6 +72,63 @@ export type Database = {
           },
         ]
       }
+      announcement_likes: {
+        Row: {
+          announcement_id: string
+          created_at: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          announcement_id: string
+          created_at?: string
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          announcement_id?: string
+          created_at?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_announcement_likes_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_announcement_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "inbox_mentions"
+            referencedColumns: ["receiver_id"]
+          },
+          {
+            foreignKeyName: "public_announcement_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "public_announcement_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "player_view"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "public_announcement_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       announcements: {
         Row: {
           author_id: string
@@ -109,28 +166,14 @@ export type Database = {
             foreignKeyName: "public_announcements_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
-            referencedRelation: "inbox_mentions"
-            referencedColumns: ["receiver_id"]
-          },
-          {
-            foreignKeyName: "public_announcements_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "p_likes"
-            referencedColumns: ["profile_id"]
+            referencedRelation: "affiliations"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_announcements_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "player_view"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "public_announcements_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -143,9 +186,9 @@ export type Database = {
           user_name: string
         }
         Insert: {
-          comment_id?: string
+          comment_id: string
           created_at?: string
-          user_id?: string
+          user_id: string
           user_name: string
         }
         Update: {

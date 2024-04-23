@@ -2,7 +2,7 @@ import { Badge, Button } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import type { TeamActionBarType, TeamType } from "~/utils/types";
-import Announcement from "../announcement";
+import AnnouncementModal from "../announcement-modal";
 import Requests from "../requests";
 
 type TeamActionBarProps = {
@@ -44,7 +44,7 @@ const TeamActionBar = ({
   };
 
   return (
-    <div>
+    <div className="w-full">
       {role === "owner" ? (
         <div className="flex w-full justify-center gap-4">
           <Button
@@ -73,10 +73,7 @@ const TeamActionBar = ({
               )}
             </Button>
           </div>
-          <Button
-            size="small"
-            onClick={() => router.push(`/team-settings/${team.id}`)}
-          >
+          <Button onClick={() => router.push(`/team-settings/${team.id}`)}>
             Team Settings
           </Button>
         </div>
@@ -101,7 +98,7 @@ const TeamActionBar = ({
         </div>
       ) : null}
       {actionBarStatus.announcement && (
-        <Announcement team={team} toggleOpen={handleModalToggle} />
+        <AnnouncementModal team={team} toggleOpen={handleModalToggle} />
       )}
       <Requests
         team={team}
