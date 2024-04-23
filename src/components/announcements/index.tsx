@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { AnnouncementType } from "~/utils/types";
+import type { AnnouncementType } from "~/utils/types";
 import Announcement from "../announcement";
 
 type AnnouncementsProps = {

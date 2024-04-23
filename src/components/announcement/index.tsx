@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { AnnouncementType, LikeListType } from "~/utils/types";
+import type { AnnouncementType, LikeListType } from "~/utils/types";
 import LikePopover from "../like-popover";
 
 type AnnouncementProps = {
