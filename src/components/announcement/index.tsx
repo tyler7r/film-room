@@ -118,51 +118,53 @@ const Announcement = ({ annc }: AnnouncementProps) => {
         orientation="vertical"
         style={{ marginLeft: "2px", marginRight: "2px" }}
       />
-      <div className="flex items-center justify-center">
-        {isLiked ? (
-          <IconButton
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-            size="small"
-            onClick={(e) => void handleUnlike(e)}
-          >
-            <FavoriteIcon color="primary" />
-          </IconButton>
-        ) : (
-          <IconButton
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-            size="small"
-            onClick={(e) => void handleLike(e)}
-          >
-            <FavoriteBorderIcon color="primary" />
-          </IconButton>
-        )}
-        <div className="text-lg font-bold">{likeCount}</div>
+      <div className="flex">
+        <div className="flex items-center justify-center">
+          {isLiked ? (
+            <IconButton
+              onMouseEnter={handlePopoverOpen}
+              onMouseLeave={handlePopoverClose}
+              size="small"
+              onClick={(e) => void handleUnlike(e)}
+            >
+              <FavoriteIcon color="primary" />
+            </IconButton>
+          ) : (
+            <IconButton
+              onMouseEnter={handlePopoverOpen}
+              onMouseLeave={handlePopoverClose}
+              size="small"
+              onClick={(e) => void handleLike(e)}
+            >
+              <FavoriteBorderIcon color="primary" />
+            </IconButton>
+          )}
+          <div className="text-lg font-bold">{likeCount}</div>
+        </div>
+        {annc.author_id === user.currentAffiliation?.affId &&
+          (isDeleteMenuOpen ? (
+            <div className="ml-4 flex gap-1">
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => void handleDelete()}
+              >
+                Delete
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => setIsDeleteMenuOpen(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
+              <DeleteIcon color="action" />
+            </IconButton>
+          ))}
       </div>
-      {annc.author_id === user.currentAffiliation?.affId &&
-        (isDeleteMenuOpen ? (
-          <div className="ml-4 flex gap-1">
-            <Button
-              size="small"
-              variant="contained"
-              onClick={() => void handleDelete()}
-            >
-              Delete
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setIsDeleteMenuOpen(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        ) : (
-          <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
-            <DeleteIcon color="action" />
-          </IconButton>
-        ))}
       {likeList && (
         <LikePopover
           open={open}

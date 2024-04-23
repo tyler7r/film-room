@@ -67,7 +67,7 @@ const Announcements = ({ teamId }: AnnouncementsProps) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4 p-2">
-      <Typography variant="h2" fontSize={42}>
+      <Typography variant="h2" fontSize={42} style={{ textAlign: "center" }}>
         Team Announcements
       </Typography>
       {!anncs && (
@@ -80,8 +80,8 @@ const Announcements = ({ teamId }: AnnouncementsProps) => {
         <Pagination
           showFirstButton
           showLastButton
-          sx={{ marginTop: "24px" }}
-          size="large"
+          sx={{ marginTop: "8px" }}
+          size="small"
           variant="text"
           shape="rounded"
           count={getNumberOfPages(isMobile, announcementCount)}
