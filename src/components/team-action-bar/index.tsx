@@ -87,14 +87,24 @@ const TeamActionBar = ({
           >
             Send Announcement
           </Button>
-          <Button
-            variant={actionBarStatus.requests ? "outlined" : "text"}
-            onClick={() =>
-              handleModalToggle("requests", !actionBarStatus.requests)
-            }
-          >
-            {`Handle Requests ${requestCount !== 0 ? requestCount : null}`}
-          </Button>
+          <div className="flex items-center">
+            <Button
+              variant={actionBarStatus.requests ? "outlined" : "text"}
+              onClick={() =>
+                handleModalToggle("requests", !actionBarStatus.requests)
+              }
+              sx={{ display: "flex", gap: 1 }}
+            >
+              <div>Handle Requests</div>
+              {!actionBarStatus.requests && (
+                <Badge
+                  badgeContent={requestCount}
+                  color="primary"
+                  sx={{ alignSelf: "start" }}
+                />
+              )}
+            </Button>
+          </div>
         </div>
       ) : null}
       {actionBarStatus.announcement && (
