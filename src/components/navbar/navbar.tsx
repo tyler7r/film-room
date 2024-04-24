@@ -84,8 +84,10 @@ export const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    void fetchUnreadCount();
-  }, [user, isOpen]);
+    if (user.isLoggedIn) {
+      void fetchUnreadCount();
+    }
+  }, [isOpen]);
 
   return isMobile ? (
     <MobileNav logout={logout} />

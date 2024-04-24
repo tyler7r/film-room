@@ -11,6 +11,7 @@ import Inbox from "../inbox";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 import TeamLogo from "../team-logo";
+import UniversalSearch from "../universal-search";
 import { type ChildrenNavProps } from "./navbar";
 
 const MobileNav = ({ logout }: ChildrenNavProps) => {
@@ -24,6 +25,7 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
     <div className="flex flex-col">
       <div className="flex items-center justify-between">
         <div className="flex h-max items-center justify-center p-0">
+          <UniversalSearch />
           <Logo size="small" />
         </div>
         <div className="flex gap-1">

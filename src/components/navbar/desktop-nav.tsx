@@ -9,6 +9,7 @@ import Inbox from "../inbox";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 import TeamLogo from "../team-logo";
+import UniversalSearch from "../universal-search";
 import { type ChildrenNavProps } from "./navbar";
 
 const DesktopNav = ({ logout }: ChildrenNavProps) => {
@@ -24,6 +25,7 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
         <div className="flex items-center gap-2">
           {user.isLoggedIn ? (
             <div className="flex items-center justify-center gap-3">
+              <UniversalSearch />
               {user.currentAffiliation && (
                 <TeamLogo
                   tm={user.currentAffiliation.team}
@@ -41,6 +43,7 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
             </div>
           ) : (
             <div className="flex gap-2">
+              <UniversalSearch />
               <Button
                 variant="contained"
                 size="medium"

@@ -70,9 +70,8 @@ export const TheInbox = ({ children }: InboxProps) => {
   }, [isOpen]);
 
   useEffect(() => {
-    console.log({ unreadCommentCount, unreadMentionCount, unreadCount });
     setUnreadCount(unreadCommentCount + unreadMentionCount);
-  }, [unreadCommentCount, unreadMentionCount, unreadCount]);
+  }, [unreadCommentCount, unreadMentionCount]);
 
   return (
     <InboxContext.Provider

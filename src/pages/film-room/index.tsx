@@ -2,7 +2,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Button, Divider, Pagination, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
-import Search from "~/components/search";
 import Video from "~/components/video";
 import VideoSearchFilters from "~/components/video-search-filters";
 import { useAuthContext } from "~/contexts/auth";
@@ -123,10 +122,6 @@ const FilmRoomHome = () => {
         variant="middle"
         sx={{ marginBottom: "16px" }}
       ></Divider>
-      <Search
-        searchOptions={searchOptions}
-        setSearchOptions={setSearchOptions}
-      />
       <VideoSearchFilters
         searchOptions={searchOptions}
         setSearchOptions={setSearchOptions}
