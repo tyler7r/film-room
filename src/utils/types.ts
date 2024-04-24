@@ -154,6 +154,7 @@ export type PlayerType = {
   team_id: string;
   verified: boolean;
   number: number | null;
+  email?: string;
 };
 
 export type VideoUploadType = {

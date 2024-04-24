@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useSearchContext } from "~/contexts/search";
 
-const UniversalSearch = () => {
+const NavbarSearch = () => {
   const { topic, setTopic, isOpen, setIsOpen } = useSearchContext();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -53,4 +53,4 @@ const UniversalSearch = () => {
   );
 };
 
-export default UniversalSearch;
+export default NavbarSearch;
