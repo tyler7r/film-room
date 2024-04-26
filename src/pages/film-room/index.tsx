@@ -131,17 +131,16 @@ const FilmRoomHome = () => {
         Clear Filters
       </Button>
       <div className="mt-6 flex w-4/5 flex-col items-center justify-center gap-6">
-        {!videos ||
-          (videos.length === 0 && (
-            <div className="flex flex-col items-center justify-center gap-1 text-center">
-              <div className="text-2xl font-bold tracking-tight">
-                No videos in the Film Room!
-              </div>
-              <div className="text-xl font-bold tracking-wide">
-                Try a new search.
-              </div>
+        {(!videos || videos.length === 0) && (
+          <div className="flex flex-col items-center justify-center gap-1 text-center">
+            <div className="text-2xl font-bold tracking-tight">
+              No videos in the Film Room!
             </div>
-          ))}
+            <div className="text-xl font-bold tracking-wide">
+              Try a new search.
+            </div>
+          </div>
+        )}
         {videos?.map((v) => <Video video={v} key={v.id} />)}
       </div>
       {videos && videoCount && (

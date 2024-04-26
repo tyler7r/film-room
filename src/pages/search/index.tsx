@@ -5,10 +5,13 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import TeamLogo from "~/components/team-logo";
 import Video from "~/components/video";
+import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { PlayerType, TeamType, VideoType } from "~/utils/types";
+import { useIsDarkContext } from "../_app";
 
 type SearchOptions = {
   loggedIn: boolean;
@@ -22,7 +25,10 @@ type ActionBarType = {
 };
 
 const Search = () => {
-  const { user } = useAuthContext();
+  const { user, setUser } = useAuthContext();
+  const { isDark, backgroundStyle } = useIsDarkContext();
+  const { affiliations } = useAffiliatedContext();
+
   const topic = useSearchParams().get("topic") ?? "";
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -58,7 +64,6 @@ const Search = () => {
       .from("player_view")
       .select("*", { count: "exact" })
       .ilike("name", `%${topic}%`);
-    console.log("users", { data });
     if (data && data.length > 0) setUsers(data);
     else setUsers(null);
   };
@@ -76,7 +81,6 @@ const Search = () => {
       videos.eq("private", false);
     }
     const { data } = await videos;
-    console.log("videos", { data });
     if (data && data.length > 0) setVideos(data);
     else setVideos(null);
   };
@@ -86,16 +90,36 @@ const Search = () => {
       .from("teams")
       .select("*", { count: "exact" })
       .ilike("full_name", `%${topic}%`);
-    console.log("teams", { data });
     if (data && data.length > 0) setTeams(data);
     else setTeams(null);
   };
+
+  const handleTeamClick = (
+    e: React.MouseEvent<HTMLDivElement>,
+    teamId: string,
+  ) => {
+    e.stopPropagation();
+    const isAffiliatedTeam = affiliations?.find(
+      (aff) => aff.team.id === teamId,
+    );
+    if (isAffiliatedTeam && user.currentAffiliation) {
+      setUser({ ...user, currentAffiliation: isAffiliatedTeam });
+    }
+    void router.push(`/team-hub/${teamId}`);
+  };
+
+  useEffect(() => {
+    setOptions({
+      loggedIn: user.isLoggedIn,
+      currentAffiliation: user.currentAffiliation?.team.id,
+    });
+  }, [user]);
 
   useEffect(() => {
     void fetchUsers();
     void fetchTeams();
     void fetchVideos(options);
-  }, [topic, user]);
+  }, [topic, options]);
 
   return (
     <div
@@ -104,7 +128,7 @@ const Search = () => {
     >
       <TextField
         className="w-4/5"
-        sx={{ marginBottom: "8px" }}
+        sx={{ marginBottom: "16px" }}
         label="Search"
         placeholder="New search..."
         onChange={(e) => handleSearch(e.target.value)}
@@ -128,17 +152,16 @@ const Search = () => {
       </div>
       {actionBar.videos && (
         <div className="mt-2 flex w-4/5 flex-col items-center justify-center gap-6">
-          {!videos ||
-            (videos.length === 0 && (
-              <div className="flex flex-col items-center justify-center gap-1 text-center">
-                <div className="text-2xl font-bold tracking-tight">
-                  No videos found!
-                </div>
-                <div className="text-xl font-bold tracking-wide">
-                  Try a new search.
-                </div>
+          {(!videos || videos.length === 0) && (
+            <div className="flex flex-col items-center justify-center gap-1 text-center">
+              <div className="text-2xl font-bold tracking-tight">
+                No videos found!
               </div>
-            ))}
+              <div className="text-xl font-bold tracking-wide">
+                Try a new search.
+              </div>
+            </div>
+          )}
           {videos?.map((v) => <Video video={v} key={v.id} />)}
         </div>
       )}
@@ -161,17 +184,16 @@ const Search = () => {
       </div>
       {actionBar.users && (
         <div className="mt-2 flex w-4/5 flex-col items-center justify-center gap-6">
-          {!users ||
-            (users.length === 0 && (
-              <div className="flex flex-col items-center justify-center gap-1 text-center">
-                <div className="text-2xl font-bold tracking-tight">
-                  No users found!
-                </div>
-                <div className="text-xl font-bold tracking-wide">
-                  Try a new search.
-                </div>
+          {(!users || users.length === 0) && (
+            <div className="flex flex-col items-center justify-center gap-1 text-center">
+              <div className="text-2xl font-bold tracking-tight">
+                No users found!
               </div>
-            ))}
+              <div className="text-xl font-bold tracking-wide">
+                Try a new search.
+              </div>
+            </div>
+          )}
           {videos?.map((v) => <Video video={v} key={v.id} />)}
         </div>
       )}
@@ -194,18 +216,38 @@ const Search = () => {
       </div>
       {actionBar.teams && (
         <div className="mt-2 flex w-4/5 flex-col items-center justify-center gap-6">
-          {!teams ||
-            (teams.length === 0 && (
-              <div className="flex flex-col items-center justify-center gap-1 text-center">
-                <div className="text-2xl font-bold tracking-tight">
-                  No teams found!
-                </div>
-                <div className="text-xl font-bold tracking-wide">
-                  Try a new search.
+          {(!teams || teams.length === 0) && (
+            <div className="flex flex-col items-center justify-center gap-1 text-center">
+              <div className="text-2xl font-bold tracking-tight">
+                No teams found!
+              </div>
+              <div className="text-xl font-bold tracking-wide">
+                Try a new search.
+              </div>
+            </div>
+          )}
+          <div className="align-center flex flex-wrap justify-center gap-6">
+            {teams?.map((team) => (
+              <div
+                className={`flex cursor-pointer items-center justify-center gap-2 rounded-sm border-2 border-solid border-transparent p-4 px-6 transition ease-in-out hover:rounded-md hover:border-solid ${
+                  isDark
+                    ? "hover:border-purple-400"
+                    : "hover:border-purple-A400"
+                } hover:delay-100`}
+                key={team.id}
+                style={backgroundStyle}
+                onClick={(e) => handleTeamClick(e, team.id)}
+              >
+                <TeamLogo tm={team} size={55} />
+                <div className="flex flex-col items-center justify-center">
+                  <div className="text-2xl font-bold">{team.full_name}</div>
+                  {team.id === user.currentAffiliation?.team.id && (
+                    <div className="text-sm">ACTIVE</div>
+                  )}
                 </div>
               </div>
             ))}
-          {videos?.map((v) => <Video video={v} key={v.id} />)}
+          </div>
         </div>
       )}
     </div>

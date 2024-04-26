@@ -1,3 +1,4 @@
+import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { useSearchParams } from "next/navigation";
@@ -5,7 +6,7 @@ import { useRouter } from "next/router";
 import { useSearchContext } from "~/contexts/search";
 
 const NavbarSearch = () => {
-  const { topic, setTopic, isOpen, setIsOpen } = useSearchContext();
+  const { topic, setTopic, setIsOpen } = useSearchContext();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -24,11 +25,13 @@ const NavbarSearch = () => {
     } else {
       params.delete("topic");
     }
+    setTopic("");
+    setIsOpen(false);
     void router.replace(`/search?${params.toString()}`);
   };
 
   return (
-    <div className="flex w-full items-center justify-center self-center">
+    <div className="w-full">
       <form onSubmit={handleSubmit}>
         <TextField
           InputProps={{
@@ -39,12 +42,20 @@ const NavbarSearch = () => {
                 </IconButton>
               </InputAdornment>
             ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setIsOpen(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
           }}
           className="w-full"
-          placeholder="Search"
+          placeholder="New search..."
           name="topic"
           autoComplete="search"
           id="search"
+          // label="Search"
           onChange={changeHandler}
           value={topic}
         />
