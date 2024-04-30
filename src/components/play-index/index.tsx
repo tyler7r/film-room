@@ -29,6 +29,8 @@ export type PlaySearchOptions = {
   receiver_name?: string;
   tag?: string;
   private_only?: boolean;
+  loggedIn: boolean;
+  currentAffiliation: string | undefined;
 };
 
 const PlayIndex = ({
@@ -51,6 +53,8 @@ const PlayIndex = ({
     role: "",
     private_only: false,
     tag: "",
+    loggedIn: user.isLoggedIn,
+    currentAffiliation: user.currentAffiliation?.team.id,
   });
 
   const fetchPlays = async (options?: PlaySearchOptions) => {
@@ -96,6 +100,13 @@ const PlayIndex = ({
     if (activePlay) {
       void plays.neq("id", activePlay.id);
     }
+    if (options?.currentAffiliation) {
+      void plays.or(
+        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
+      );
+    } else {
+      void plays.eq("private", false);
+    }
 
     const { data, count } = await plays;
     if (data) setPlays(data);
@@ -131,6 +142,14 @@ const PlayIndex = ({
       void supabase.removeChannel(channel);
     };
   }, []);
+
+  useEffect(() => {
+    setSearchOptions({
+      ...searchOptions,
+      currentAffiliation: user.currentAffiliation?.team.id,
+      loggedIn: user.isLoggedIn,
+    });
+  }, [user]);
 
   useEffect(() => {
     if (user.currentAffiliation) void fetchPlays(searchOptions);

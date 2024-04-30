@@ -43,10 +43,12 @@ const PlaySearchFilters = ({
 
   const clearSearchOptions = () => {
     setSearchOptions({
+      ...searchOptions,
       only_highlights: false,
       role: "",
       receiver_name: "",
       tag: "",
+      private_only: false,
     });
   };
 

@@ -26,39 +26,39 @@ const Inbox = () => {
         >
           Inbox
         </Typography>
+        {!user.isLoggedIn && (
+          <div className="mb-4 flex items-center justify-center gap-2">
+            <Button
+              variant="contained"
+              size="medium"
+              onClick={() => {
+                setIsOpen(false);
+                void router.push("/signup");
+              }}
+              sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+            >
+              Signup
+            </Button>
+            <Button
+              variant="outlined"
+              disabled={false}
+              size="medium"
+              onClick={() => {
+                setIsOpen(false);
+                void router.push("/login");
+              }}
+              sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+            >
+              Login
+            </Button>
+          </div>
+        )}
         <div className="flex flex-col gap-3">
           <TeamHeader />
           <Divider></Divider>
           <InboxMentions hide={hideMentions} setHide={setHideMentions} />
           <Divider />
           <InboxComments hide={hideComments} setHide={setHideComments} />
-          {!user.isLoggedIn && (
-            <div className="mt-2 flex items-center justify-center gap-2">
-              <Button
-                variant="contained"
-                size="medium"
-                onClick={() => {
-                  setIsOpen(false);
-                  void router.push("/signup");
-                }}
-                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
-              >
-                Signup
-              </Button>
-              <Button
-                variant="outlined"
-                disabled={false}
-                size="medium"
-                onClick={() => {
-                  setIsOpen(false);
-                  void router.push("/login");
-                }}
-                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
-              >
-                Login
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     </Drawer>

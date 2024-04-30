@@ -199,9 +199,6 @@ const AddVideo = () => {
     <Modal open={isOpen} onClose={reset}>
       <Box
         className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid p-4"
-        // sx={{
-        //   position: "relative",
-        // }}
         sx={backgroundStyle}
       >
         <Button

@@ -1,9 +1,12 @@
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Checkbox,
   FormControl,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
+  TextField,
   type SelectChangeEvent,
 } from "@mui/material";
 import type { SearchOptions } from "~/pages/film-room";
@@ -26,8 +29,34 @@ const VideoSearchFilters = ({
     setSearchOptions({ ...searchOptions, [name]: value });
   };
 
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setSearchOptions({ ...searchOptions, title: value });
+  };
+
   return (
     <div className="flex w-4/5 flex-col items-center justify-center gap-2">
+      <div className="relative mb-4 flex w-4/5 flex-1 flex-shrink-0">
+        <label htmlFor="search" className="sr-only">
+          Search
+        </label>
+        <TextField
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+          className="w-full"
+          placeholder="Search videos by title..."
+          name="search"
+          autoComplete="search"
+          id="search"
+          onChange={changeHandler}
+          value={searchOptions.title}
+        />
+      </div>
       <div className="flex w-full gap-2">
         <FormControl className="w-full">
           <InputLabel>Search by division...</InputLabel>

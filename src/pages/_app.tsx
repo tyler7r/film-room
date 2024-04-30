@@ -12,6 +12,7 @@ import { IsAffiliated } from "~/contexts/affiliations";
 import { IsAuth } from "~/contexts/auth";
 import { TheInbox } from "~/contexts/inbox";
 import { IsMobile } from "~/contexts/mobile";
+import { GlobalSearch } from "~/contexts/search";
 import { darkTheme, lightTheme } from "~/contexts/theme";
 import "~/styles/globals.css";
 
@@ -65,8 +66,10 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           <IsMobile>
             <IsAffiliated>
               <TheInbox>
-                <Navbar />
-                <Component {...pageProps} />
+                <GlobalSearch>
+                  <Navbar />
+                  <Component {...pageProps} />
+                </GlobalSearch>
               </TheInbox>
             </IsAffiliated>
           </IsMobile>

@@ -2,7 +2,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Button, Divider, Pagination, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
-import Search from "~/components/search";
 import Video from "~/components/video";
 import VideoSearchFilters from "~/components/video-search-filters";
 import { useAuthContext } from "~/contexts/auth";
@@ -36,16 +35,18 @@ const FilmRoomHome = () => {
 
   const fetchVideos = async (options?: SearchOptions) => {
     const { from, to } = getFromAndTo();
-    let videos = supabase
+    const videos = supabase
       .from("videos")
       .select("*", { count: "exact" })
       .order("uploaded_at", { ascending: false })
       .range(from, to);
-    videos = options?.currentAffiliation
-      ? videos.or(
-          `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
-        )
-      : videos.eq("private", false);
+    if (options?.currentAffiliation) {
+      void videos.or(
+        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
+      );
+    } else {
+      void videos.eq("private", false);
+    }
     if (options?.title) {
       void videos.ilike("title", `%${options.title}%`);
     }
@@ -105,6 +106,13 @@ const FilmRoomHome = () => {
   }, []);
 
   useEffect(() => {
+    setSearchOptions({
+      ...searchOptions,
+      currentAffiliation: user.currentAffiliation?.team.id,
+    });
+  }, [user]);
+
+  useEffect(() => {
     void fetchVideos(searchOptions);
   }, [page, isMobile, searchOptions]);
 
@@ -123,10 +131,6 @@ const FilmRoomHome = () => {
         variant="middle"
         sx={{ marginBottom: "16px" }}
       ></Divider>
-      <Search
-        searchOptions={searchOptions}
-        setSearchOptions={setSearchOptions}
-      />
       <VideoSearchFilters
         searchOptions={searchOptions}
         setSearchOptions={setSearchOptions}
@@ -136,17 +140,16 @@ const FilmRoomHome = () => {
         Clear Filters
       </Button>
       <div className="mt-6 flex w-4/5 flex-col items-center justify-center gap-6">
-        {!videos ||
-          (videos.length === 0 && (
-            <div className="flex flex-col items-center justify-center gap-1 text-center">
-              <div className="text-2xl font-bold tracking-tight">
-                No videos in the Film Room!
-              </div>
-              <div className="text-xl font-bold tracking-wide">
-                Try a new search.
-              </div>
+        {(!videos || videos.length === 0) && (
+          <div className="flex flex-col items-center justify-center gap-1 text-center">
+            <div className="text-2xl font-bold tracking-tight">
+              No videos in the Film Room!
             </div>
-          ))}
+            <div className="text-xl font-bold tracking-wide">
+              Try a new search.
+            </div>
+          </div>
+        )}
         {videos?.map((v) => <Video video={v} key={v.id} />)}
       </div>
       {videos && videoCount && (

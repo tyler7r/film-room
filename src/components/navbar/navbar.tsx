@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
@@ -11,35 +11,48 @@ export type ChildrenNavProps = {
   logout: () => void;
 };
 
+type FetchOptions = {
+  loggedIn: boolean;
+  userId: string | undefined;
+};
+
 export const Navbar = () => {
   const { isMobile } = useMobileContext();
   const { setUnreadCommentCount, setUnreadMentionCount, isOpen } =
     useInboxContext();
   const { user } = useAuthContext();
-
   const router = useRouter();
 
-  const fetchUnreadMentions = async () => {
-    const { count } = await supabase
-      .from("inbox_mentions")
-      .select("*", { count: "exact" })
-      .match({ receiver_id: `${user.userId}`, viewed: false });
-    if (count && count > 0) setUnreadMentionCount(count);
-    else setUnreadMentionCount(0);
+  const [options, setOptions] = useState<FetchOptions>({
+    loggedIn: user.isLoggedIn,
+    userId: user.userId,
+  });
+
+  const fetchUnreadMentions = async (options?: FetchOptions) => {
+    if (options?.loggedIn && options?.userId) {
+      const { count } = await supabase
+        .from("inbox_mentions")
+        .select("*", { count: "exact" })
+        .match({ receiver_id: `${user.userId}`, viewed: false });
+      if (count && count > 0) setUnreadMentionCount(count);
+      else setUnreadMentionCount(0);
+    }
   };
 
-  const fetchUnreadComments = async () => {
-    const { count } = await supabase
-      .from("comment_notifications")
-      .select("*", { count: "exact" })
-      .match({ play_author_id: `${user.userId}`, viewed_by_author: false });
-    if (count && count > 0) setUnreadCommentCount(count);
-    else setUnreadCommentCount(0);
+  const fetchUnreadComments = async (options?: FetchOptions) => {
+    if (options?.userId && options.loggedIn) {
+      const { count } = await supabase
+        .from("comment_notifications")
+        .select("*", { count: "exact" })
+        .match({ play_author_id: `${user.userId}`, viewed_by_author: false });
+      if (count && count > 0) setUnreadCommentCount(count);
+      else setUnreadCommentCount(0);
+    }
   };
 
   const fetchUnreadCount = async () => {
-    void fetchUnreadMentions();
-    void fetchUnreadComments();
+    void fetchUnreadMentions(options);
+    void fetchUnreadComments(options);
   };
 
   const logout = async () => {
@@ -54,7 +67,6 @@ export const Navbar = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "play_mentions" },
         () => {
-          console.log("mentions changed");
           void fetchUnreadMentions();
         },
       )
@@ -72,7 +84,6 @@ export const Navbar = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "comments" },
         () => {
-          console.log("comments changed");
           void fetchUnreadComments();
         },
       )
@@ -84,8 +95,12 @@ export const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    setOptions({ ...options, loggedIn: user.isLoggedIn, userId: user.userId });
+  }, [user]);
+
+  useEffect(() => {
     void fetchUnreadCount();
-  }, [user, isOpen]);
+  }, [isOpen, options]);
 
   return isMobile ? (
     <MobileNav logout={logout} />

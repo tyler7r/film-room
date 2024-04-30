@@ -25,6 +25,11 @@ type TeamVideosProps = {
   teamId: string;
 };
 
+type SearchOptions = {
+  loggedIn: boolean;
+  currentAffiliation: string | undefined;
+};
+
 const TeamVideos = ({ teamId }: TeamVideosProps) => {
   const { isMobile } = useMobileContext();
   const { user } = useAuthContext();
@@ -32,21 +37,30 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
 
   const [videos, setVideos] = useState<TeamVideoType | null>(null);
   const [videoCount, setVideoCount] = useState<number>(0);
+  const [options, setOptions] = useState<SearchOptions>({
+    loggedIn: user.isLoggedIn,
+    currentAffiliation: user.currentAffiliation?.team.id,
+  });
 
-  const fetchVideos = async () => {
+  const fetchVideos = async (options?: SearchOptions) => {
     const { from, to } = getFromAndTo();
-    const { data, count } = await supabase
+    const videos = supabase
       .from("team_videos")
       .select(`uploaded_at, video:videos!inner(*)`, {
         count: "exact",
       })
       .match({ team_id: teamId })
-      .or(
-        `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
-        { referencedTable: "videos" },
-      )
       .order("uploaded_at", { ascending: false })
       .range(from, to);
+    if (options?.currentAffiliation) {
+      void videos.or(
+        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
+        { referencedTable: "videos" },
+      );
+    } else {
+      void videos.eq("video.private", false);
+    }
+    const { data, count } = await videos;
     if (data && data.length > 0) setVideos(data);
     else setVideos(null);
     if (count) setVideoCount(count);
@@ -66,8 +80,15 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
   };
 
   useEffect(() => {
-    void fetchVideos();
-  }, [teamId]);
+    setOptions({
+      loggedIn: user.isLoggedIn,
+      currentAffiliation: user.currentAffiliation?.team.id,
+    });
+  }, [user]);
+
+  useEffect(() => {
+    void fetchVideos(options);
+  }, [teamId, options]);
 
   return (
     <div className="flex w-11/12 flex-col items-center justify-center">
