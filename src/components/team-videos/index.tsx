@@ -53,12 +53,12 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
       .order("uploaded_at", { ascending: false })
       .range(from, to);
     if (options?.currentAffiliation) {
-      videos.or(
+      void videos.or(
         `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
         { referencedTable: "videos" },
       );
     } else {
-      videos.eq("video.private", false);
+      void videos.eq("video.private", false);
     }
     const { data, count } = await videos;
     if (data && data.length > 0) setVideos(data);

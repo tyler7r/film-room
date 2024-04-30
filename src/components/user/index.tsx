@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useIsDarkContext } from "~/pages/_app";
-import { UserType } from "~/utils/types";
+import type { UserType } from "~/utils/types";
 
 type UserProps = {
   user: UserType;

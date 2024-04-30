@@ -35,7 +35,7 @@ const FilmRoomHome = () => {
 
   const fetchVideos = async (options?: SearchOptions) => {
     const { from, to } = getFromAndTo();
-    let videos = supabase
+    const videos = supabase
       .from("videos")
       .select("*", { count: "exact" })
       .order("uploaded_at", { ascending: false })

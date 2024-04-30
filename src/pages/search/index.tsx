@@ -11,7 +11,7 @@ import Video from "~/components/video";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { TeamType, UserType, VideoType } from "~/utils/types";
+import type { TeamType, UserType, VideoType } from "~/utils/types";
 import { useIsDarkContext } from "../_app";
 
 type SearchOptions = {
@@ -60,7 +60,7 @@ const Search = () => {
   }, 300);
 
   const fetchUsers = async () => {
-    const { data, count } = await supabase
+    const { data } = await supabase
       .from("profiles")
       .select("*", { count: "exact" })
       .ilike("name", `%${topic}%`);
@@ -74,11 +74,11 @@ const Search = () => {
       .select("*")
       .ilike("title", `%${topic}%`);
     if (options?.currentAffiliation) {
-      videos.or(
+      void videos.or(
         `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
       );
     } else {
-      videos.eq("private", false);
+      void videos.eq("private", false);
     }
     const { data } = await videos;
     if (data && data.length > 0) setVideos(data);
@@ -86,7 +86,7 @@ const Search = () => {
   };
 
   const fetchTeams = async () => {
-    const { data, count } = await supabase
+    const { data } = await supabase
       .from("teams")
       .select("*", { count: "exact" })
       .ilike("full_name", `%${topic}%`);
