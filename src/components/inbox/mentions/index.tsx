@@ -1,5 +1,5 @@
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import MailIcon from "@mui/icons-material/Mail";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
@@ -159,17 +159,12 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
       >
         <div>Recent Mentions</div>
         {hide && (
-          <Button
-            variant="outlined"
-            size="small"
-            endIcon={<ExpandMoreIcon />}
-            onClick={() => setHide(false)}
-          >
-            Show
-          </Button>
+          <IconButton onClick={() => setHide(false)}>
+            <KeyboardArrowRightIcon />
+          </IconButton>
         )}
         {!hide && (
-          <div>
+          <div className="flex gap-2">
             <IconButton onClick={() => handleUnreadClick()}>
               {isUnreadOnly ? (
                 <MailIcon color="primary" />
@@ -177,14 +172,9 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
                 <MailOutlineIcon color="primary" />
               )}
             </IconButton>
-            <Button
-              size="small"
-              variant="outlined"
-              endIcon={<ExpandLessIcon />}
-              onClick={() => setHide(true)}
-            >
-              Hide
-            </Button>
+            <IconButton onClick={() => setHide(true)}>
+              <ExpandMoreIcon />
+            </IconButton>
           </div>
         )}
       </div>

@@ -1,5 +1,5 @@
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import MailIcon from "@mui/icons-material/Mail";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
@@ -157,21 +157,16 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
     <div className="flex flex-col gap-4">
       <div
         ref={topRef}
-        className="flex items-center justify-between text-2xl font-bold lg:mb-2 lg:text-3xl"
+        className="flex items-center text-2xl font-bold lg:mb-2 lg:text-3xl"
       >
         <div>Recent Comments</div>
         {hide && (
-          <Button
-            variant="outlined"
-            size="small"
-            endIcon={<ExpandMoreIcon />}
-            onClick={() => setHide(false)}
-          >
-            Show
-          </Button>
+          <IconButton onClick={() => setHide(false)}>
+            <KeyboardArrowRightIcon />
+          </IconButton>
         )}
         {!hide && (
-          <div>
+          <div className="flex gap-2">
             <IconButton onClick={() => handleUnreadClick()}>
               {isUnreadOnly ? (
                 <MailIcon color="primary" />
@@ -179,14 +174,9 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
                 <MailOutlineIcon color="primary" />
               )}
             </IconButton>
-            <Button
-              size="small"
-              variant="outlined"
-              endIcon={<ExpandLessIcon />}
-              onClick={() => setHide(true)}
-            >
-              Hide
-            </Button>
+            <IconButton onClick={() => setHide(true)}>
+              <ExpandMoreIcon />
+            </IconButton>
           </div>
         )}
       </div>

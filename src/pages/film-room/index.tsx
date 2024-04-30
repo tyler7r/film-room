@@ -40,11 +40,13 @@ const FilmRoomHome = () => {
       .select("*", { count: "exact" })
       .order("uploaded_at", { ascending: false })
       .range(from, to);
-    videos = options?.currentAffiliation
-      ? videos.or(
-          `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
-        )
-      : videos.eq("private", false);
+    if (options?.currentAffiliation) {
+      void videos.or(
+        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
+      );
+    } else {
+      void videos.eq("private", false);
+    }
     if (options?.title) {
       void videos.ilike("title", `%${options.title}%`);
     }
@@ -102,6 +104,13 @@ const FilmRoomHome = () => {
       void supabase.removeChannel(channel);
     };
   }, []);
+
+  useEffect(() => {
+    setSearchOptions({
+      ...searchOptions,
+      currentAffiliation: user.currentAffiliation?.team.id,
+    });
+  }, [user]);
 
   useEffect(() => {
     void fetchVideos(searchOptions);

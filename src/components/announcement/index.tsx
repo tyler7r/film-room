@@ -38,7 +38,6 @@ const Announcement = ({ annc }: AnnouncementProps) => {
       .from("announcement_likes")
       .select("user_name", { count: "exact" })
       .eq("announcement_id", annc.id);
-    console.log({ data, count });
     if (data && data.length > 0) setLikeList(data);
     if (count) setLikeCount(count);
     else {
