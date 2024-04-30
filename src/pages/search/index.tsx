@@ -6,11 +6,12 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import TeamLogo from "~/components/team-logo";
+import User from "~/components/user";
 import Video from "~/components/video";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { PlayerType, TeamType, VideoType } from "~/utils/types";
+import { TeamType, UserType, VideoType } from "~/utils/types";
 import { useIsDarkContext } from "../_app";
 
 type SearchOptions = {
@@ -34,7 +35,7 @@ const Search = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const [users, setUsers] = useState<PlayerType[] | null>(null);
+  const [users, setUsers] = useState<UserType[] | null>(null);
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [options, setOptions] = useState<SearchOptions>({
@@ -59,9 +60,8 @@ const Search = () => {
   }, 300);
 
   const fetchUsers = async () => {
-    console.log(topic);
     const { data, count } = await supabase
-      .from("player_view")
+      .from("profiles")
       .select("*", { count: "exact" })
       .ilike("name", `%${topic}%`);
     if (data && data.length > 0) setUsers(data);
@@ -151,7 +151,7 @@ const Search = () => {
         )}
       </div>
       {actionBar.videos && (
-        <div className="mt-2 flex w-4/5 flex-col items-center justify-center gap-6">
+        <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
           {(!videos || videos.length === 0) && (
             <div className="flex flex-col items-center justify-center gap-1 text-center">
               <div className="text-2xl font-bold tracking-tight">
@@ -183,7 +183,7 @@ const Search = () => {
         )}
       </div>
       {actionBar.users && (
-        <div className="mt-2 flex w-4/5 flex-col items-center justify-center gap-6">
+        <div className="mt-2 w-11/12">
           {(!users || users.length === 0) && (
             <div className="flex flex-col items-center justify-center gap-1 text-center">
               <div className="text-2xl font-bold tracking-tight">
@@ -194,7 +194,9 @@ const Search = () => {
               </div>
             </div>
           )}
-          {videos?.map((v) => <Video video={v} key={v.id} />)}
+          <div className="align-center flex flex-wrap justify-center gap-6">
+            {users?.map((u) => <User user={u} key={u.id} />)}
+          </div>
         </div>
       )}
       <Divider flexItem variant="middle" sx={{ margin: "8px 24px 8px 24px" }} />
@@ -215,7 +217,7 @@ const Search = () => {
         )}
       </div>
       {actionBar.teams && (
-        <div className="mt-2 flex w-4/5 flex-col items-center justify-center gap-6">
+        <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
           {(!teams || teams.length === 0) && (
             <div className="flex flex-col items-center justify-center gap-1 text-center">
               <div className="text-2xl font-bold tracking-tight">

@@ -54,7 +54,7 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
               )}
             </div>
           ) : (
-            <div className="flex w-full items-center justify-end gap-2 border-solid">
+            <div className="flex w-full items-center justify-end gap-2">
               {isSearchOpen ? (
                 <NavbarSearch />
               ) : (
