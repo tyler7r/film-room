@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import ProfileActionBar from "~/components/profile-action-bar";
 import TeamLogo from "~/components/team-logo";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
@@ -7,6 +8,7 @@ import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import {
   BasicPlayType,
+  ProfileActionBarType,
   RealMentionType,
   TeamAffiliationType,
 } from "~/utils/types";
@@ -49,6 +51,11 @@ const Profile = () => {
     playCount: 0,
     highlights: null,
     highlightCount: 0,
+  });
+  const [actionBarStatus, setActionBarStatus] = useState<ProfileActionBarType>({
+    createdPlays: false,
+    mentions: false,
+    highlights: false,
   });
 
   const fetchProfile = async (options?: FetchOptions) => {
@@ -191,6 +198,12 @@ const Profile = () => {
               </div>
             </div>
           ))}
+        </div>
+        <div className="w-full">
+          <ProfileActionBar
+            actionBarStatus={actionBarStatus}
+            setActionBarStatus={setActionBarStatus}
+          />
         </div>
         {/* {play && (
           <Youtube

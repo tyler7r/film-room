@@ -239,6 +239,12 @@ export type TeamActionBarType = {
   requests: boolean;
 };
 
+export type ProfileActionBarType = {
+  createdPlays: boolean;
+  mentions: boolean;
+  highlights: boolean;
+};
+
 export type RequestType = {
   email: string;
   id: string;
