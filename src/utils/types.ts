@@ -24,6 +24,7 @@ export type Database = MergeDeep<
         };
         inbox_mentions: {
           Row: {
+            author_id: string;
             author_name: string;
             created_at: string;
             highlight: boolean;
@@ -43,6 +44,7 @@ export type Database = MergeDeep<
           Row: {
             email: string;
             id: string;
+            join_date: string;
             name: string;
             number: number | null;
             profile_id: string;
@@ -87,6 +89,7 @@ export type TeamAffiliationType = {
   };
   role: string;
   affId: string;
+  number?: number | null;
 };
 
 export type UserSession = {
@@ -146,9 +149,25 @@ export type PlayType = {
   }[];
 };
 
+export type BasicPlayType = {
+  author_id: string | null;
+  video_id: string | null;
+  highlight: boolean;
+  id: string;
+  note: string;
+  exclusive_to: string | null;
+  private: boolean;
+  author_name: string;
+  author_role: string;
+  start_time: number;
+  end_time: number;
+  title: string;
+};
+
 export type PlayerType = {
   id: string;
   name: string;
+  join_date: string;
   profile_id: string;
   role: string;
   team_id: string;
@@ -178,6 +197,7 @@ export type TeamMentionType = {
 }[];
 
 export type RealMentionType = {
+  author_id: string;
   author_name: string;
   created_at: string;
   highlight: boolean;

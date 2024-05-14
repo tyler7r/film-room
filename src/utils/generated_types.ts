@@ -657,6 +657,7 @@ export type Database = {
         Row: {
           email: string | null
           id: string
+          join_date: string
           last_watched: string | null
           last_watched_time: number | null
           name: string | null
@@ -664,6 +665,7 @@ export type Database = {
         Insert: {
           email?: string | null
           id: string
+          join_date?: string
           last_watched?: string | null
           last_watched_time?: number | null
           name?: string | null
@@ -671,6 +673,7 @@ export type Database = {
         Update: {
           email?: string | null
           id?: string
+          join_date?: string
           last_watched?: string | null
           last_watched_time?: number | null
           name?: string | null
@@ -1073,6 +1076,7 @@ export type Database = {
       }
       inbox_mentions: {
         Row: {
+          author_id: string | null
           author_name: string | null
           created_at: string | null
           highlight: boolean | null
@@ -1102,6 +1106,20 @@ export type Database = {
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "public_plays_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "affiliations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "player_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       p_likes: {
@@ -1124,6 +1142,7 @@ export type Database = {
         Row: {
           email: string | null
           id: string | null
+          join_date: string | null
           name: string | null
           number: number | null
           profile_id: string | null
@@ -1150,6 +1169,7 @@ export type Database = {
       }
       transition_mention_view: {
         Row: {
+          author_id: string | null
           author_name: string | null
           created_at: string | null
           highlight: boolean | null
@@ -1198,6 +1218,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "player_view"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "public_plays_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "affiliations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "player_view"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_plays_video_id_fkey"
