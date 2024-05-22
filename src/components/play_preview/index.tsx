@@ -1,9 +1,9 @@
 import { useState } from "react";
 import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
-import { PlayPreviewType } from "~/utils/types";
+import { PlayPreviewType, RealMentionType } from "~/utils/types";
 
 type PlayPreviewProps = {
-  play: PlayPreviewType;
+  play: PlayPreviewType | RealMentionType;
 };
 
 const PlayPreview = ({ play }: PlayPreviewProps) => {
@@ -41,7 +41,7 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
           rel: 0,
           color: "red",
           origin: "https://www.youtube.com",
-          start: play.start_time,
+          // start: start_time,
         },
       }}
       onReady={videoOnReady}

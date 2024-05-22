@@ -24,11 +24,11 @@ type ProfileType = {
 };
 
 type StatsType = {
-  mentions: RealMentionType | null;
+  mentions: RealMentionType[] | null;
   mentionCount: number;
   plays: PlayPreviewType[] | null;
   playCount: number;
-  highlights: RealMentionType | null;
+  highlights: RealMentionType[] | null;
   highlightCount: number;
 };
 
@@ -200,6 +200,14 @@ const Profile = () => {
         {actionBarStatus.createdPlays &&
           stats.plays?.map((play) => (
             <PlayPreview key={play.play_title + play.author_id} play={play} />
+          ))}
+        {actionBarStatus.mentions &&
+          stats.mentions?.map((play) => (
+            <PlayPreview key={play.play_id} play={play} />
+          ))}
+        {actionBarStatus.highlights &&
+          stats.highlights?.map((play) => (
+            <PlayPreview key={play.play_id} play={play} />
           ))}
       </div>
     )

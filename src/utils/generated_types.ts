@@ -313,6 +313,13 @@ export type Database = {
             foreignKeyName: "public_comments_play_id_fkey"
             columns: ["play_id"]
             isOneToOne: false
+            referencedRelation: "play_preview"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
             referencedRelation: "plays"
             referencedColumns: ["id"]
           },
@@ -385,6 +392,13 @@ export type Database = {
             columns: ["play_id"]
             isOneToOne: false
             referencedRelation: "p_likes"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_likes_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "play_preview"
             referencedColumns: ["play_id"]
           },
           {
@@ -481,6 +495,13 @@ export type Database = {
             foreignKeyName: "public_play_mentions2_play_id_fkey"
             columns: ["play_id"]
             isOneToOne: false
+            referencedRelation: "play_preview"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_mentions2_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
             referencedRelation: "plays"
             referencedColumns: ["id"]
           },
@@ -547,6 +568,13 @@ export type Database = {
             columns: ["play_id"]
             isOneToOne: false
             referencedRelation: "p_likes"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "play_preview"
             referencedColumns: ["play_id"]
           },
           {
@@ -972,6 +1000,13 @@ export type Database = {
             foreignKeyName: "public_comments_play_id_fkey"
             columns: ["play_id"]
             isOneToOne: false
+            referencedRelation: "play_preview"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
             referencedRelation: "transition_mention_view"
             referencedColumns: ["play_id"]
           },
@@ -1062,6 +1097,13 @@ export type Database = {
             foreignKeyName: "public_comments_play_id_fkey"
             columns: ["play_id"]
             isOneToOne: false
+            referencedRelation: "play_preview"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
             referencedRelation: "transition_mention_view"
             referencedColumns: ["play_id"]
           },
@@ -1114,7 +1156,9 @@ export type Database = {
           author_id: string | null
           author_name: string | null
           created_at: string | null
+          end_time: number | null
           highlight: boolean | null
+          link: string | null
           mention_id: string | null
           play_id: string | null
           play_title: string | null
@@ -1182,6 +1226,7 @@ export type Database = {
           highlight: boolean | null
           link: string | null
           note: string | null
+          play_id: string | null
           play_title: string | null
           private: boolean | null
           start_time: number | null
@@ -1260,6 +1305,7 @@ export type Database = {
           author_id: string | null
           author_name: string | null
           created_at: string | null
+          end_time: number | null
           highlight: boolean | null
           mention_id: string | null
           play_id: string | null
