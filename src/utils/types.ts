@@ -53,6 +53,22 @@ export type Database = MergeDeep<
             verified: boolean;
           };
         };
+        play_preview: {
+          Row: {
+            author_id: string;
+            author_name: string;
+            end_time: number;
+            exclusive_to: string | null;
+            highlight: boolean;
+            video_id: string;
+            link: string;
+            note: string;
+            play_title: string;
+            private: boolean;
+            start_time: number;
+            video_title: string;
+          };
+        };
         comment_notifications: {
           Row: {
             comment: string;
@@ -270,4 +286,19 @@ export type AnnouncementType = {
   id: string;
   team_id: string;
   text: string;
+};
+
+export type PlayPreviewType = {
+  author_id: string;
+  author_name: string;
+  end_time: number;
+  exclusive_to: string | null;
+  highlight: boolean;
+  video_id: string;
+  link: string;
+  note: string;
+  play_title: string;
+  private: boolean;
+  start_time: number;
+  video_title: string;
 };

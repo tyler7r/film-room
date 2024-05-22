@@ -648,6 +648,13 @@ export type Database = {
             foreignKeyName: "public_plays_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
+            referencedRelation: "play_preview"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "public_plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
             referencedRelation: "videos"
             referencedColumns: ["id"]
           },
@@ -691,6 +698,13 @@ export type Database = {
             columns: ["last_watched"]
             isOneToOne: false
             referencedRelation: "inbox_mentions"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "public_profiles_last_watched_fkey"
+            columns: ["last_watched"]
+            isOneToOne: false
+            referencedRelation: "play_preview"
             referencedColumns: ["video_id"]
           },
           {
@@ -760,6 +774,13 @@ export type Database = {
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "inbox_mentions"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "public_team_videos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "play_preview"
             referencedColumns: ["video_id"]
           },
           {
@@ -975,6 +996,13 @@ export type Database = {
             referencedRelation: "inbox_mentions"
             referencedColumns: ["video_id"]
           },
+          {
+            foreignKeyName: "public_plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "play_preview"
+            referencedColumns: ["video_id"]
+          },
         ]
       }
       comment_transition_view: {
@@ -1072,6 +1100,13 @@ export type Database = {
             referencedRelation: "inbox_mentions"
             referencedColumns: ["video_id"]
           },
+          {
+            foreignKeyName: "public_plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "play_preview"
+            referencedColumns: ["video_id"]
+          },
         ]
       }
       inbox_mentions: {
@@ -1134,6 +1169,59 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: true
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      play_preview: {
+        Row: {
+          author_id: string | null
+          author_name: string | null
+          end_time: number | null
+          exclusive_to: string | null
+          highlight: boolean | null
+          link: string | null
+          note: string | null
+          play_title: string | null
+          private: boolean | null
+          start_time: number | null
+          video_id: string | null
+          video_title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliations_user_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliations_user_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "inbox_mentions"
+            referencedColumns: ["receiver_id"]
+          },
+          {
+            foreignKeyName: "affiliations_user_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "affiliations_user_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "player_view"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]
@@ -1245,6 +1333,13 @@ export type Database = {
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "inbox_mentions"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "public_plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "play_preview"
             referencedColumns: ["video_id"]
           },
         ]

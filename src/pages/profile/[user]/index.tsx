@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import PlayPreview from "~/components/play_preview";
 import ProfileActionBar from "~/components/profile-action-bar";
 import TeamLogo from "~/components/team-logo";
 import { useAffiliatedContext } from "~/contexts/affiliations";
@@ -7,7 +8,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import {
-  BasicPlayType,
+  PlayPreviewType,
   ProfileActionBarType,
   RealMentionType,
   TeamAffiliationType,
@@ -25,7 +26,7 @@ type ProfileType = {
 type StatsType = {
   mentions: RealMentionType | null;
   mentionCount: number;
-  plays: BasicPlayType[] | null;
+  plays: PlayPreviewType[] | null;
   playCount: number;
   highlights: RealMentionType | null;
   highlightCount: number;
@@ -53,7 +54,7 @@ const Profile = () => {
     highlightCount: 0,
   });
   const [actionBarStatus, setActionBarStatus] = useState<ProfileActionBarType>({
-    createdPlays: false,
+    createdPlays: true,
     mentions: false,
     highlights: false,
   });
@@ -77,15 +78,6 @@ const Profile = () => {
     }
   };
 
-  //   const fetchPlay = async () => {
-  //     const { data } = await supabase
-  //       .from("plays")
-  //       .select("*, videos(link)")
-  //       .eq("id", "06af3f59-c8e8-4e0e-9919-405c283be89d")
-  //       .single();
-  //     if (data) setPlay(data);
-  //   };
-
   const fetchStats = async (options?: FetchOptions) => {
     if (options?.profileId) {
       const getMentions = await supabase
@@ -101,11 +93,11 @@ const Profile = () => {
         })
         .match({ highlight: true, receiver_id: options.profileId });
       const getPlays = await supabase
-        .from("plays")
-        .select("*, affiliation: public_plays_author_id_fkey!inner(user_id)", {
+        .from("play_preview")
+        .select("*", {
           count: "exact",
         })
-        .eq("affiliation.user_id", options.profileId);
+        .eq("author_id", options.profileId);
       setStats({
         mentions:
           getMentions.data && getMentions.data.length > 0
@@ -205,25 +197,10 @@ const Profile = () => {
             setActionBarStatus={setActionBarStatus}
           />
         </div>
-        {/* {play && (
-          <Youtube
-            opts={{
-              //   width: `${screenWidth * 0.8}`,
-              //   height: `${(screenWidth * 0.8) / 1.778}`,
-              playerVars: {
-                enablejsapi: 1,
-                playsinline: 1,
-                fs: 1,
-                rel: 0,
-                color: "red",
-                origin: "https://www.youtube.com",
-              },
-            }}
-            id="player"
-            videoId={play.videos.link.split("v=")[1]?.split("&")[0]}
-            onReady={videoOnReady}
-          />
-        )} */}
+        {actionBarStatus.createdPlays &&
+          stats.plays?.map((play) => (
+            <PlayPreview key={play.play_title + play.author_id} play={play} />
+          ))}
       </div>
     )
   );

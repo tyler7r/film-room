@@ -2,7 +2,6 @@ import CreateIcon from "@mui/icons-material/Create";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import StarIcon from "@mui/icons-material/Star";
 import { IconButton } from "@mui/material";
-import { useIsDarkContext } from "~/pages/_app";
 import { ProfileActionBarType } from "~/utils/types";
 
 type ProfileActionBarProps = {
@@ -14,8 +13,6 @@ const ProfileActionBar = ({
   actionBarStatus,
   setActionBarStatus,
 }: ProfileActionBarProps) => {
-  const { backgroundStyle } = useIsDarkContext();
-
   const handleModalToggle = (modal: string) => {
     if (modal === "createdPlays") {
       setActionBarStatus({
