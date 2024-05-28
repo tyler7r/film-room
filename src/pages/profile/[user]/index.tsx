@@ -59,7 +59,7 @@ type FeedType = {
 
 const Profile = () => {
   const router = useRouter();
-  const { isDark, backgroundStyle } = useIsDarkContext();
+  const { isDark } = useIsDarkContext();
   const { affiliations } = useAffiliatedContext();
   const { user, setUser } = useAuthContext();
 
