@@ -1,12 +1,15 @@
 import { useState } from "react";
-import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
-import { PlayPreviewType, RealMentionType } from "~/utils/types";
+import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
+import { useMobileContext } from "~/contexts/mobile";
+import type { PlayPreviewType, RealMentionType } from "~/utils/types";
 
 type PlayPreviewProps = {
   play: PlayPreviewType | RealMentionType;
 };
 
 const PlayPreview = ({ play }: PlayPreviewProps) => {
+  const { screenWidth, isMobile } = useMobileContext();
+
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
   const videoOnReady = async (e: YouTubeEvent) => {
@@ -33,6 +36,8 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
   return (
     <YouTube
       opts={{
+        width: `${isMobile ? screenWidth * 0.9 : 640}`,
+        height: `${isMobile ? (screenWidth * 0.9) / 1.778 : 390}`,
         playerVars: {
           controls: 0,
           enablejsapi: 1,
@@ -41,7 +46,6 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
           rel: 0,
           color: "red",
           origin: "https://www.youtube.com",
-          // start: start_time,
         },
       }}
       onReady={videoOnReady}

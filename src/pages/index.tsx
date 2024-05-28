@@ -1,90 +1,67 @@
-import AddIcon from "@mui/icons-material/Add";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { Button } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import TeamLogo from "~/components/team-logo";
-import Video from "~/components/video";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
-import { supabase } from "~/utils/supabase";
-import type { TeamAffiliationType } from "~/utils/types";
 import { useIsDarkContext } from "./_app";
-
-type LastWatchedType = {
-  last_watched: string | null;
-  last_watched_time: number | null;
-  videos: {
-    division: string;
-    exclusive_to: string | null;
-    id: string;
-    link: string;
-    private: boolean;
-    season: string;
-    title: string;
-    tournament: string | null;
-    uploaded_at: string;
-    week: string | null;
-  } | null;
-};
+import Profile from "./profile/[user]";
 
 export default function Home() {
   const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
   const { backgroundStyle, isDark } = useIsDarkContext();
   const router = useRouter();
-  const [lastWatched, setLastWatched] = useState<LastWatchedType | null>(null);
+  // const [lastWatched, setLastWatched] = useState<LastWatchedType | null>(null);
 
-  const fetchLastWatched = async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("last_watched, last_watched_time, videos(*)")
-      .eq("id", `${user.userId}`)
-      .single();
-    if (data?.last_watched) setLastWatched(data);
-    else setLastWatched(null);
-  };
+  // const fetchLastWatched = async () => {
+  //   const { data } = await supabase
+  //     .from("profiles")
+  //     .select("last_watched, last_watched_time, videos(*)")
+  //     .eq("id", `${user.userId}`)
+  //     .single();
+  //   if (data?.last_watched) setLastWatched(data);
+  //   else setLastWatched(null);
+  // };
 
-  const updateUserAffiliation = (teamId: string | null | undefined) => {
-    if (teamId) {
-      const team = affiliations?.find((aff) => aff.team.id === teamId);
-      if (user.currentAffiliation?.team.id === teamId) return;
-      else {
-        setUser({
-          ...user,
-          currentAffiliation: team ? team : user.currentAffiliation,
-        });
-      }
-    } else return;
-  };
+  // const updateUserAffiliation = (teamId: string | null | undefined) => {
+  //   if (teamId) {
+  //     const team = affiliations?.find((aff) => aff.team.id === teamId);
+  //     if (user.currentAffiliation?.team.id === teamId) return;
+  //     else {
+  //       setUser({
+  //         ...user,
+  //         currentAffiliation: team ? team : user.currentAffiliation,
+  //       });
+  //     }
+  //   } else return;
+  // };
 
-  const handleTeamClick = (
-    e: React.MouseEvent<HTMLDivElement>,
-    aff: TeamAffiliationType,
-  ) => {
-    e.stopPropagation();
-    if (aff.team.id === user.currentAffiliation?.team.id) {
-      void router.push(`/team-hub/${aff.team.id}`);
-    } else {
-      setUser({ ...user, currentAffiliation: aff });
-    }
-  };
+  // const handleTeamClick = (
+  //   e: React.MouseEvent<HTMLDivElement>,
+  //   aff: TeamAffiliationType,
+  // ) => {
+  //   e.stopPropagation();
+  //   if (aff.team.id === user.currentAffiliation?.team.id) {
+  //     void router.push(`/team-hub/${aff.team.id}`);
+  //   } else {
+  //     setUser({ ...user, currentAffiliation: aff });
+  //   }
+  // };
 
-  const handleAddNewClick = (userId: string | undefined) => {
-    if (userId) {
-      void router.push(`/team-select`);
-    } else {
-      void router.push(`/signup`);
-    }
-  };
+  // const handleAddNewClick = (userId: string | undefined) => {
+  //   if (userId) {
+  //     void router.push(`/team-select`);
+  //   } else {
+  //     void router.push(`/signup`);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (user.userId) void fetchLastWatched();
-  }, [user]);
+  // useEffect(() => {
+  //   if (user.userId) void fetchLastWatched();
+  // }, [user]);
 
   return (
     <div className="mt-2 flex flex-col items-center justify-center gap-8 p-4">
-      <div className="text-center text-6xl tracking-wide">
+      <Profile />
+      {/* <div className="text-center text-6xl tracking-wide">
         Hello {user.name ? user.name : "Guest"}!
       </div>
       {lastWatched && (
@@ -144,7 +121,7 @@ export default function Home() {
         >
           Add New Affiliation
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

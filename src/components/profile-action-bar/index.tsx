@@ -2,7 +2,7 @@ import CreateIcon from "@mui/icons-material/Create";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import StarIcon from "@mui/icons-material/Star";
 import { IconButton } from "@mui/material";
-import { ProfileActionBarType } from "~/utils/types";
+import type { ProfileActionBarType } from "~/utils/types";
 
 type ProfileActionBarProps = {
   actionBarStatus: ProfileActionBarType;

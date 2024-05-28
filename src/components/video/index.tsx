@@ -1,5 +1,5 @@
 import PublicIcon from "@mui/icons-material/Public";
-import { Typography } from "@mui/material";
+import { Typography, colors } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAffiliatedContext } from "~/contexts/affiliations";
@@ -12,9 +12,10 @@ import TeamLogo from "../team-logo";
 type VideoProps = {
   video: VideoType | null;
   startTime?: string | null;
+  purpleBackground?: boolean;
 };
 
-const Video = ({ video, startTime }: VideoProps) => {
+const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
   const { backgroundStyle, isDark } = useIsDarkContext();
   const { affiliations } = useAffiliatedContext();
   const { user } = useAuthContext();
@@ -53,7 +54,13 @@ const Video = ({ video, startTime }: VideoProps) => {
   return (
     video && (
       <div
-        style={backgroundStyle}
+        style={
+          !purpleBackground
+            ? backgroundStyle
+            : isDark
+              ? { backgroundColor: `${colors.purple[200]}` }
+              : { backgroundColor: `${colors.purple[50]}` }
+        }
         key={video.id}
         className={`${
           isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
