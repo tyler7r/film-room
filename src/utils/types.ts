@@ -24,14 +24,17 @@ export type Database = MergeDeep<
         };
         inbox_mentions: {
           Row: {
+            author_id: string;
             author_name: string;
             created_at: string;
             highlight: boolean;
+            link: string;
             mention_id: string;
             play_id: string;
             play_title: string;
             private: boolean;
             start_time: number;
+            end_time: number;
             receiver_id: string;
             team_id: string;
             title: string;
@@ -43,12 +46,30 @@ export type Database = MergeDeep<
           Row: {
             email: string;
             id: string;
+            join_date: string;
             name: string;
             number: number | null;
             profile_id: string;
             role: string;
             team_id: string;
             verified: boolean;
+          };
+        };
+        play_preview: {
+          Row: {
+            author_id: string;
+            author_name: string;
+            end_time: number;
+            exclusive_to: string | null;
+            highlight: boolean;
+            video_id: string;
+            link: string;
+            note: string;
+            play_title: string;
+            private: boolean;
+            start_time: number;
+            video_title: string;
+            play_id: string;
           };
         };
         comment_notifications: {
@@ -87,6 +108,7 @@ export type TeamAffiliationType = {
   };
   role: string;
   affId: string;
+  number?: number | null;
 };
 
 export type UserSession = {
@@ -146,9 +168,25 @@ export type PlayType = {
   }[];
 };
 
+export type BasicPlayType = {
+  author_id: string | null;
+  video_id: string | null;
+  highlight: boolean;
+  id: string;
+  note: string;
+  exclusive_to: string | null;
+  private: boolean;
+  author_name: string;
+  author_role: string;
+  start_time: number;
+  end_time: number;
+  title: string;
+};
+
 export type PlayerType = {
   id: string;
   name: string;
+  join_date: string;
   profile_id: string;
   role: string;
   team_id: string;
@@ -178,21 +216,24 @@ export type TeamMentionType = {
 }[];
 
 export type RealMentionType = {
+  author_id: string;
   author_name: string;
   created_at: string;
   highlight: boolean;
+  link: string;
   mention_id: string;
   play_id: string;
   play_title: string;
   private: boolean;
   receiver_id: string;
   start_time: number;
+  end_time: number;
   team_id: string;
   title: string;
   video_id: string;
   viewed: boolean;
   team: TeamType | null;
-}[];
+};
 
 export type RealCommentType = {
   comment: string;
@@ -217,6 +258,12 @@ export type TeamActionBarType = {
   settings: boolean;
   announcement: boolean;
   requests: boolean;
+};
+
+export type ProfileActionBarType = {
+  createdPlays: boolean;
+  mentions: boolean;
+  highlights: boolean;
 };
 
 export type RequestType = {
@@ -244,4 +291,20 @@ export type AnnouncementType = {
   id: string;
   team_id: string;
   text: string;
+};
+
+export type PlayPreviewType = {
+  author_id: string;
+  author_name: string;
+  end_time: number;
+  exclusive_to: string | null;
+  highlight: boolean;
+  video_id: string;
+  link: string;
+  note: string;
+  play_title: string;
+  private: boolean;
+  start_time: number;
+  video_title: string;
+  play_id: string;
 };

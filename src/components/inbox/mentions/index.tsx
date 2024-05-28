@@ -31,7 +31,7 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   const topRef = useRef<HTMLDivElement | null>(null);
 
   const [isUnreadOnly, setIsUnreadOnly] = useState(false);
-  const [mentions, setMentions] = useState<RealMentionType | null>(null);
+  const [mentions, setMentions] = useState<RealMentionType[] | null>(null);
   const [isBtnDisabled, setIsBtnDisabled] = useState<boolean>(false);
 
   const fetchMentions = async (unreadOnly: boolean) => {
