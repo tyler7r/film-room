@@ -1,20 +1,18 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import LockIcon from "@mui/icons-material/Lock";
 import StarIcon from "@mui/icons-material/Star";
-import { Button, Divider, IconButton, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Button, Divider, Typography } from "@mui/material";
+import { useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import AddComment from "~/components/interactions/comments/add-comment";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
 import CommentIndex from "~/components/interactions/comments/comment-index";
-import LikePopover from "~/components/like-popover";
+import LikeBtn from "~/components/interactions/likes/like-btn";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { LikeListType, PlayType } from "~/utils/types";
+import type { PlayType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
 
 type PlayProps = {
@@ -44,22 +42,7 @@ const Play = ({
   const { user } = useAuthContext();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [likeCount, setLikeCount] = useState<number>(0);
   const [commentCount, setCommentCount] = useState<number>(0);
-
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [likeList, setLikeList] = useState<LikeListType | null>(null);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
 
   const updateLastWatched = async (time: number) => {
     await supabase
@@ -78,64 +61,6 @@ const Play = ({
     setActivePlay(play);
   };
 
-  const fetchLikeCount = async () => {
-    const { data, count } = await supabase
-      .from("play_likes")
-      .select("user_name", { count: "exact" })
-      .eq("play_id", play.id);
-    if (data && data.length > 0) setLikeList(data);
-    if (count) setLikeCount(count);
-    else {
-      setLikeCount(0);
-      setLikeList(null);
-    }
-  };
-
-  const handleLike = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const { data } = await supabase
-      .from("play_likes")
-      .insert({
-        play_id: play.id,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    if (data) {
-      void fetchLikeCount();
-      void fetchIfUserLiked();
-    }
-  };
-
-  const handleUnlike = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const { data } = await supabase
-      .from("play_likes")
-      .delete()
-      .match({
-        play_id: play.id,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    if (data) {
-      void fetchLikeCount();
-      void fetchIfUserLiked();
-    }
-  };
-
-  const fetchIfUserLiked = async () => {
-    const { count } = await supabase
-      .from("play_likes")
-      .select("*", { count: "exact" })
-      .match({ play_id: play.id, user_id: user.userId });
-    if (count && count > 0) {
-      setIsLiked(true);
-    } else {
-      setIsLiked(false);
-    }
-  };
-
   const handleMentionClick = (e: React.MouseEvent, mention: string) => {
     e.stopPropagation();
     setIsFiltersOpen(true);
@@ -146,11 +71,6 @@ const Play = ({
     setIsFiltersOpen(true);
     setSearchOptions({ ...searchOptions, tag: tag });
   };
-
-  useEffect(() => {
-    void fetchLikeCount();
-    void fetchIfUserLiked();
-  }, [activePlay]);
 
   return (
     <div className="flex w-full grow flex-col self-center">
@@ -164,34 +84,11 @@ const Play = ({
             {play.author_name}
           </div>
           <div className="flex gap-1">
-            <div className="flex items-center justify-center">
-              {isLiked ? (
-                <IconButton
-                  onMouseEnter={handlePopoverOpen}
-                  onMouseLeave={handlePopoverClose}
-                  onClick={(e) => void handleUnlike(e)}
-                >
-                  <FavoriteIcon color="primary" />
-                </IconButton>
-              ) : (
-                <IconButton
-                  onMouseEnter={handlePopoverOpen}
-                  onMouseLeave={handlePopoverClose}
-                  onClick={(e) => void handleLike(e)}
-                >
-                  <FavoriteBorderIcon color="primary" />
-                </IconButton>
-              )}
-              <div className="text-lg font-bold">{likeCount}</div>
-            </div>
-            {likeList && (
-              <LikePopover
-                open={open}
-                anchorEl={anchorEl}
-                handlePopoverClose={handlePopoverClose}
-                likeList={likeList}
-              />
-            )}
+            <LikeBtn
+              playId={play.id}
+              includePopover={true}
+              activePlay={activePlay}
+            />
             <CommentBtn
               isOpen={isExpanded}
               setIsOpen={setIsExpanded}

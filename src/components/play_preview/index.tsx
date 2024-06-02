@@ -1,6 +1,4 @@
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import { Divider, IconButton } from "@mui/material";
+import { Divider } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
@@ -12,6 +10,7 @@ import type { PlayPreviewType, RealMentionType } from "~/utils/types";
 import AddComment from "../interactions/comments/add-comment";
 import CommentBtn from "../interactions/comments/comment-btn";
 import CommentIndex from "../interactions/comments/comment-index";
+import LikeBtn from "../interactions/likes/like-btn";
 
 type PlayPreviewProps = {
   play: PlayPreviewType | RealMentionType;
@@ -29,8 +28,8 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
   const router = useRouter();
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [likeCount, setLikeCount] = useState<number>(0);
+  // const [isLiked, setIsLiked] = useState<boolean>(false);
+  // const [likeCount, setLikeCount] = useState<number>(0);
 
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
@@ -77,61 +76,61 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
     else setMentions(null);
   };
 
-  const fetchLikeCount = async () => {
-    const { count } = await supabase
-      .from("play_likes")
-      .select("user_name", { count: "exact" })
-      .eq("play_id", play.play_id);
-    if (count) setLikeCount(count);
-    else {
-      setLikeCount(0);
-    }
-  };
+  // const fetchLikeCount = async () => {
+  //   const { count } = await supabase
+  //     .from("play_likes")
+  //     .select("user_name", { count: "exact" })
+  //     .eq("play_id", play.play_id);
+  //   if (count) setLikeCount(count);
+  //   else {
+  //     setLikeCount(0);
+  //   }
+  // };
 
-  const handleLike = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const { data } = await supabase
-      .from("play_likes")
-      .insert({
-        play_id: play.play_id,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    if (data) {
-      void fetchLikeCount();
-      void fetchIfUserLiked();
-    }
-  };
+  // const handleLike = async (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   const { data } = await supabase
+  //     .from("play_likes")
+  //     .insert({
+  //       play_id: play.play_id,
+  //       user_id: `${user.userId}`,
+  //       user_name: `${user.name}`,
+  //     })
+  //     .select();
+  //   if (data) {
+  //     void fetchLikeCount();
+  //     void fetchIfUserLiked();
+  //   }
+  // };
 
-  const handleUnlike = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const { data } = await supabase
-      .from("play_likes")
-      .delete()
-      .match({
-        play_id: play.play_id,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    if (data) {
-      void fetchLikeCount();
-      void fetchIfUserLiked();
-    }
-  };
+  // const handleUnlike = async (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   const { data } = await supabase
+  //     .from("play_likes")
+  //     .delete()
+  //     .match({
+  //       play_id: play.play_id,
+  //       user_id: `${user.userId}`,
+  //       user_name: `${user.name}`,
+  //     })
+  //     .select();
+  //   if (data) {
+  //     void fetchLikeCount();
+  //     void fetchIfUserLiked();
+  //   }
+  // };
 
-  const fetchIfUserLiked = async () => {
-    const { count } = await supabase
-      .from("play_likes")
-      .select("*", { count: "exact" })
-      .match({ play_id: play.play_id, user_id: user.userId });
-    if (count && count > 0) {
-      setIsLiked(true);
-    } else {
-      setIsLiked(false);
-    }
-  };
+  // const fetchIfUserLiked = async () => {
+  //   const { count } = await supabase
+  //     .from("play_likes")
+  //     .select("*", { count: "exact" })
+  //     .match({ play_id: play.play_id, user_id: user.userId });
+  //   if (count && count > 0) {
+  //     setIsLiked(true);
+  //   } else {
+  //     setIsLiked(false);
+  //   }
+  // };
 
   // const fetchInitialCommentNumber = async () => {
   //   const { count } = await supabase
@@ -142,8 +141,8 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
   // };
 
   useEffect(() => {
-    void fetchLikeCount();
-    void fetchIfUserLiked();
+    // void fetchLikeCount();
+    // void fetchIfUserLiked();
     void fetchMentions();
     // void fetchInitialCommentNumber();
   }, []);
@@ -188,24 +187,7 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
       />
       <div className="flex w-full items-center gap-4 px-2">
         <div className="flex items-center justify-center gap-2">
-          <div className="flex items-center">
-            {isLiked ? (
-              <IconButton onClick={(e) => void handleUnlike(e)}>
-                <FavoriteIcon
-                  color="primary"
-                  fontSize={isMobile ? "medium" : "large"}
-                />
-              </IconButton>
-            ) : (
-              <IconButton onClick={(e) => void handleLike(e)}>
-                <FavoriteBorderIcon
-                  color="primary"
-                  fontSize={isMobile ? "medium" : "large"}
-                />
-              </IconButton>
-            )}
-            <div className="text-lg font-bold md:text-2xl">{likeCount}</div>
-          </div>
+          <LikeBtn playId={play.play_id} />
           <CommentBtn
             isOpen={isCommentsOpen}
             setIsOpen={setIsCommentsOpen}
