@@ -65,9 +65,6 @@ const PlayIndex = ({
         count: "exact",
       })
       .eq("video_id", videoId)
-      .or(
-        `private.eq.false, exclusive_to.eq.${user.currentAffiliation?.team.id}`,
-      )
       .order("start_time")
       .range(from, to);
     if (options?.receiver_name) {
@@ -152,7 +149,7 @@ const PlayIndex = ({
   }, [user]);
 
   useEffect(() => {
-    if (user.currentAffiliation) void fetchPlays(searchOptions);
+    void fetchPlays(searchOptions);
   }, [searchOptions, videoId, page, isMobile, activePlay]);
 
   return (

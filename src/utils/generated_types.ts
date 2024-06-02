@@ -605,6 +605,7 @@ export type Database = {
           author_id: string
           author_name: string
           author_role: string
+          created_at: string
           end_time: number
           exclusive_to: string | null
           highlight: boolean
@@ -619,6 +620,7 @@ export type Database = {
           author_id: string
           author_name: string
           author_role: string
+          created_at?: string
           end_time: number
           exclusive_to?: string | null
           highlight?: boolean
@@ -633,6 +635,7 @@ export type Database = {
           author_id?: string
           author_name?: string
           author_role?: string
+          created_at?: string
           end_time?: number
           exclusive_to?: string | null
           highlight?: boolean
@@ -1164,6 +1167,7 @@ export type Database = {
           play_title: string | null
           private: boolean | null
           receiver_id: string | null
+          receiver_name: string | null
           start_time: number | null
           team_id: string | null
           title: string | null
@@ -1221,6 +1225,7 @@ export type Database = {
         Row: {
           author_id: string | null
           author_name: string | null
+          created_at: string | null
           end_time: number | null
           exclusive_to: string | null
           highlight: boolean | null

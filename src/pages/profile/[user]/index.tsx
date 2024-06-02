@@ -258,127 +258,129 @@ const Profile = () => {
     void fetchFeed(options);
   }, [options]);
 
-  return profile ? (
-    <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
-      <div className="flex flex-col justify-center gap-4">
-        <div className="flex w-full flex-col items-center justify-center">
-          <div className="text-6xl font-bold">{profile.name}</div>
-          <div className="text-lg font-light leading-5 tracking-tight">
-            Member since {profile.join_date.substring(0, 4)}
-          </div>
-        </div>
-        {stats && (
-          <div
-            className="flex cursor-default items-center justify-around rounded-md p-2"
-            style={
-              isDark
-                ? { backgroundColor: `${colors.purple[200]}` }
-                : { backgroundColor: `${colors.purple[50]}` }
-            }
-          >
-            <div
-              className="flex cursor-pointer flex-col items-center justify-center"
-              onClick={() => changeActionBar("createdPlays")}
-            >
-              <div className="text-3xl font-bold">{stats.playCount}</div>
-              <div className="font-light leading-4 tracking-tight">created</div>
-            </div>
-            <Divider flexItem orientation="vertical" />
-            <div
-              className="flex cursor-pointer flex-col items-center justify-center"
-              onClick={() => changeActionBar("mentions")}
-            >
-              <div className="text-3xl font-bold">{stats.mentionCount}</div>
-              <div className="font-light leading-4 tracking-tight">
-                mentions
-              </div>
-            </div>
-            <Divider flexItem orientation="vertical" />
-            <div
-              className="flex cursor-pointer flex-col items-center justify-center"
-              onClick={() => changeActionBar("highlights")}
-            >
-              <div className="text-3xl font-bold">{stats.highlightCount}</div>
-              <div className="font-light leading-4 tracking-tight">
-                highlights
-              </div>
+  return (
+    profile && (
+      <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
+        <div className="flex flex-col justify-center gap-4">
+          <div className="flex w-full flex-col items-center justify-center">
+            <div className="text-6xl font-bold">{profile.name}</div>
+            <div className="text-lg font-light leading-5 tracking-tight">
+              Member since {profile.join_date.substring(0, 4)}
             </div>
           </div>
-        )}
-      </div>
-      <div className="align-center flex flex-wrap justify-center gap-1">
-        {profileAffiliations?.map((aff) => (
-          <div
-            className={`flex cursor-pointer items-center justify-center gap-2 rounded-sm border-2 border-solid border-transparent p-1 px-2 transition ease-in-out hover:rounded-md hover:border-solid ${
-              isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
-            } hover:delay-100`}
-            key={aff.team.id}
-            onClick={(e) => handleTeamClick(e, aff.team.id)}
-          >
-            <TeamLogo tm={aff.team} size={35} />
-            <div className="flex items-center justify-center gap-2">
-              <div className="text-lg font-bold">{aff.team.full_name}</div>
-              {aff.number && <div className="leading-3">#{aff.number}</div>}
-            </div>
-          </div>
-        ))}
-      </div>
-      {!router.query.user && (
-        <div className="flex w-full items-center justify-center">
-          {lastWatched && (
-            <div className="flex w-11/12 flex-col items-center justify-center gap-3">
-              <div className="flex items-center gap-2 text-2xl font-bold">
-                <PlayArrowIcon />
-                <div>Continue Watching</div>
-              </div>
+          {stats && (
+            <div
+              className="flex cursor-default items-center justify-around rounded-md p-2"
+              style={
+                isDark
+                  ? { backgroundColor: `${colors.purple[200]}` }
+                  : { backgroundColor: `${colors.purple[50]}` }
+              }
+            >
               <div
-                className="w-full"
-                onClick={() =>
-                  updateUserAffiliation(lastWatched.videos?.exclusive_to)
-                }
+                className="flex cursor-pointer flex-col items-center justify-center"
+                onClick={() => changeActionBar("createdPlays")}
               >
-                <Video
-                  video={lastWatched.videos}
-                  startTime={`${lastWatched.last_watched_time}`}
-                />
+                <div className="text-3xl font-bold">{stats.playCount}</div>
+                <div className="font-light leading-4 tracking-tight">
+                  created
+                </div>
+              </div>
+              <Divider flexItem orientation="vertical" />
+              <div
+                className="flex cursor-pointer flex-col items-center justify-center"
+                onClick={() => changeActionBar("mentions")}
+              >
+                <div className="text-3xl font-bold">{stats.mentionCount}</div>
+                <div className="font-light leading-4 tracking-tight">
+                  mentions
+                </div>
+              </div>
+              <Divider flexItem orientation="vertical" />
+              <div
+                className="flex cursor-pointer flex-col items-center justify-center"
+                onClick={() => changeActionBar("highlights")}
+              >
+                <div className="text-3xl font-bold">{stats.highlightCount}</div>
+                <div className="font-light leading-4 tracking-tight">
+                  highlights
+                </div>
               </div>
             </div>
           )}
         </div>
-      )}
-      <div className="w-full">
-        <ProfileActionBar
-          actionBarStatus={actionBarStatus}
-          setActionBarStatus={setActionBarStatus}
-        />
+        <div className="align-center flex flex-wrap justify-center gap-1">
+          {profileAffiliations?.map((aff) => (
+            <div
+              className={`flex cursor-pointer items-center justify-center gap-2 rounded-sm border-2 border-solid border-transparent p-1 px-2 transition ease-in-out hover:rounded-md hover:border-solid ${
+                isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
+              } hover:delay-100`}
+              key={aff.team.id}
+              onClick={(e) => handleTeamClick(e, aff.team.id)}
+            >
+              <TeamLogo tm={aff.team} size={35} />
+              <div className="flex items-center justify-center gap-2">
+                <div className="text-lg font-bold">{aff.team.full_name}</div>
+                {aff.number && <div className="leading-3">#{aff.number}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+        {!router.query.user && (
+          <div className="flex w-full items-center justify-center">
+            {lastWatched && (
+              <div className="flex w-11/12 flex-col items-center justify-center gap-3">
+                <div className="flex items-center gap-2 text-2xl font-bold">
+                  <PlayArrowIcon />
+                  <div>Continue Watching</div>
+                </div>
+                <div
+                  className="w-full"
+                  onClick={() =>
+                    updateUserAffiliation(lastWatched.videos?.exclusive_to)
+                  }
+                >
+                  <Video
+                    video={lastWatched.videos}
+                    startTime={`${lastWatched.last_watched_time}`}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        <div className="w-full">
+          <ProfileActionBar
+            actionBarStatus={actionBarStatus}
+            setActionBarStatus={setActionBarStatus}
+          />
+        </div>
+        {actionBarStatus.createdPlays &&
+          (feed.plays ? (
+            feed.plays.map((play) => (
+              <PlayPreview key={play.play_id} play={play} />
+            ))
+          ) : (
+            <EmptyMessage message="user created plays" />
+          ))}
+        {actionBarStatus.mentions &&
+          (feed.mentions ? (
+            feed.mentions.map((play) => (
+              <PlayPreview key={play.play_id} play={play} />
+            ))
+          ) : (
+            <EmptyMessage message="user mentions" />
+          ))}
+        {actionBarStatus.highlights &&
+          (feed.highlights ? (
+            feed.highlights.map((play) => (
+              <PlayPreview key={play.play_id} play={play} />
+            ))
+          ) : (
+            <EmptyMessage message="user highlights" />
+          ))}
       </div>
-      {actionBarStatus.createdPlays &&
-        (feed.plays ? (
-          feed.plays.map((play) => (
-            <PlayPreview key={play.play_id} play={play} />
-          ))
-        ) : (
-          <EmptyMessage message="user created plays" />
-        ))}
-      {actionBarStatus.mentions &&
-        (feed.mentions ? (
-          feed.mentions.map((play) => (
-            <PlayPreview key={play.play_id} play={play} />
-          ))
-        ) : (
-          <EmptyMessage message="user mentions" />
-        ))}
-      {actionBarStatus.highlights &&
-        (feed.highlights ? (
-          feed.highlights.map((play) => (
-            <PlayPreview key={play.play_id} play={play} />
-          ))
-        ) : (
-          <EmptyMessage message="user highlights" />
-        ))}
-    </div>
-  ) : (
-    <div></div>
+    )
   );
 };
 

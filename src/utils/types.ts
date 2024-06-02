@@ -36,6 +36,7 @@ export type Database = MergeDeep<
             start_time: number;
             end_time: number;
             receiver_id: string;
+            receiver_name: string;
             team_id: string;
             title: string;
             video_id: string;
@@ -59,6 +60,7 @@ export type Database = MergeDeep<
           Row: {
             author_id: string;
             author_name: string;
+            created_at: string;
             end_time: number;
             exclusive_to: string | null;
             highlight: boolean;
@@ -226,6 +228,7 @@ export type RealMentionType = {
   play_title: string;
   private: boolean;
   receiver_id: string;
+  receiver_name: string;
   start_time: number;
   end_time: number;
   team_id: string;
@@ -296,6 +299,7 @@ export type AnnouncementType = {
 export type PlayPreviewType = {
   author_id: string;
   author_name: string;
+  created_at: string;
   end_time: number;
   exclusive_to: string | null;
   highlight: boolean;
