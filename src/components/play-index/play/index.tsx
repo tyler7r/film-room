@@ -3,13 +3,13 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import LockIcon from "@mui/icons-material/Lock";
-import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import StarIcon from "@mui/icons-material/Star";
 import { Button, Divider, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
-import AddComment from "~/components/add-comment";
-import CommentIndex from "~/components/comment-index";
+import AddComment from "~/components/interactions/comments/add-comment";
+import CommentBtn from "~/components/interactions/comments/comment-btn";
+import CommentIndex from "~/components/interactions/comments/comment-index";
 import LikePopover from "~/components/like-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
@@ -124,11 +124,6 @@ const Play = ({
     }
   };
 
-  const handleCommentClick = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsExpanded(true);
-  };
-
   const fetchIfUserLiked = async () => {
     const { count } = await supabase
       .from("play_likes")
@@ -139,14 +134,6 @@ const Play = ({
     } else {
       setIsLiked(false);
     }
-  };
-
-  const fetchInitialCommentNumber = async () => {
-    const { count } = await supabase
-      .from("comments")
-      .select("*", { count: "exact" })
-      .eq("play_id", play.id);
-    if (count) setCommentCount(count);
   };
 
   const handleMentionClick = (e: React.MouseEvent, mention: string) => {
@@ -164,10 +151,6 @@ const Play = ({
     void fetchLikeCount();
     void fetchIfUserLiked();
   }, [activePlay]);
-
-  useEffect(() => {
-    void fetchInitialCommentNumber();
-  }, []);
 
   return (
     <div className="flex w-full grow flex-col self-center">
@@ -209,12 +192,13 @@ const Play = ({
                 likeList={likeList}
               />
             )}
-            <div className="flex items-center justify-center">
-              <IconButton onClick={(e) => handleCommentClick(e)}>
-                <ModeCommentIcon color="primary" />
-              </IconButton>
-              <div className="text-lg font-bold">{commentCount}</div>
-            </div>
+            <CommentBtn
+              isOpen={isExpanded}
+              setIsOpen={setIsExpanded}
+              commentCount={commentCount}
+              setCommentCount={setCommentCount}
+              playId={play.id}
+            />
           </div>
         </div>
         <Divider

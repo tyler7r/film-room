@@ -1,6 +1,5 @@
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -10,8 +9,9 @@ import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType, RealMentionType } from "~/utils/types";
-import AddComment from "../add-comment";
-import CommentIndex from "../comment-index";
+import AddComment from "../interactions/comments/add-comment";
+import CommentBtn from "../interactions/comments/comment-btn";
+import CommentIndex from "../interactions/comments/comment-index";
 
 type PlayPreviewProps = {
   play: PlayPreviewType | RealMentionType;
@@ -69,7 +69,7 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
   };
 
   const fetchMentions = async () => {
-    const { data, count } = await supabase
+    const { data } = await supabase
       .from("inbox_mentions")
       .select("receiver_name, receiver_id")
       .eq("play_id", play.play_id);
@@ -133,27 +133,19 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
     }
   };
 
-  const fetchInitialCommentNumber = async () => {
-    const { count } = await supabase
-      .from("comments")
-      .select("*", { count: "exact" })
-      .eq("play_id", play.play_id);
-    if (count) setCommentCount(count);
-  };
-
-  useEffect(() => {
-    document.addEventListener("keydown", async (e: KeyboardEvent) => {
-      const time = await player?.getCurrentTime();
-      if (time) console.log({ time: time + 5, end: play.end_time });
-      // if (e.key === 'ArrowRight')
-    });
-  }, []);
+  // const fetchInitialCommentNumber = async () => {
+  //   const { count } = await supabase
+  //     .from("comments")
+  //     .select("*", { count: "exact" })
+  //     .eq("play_id", play.play_id);
+  //   if (count) setCommentCount(count);
+  // };
 
   useEffect(() => {
     void fetchLikeCount();
     void fetchIfUserLiked();
     void fetchMentions();
-    void fetchInitialCommentNumber();
+    // void fetchInitialCommentNumber();
   }, []);
 
   return (
@@ -182,6 +174,7 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
             controls: isMobile ? 1 : 0,
             enablejsapi: 1,
             playsinline: 1,
+            disablekb: 1,
             fs: 1,
             rel: 0,
             color: "red",
@@ -213,15 +206,13 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
             )}
             <div className="text-lg font-bold md:text-2xl">{likeCount}</div>
           </div>
-          <div className="flex items-center">
-            <IconButton onClick={() => setIsCommentsOpen(!isCommentsOpen)}>
-              <ModeCommentIcon
-                color="primary"
-                fontSize={isMobile ? "medium" : "large"}
-              />
-            </IconButton>
-            <div className="text-lg font-bold md:text-2xl">{commentCount}</div>
-          </div>
+          <CommentBtn
+            isOpen={isCommentsOpen}
+            setIsOpen={setIsCommentsOpen}
+            playId={play.play_id}
+            commentCount={commentCount}
+            setCommentCount={setCommentCount}
+          />
         </div>
         {mentions && (
           <Divider flexItem orientation="vertical" variant="middle" />

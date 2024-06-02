@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type { LikeListType } from "~/utils/types";
-import LikePopover from "../like-popover";
+import LikePopover from "../../../like-popover";
 
 type CommentType = {
   author_name: string;
