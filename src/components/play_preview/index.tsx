@@ -1,4 +1,4 @@
-import { Divider } from "@mui/material";
+import { Button, Divider } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
@@ -6,7 +6,12 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { PlayPreviewType, RealMentionType } from "~/utils/types";
+import {
+  PlayPreviewMentionType,
+  PlayPreviewTagType,
+  type PlayPreviewType,
+  type RealMentionType,
+} from "~/utils/types";
 import AddComment from "../interactions/comments/add-comment";
 import CommentBtn from "../interactions/comments/comment-btn";
 import CommentIndex from "../interactions/comments/comment-index";
@@ -16,11 +21,6 @@ type PlayPreviewProps = {
   play: PlayPreviewType | RealMentionType;
 };
 
-type PlayPreviewMentionType = {
-  receiver_id: string;
-  receiver_name: string;
-};
-
 const PlayPreview = ({ play }: PlayPreviewProps) => {
   const { screenWidth, isMobile } = useMobileContext();
   const { isDark } = useIsDarkContext();
@@ -28,15 +28,14 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
   const router = useRouter();
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
-  // const [isLiked, setIsLiked] = useState<boolean>(false);
-  // const [likeCount, setLikeCount] = useState<number>(0);
 
-  const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
 
   const [mentions, setMentions] = useState<PlayPreviewMentionType[] | null>(
     null,
   );
+  const [tags, setTags] = useState<PlayPreviewTagType[] | null>(null);
 
   const videoOnReady = async (e: YouTubeEvent) => {
     const video = e.target;
@@ -76,76 +75,27 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
     else setMentions(null);
   };
 
-  // const fetchLikeCount = async () => {
-  //   const { count } = await supabase
-  //     .from("play_likes")
-  //     .select("user_name", { count: "exact" })
-  //     .eq("play_id", play.play_id);
-  //   if (count) setLikeCount(count);
-  //   else {
-  //     setLikeCount(0);
-  //   }
-  // };
-
-  // const handleLike = async (e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  //   const { data } = await supabase
-  //     .from("play_likes")
-  //     .insert({
-  //       play_id: play.play_id,
-  //       user_id: `${user.userId}`,
-  //       user_name: `${user.name}`,
-  //     })
-  //     .select();
-  //   if (data) {
-  //     void fetchLikeCount();
-  //     void fetchIfUserLiked();
-  //   }
-  // };
-
-  // const handleUnlike = async (e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  //   const { data } = await supabase
-  //     .from("play_likes")
-  //     .delete()
-  //     .match({
-  //       play_id: play.play_id,
-  //       user_id: `${user.userId}`,
-  //       user_name: `${user.name}`,
-  //     })
-  //     .select();
-  //   if (data) {
-  //     void fetchLikeCount();
-  //     void fetchIfUserLiked();
-  //   }
-  // };
-
-  // const fetchIfUserLiked = async () => {
-  //   const { count } = await supabase
-  //     .from("play_likes")
-  //     .select("*", { count: "exact" })
-  //     .match({ play_id: play.play_id, user_id: user.userId });
-  //   if (count && count > 0) {
-  //     setIsLiked(true);
-  //   } else {
-  //     setIsLiked(false);
-  //   }
-  // };
-
-  // const fetchInitialCommentNumber = async () => {
-  //   const { count } = await supabase
-  //     .from("comments")
-  //     .select("*", { count: "exact" })
-  //     .eq("play_id", play.play_id);
-  //   if (count) setCommentCount(count);
-  // };
+  const fetchTags = async () => {
+    const tags = supabase
+      .from("tags_for_play_previews")
+      .select()
+      .eq("play_id", play.play_id);
+    if (user.currentAffiliation?.team.id) {
+      void tags.or(
+        `private.eq.false, exclusive_to.eq.${user.currentAffiliation.team.id}`,
+      );
+    } else {
+      void tags.eq("private", false);
+    }
+    const { data } = await tags;
+    if (data && data.length > 0) setTags(data);
+    else setTags(null);
+  };
 
   useEffect(() => {
-    // void fetchLikeCount();
-    // void fetchIfUserLiked();
     void fetchMentions();
-    // void fetchInitialCommentNumber();
-  }, []);
+    void fetchTags();
+  }, [user]);
 
   return (
     <div className="flex flex-col rounded-md">
@@ -189,8 +139,8 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
         <div className="flex items-center justify-center gap-2">
           <LikeBtn playId={play.play_id} />
           <CommentBtn
-            isOpen={isCommentsOpen}
-            setIsOpen={setIsCommentsOpen}
+            isOpen={isExpanded}
+            setIsOpen={setIsExpanded}
             playId={play.play_id}
             commentCount={commentCount}
             setCommentCount={setCommentCount}
@@ -214,8 +164,15 @@ const PlayPreview = ({ play }: PlayPreviewProps) => {
           ))}
         </div>
       </div>
-      {isCommentsOpen && (
-        <div className="my-4 flex w-full flex-col gap-4">
+      {isExpanded && (
+        <div className="flex w-full flex-col gap-4">
+          <div>
+            {tags?.map((tag) => (
+              <Button key={tag.title + tag.play_id} size="small">
+                #{tag.title}
+              </Button>
+            ))}
+          </div>
           <AddComment playId={play.play_id} />
           <CommentIndex
             playId={play.play_id}

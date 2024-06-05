@@ -22,6 +22,15 @@ export type Database = MergeDeep<
             viewed: boolean;
           };
         };
+        tags_for_play_previews: {
+          Row: {
+            exclusive_to: string | null;
+            play_id: string;
+            private: boolean;
+            tag_id: string;
+            title: string;
+          };
+        };
         inbox_mentions: {
           Row: {
             author_id: string;
@@ -72,6 +81,13 @@ export type Database = MergeDeep<
             start_time: number;
             video_title: string;
             play_id: string;
+          };
+        };
+        tag_mentions: {
+          Row: {
+            play: BasicPlayType;
+            tag: TagType;
+            video: VideoType;
           };
         };
         comment_notifications: {
@@ -183,6 +199,7 @@ export type BasicPlayType = {
   start_time: number;
   end_time: number;
   title: string;
+  created_at: string;
 };
 
 export type PlayerType = {
@@ -311,4 +328,30 @@ export type PlayPreviewType = {
   start_time: number;
   video_title: string;
   play_id: string;
+};
+
+export type TagMentions = {
+  play: BasicPlayType;
+  tag: TagType;
+  video: VideoType;
+};
+
+export type TagType = {
+  id: string;
+  title: string;
+  private: boolean;
+  exclusive_to: string | null;
+};
+
+export type PlayPreviewMentionType = {
+  receiver_id: string;
+  receiver_name: string;
+};
+
+export type PlayPreviewTagType = {
+  exclusive_to: string | null;
+  play_id: string;
+  private: boolean;
+  tag_id: string;
+  title: string;
 };
