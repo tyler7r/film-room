@@ -36,6 +36,12 @@ const AddComment = ({ playId }: CommentProps) => {
   };
 
   useEffect(() => {
+    if (!user.isLoggedIn) {
+      setIsValid(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
     if (comment !== "") {
       setIsValid(true);
     } else setIsValid(false);

@@ -29,7 +29,6 @@ export type PlaySearchOptions = {
   receiver_name?: string;
   tag?: string;
   private_only?: boolean;
-  loggedIn: boolean;
   currentAffiliation: string | undefined;
 };
 
@@ -53,7 +52,6 @@ const PlayIndex = ({
     role: "",
     private_only: false,
     tag: "",
-    loggedIn: user.isLoggedIn,
     currentAffiliation: user.currentAffiliation?.team.id,
   });
 
@@ -61,7 +59,7 @@ const PlayIndex = ({
     const { from, to } = getFromAndTo();
     const plays = supabase
       .from(`plays`)
-      .select(`*, mentions:play_mentions(receiver_name), tags(title)`, {
+      .select(`*, tags(title), mentions:play_mentions(receiver_name)`, {
         count: "exact",
       })
       .eq("video_id", videoId)
@@ -97,14 +95,13 @@ const PlayIndex = ({
     if (activePlay) {
       void plays.neq("id", activePlay.id);
     }
-    if (options?.currentAffiliation) {
+    if (user.currentAffiliation?.team.id) {
       void plays.or(
-        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
+        `private.eq.false, exclusive_to.eq.${user.currentAffiliation.team.id}`,
       );
     } else {
       void plays.eq("private", false);
     }
-
     const { data, count } = await plays;
     if (data) setPlays(data);
     if (count) setPlayCount(count);
@@ -144,7 +141,6 @@ const PlayIndex = ({
     setSearchOptions({
       ...searchOptions,
       currentAffiliation: user.currentAffiliation?.team.id,
-      loggedIn: user.isLoggedIn,
     });
   }, [user]);
 

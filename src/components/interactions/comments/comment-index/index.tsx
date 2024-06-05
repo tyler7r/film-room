@@ -105,7 +105,7 @@ const CommentIndex = ({
           flexItem
           sx={{ marginTop: "8px", marginBottom: "8px" }}
           variant="middle"
-        ></Divider>
+        />
       )}
     </div>
   );
