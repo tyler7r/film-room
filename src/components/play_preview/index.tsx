@@ -6,11 +6,11 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import {
+import type {
   PlayPreviewMentionType,
   PlayPreviewTagType,
-  type PlayPreviewType,
-  type RealMentionType,
+  PlayPreviewType,
+  RealMentionType,
 } from "~/utils/types";
 import AddComment from "../interactions/comments/add-comment";
 import CommentBtn from "../interactions/comments/comment-btn";

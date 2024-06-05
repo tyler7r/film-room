@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
-import { LikeListType, PlayType } from "~/utils/types";
+import type { LikeListType, PlayType } from "~/utils/types";
 import LikePopover from "../like-popover";
 
 type LikeBtnProps = {
