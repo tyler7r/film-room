@@ -35,7 +35,7 @@ type PlayDetailsType = {
   private: boolean;
 };
 
-export type TagType = {
+export type CreateNewTagType = {
   title: string;
   id?: string;
   create?: boolean;
@@ -64,8 +64,8 @@ const PlayModal = ({
   const [affiliatedPlayers, setAffiliatedPlayers] = useState<
     PlayerType[] | null
   >(null);
-  const [playTags, setPlayTags] = useState<TagType[]>([]);
-  const [tags, setTags] = useState<TagType[] | null>(null);
+  const [playTags, setPlayTags] = useState<CreateNewTagType[]>([]);
+  const [tags, setTags] = useState<CreateNewTagType[] | null>(null);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   const fetchAffiliatedPlayers = async () => {

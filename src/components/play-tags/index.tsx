@@ -15,7 +15,7 @@ import {
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import type { TagType } from "../play-modal";
+import type { CreateNewTagType } from "../play-modal";
 
 type NewTagType = {
   title: string;
@@ -25,12 +25,12 @@ type NewTagType = {
 };
 
 type PlayTagsProps = {
-  tags: TagType[];
-  setTags: (tags: TagType[]) => void;
-  allTags: TagType[] | null;
+  tags: CreateNewTagType[];
+  setTags: (tags: CreateNewTagType[]) => void;
+  allTags: CreateNewTagType[] | null;
 };
 
-const filter = createFilterOptions<TagType>();
+const filter = createFilterOptions<CreateNewTagType>();
 
 const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
   const { user } = useAuthContext();
@@ -45,9 +45,9 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
 
   const handleChange = (
     event: SyntheticEvent<Element, Event>,
-    newValue: (string | TagType)[],
+    newValue: (string | CreateNewTagType)[],
     reason: AutocompleteChangeReason,
-    details: AutocompleteChangeDetails<TagType> | undefined,
+    details: AutocompleteChangeDetails<CreateNewTagType> | undefined,
   ) => {
     event.stopPropagation();
     if (details?.option.create && reason !== "removeOption") {
@@ -122,7 +122,7 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
               handleChange(event, newValue, reason, details);
             }}
             filterSelectedOptions
-            filterOptions={(options, params): TagType[] => {
+            filterOptions={(options, params): CreateNewTagType[] => {
               const filtered = filter(options, params);
               const { inputValue } = params;
               const isExisting = options.some(

@@ -605,6 +605,7 @@ export type Database = {
           author_id: string
           author_name: string
           author_role: string
+          created_at: string
           end_time: number
           exclusive_to: string | null
           highlight: boolean
@@ -619,6 +620,7 @@ export type Database = {
           author_id: string
           author_name: string
           author_role: string
+          created_at?: string
           end_time: number
           exclusive_to?: string | null
           highlight?: boolean
@@ -633,6 +635,7 @@ export type Database = {
           author_id?: string
           author_name?: string
           author_role?: string
+          created_at?: string
           end_time?: number
           exclusive_to?: string | null
           highlight?: boolean
@@ -1164,6 +1167,7 @@ export type Database = {
           play_title: string | null
           private: boolean | null
           receiver_id: string | null
+          receiver_name: string | null
           start_time: number | null
           team_id: string | null
           title: string | null
@@ -1221,6 +1225,7 @@ export type Database = {
         Row: {
           author_id: string | null
           author_name: string | null
+          created_at: string | null
           end_time: number | null
           exclusive_to: string | null
           highlight: boolean | null
@@ -1300,6 +1305,74 @@ export type Database = {
           },
         ]
       }
+      tag_mentions: {
+        Row: {
+          play: Json | null
+          tag: Json | null
+          video: Json | null
+        }
+        Relationships: []
+      }
+      tags_for_play_previews: {
+        Row: {
+          exclusive_to: string | null
+          play_id: string | null
+          private: boolean | null
+          tag_id: string | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "plays"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "inbox_mentions"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "p_likes"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "play_preview"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "transition_mention_view"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_tags_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transition_mention_view: {
         Row: {
           author_id: string | null
@@ -1367,6 +1440,36 @@ export type Database = {
             referencedRelation: "player_view"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "public_plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "inbox_mentions"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "public_plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "play_preview"
+            referencedColumns: ["video_id"]
+          },
+        ]
+      }
+      transition_tag_mentions: {
+        Row: {
+          play: Json | null
+          tag: Json | null
+          video_id: string | null
+        }
+        Relationships: [
           {
             foreignKeyName: "public_plays_video_id_fkey"
             columns: ["video_id"]

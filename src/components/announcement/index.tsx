@@ -7,7 +7,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { AnnouncementType, LikeListType } from "~/utils/types";
-import LikePopover from "../like-popover";
+import LikePopover from "../interactions/likes/like-popover";
 
 type AnnouncementProps = {
   annc: AnnouncementType;
