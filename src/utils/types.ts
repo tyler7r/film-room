@@ -22,27 +22,6 @@ export type Database = MergeDeep<
             viewed: boolean;
           };
         };
-        inbox_mentions: {
-          Row: {
-            author_id: string;
-            author_name: string;
-            created_at: string;
-            highlight: boolean;
-            link: string;
-            mention_id: string;
-            play_id: string;
-            play_title: string;
-            private: boolean;
-            start_time: number;
-            end_time: number;
-            receiver_id: string;
-            receiver_name: string;
-            team_id: string;
-            title: string;
-            video_id: string;
-            viewed: boolean;
-          };
-        };
         player_view: {
           Row: {
             email: string;
@@ -58,41 +37,38 @@ export type Database = MergeDeep<
         };
         play_preview: {
           Row: {
-            play: RealPlayType;
+            play: PlayType;
             video: VideoType;
           };
         };
         plays_via_tag: {
           Row: {
-            play: RealPlayType;
+            play: PlayType;
             tag: TagType;
             video: VideoType;
           };
         };
         plays_via_user_mention: {
           Row: {
-            play: RealPlayType;
+            play: PlayType;
             mention: MentionType;
             video: VideoType;
           };
         };
-        comment_notifications: {
+        comment_notification: {
           Row: {
-            comment: string;
-            comment_author_name: string;
-            comment_id: string;
-            created_at: string;
-            highlight: boolean;
-            note: string;
-            play_id: string;
-            play_title: string;
-            private: boolean;
-            start_time: number;
-            team_id: string;
-            play_author_id: string;
-            video_id: string;
-            video_title: string;
-            viewed_by_author: boolean;
+            play: PlayType;
+            video: VideoType;
+            comment: CommentType;
+            team: TeamType;
+          };
+        };
+        mention_notification: {
+          Row: {
+            play: PlayType;
+            video: VideoType;
+            mention: MentionType;
+            team: TeamType;
           };
         };
       };
@@ -151,7 +127,7 @@ export type VideoType = {
   division: string;
 };
 
-export type RealPlayType = {
+export type PlayType = {
   id: string;
   note: string;
   author_id: string;
@@ -167,7 +143,7 @@ export type RealPlayType = {
   created_at: string;
 };
 
-export type PlayType = {
+export type IndexPlayType = {
   author_id: string | null;
   video_id: string | null;
   highlight: boolean;
@@ -186,22 +162,6 @@ export type PlayType = {
   tags: {
     title: string;
   }[];
-};
-
-export type BasicPlayType = {
-  author_id: string | null;
-  video_id: string | null;
-  highlight: boolean;
-  id: string;
-  note: string;
-  exclusive_to: string | null;
-  private: boolean;
-  author_name: string;
-  author_role: string;
-  start_time: number;
-  end_time: number;
-  title: string;
-  created_at: string;
 };
 
 export type PlayerType = {
@@ -236,25 +196,15 @@ export type TeamMentionType = {
   id: string;
 }[];
 
-export type RealMentionType = {
-  author_id: string;
-  author_name: string;
+export type CommentType = {
+  id: string;
   created_at: string;
-  highlight: boolean;
-  link: string;
-  mention_id: string;
+  comment: string;
+  comment_author: string;
+  author_name: string;
+  team_id: string | null;
   play_id: string;
-  play_title: string;
-  private: boolean;
-  receiver_id: string;
-  receiver_name: string;
-  start_time: number;
-  end_time: number;
-  team_id: string;
-  title: string;
-  video_id: string;
   viewed: boolean;
-  team: TeamType | null;
 };
 
 export type RealCommentType = {
@@ -272,7 +222,7 @@ export type RealCommentType = {
   play_author_id: string;
   video_id: string;
   video_title: string;
-  viewed_by_author: boolean;
+  viewed: boolean;
   team: TeamType | null;
 }[];
 
@@ -316,16 +266,25 @@ export type AnnouncementType = {
 };
 
 export type PlayPreviewType = {
-  play: RealPlayType;
+  play: PlayType;
   video: VideoType;
   mention?: MentionType;
   tag?: TagType;
 };
 
-// export type RealPlayPreviewType = {
-//   play: RealPlayType;
-//   video: VideoType;
-// };
+export type MentionNotificationType = {
+  play: PlayType;
+  video: VideoType;
+  team: TeamType;
+  mention: MentionType;
+};
+
+export type CommentNotificationType = {
+  play: PlayType;
+  video: VideoType;
+  team: TeamType;
+  comment: CommentType;
+};
 
 export type TagType = {
   id: string;
@@ -343,17 +302,4 @@ export type MentionType = {
   sender_name: string;
   viewed: boolean;
   id: string;
-};
-
-export type PlayPreviewMentionType = {
-  receiver_id: string;
-  receiver_name: string;
-};
-
-export type PlayPreviewTagType = {
-  exclusive_to: string | null;
-  play_id: string;
-  private: boolean;
-  tag_id: string;
-  title: string;
 };

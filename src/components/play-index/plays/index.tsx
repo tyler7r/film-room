@@ -1,13 +1,13 @@
 import type { YouTubePlayer } from "react-youtube";
-import type { PlayType } from "~/utils/types";
+import type { IndexPlayType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
 import Play from "../play";
 
 type PlaysProps = {
-  plays: PlayType[] | null;
+  plays: IndexPlayType[] | null;
   player: YouTubePlayer | null;
   scrollToPlayer: () => void;
-  setActivePlay: (play: PlayType) => void;
+  setActivePlay: (play: IndexPlayType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
   setIsFiltersOpen: (isFiltersOpen: boolean) => void;

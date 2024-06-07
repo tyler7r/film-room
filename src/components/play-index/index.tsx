@@ -9,7 +9,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { PlayType } from "~/utils/types";
+import type { IndexPlayType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
 import Play from "./play";
 import Plays from "./plays";
@@ -19,8 +19,8 @@ type PlayIndexProps = {
   videoId: string;
   scrollToPlayer: () => void;
   duration: number;
-  setActivePlay: (play: PlayType) => void;
-  activePlay: PlayType | null;
+  setActivePlay: (play: IndexPlayType) => void;
+  activePlay: IndexPlayType | null;
 };
 
 export type PlaySearchOptions = {
@@ -42,7 +42,7 @@ const PlayIndex = ({
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
 
-  const [plays, setPlays] = useState<PlayType[] | null>(null);
+  const [plays, setPlays] = useState<IndexPlayType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [playCount, setPlayCount] = useState<number | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);

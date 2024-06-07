@@ -13,7 +13,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { RealCommentType } from "~/utils/types";
+import type { CommentNotificationType } from "~/utils/types";
 
 type InboxCommentsProps = {
   hide: boolean;
@@ -33,22 +33,24 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   const topRef = useRef<HTMLDivElement | null>(null);
 
   const [isUnreadOnly, setIsUnreadOnly] = useState(false);
-  const [comments, setComments] = useState<RealCommentType | null>(null);
+  const [comments, setComments] = useState<CommentNotificationType[] | null>(
+    null,
+  );
   const [isBtnDisabled, setIsBtnDisabled] = useState<boolean>(false);
 
   const fetchComments = async (unreadOnly: boolean) => {
     const { from, to } = getFromAndTo();
     const cmts = supabase
-      .from("comment_notifications")
-      .select(`*, team: teams!inner(*)`, {
+      .from("comment_notification")
+      .select(`*`, {
         count: "exact",
       })
-      .eq("play_author_id", `${user.userId}`)
+      .eq("play->>author_id", `${user.userId}`)
       .range(from, to)
-      .order("created_at", { ascending: false });
+      .order("comment->>created_at", { ascending: false });
     setCommentPage(commentPage + 1);
     if (unreadOnly) {
-      void cmts.eq("viewed_by_author", false);
+      void cmts.eq("comment->>viewed", false);
     }
     const { data, count } = await cmts;
     if (count) {
@@ -89,7 +91,7 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   const updateComment = async (commentId: string) => {
     await supabase
       .from("comments")
-      .update({ viewed_by_author: true })
+      .update({ viewed: true })
       .eq("id", commentId);
   };
 
@@ -184,28 +186,31 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
         <>
           <div className="flex flex-col gap-5 md:px-2 lg:px-4">
             {comments &&
-              comments.length > 0 &&
-              comments.map((comment) => (
-                <div key={comment.play_id + comment.created_at}>
+              comments.map((notification) => (
+                <div
+                  key={notification.play.id + notification.comment.created_at}
+                >
                   <div className="flex items-center gap-2">
-                    {comment.private && comment.team && (
-                      <TeamLogo tm={comment.team} size={20} />
+                    {notification.team && (
+                      <TeamLogo tm={notification.team} size={20} />
                     )}
-                    {!comment.private && <PublicIcon fontSize="small" />}
+                    {!notification.play.private && (
+                      <PublicIcon fontSize="small" />
+                    )}
                     <div>
-                      <strong>{comment.comment_author_name}</strong> commented
-                      on:
+                      <strong>{notification.comment.author_name}</strong>{" "}
+                      commented on:
                     </div>
                   </div>
                   <div
                     onClick={() =>
                       handleClick(
-                        comment.video_id,
-                        comment.play_id,
-                        comment.start_time,
-                        comment.comment_id,
-                        comment.team_id,
-                        comment.viewed_by_author,
+                        notification.video.id,
+                        notification.play.id,
+                        notification.play.start_time,
+                        notification.comment.id,
+                        notification.team.id,
+                        notification.comment.viewed,
                       )
                     }
                     className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
@@ -214,7 +219,7 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
                         : "hover:border-purple-A400"
                     } hover:delay-100`}
                     style={
-                      !comment.viewed_by_author
+                      !notification.comment.viewed
                         ? isDark
                           ? { backgroundColor: `${colors.purple[200]}` }
                           : { backgroundColor: `${colors.purple[50]}` }
@@ -222,12 +227,14 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
                     }
                   >
                     <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
-                      {comment.video_title}
+                      {notification.video.title}
                     </div>
                     <Divider
                       sx={{ marginLeft: "12px", marginRight: "12px" }}
                     ></Divider>
-                    <div className="ml-1 text-center">{comment.play_title}</div>
+                    <div className="ml-1 text-center">
+                      {notification.play.title}
+                    </div>
                   </div>
                 </div>
               ))}

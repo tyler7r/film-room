@@ -12,15 +12,15 @@ import LikeBtn from "~/components/interactions/likes/like-btn";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { type PlayType } from "~/utils/types";
+import { type IndexPlayType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
 
 type PlayProps = {
   player: YouTubePlayer | null;
-  play: PlayType;
+  play: IndexPlayType;
   scrollToPlayer: () => void;
-  activePlay?: PlayType | null;
-  setActivePlay: (play: PlayType) => void;
+  activePlay?: IndexPlayType | null;
+  setActivePlay: (play: IndexPlayType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
   setIsFiltersOpen: (isFiltersOpen: boolean) => void;
@@ -54,7 +54,7 @@ const Play = ({
       .eq("id", `${user.userId}`);
   };
 
-  const handleClick = async (playTime: number, play: PlayType) => {
+  const handleClick = async (playTime: number, play: IndexPlayType) => {
     scrollToPlayer();
     void player?.seekTo(playTime, true);
     void updateLastWatched(playTime);

@@ -269,7 +269,7 @@ const Profile = () => {
       <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
         <div className="flex flex-col justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
-            <div className="text-6xl font-bold">{profile.name}</div>
+            <div className="text-center text-6xl font-bold">{profile.name}</div>
             <div className="text-lg font-light leading-5 tracking-tight">
               Member since {profile.join_date.substring(0, 4)}
             </div>

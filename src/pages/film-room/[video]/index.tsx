@@ -8,7 +8,7 @@ import PlayModal from "~/components/play-modal";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
-import type { PlayType, VideoType } from "~/utils/types";
+import type { IndexPlayType, VideoType } from "~/utils/types";
 
 const FilmRoom = () => {
   const router = useRouter();
@@ -22,7 +22,7 @@ const FilmRoom = () => {
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
   const [videoDuration, setVideoDuration] = useState<number>(0);
-  const [activePlay, setActivePlay] = useState<PlayType | null>(null);
+  const [activePlay, setActivePlay] = useState<IndexPlayType | null>(null);
 
   const [isPlayModalOpen, setIsPlayModalOpen] = useState<boolean>(false);
 

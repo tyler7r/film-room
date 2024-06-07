@@ -5,13 +5,13 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
-import type { LikeListType, PlayType } from "~/utils/types";
+import type { IndexPlayType, LikeListType } from "~/utils/types";
 import LikePopover from "../like-popover";
 
 type LikeBtnProps = {
   includePopover?: boolean;
   playId: string;
-  activePlay?: PlayType | null | undefined;
+  activePlay?: IndexPlayType | null | undefined;
   commentLike?: boolean;
   small?: boolean;
 };
@@ -135,7 +135,7 @@ const LikeBtn = ({
 
   useEffect(() => {
     void fetchLikeCount();
-    void fetchIfUserLiked();
+    if (user.isLoggedIn) void fetchIfUserLiked();
   }, [activePlay]);
 
   return (

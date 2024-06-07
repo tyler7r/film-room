@@ -61,15 +61,13 @@ const PlayModal = ({
     private: false,
   });
   const [mentions, setMentions] = useState<PlayerType[]>([]);
-  const [affiliatedPlayers, setAffiliatedPlayers] = useState<
-    PlayerType[] | null
-  >(null);
+  const [players, setPlayers] = useState<PlayerType[] | null>(null);
   const [playTags, setPlayTags] = useState<CreateNewTagType[]>([]);
   const [tags, setTags] = useState<CreateNewTagType[] | null>(null);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
-  const fetchAffiliatedPlayers = async () => {
-    const { data } = await supabase
+  const fetchPlayers = async () => {
+    const affiliatedPlayers = supabase
       .from("player_view")
       .select()
       .match({
@@ -77,7 +75,17 @@ const PlayModal = ({
         role: "player",
         verified: true,
       });
-    if (data) setAffiliatedPlayers(data);
+    const allPlayers = supabase
+      .from("player_view")
+      .select("*")
+      .eq("role", "player");
+    const { data } = video.private ? await affiliatedPlayers : await allPlayers;
+    if (data) {
+      const uniquePlayers = [
+        ...new Map(data.map((x) => [x.profile_id, x])).values(),
+      ];
+      setPlayers(uniquePlayers);
+    }
   };
 
   const fetchTags = async () => {
@@ -241,7 +249,7 @@ const PlayModal = ({
   }, [playDetails]);
 
   useEffect(() => {
-    if (user.currentAffiliation) void fetchAffiliatedPlayers();
+    if (user.isLoggedIn && user.userId) void fetchPlayers();
     void fetchTags();
   }, [video]);
 
@@ -301,9 +309,7 @@ const PlayModal = ({
             maxRows={5}
           />
           <PlayTags tags={playTags} setTags={setPlayTags} allTags={tags} />
-          {user.currentAffiliation && (
-            <Mentions players={affiliatedPlayers} setMentions={setMentions} />
-          )}
+          <Mentions players={players} setMentions={setMentions} />
           <div className="flex w-full justify-around">
             <div className="flex items-center justify-center">
               <div className="text-xl font-bold tracking-tight">
