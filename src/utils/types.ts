@@ -341,7 +341,7 @@ export type MentionType = {
   created_at: string;
   receiver_name: string;
   sender_name: string;
-  viewed: string;
+  viewed: boolean;
   id: string;
 };
 
