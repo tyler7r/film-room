@@ -140,7 +140,7 @@ const PlayModal = ({
   const handleMention = async (player: string, name: string, play: string) => {
     await supabase.from("play_mentions").insert({
       play_id: play,
-      sender_id: `${user.currentAffiliation?.affId}`,
+      sender_id: `${user.userId}`,
       receiver_id: player,
       receiver_name: name,
       sender_name: `${user.name}`,
@@ -168,8 +168,11 @@ const PlayModal = ({
     const { data } = await supabase
       .from("plays")
       .insert({
-        exclusive_to: isPrivate ? `${user.currentAffiliation?.team.id}` : null,
-        author_id: `${user.currentAffiliation?.affId}`,
+        exclusive_to:
+          isPrivate && user.currentAffiliation?.team.id
+            ? user.currentAffiliation.team.id
+            : null,
+        author_id: `${user.userId}`,
         video_id: video.id,
         highlight: playDetails.highlight,
         title: playDetails.title,
@@ -184,7 +187,7 @@ const PlayModal = ({
       .single();
     if (data) {
       mentions?.forEach((mention) => {
-        void handleMention(mention.id, mention.name, data.id);
+        void handleMention(mention.profile_id, mention.name, data.id);
       });
       playTags.forEach((tag) => {
         void handleTag(data.id, `${tag.id}`);

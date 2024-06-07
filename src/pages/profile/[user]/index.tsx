@@ -14,7 +14,6 @@ import { supabase } from "~/utils/supabase";
 import type {
   PlayPreviewType,
   ProfileActionBarType,
-  RealMentionType,
   TeamAffiliationType,
 } from "~/utils/types";
 
@@ -52,9 +51,9 @@ type StatsType = {
 };
 
 type FeedType = {
-  mentions: RealMentionType[] | null;
+  mentions: PlayPreviewType[] | null;
   plays: PlayPreviewType[] | null;
-  highlights: RealMentionType[] | null;
+  highlights: PlayPreviewType[] | null;
 };
 
 const Profile = () => {
@@ -110,23 +109,26 @@ const Profile = () => {
   const fetchStats = async (options?: FetchOptions) => {
     if (options?.profileId) {
       const getMentions = await supabase
-        .from("inbox_mentions")
-        .select("*, team: teams!affiliations_team_id_fkey(*)", {
+        .from("plays_via_user_mention")
+        .select("*", {
           count: "exact",
         })
-        .eq("receiver_id", options.profileId);
+        .eq("mention->>receiver_id", options.profileId);
       const getHighlights = await supabase
-        .from("inbox_mentions")
-        .select("*, team: teams!affiliations_team_id_fkey(*)", {
+        .from("plays_via_user_mention")
+        .select("*", {
           count: "exact",
         })
-        .match({ highlight: true, receiver_id: options.profileId });
+        .match({
+          "play->>highlight": true,
+          "mention->>receiver_id": options.profileId,
+        });
       const getPlays = await supabase
         .from("play_preview")
         .select("*", {
           count: "exact",
         })
-        .eq("author_id", options.profileId);
+        .eq("play->>author_id", options.profileId);
       setStats({
         mentionCount: getMentions.count ? getMentions.count : 0,
         highlightCount: getHighlights.count ? getHighlights.count : 0,
@@ -135,34 +137,38 @@ const Profile = () => {
     }
   };
 
+  //
   const fetchFeed = async (options?: FetchOptions) => {
     if (options?.profileId) {
       const mentions = supabase
-        .from("inbox_mentions")
-        .select("*, team: teams!affiliations_team_id_fkey(*)")
-        .eq("receiver_id", options.profileId);
+        .from("plays_via_user_mention")
+        .select("*")
+        .eq("mention->>receiver_id", options.profileId);
       const highlights = supabase
-        .from("inbox_mentions")
-        .select("*, team: teams!affiliations_team_id_fkey(*)")
-        .match({ highlight: true, receiver_id: options.profileId });
+        .from("plays_via_user_mention")
+        .select("*")
+        .match({
+          "play->>highlight": true,
+          "mention->>receiver_id": options.profileId,
+        });
       const plays = supabase
         .from("play_preview")
         .select("*")
-        .eq("author_id", options.profileId);
+        .eq("play->>author_id", options.profileId);
       if (options.currentAffiliation) {
         void mentions.or(
-          `private.eq.false, team_id.eq.${options.currentAffiliation}`,
+          `play->>private.eq.false, play->>exclusive_to.eq.${options.currentAffiliation}`,
         );
         void highlights.or(
-          `private.eq.false, team_id.eq.${options.currentAffiliation}`,
+          `play->>private.eq.false, play->>exclusive_to.eq.${options.currentAffiliation}`,
         );
         void plays.or(
-          `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
+          `play->>private.eq.false, play->>exclusive_to.eq.${options.currentAffiliation}`,
         );
       } else {
-        void mentions.eq("private", false);
-        void highlights.eq("private", false);
-        void plays.eq("private", false);
+        void mentions.eq("play->>private", false);
+        void highlights.eq("play->>private", false);
+        void plays.eq("play->>private", false);
       }
       const getMentions = await mentions;
       const getHighlights = await highlights;
@@ -358,7 +364,7 @@ const Profile = () => {
         {actionBarStatus.createdPlays &&
           (feed.plays ? (
             feed.plays.map((play) => (
-              <PlayPreview key={play.play_id} play={play} />
+              <PlayPreview key={play.play.id} preview={play} />
             ))
           ) : (
             <EmptyMessage message="user created plays" />
@@ -366,7 +372,7 @@ const Profile = () => {
         {actionBarStatus.mentions &&
           (feed.mentions ? (
             feed.mentions.map((play) => (
-              <PlayPreview key={play.play_id} play={play} />
+              <PlayPreview key={play.play.id} preview={play} />
             ))
           ) : (
             <EmptyMessage message="user mentions" />
@@ -374,7 +380,7 @@ const Profile = () => {
         {actionBarStatus.highlights &&
           (feed.highlights ? (
             feed.highlights.map((play) => (
-              <PlayPreview key={play.play_id} play={play} />
+              <PlayPreview key={play.play.id} preview={play} />
             ))
           ) : (
             <EmptyMessage message="user highlights" />
