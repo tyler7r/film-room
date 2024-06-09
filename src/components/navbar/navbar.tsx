@@ -39,7 +39,7 @@ export const Navbar = () => {
         });
       if (count && count > 0) setUnreadMentionCount(count);
       else setUnreadMentionCount(0);
-    }
+    } else setUnreadMentionCount(0);
   };
 
   const fetchUnreadComments = async (options?: FetchOptions) => {
@@ -53,7 +53,7 @@ export const Navbar = () => {
         });
       if (count && count > 0) setUnreadCommentCount(count);
       else setUnreadCommentCount(0);
-    }
+    } else setUnreadCommentCount(0);
   };
 
   const fetchUnreadCount = async () => {

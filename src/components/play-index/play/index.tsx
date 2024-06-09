@@ -3,7 +3,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockIcon from "@mui/icons-material/Lock";
 import StarIcon from "@mui/icons-material/Star";
 import { Button, Divider, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import AddComment from "~/components/interactions/comments/add-comment";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
@@ -12,15 +12,15 @@ import LikeBtn from "~/components/interactions/likes/like-btn";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { type IndexPlayType } from "~/utils/types";
+import { MentionType, PlayType, TagType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
 
 type PlayProps = {
   player: YouTubePlayer | null;
-  play: IndexPlayType;
+  play: PlayType;
   scrollToPlayer: () => void;
-  activePlay?: IndexPlayType | null;
-  setActivePlay: (play: IndexPlayType) => void;
+  activePlay?: PlayType | null;
+  setActivePlay: (play: PlayType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
   setIsFiltersOpen: (isFiltersOpen: boolean) => void;
@@ -43,6 +43,38 @@ const Play = ({
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
+  const [mentions, setMentions] = useState<MentionType[] | null>(null);
+  const [tags, setTags] = useState<TagType[] | null>(null);
+
+  const fetchMentions = async () => {
+    const { data } = await supabase
+      .from("plays_via_user_mention")
+      .select("*")
+      .eq("play->>id", play.id);
+    if (data && data.length > 0) {
+      const mentions: MentionType[] = data.map((mention) => mention.mention);
+      setMentions(mentions);
+    } else setMentions(null);
+  };
+
+  const fetchTags = async () => {
+    const tags = supabase
+      .from("plays_via_tag")
+      .select("*")
+      .eq("play->>id", play.id);
+    if (user.currentAffiliation?.team.id) {
+      void tags.or(
+        `tag->>private.eq.false, tag->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
+      );
+    } else {
+      void tags.eq("play->>private", false);
+    }
+    const { data } = await tags;
+    if (data) {
+      const tags: TagType[] = data.map((tag) => tag.tag);
+      setTags(tags);
+    } else setTags(null);
+  };
 
   const updateLastWatched = async (time: number) => {
     await supabase
@@ -54,7 +86,7 @@ const Play = ({
       .eq("id", `${user.userId}`);
   };
 
-  const handleClick = async (playTime: number, play: IndexPlayType) => {
+  const handleClick = async (playTime: number, play: PlayType) => {
     scrollToPlayer();
     void player?.seekTo(playTime, true);
     void updateLastWatched(playTime);
@@ -64,13 +96,18 @@ const Play = ({
   const handleMentionClick = (e: React.MouseEvent, mention: string) => {
     e.stopPropagation();
     setIsFiltersOpen(true);
-    setSearchOptions({ ...searchOptions, receiver_name: mention });
+    setSearchOptions({ ...searchOptions, topic: mention });
   };
 
   const handleTagClick = (tag: string) => {
     setIsFiltersOpen(true);
-    setSearchOptions({ ...searchOptions, tag: tag });
+    setSearchOptions({ ...searchOptions, topic: tag });
   };
+
+  useEffect(() => {
+    void fetchMentions();
+    void fetchTags();
+  }, []);
 
   return (
     <div className="flex w-full grow flex-col self-center">
@@ -95,6 +132,7 @@ const Play = ({
               commentCount={commentCount}
               setCommentCount={setCommentCount}
               playId={play.id}
+              activePlay={activePlay}
             />
           </div>
         </div>
@@ -111,11 +149,11 @@ const Play = ({
           <div className="text-center text-xl tracking-wide md:text-2xl">
             {play.title}
           </div>
-          {play.mentions.length > 0 && (
+          {mentions && (
             <div className="flex w-full flex-col">
               <Divider flexItem sx={{ margin: "8px", marginBottom: "12px" }} />
               <div className="flex flex-grow flex-wrap items-center justify-center gap-3">
-                {play.mentions.map((m) => (
+                {mentions.map((m) => (
                   <div
                     className={`text-center text-sm font-bold even:text-slate-500 md:text-base ${
                       isDark
@@ -170,15 +208,14 @@ const Play = ({
               {play.note}
             </div>
             <div className="flex flex-wrap">
-              {play.tags.length > 0 &&
-                play.tags.map((tag) => (
-                  <Button
-                    key={tag.title}
-                    onClick={() => handleTagClick(tag.title)}
-                  >
-                    #{tag.title}
-                  </Button>
-                ))}
+              {tags?.map((tag) => (
+                <Button
+                  key={tag.title}
+                  onClick={() => handleTagClick(tag.title)}
+                >
+                  #{tag.title}
+                </Button>
+              ))}
             </div>
           </div>
           <AddComment playId={play.id} />

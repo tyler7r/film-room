@@ -187,7 +187,7 @@ const PlayModal = ({
         note: playDetails.note,
         start_time: playDetails.start!,
         end_time: playDetails.end!,
-        author_role: `${user.currentAffiliation?.role}`,
+        author_role: user.currentAffiliation?.role ?? "guest",
         author_name: `${user.name}`,
         private: isPrivate ? true : false,
       })
