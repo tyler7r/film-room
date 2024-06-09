@@ -185,59 +185,56 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
       {!hide && (
         <>
           <div className="flex flex-col gap-5 md:px-2 lg:px-4">
-            {comments &&
-              comments.map((notification) => (
-                <div
-                  key={notification.play.id + notification.comment.created_at}
-                >
-                  <div className="flex items-center gap-2">
-                    {notification.team && (
-                      <TeamLogo tm={notification.team} size={20} />
-                    )}
-                    {!notification.play.private && (
-                      <PublicIcon fontSize="small" />
-                    )}
-                    <div>
-                      <strong>{notification.comment.author_name}</strong>{" "}
-                      commented on:
-                    </div>
-                  </div>
-                  <div
-                    onClick={() =>
-                      handleClick(
-                        notification.video.id,
-                        notification.play.id,
-                        notification.play.start_time,
-                        notification.comment.id,
-                        notification.team.id,
-                        notification.comment.viewed,
-                      )
-                    }
-                    className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
-                      isDark
-                        ? "hover:border-purple-400"
-                        : "hover:border-purple-A400"
-                    } hover:delay-100`}
-                    style={
-                      !notification.comment.viewed
-                        ? isDark
-                          ? { backgroundColor: `${colors.purple[200]}` }
-                          : { backgroundColor: `${colors.purple[50]}` }
-                        : backgroundStyle
-                    }
-                  >
-                    <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
-                      {notification.video.title}
-                    </div>
-                    <Divider
-                      sx={{ marginLeft: "12px", marginRight: "12px" }}
-                    ></Divider>
-                    <div className="ml-1 text-center">
-                      {notification.play.title}
-                    </div>
+            {comments?.map((notification) => (
+              <div key={notification.play.id + notification.comment.created_at}>
+                <div className="flex items-center gap-2">
+                  {notification.team && (
+                    <TeamLogo tm={notification.team} size={20} />
+                  )}
+                  {!notification.play.private && (
+                    <PublicIcon fontSize="small" />
+                  )}
+                  <div>
+                    <strong>{notification.comment.author_name}</strong>{" "}
+                    commented on:
                   </div>
                 </div>
-              ))}
+                <div
+                  onClick={() =>
+                    handleClick(
+                      notification.video.id,
+                      notification.play.id,
+                      notification.play.start_time,
+                      notification.comment.id,
+                      notification.team.id,
+                      notification.comment.viewed,
+                    )
+                  }
+                  className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
+                    isDark
+                      ? "hover:border-purple-400"
+                      : "hover:border-purple-A400"
+                  } hover:delay-100`}
+                  style={
+                    !notification.comment.viewed
+                      ? isDark
+                        ? { backgroundColor: `${colors.purple[200]}` }
+                        : { backgroundColor: `${colors.purple[50]}` }
+                      : backgroundStyle
+                  }
+                >
+                  <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
+                    {notification.video.title}
+                  </div>
+                  <Divider
+                    sx={{ marginLeft: "12px", marginRight: "12px" }}
+                  ></Divider>
+                  <div className="ml-1 text-center">
+                    {notification.play.title}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
           {comments && comments.length > 0 ? (
             <div className="flex flex-col items-center justify-center gap-1">

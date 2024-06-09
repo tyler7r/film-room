@@ -51,7 +51,6 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
       void mtns.eq("mention->>viewed", false);
     }
     const { data, count } = await mtns;
-    console.log(data);
     if (count) {
       setMentionCount(count);
       if (to >= count - 1) setIsBtnDisabled(true);
@@ -110,14 +109,14 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
     playId: string,
     start: number,
     mentionId: string,
-    // teamId: string | null,
+    teamId: string | null,
     viewed: boolean,
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set("play", playId);
     params.set("start", `${start}`);
     if (!viewed) void updateMention(mentionId);
-    // if (teamId) void updateUserAffiliation(teamId);
+    if (teamId) void updateUserAffiliation(teamId);
     void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
@@ -184,60 +183,59 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
       {!hide && (
         <>
           <div className="flex flex-col gap-5 md:px-2 lg:px-4">
-            {mentions &&
-              mentions.map((notification) => (
-                <div key={notification.mention.id}>
-                  <div className="flex items-center gap-2">
-                    {notification.team && (
-                      <TeamLogo tm={notification.team} size={20} />
-                    )}
-                    {!notification.team && <PublicIcon fontSize="small" />}
-                    <div>
-                      <strong>{notification.play.author_name}</strong> mentioned
-                      you on:
-                    </div>
-                  </div>
-                  <div
-                    onClick={() =>
-                      handleClick(
-                        notification.video.id,
-                        notification.play.id,
-                        notification.play.start_time,
-                        notification.mention.id,
-                        // notification.team.id ? notification.team.id : null,
-                        notification.mention.viewed,
-                      )
-                    }
-                    className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
-                      isDark
-                        ? "hover:border-purple-400"
-                        : "hover:border-purple-A400"
-                    } hover:delay-100 ${
-                      !notification.mention.viewed ? "bg-purple-100" : ""
-                    }`}
-                    style={
-                      !notification.mention.viewed
-                        ? isDark
-                          ? { backgroundColor: `${colors.purple[200]}` }
-                          : { backgroundColor: `${colors.purple[50]}` }
-                        : backgroundStyle
-                    }
-                  >
-                    <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
-                      {notification.video.title}
-                    </div>
-                    <Divider
-                      sx={{
-                        marginLeft: "12px",
-                        marginRight: "12px",
-                      }}
-                    ></Divider>
-                    <div className="mx-4 text-center">
-                      {notification.play.title}
-                    </div>
+            {mentions?.map((notification) => (
+              <div key={notification.mention.id}>
+                <div className="flex items-center gap-2">
+                  {notification.team && (
+                    <TeamLogo tm={notification.team} size={20} />
+                  )}
+                  {!notification.team && <PublicIcon fontSize="small" />}
+                  <div>
+                    <strong>{notification.play.author_name}</strong> mentioned
+                    you on:
                   </div>
                 </div>
-              ))}
+                <div
+                  onClick={() =>
+                    handleClick(
+                      notification.video.id,
+                      notification.play.id,
+                      notification.play.start_time,
+                      notification.mention.id,
+                      notification.team ? notification.team.id : null,
+                      notification.mention.viewed,
+                    )
+                  }
+                  className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
+                    isDark
+                      ? "hover:border-purple-400"
+                      : "hover:border-purple-A400"
+                  } hover:delay-100 ${
+                    !notification.mention.viewed ? "bg-purple-100" : ""
+                  }`}
+                  style={
+                    !notification.mention.viewed
+                      ? isDark
+                        ? { backgroundColor: `${colors.purple[200]}` }
+                        : { backgroundColor: `${colors.purple[50]}` }
+                      : backgroundStyle
+                  }
+                >
+                  <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
+                    {notification.video.title}
+                  </div>
+                  <Divider
+                    sx={{
+                      marginLeft: "12px",
+                      marginRight: "12px",
+                    }}
+                  ></Divider>
+                  <div className="mx-4 text-center">
+                    {notification.play.title}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
           {mentions && mentions.length > 0 ? (
             <div className="flex flex-col items-center justify-center">

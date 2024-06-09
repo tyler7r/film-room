@@ -12,7 +12,7 @@ import LikeBtn from "~/components/interactions/likes/like-btn";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { MentionType, PlayType, TagType } from "~/utils/types";
+import type { MentionType, PlayType, TagType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
 
 type PlayProps = {

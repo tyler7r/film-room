@@ -3,7 +3,7 @@ import { IconButton } from "@mui/material";
 import React, { useEffect } from "react";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
-import { PlayType } from "~/utils/types";
+import type { PlayType } from "~/utils/types";
 
 type CommentBtnProps = {
   playId: string;
