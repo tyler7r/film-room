@@ -2,7 +2,7 @@ import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages } from "~/utils/helpers";
+import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import Video from "../video";
 
@@ -42,8 +42,10 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
     currentAffiliation: user.currentAffiliation?.team.id,
   });
 
+  const itemsPerPage = isMobile ? 10 : 20;
+
   const fetchVideos = async (options?: SearchOptions) => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const videos = supabase
       .from("team_videos")
       .select(`uploaded_at, video:videos!inner(*)`, {
@@ -71,14 +73,6 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
     setPage(value);
   };
 
-  const getFromAndTo = () => {
-    const itemPerPage = isMobile ? 5 : 10;
-    const from = (page - 1) * itemPerPage;
-    const to = from + itemPerPage - 1;
-
-    return { from, to };
-  };
-
   useEffect(() => {
     setOptions({
       loggedIn: user.isLoggedIn,
@@ -87,8 +81,13 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
   }, [user]);
 
   useEffect(() => {
+    if (page === 1) void fetchVideos(options);
+    else setPage(1);
+  }, [isMobile]);
+
+  useEffect(() => {
     void fetchVideos(options);
-  }, [teamId, options]);
+  }, [teamId, options, page]);
 
   return (
     <div className="flex w-11/12 flex-col items-center justify-center">
@@ -105,7 +104,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
           size="large"
           variant="text"
           shape="rounded"
-          count={getNumberOfPages(isMobile, videoCount)}
+          count={getNumberOfPages(itemsPerPage, videoCount)}
           page={page}
           onChange={handleChange}
         />

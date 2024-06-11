@@ -6,7 +6,7 @@ import Video from "~/components/video";
 import VideoSearchFilters from "~/components/video-search-filters";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages } from "~/utils/helpers";
+import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
 
@@ -33,8 +33,10 @@ const FilmRoomHome = () => {
     privateOnly: false,
   });
 
+  const itemsPerPage = isMobile ? 10 : 20;
+
   const fetchVideos = async (options?: SearchOptions) => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const videos = supabase
       .from("videos")
       .select("*", { count: "exact" })
@@ -68,14 +70,6 @@ const FilmRoomHome = () => {
   const handleChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
     setPage(value);
-  };
-
-  const getFromAndTo = () => {
-    const itemPerPage = isMobile ? 5 : 10;
-    const from = (page - 1) * itemPerPage;
-    const to = from + itemPerPage - 1;
-
-    return { from, to };
   };
 
   const clearSearchOptions = () => {
@@ -113,8 +107,13 @@ const FilmRoomHome = () => {
   }, [user]);
 
   useEffect(() => {
+    if (page === 1) void fetchVideos(searchOptions);
+    else setPage(1);
+  }, [searchOptions, isMobile]);
+
+  useEffect(() => {
     void fetchVideos(searchOptions);
-  }, [page, isMobile, searchOptions]);
+  }, [page]);
 
   return (
     <div className="mb-4 flex w-full flex-col items-center justify-center">
@@ -160,7 +159,7 @@ const FilmRoomHome = () => {
           size="large"
           variant="text"
           shape="rounded"
-          count={getNumberOfPages(isMobile, videoCount)}
+          count={getNumberOfPages(itemsPerPage, videoCount)}
           page={page}
           onChange={handleChange}
         />

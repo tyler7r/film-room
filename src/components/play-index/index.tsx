@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages } from "~/utils/helpers";
+import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
@@ -53,9 +53,10 @@ const PlayIndex = ({
     topic: "",
     currentAffiliation: user.currentAffiliation?.team.id,
   });
+  const itemsPerPage = isMobile ? 10 : 20;
 
   const fetchPlays = async (options?: PlaySearchOptions) => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const plays = supabase
       .from("play_preview")
       .select(`*`, {
@@ -89,7 +90,7 @@ const PlayIndex = ({
   };
 
   const fetchPlaysBySearch = async (options: PlaySearchOptions) => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const playsByMention = supabase
       .from("plays_via_user_mention")
       .select("*")
@@ -157,14 +158,6 @@ const PlayIndex = ({
     setPage(value);
   };
 
-  const getFromAndTo = () => {
-    const itemPerPage = isMobile ? 5 : 10;
-    const from = (page - 1) * itemPerPage;
-    const to = from + itemPerPage - 1;
-
-    return { from, to };
-  };
-
   useEffect(() => {
     const channel = supabase
       .channel("play_changes")
@@ -190,9 +183,17 @@ const PlayIndex = ({
   }, [user]);
 
   useEffect(() => {
+    if (page === 1 && searchOptions.topic !== "")
+      void fetchPlaysBySearch(searchOptions);
+    else if (page === 1 && searchOptions.topic === "")
+      void fetchPlays(searchOptions);
+    else setPage(1);
+  }, [searchOptions, isMobile]);
+
+  useEffect(() => {
     if (searchOptions.topic !== "") void fetchPlaysBySearch(searchOptions);
     else void fetchPlays(searchOptions);
-  }, [searchOptions, videoId, page, isMobile, activePlay]);
+  }, [videoId, page, activePlay]);
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -275,7 +276,7 @@ const PlayIndex = ({
             size="large"
             variant="text"
             shape="rounded"
-            count={getNumberOfPages(isMobile, playCount)}
+            count={getNumberOfPages(itemsPerPage, playCount)}
             page={page}
             onChange={handlePageChange}
           />

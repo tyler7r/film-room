@@ -7,7 +7,7 @@ import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
-import { getNumberOfPages } from "~/utils/helpers";
+import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { TeamType } from "~/utils/types";
 
@@ -26,9 +26,10 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
   const [teamCount, setTeamCount] = useState<number | null>(null);
 
   const [page, setPage] = useState<number>(1);
+  const itemsPerPage = isMobile ? 10 : 20;
 
   const fetchTeams = async () => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const { data, count } = await supabase
       .from("teams")
       .select("*", { count: "exact" })
@@ -38,14 +39,6 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
     else setTeams(null);
     if (count) setTeamCount(count);
     else setTeamCount(null);
-  };
-
-  const getFromAndTo = () => {
-    const itemPerPage = isMobile ? 5 : 10;
-    const from = (page - 1) * itemPerPage;
-    const to = from + itemPerPage - 1;
-
-    return { from, to };
   };
 
   const handleTeamClick = (
@@ -70,7 +63,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
   useEffect(() => {
     if (page === 1) void fetchTeams();
     else setPage(1);
-  }, [topic]);
+  }, [topic, isMobile]);
 
   useEffect(() => {
     void fetchTeams();
@@ -107,7 +100,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
           size="medium"
           variant="text"
           shape="rounded"
-          count={getNumberOfPages(isMobile, teamCount)}
+          count={getNumberOfPages(itemsPerPage, teamCount)}
           page={page}
           onChange={handlePageChange}
         />

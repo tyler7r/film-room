@@ -137,7 +137,6 @@ const Profile = () => {
     }
   };
 
-  //
   const fetchFeed = async (options?: FetchOptions) => {
     if (options?.profileId) {
       const mentions = supabase
@@ -382,7 +381,7 @@ const Profile = () => {
           ))}
         {actionBarStatus.highlights &&
           (feed.highlights ? (
-            feed.highlights.map((play) => (
+            feed.highlights?.map((play) => (
               <PlayPreview key={play.play.id + play.video.id} preview={play} />
             ))
           ) : (

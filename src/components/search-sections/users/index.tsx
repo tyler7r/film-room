@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import User from "~/components/user";
 import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages } from "~/utils/helpers";
+import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { UserType } from "~/utils/types";
 
@@ -18,9 +18,10 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
   const [userCount, setUserCount] = useState<number | null>(null);
 
   const [page, setPage] = useState<number>(1);
+  const itemsPerPage = isMobile ? 10 : 20;
 
   const fetchUsers = async () => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const { data, count } = await supabase
       .from("profiles")
       .select("*", { count: "exact" })
@@ -32,14 +33,6 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
     else setUserCount(null);
   };
 
-  const getFromAndTo = () => {
-    const itemPerPage = isMobile ? 5 : 10;
-    const from = (page - 1) * itemPerPage;
-    const to = from + itemPerPage - 1;
-
-    return { from, to };
-  };
-
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
     setPage(value);
@@ -48,7 +41,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
   useEffect(() => {
     if (page === 1) void fetchUsers();
     else setPage(1);
-  }, [topic]);
+  }, [topic, isMobile]);
 
   useEffect(() => {
     void fetchUsers();
@@ -68,7 +61,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
           size="small"
           variant="text"
           shape="rounded"
-          count={getNumberOfPages(isMobile, userCount)}
+          count={getNumberOfPages(itemsPerPage, userCount)}
           page={page}
           onChange={handlePageChange}
         />

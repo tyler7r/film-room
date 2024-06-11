@@ -4,7 +4,7 @@ import EmptyMessage from "~/components/empty-msg";
 import Video from "~/components/video";
 import { useMobileContext } from "~/contexts/mobile";
 import { SearchOptions } from "~/pages/search";
-import { getNumberOfPages } from "~/utils/helpers";
+import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { VideoType } from "~/utils/types";
 
@@ -20,9 +20,10 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
   const [videoCount, setVideoCount] = useState<number | null>(null);
 
   const [page, setPage] = useState<number>(1);
+  const itemsPerPage = isMobile ? 10 : 20;
 
   const fetchVideos = async (options?: SearchOptions) => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const videos = supabase
       .from("videos")
       .select("*", { count: "exact" })
@@ -42,14 +43,6 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
     else setVideoCount(null);
   };
 
-  const getFromAndTo = () => {
-    const itemPerPage = isMobile ? 3 : 5;
-    const from = (page - 1) * itemPerPage;
-    const to = from + itemPerPage - 1;
-
-    return { from, to };
-  };
-
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
     setPage(value);
@@ -58,7 +51,7 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
   useEffect(() => {
     if (page === 1) void fetchVideos();
     else setPage(1);
-  }, [topic]);
+  }, [topic, isMobile]);
 
   useEffect(() => {
     void fetchVideos(options);
@@ -76,7 +69,7 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
           size="small"
           variant="text"
           shape="rounded"
-          count={getNumberOfPages(isMobile, videoCount)}
+          count={getNumberOfPages(itemsPerPage, videoCount)}
           page={page}
           onChange={handlePageChange}
         />
