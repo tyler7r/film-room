@@ -113,15 +113,15 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
       </div>
       <YouTube
         opts={{
-          width: `${isMobile ? screenWidth * 0.9 : 640}`,
-          height: `${isMobile ? (screenWidth * 0.9) / 1.778 : 390}`,
+          width: `${isMobile ? screenWidth : 640}`,
+          height: `${isMobile ? screenWidth / 1.778 : 390}`,
           playerVars: {
             end: preview.play.end_time,
-            controls: isMobile ? 1 : 0,
             enablejsapi: 1,
             playsinline: 1,
             disablekb: 1,
             fs: 1,
+            controls: 0,
             rel: 0,
             color: "red",
             origin: "https://www.youtube.com",
@@ -141,6 +141,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             playId={preview.play.id}
             commentCount={commentCount}
             setCommentCount={setCommentCount}
+            activePlay={null}
           />
         </div>
         {mentions && (

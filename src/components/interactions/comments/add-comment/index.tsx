@@ -27,7 +27,7 @@ const AddComment = ({ playId }: CommentProps) => {
       void router.push("/login");
       return;
     }
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("comments")
       .insert({
         play_id: playId,
@@ -40,7 +40,6 @@ const AddComment = ({ playId }: CommentProps) => {
     if (data) {
       setComment("");
     }
-    if (error) console.log(error.message);
   };
 
   useEffect(() => {

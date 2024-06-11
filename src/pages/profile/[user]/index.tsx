@@ -372,7 +372,10 @@ const Profile = () => {
         {actionBarStatus.mentions &&
           (feed.mentions ? (
             feed.mentions.map((play) => (
-              <PlayPreview key={play.play.id} preview={play} />
+              <PlayPreview
+                key={play.play.id + play.mention?.created_at}
+                preview={play}
+              />
             ))
           ) : (
             <EmptyMessage message="user mentions" />
@@ -380,7 +383,7 @@ const Profile = () => {
         {actionBarStatus.highlights &&
           (feed.highlights ? (
             feed.highlights.map((play) => (
-              <PlayPreview key={play.play.id} preview={play} />
+              <PlayPreview key={play.play.id + play.video.id} preview={play} />
             ))
           ) : (
             <EmptyMessage message="user highlights" />
