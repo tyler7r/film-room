@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import Video from "~/components/video";
 import { useMobileContext } from "~/contexts/mobile";
-import { SearchOptions } from "~/pages/search";
+import type { SearchOptions } from "~/pages/search";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { VideoType } from "~/utils/types";
+import type { VideoType } from "~/utils/types";
 
 type SearchVideosProps = {
   options: SearchOptions;

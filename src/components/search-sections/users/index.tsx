@@ -5,7 +5,7 @@ import User from "~/components/user";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { UserType } from "~/utils/types";
+import type { UserType } from "~/utils/types";
 
 type SearchUsersProps = {
   topic: string;

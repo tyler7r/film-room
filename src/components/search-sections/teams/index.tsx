@@ -9,7 +9,7 @@ import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { TeamType } from "~/utils/types";
+import type { TeamType } from "~/utils/types";
 
 type SearchTeamsProps = {
   topic: string;

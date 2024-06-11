@@ -8,8 +8,6 @@ import SearchTeams from "~/components/search-sections/teams";
 import SearchUsers from "~/components/search-sections/users";
 import SearchVideos from "~/components/search-sections/videos";
 import { useAuthContext } from "~/contexts/auth";
-import { useMobileContext } from "~/contexts/mobile";
-import { useIsDarkContext } from "../_app";
 
 export type SearchOptions = {
   currentAffiliation: string | undefined;
@@ -23,8 +21,6 @@ type ActionBarType = {
 
 const Search = () => {
   const { user } = useAuthContext();
-  const { isDark, backgroundStyle } = useIsDarkContext();
-  const { isMobile } = useMobileContext();
 
   const topic = useSearchParams().get("topic") ?? "";
   const searchParams = useSearchParams();
