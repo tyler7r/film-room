@@ -71,10 +71,25 @@ export type Database = MergeDeep<
             team: TeamType;
           };
         };
+        user_teams: {
+          Row: {
+            affiliations: AffiliationType;
+            team: TeamType;
+          };
+        };
       };
     };
   }
 >;
+
+export type AffiliationType = {
+  team_id: string;
+  user_id: string;
+  id: string;
+  verified: boolean;
+  role: string;
+  number: number | null;
+};
 
 export type TeamAffiliationType = {
   team: {
@@ -284,6 +299,11 @@ export type CommentNotificationType = {
   video: VideoType;
   team: TeamType;
   comment: CommentType;
+};
+
+export type UserTeamType = {
+  affiliations: AffiliationType;
+  team: TeamType;
 };
 
 export type TagType = {
