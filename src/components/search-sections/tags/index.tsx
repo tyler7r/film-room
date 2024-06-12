@@ -38,14 +38,10 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
       void plays.eq("play->>private", false);
     }
     const { data, count } = await plays;
-    if (data && data.length) {
-      const uniquePlays = [
-        ...new Map(data.map((x) => [x.play.id, x])).values(),
-      ];
-      setPlayTags(uniquePlays);
-      if (uniquePlays.length > 0) setPlayCount(uniquePlays.length);
-      else setPlayCount(null);
-    } else setPlayTags(null);
+    const uniquePlays = [...new Map(data?.map((x) => [x.play.id, x])).values()];
+    setPlayTags(uniquePlays);
+    if (uniquePlays.length > 0) setPlayCount(uniquePlays.length);
+    else setPlayCount(null);
     if (!count) setPlayCount(null);
   };
 
