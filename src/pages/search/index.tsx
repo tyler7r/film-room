@@ -4,6 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import SearchPlayTags from "~/components/search-sections/tags";
 import SearchTeams from "~/components/search-sections/teams";
 import SearchUsers from "~/components/search-sections/users";
 import SearchVideos from "~/components/search-sections/videos";
@@ -17,6 +18,7 @@ type ActionBarType = {
   videos: boolean;
   users: boolean;
   teams: boolean;
+  tags: boolean;
 };
 
 const Search = () => {
@@ -34,6 +36,7 @@ const Search = () => {
     videos: true,
     users: false,
     teams: false,
+    tags: false,
   });
 
   const handleSearch = useDebouncedCallback((term: string) => {
@@ -48,11 +51,13 @@ const Search = () => {
 
   const handleActionBarClick = (topic: string) => {
     if (topic === "videos") {
-      setActionBar({ videos: true, users: false, teams: false });
+      setActionBar({ videos: true, users: false, teams: false, tags: false });
     } else if (topic === "users") {
-      setActionBar({ users: true, videos: false, teams: false });
+      setActionBar({ users: true, videos: false, teams: false, tags: false });
+    } else if (topic === "tags") {
+      setActionBar({ teams: false, users: false, videos: false, tags: true });
     } else {
-      setActionBar({ users: false, videos: false, teams: true });
+      setActionBar({ users: false, videos: false, teams: true, tags: false });
     }
   };
 
@@ -121,10 +126,23 @@ const Search = () => {
         >
           Teams
         </Button>
+        <Button
+          onClick={() => handleActionBarClick("tags")}
+          variant={actionBar.tags ? "outlined" : "text"}
+          sx={{
+            fontSize: "20px",
+            padding: "6px 20px 6px 20px",
+            fontWeight: "bold",
+            letterSpacing: "0.07em",
+          }}
+        >
+          Tags
+        </Button>
       </div>
       {actionBar.videos && <SearchVideos topic={topic} options={options} />}
       {actionBar.users && <SearchUsers topic={topic} />}
       {actionBar.teams && <SearchTeams topic={topic} />}
+      {actionBar.tags && <SearchPlayTags topic={topic} />}
     </div>
   );
 };
