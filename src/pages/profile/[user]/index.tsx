@@ -231,20 +231,6 @@ const Profile = () => {
     } else return;
   };
 
-  const handleTeamClick = (
-    e: React.MouseEvent<HTMLDivElement>,
-    teamId: string,
-  ) => {
-    e.stopPropagation();
-    const isAffiliatedTeam = affiliations?.find(
-      (aff) => aff.team.id === teamId,
-    );
-    if (isAffiliatedTeam && user.isLoggedIn) {
-      setUser({ ...user, currentAffiliation: isAffiliatedTeam });
-    }
-    void router.push(`/team-hub/${teamId}`);
-  };
-
   useEffect(() => {
     if (user.userId) void fetchLastWatched();
   }, [user]);

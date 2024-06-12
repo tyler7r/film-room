@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { TeamAffiliationType } from "~/utils/types";
+import type { TeamAffiliationType } from "~/utils/types";
 import TeamLogo from "../team-logo";
 
 type TeamAffiliationProps = {

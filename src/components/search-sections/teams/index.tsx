@@ -1,12 +1,8 @@
 import { Pagination } from "@mui/material";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import Team from "~/components/team";
-import { useAffiliatedContext } from "~/contexts/affiliations";
-import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
-import { useIsDarkContext } from "~/pages/_app";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { TeamType } from "~/utils/types";
@@ -17,10 +13,6 @@ type SearchTeamsProps = {
 
 const SearchTeams = ({ topic }: SearchTeamsProps) => {
   const { isMobile } = useMobileContext();
-  const { affiliations } = useAffiliatedContext();
-  const { user, setUser } = useAuthContext();
-  const { isDark, backgroundStyle } = useIsDarkContext();
-  const router = useRouter();
 
   const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [teamCount, setTeamCount] = useState<number | null>(null);

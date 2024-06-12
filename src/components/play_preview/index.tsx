@@ -18,7 +18,7 @@ type PlayPreviewProps = {
 
 const PlayPreview = ({ preview }: PlayPreviewProps) => {
   const { screenWidth, isMobile } = useMobileContext();
-  const { isDark, hoverText } = useIsDarkContext();
+  const { hoverText } = useIsDarkContext();
   const { user } = useAuthContext();
   const router = useRouter();
 

@@ -11,7 +11,7 @@ type UserProps = {
 };
 
 const User = ({ user }: UserProps) => {
-  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
+  const { backgroundStyle, hoverBorder } = useIsDarkContext();
   const router = useRouter();
 
   const [userTeams, setUserTeams] = useState<TeamType[] | null>(null);
