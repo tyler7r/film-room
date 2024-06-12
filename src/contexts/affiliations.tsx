@@ -35,7 +35,7 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
       const { data } = await supabase
         .from("affiliations")
         .select(
-          `role, id, teams!inner(id, name, city, division, logo, full_name, owner)`,
+          `role, id, number, teams!inner(id, name, city, division, logo, full_name, owner)`,
         )
         .match({ user_id: `${user.userId}`, verified: true });
       if (data && data.length > 0) {
@@ -43,6 +43,7 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
           team: tm.teams!,
           role: tm.role,
           affId: tm.id,
+          number: tm.number,
         }));
         setAffiliations(typedAffiliations);
         setUser({ ...user, currentAffiliation: typedAffiliations[0] });

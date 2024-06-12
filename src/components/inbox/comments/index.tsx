@@ -25,7 +25,7 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   const { affiliations } = useAffiliatedContext();
   const { setIsOpen, commentPage, setCommentPage, setCommentCount } =
     useInboxContext();
-  const { backgroundStyle, isDark } = useIsDarkContext();
+  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -210,11 +210,7 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
                       notification.comment.viewed,
                     )
                   }
-                  className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
-                    isDark
-                      ? "hover:border-purple-400"
-                      : "hover:border-purple-A400"
-                  } hover:delay-100`}
+                  className={`flex w-full flex-col gap-2 ${hoverBorder}`}
                   style={
                     !notification.comment.viewed
                       ? isDark

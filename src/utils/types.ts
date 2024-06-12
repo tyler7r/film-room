@@ -269,6 +269,7 @@ export type UserType = {
   last_watched: string | null;
   last_watched_time: number | null;
   name: string | null;
+  join_date: string;
 };
 
 export type AnnouncementType = {

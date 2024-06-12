@@ -38,7 +38,7 @@ const Play = ({
   setIsFiltersOpen,
   videoId,
 }: PlayProps) => {
-  const { backgroundStyle, isDark } = useIsDarkContext();
+  const { backgroundStyle, hoverText } = useIsDarkContext();
   const { user } = useAuthContext();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -155,11 +155,7 @@ const Play = ({
               <div className="flex flex-grow flex-wrap items-center justify-center gap-3">
                 {mentions.map((m) => (
                   <div
-                    className={`text-center text-sm font-bold even:text-slate-500 md:text-base ${
-                      isDark
-                        ? "hover:text-purple-400"
-                        : "hover:text-purple-A400"
-                    } hover:delay-100`}
+                    className={`text-center text-sm font-bold even:text-slate-500 md:text-base ${hoverText}`}
                     key={m.receiver_name}
                     onClick={(e) => handleMentionClick(e, m.receiver_name)}
                   >

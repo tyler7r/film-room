@@ -18,7 +18,7 @@ type PlayPreviewProps = {
 
 const PlayPreview = ({ preview }: PlayPreviewProps) => {
   const { screenWidth, isMobile } = useMobileContext();
-  const { isDark } = useIsDarkContext();
+  const { isDark, hoverText } = useIsDarkContext();
   const { user } = useAuthContext();
   const router = useRouter();
 
@@ -98,9 +98,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
     <div className="flex flex-col rounded-md">
       <div className="flex items-center gap-2 p-2">
         <div
-          className={`tracking cursor-pointer text-center text-xl font-bold ${
-            isDark ? "hover:text-purple-400" : "hover:text-purple-A400"
-          } hover:delay-100`}
+          className={`tracking text-center text-xl font-bold ${hoverText}`}
           onClick={() => void router.push(`/profile/${preview.play.author_id}`)}
         >
           {preview.play.author_name}
@@ -153,9 +151,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
               onClick={() =>
                 void router.push(`/profile/${mention.receiver_id}`)
               }
-              className={`tracking cursor-pointer text-center text-lg font-bold ${
-                isDark ? "hover:text-purple-400" : "hover:text-purple-A400"
-              } hover:delay-100`}
+              className={`tracking text-center text-lg font-bold ${hoverText}`}
             >
               @{mention.receiver_name}
             </div>

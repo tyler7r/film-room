@@ -16,7 +16,7 @@ type VideoProps = {
 };
 
 const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
-  const { backgroundStyle, isDark } = useIsDarkContext();
+  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
   const { affiliations } = useAffiliatedContext();
   const { user } = useAuthContext();
   const router = useRouter();
@@ -62,9 +62,7 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
               : { backgroundColor: `${colors.purple[50]}` }
         }
         key={video.id}
-        className={`${
-          isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
-        } flex w-full cursor-pointer flex-col gap-1 border-2 border-solid border-transparent p-2 px-10 transition ease-in-out hover:rounded-sm hover:border-solid hover:delay-100`}
+        className={`${hoverBorder} flex w-full flex-col gap-1`}
         onClick={() => handleClick(video.id)}
       >
         <Typography

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import PlayPreview from "~/components/play_preview";
 import ProfileActionBar from "~/components/profile-action-bar";
-import TeamLogo from "~/components/team-logo";
+import TeamAffiliation from "~/components/team-affiliation";
 import Video from "~/components/video";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
@@ -316,19 +316,7 @@ const Profile = () => {
         </div>
         <div className="align-center flex flex-wrap justify-center gap-1">
           {profileAffiliations?.map((aff) => (
-            <div
-              className={`flex cursor-pointer items-center justify-center gap-2 rounded-sm border-2 border-solid border-transparent p-1 px-2 transition ease-in-out hover:rounded-md hover:border-solid ${
-                isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
-              } hover:delay-100`}
-              key={aff.team.id}
-              onClick={(e) => handleTeamClick(e, aff.team.id)}
-            >
-              <TeamLogo tm={aff.team} size={35} />
-              <div className="flex items-center justify-center gap-2">
-                <div className="text-lg font-bold">{aff.team.full_name}</div>
-                {aff.number && <div className="leading-3">#{aff.number}</div>}
-              </div>
-            </div>
+            <TeamAffiliation key={aff.affId} aff={aff} />
           ))}
         </div>
         {!router.query.user && (
@@ -372,7 +360,7 @@ const Profile = () => {
           (feed.mentions ? (
             feed.mentions.map((play) => (
               <PlayPreview
-                key={play.play.id + play.mention?.created_at}
+                key={play.play.id + play.play.title}
                 preview={play}
               />
             ))

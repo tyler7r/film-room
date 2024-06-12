@@ -24,7 +24,7 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
   const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
-  const { backgroundStyle, isDark } = useIsDarkContext();
+  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -206,13 +206,9 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
                       notification.mention.viewed,
                     )
                   }
-                  className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
-                    isDark
-                      ? "hover:border-purple-400"
-                      : "hover:border-purple-A400"
-                  } hover:delay-100 ${
+                  className={`flex w-full flex-col gap-2 ${
                     !notification.mention.viewed ? "bg-purple-100" : ""
-                  }`}
+                  } ${hoverBorder}`}
                   style={
                     !notification.mention.viewed
                       ? isDark

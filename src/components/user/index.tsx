@@ -11,7 +11,7 @@ type UserProps = {
 };
 
 const User = ({ user }: UserProps) => {
-  const { backgroundStyle, isDark } = useIsDarkContext();
+  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
   const router = useRouter();
 
   const [userTeams, setUserTeams] = useState<TeamType[] | null>(null);
@@ -36,9 +36,7 @@ const User = ({ user }: UserProps) => {
   return (
     <div
       style={backgroundStyle}
-      className={`${
-        isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
-      } flex w-full cursor-pointer items-center gap-4 border-2 border-solid border-transparent p-2 px-4 transition ease-in-out hover:rounded-sm hover:border-solid hover:delay-100`}
+      className={`${hoverBorder} flex w-full items-center gap-4 `}
       onClick={() => handleClick(user.id)}
     >
       <div className="w-full grow text-center text-2xl font-bold">

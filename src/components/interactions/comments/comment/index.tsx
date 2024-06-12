@@ -23,7 +23,7 @@ type CommentProps = {
 
 const Comment = ({ comment }: CommentProps) => {
   const { user } = useAuthContext();
-  const { isDark } = useIsDarkContext();
+  const { hoverText } = useIsDarkContext();
   const router = useRouter();
 
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
@@ -40,9 +40,7 @@ const Comment = ({ comment }: CommentProps) => {
     <div className="flex items-center gap-2 text-lg">
       <div>
         <strong
-          className={`cursor-pointer tracking-tight ${
-            isDark ? "hover:text-purple-400" : "hover:text-purple-A400"
-          } hover:delay-100`}
+          className={`tracking-tight ${hoverText}`}
           onClick={() => handleAuthorClick(comment.comment_author)}
         >{`${comment.author_name}: `}</strong>
         {comment.comment}

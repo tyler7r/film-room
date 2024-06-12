@@ -1,8 +1,8 @@
-import { Divider, Pagination } from "@mui/material";
+import { Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
-import TeamLogo from "~/components/team-logo";
+import Team from "~/components/team";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
@@ -41,20 +41,6 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
     else setTeamCount(null);
   };
 
-  const handleTeamClick = (
-    e: React.MouseEvent<HTMLDivElement>,
-    teamId: string,
-  ) => {
-    e.stopPropagation();
-    const isAffiliatedTeam = affiliations?.find(
-      (aff) => aff.team.id === teamId,
-    );
-    if (isAffiliatedTeam && user.currentAffiliation) {
-      setUser({ ...user, currentAffiliation: isAffiliatedTeam });
-    }
-    void router.push(`/team-hub/${teamId}`);
-  };
-
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
     setPage(value);
@@ -73,27 +59,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
     <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
       {!teams && <EmptyMessage message="teams" />}
       <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-        {teams?.map((team) => (
-          <div
-            className={`flex cursor-pointer items-center justify-center gap-4 rounded-sm border-2 border-solid border-transparent p-4 px-6 transition ease-in-out hover:rounded-md hover:border-solid ${
-              isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
-            } hover:delay-100`}
-            key={team.id}
-            style={backgroundStyle}
-            onClick={(e) => handleTeamClick(e, team.id)}
-          >
-            <TeamLogo tm={team} size={55} />
-            <Divider variant="middle" orientation="vertical" flexItem />
-            <div className="flex flex-col items-center justify-center">
-              <div className="text-center text-2xl font-bold">
-                {team.full_name}
-              </div>
-              {team.id === user.currentAffiliation?.team.id && (
-                <div className="text-sm">ACTIVE</div>
-              )}
-            </div>
-          </div>
-        ))}
+        {teams?.map((team) => <Team team={team} key={team.id} />)}
       </div>
       {teams && teamCount && (
         <Pagination
