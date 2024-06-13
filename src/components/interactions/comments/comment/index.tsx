@@ -1,7 +1,9 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Button, IconButton } from "@mui/material";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import LikeBtn from "../../likes/like-btn";
 
@@ -21,7 +23,14 @@ type CommentProps = {
 
 const Comment = ({ comment }: CommentProps) => {
   const { user } = useAuthContext();
+  const { hoverText } = useIsDarkContext();
+  const router = useRouter();
+
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
+
+  const handleAuthorClick = (id: string) => {
+    void router.push(`/profile/${id}`);
+  };
 
   const handleDelete = async () => {
     await supabase.from("comments").delete().eq("id", comment.id);
@@ -30,7 +39,10 @@ const Comment = ({ comment }: CommentProps) => {
   return (
     <div className="flex items-center gap-2 text-lg">
       <div>
-        <strong className="tracking-tight">{`${comment.author_name}: `}</strong>
+        <strong
+          className={`tracking-tight ${hoverText}`}
+          onClick={() => handleAuthorClick(comment.comment_author)}
+        >{`${comment.author_name}: `}</strong>
         {comment.comment}
       </div>
       <LikeBtn

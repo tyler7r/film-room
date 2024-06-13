@@ -13,7 +13,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { RealMentionType } from "~/utils/types";
+import type { MentionNotificationType } from "~/utils/types";
 
 type InboxMentionsProps = {
   hide: boolean;
@@ -24,29 +24,31 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
   const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
-  const { backgroundStyle, isDark } = useIsDarkContext();
+  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const topRef = useRef<HTMLDivElement | null>(null);
 
   const [isUnreadOnly, setIsUnreadOnly] = useState(false);
-  const [mentions, setMentions] = useState<RealMentionType[] | null>(null);
+  const [mentions, setMentions] = useState<MentionNotificationType[] | null>(
+    null,
+  );
   const [isBtnDisabled, setIsBtnDisabled] = useState<boolean>(false);
 
   const fetchMentions = async (unreadOnly: boolean) => {
     const { from, to } = getFromAndTo();
     const mtns = supabase
-      .from("inbox_mentions")
-      .select(`*, team: teams!affiliations_team_id_fkey(*)`, {
+      .from("mention_notification")
+      .select(`*`, {
         count: "exact",
       })
-      .eq("receiver_id", `${user.userId}`)
+      .eq("mention->>receiver_id", `${user.userId}`)
       .range(from, to)
-      .order("created_at", { ascending: false });
+      .order("mention->>created_at", { ascending: false });
     setPage(page + 1);
     if (unreadOnly) {
-      void mtns.eq("viewed", false);
+      void mtns.eq("mention->>viewed", false);
     }
     const { data, count } = await mtns;
     if (count) {
@@ -107,14 +109,14 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
     playId: string,
     start: number,
     mentionId: string,
-    teamId: string,
+    teamId: string | null,
     viewed: boolean,
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set("play", playId);
     params.set("start", `${start}`);
     if (!viewed) void updateMention(mentionId);
-    void updateUserAffiliation(teamId);
+    if (teamId) void updateUserAffiliation(teamId);
     void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
@@ -181,58 +183,55 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
       {!hide && (
         <>
           <div className="flex flex-col gap-5 md:px-2 lg:px-4">
-            {mentions &&
-              mentions.length > 0 &&
-              mentions.map((mention) => (
-                <div key={mention.play_id + mention.created_at}>
-                  <div className="flex items-center gap-2">
-                    {mention.private && mention.team && (
-                      <TeamLogo tm={mention.team} size={20} />
-                    )}
-                    {!mention.private && <PublicIcon fontSize="small" />}
-                    <div>
-                      <strong>{mention.author_name}</strong> mentioned you on:
-                    </div>
-                  </div>
-                  <div
-                    onClick={() =>
-                      handleClick(
-                        mention.video_id,
-                        mention.play_id,
-                        mention.start_time,
-                        mention.mention_id,
-                        mention.team_id,
-                        mention.viewed,
-                      )
-                    }
-                    className={`flex w-full cursor-pointer flex-col gap-2 rounded-sm border-2 border-solid border-transparent p-2 transition ease-in-out hover:rounded-md hover:border-solid ${
-                      isDark
-                        ? "hover:border-purple-400"
-                        : "hover:border-purple-A400"
-                    } hover:delay-100 ${
-                      !mention.viewed ? "bg-purple-100" : ""
-                    }`}
-                    style={
-                      !mention.viewed
-                        ? isDark
-                          ? { backgroundColor: `${colors.purple[200]}` }
-                          : { backgroundColor: `${colors.purple[50]}` }
-                        : backgroundStyle
-                    }
-                  >
-                    <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
-                      {mention.title}
-                    </div>
-                    <Divider
-                      sx={{
-                        marginLeft: "12px",
-                        marginRight: "12px",
-                      }}
-                    ></Divider>
-                    <div className="mx-4 text-center">{mention.play_title}</div>
+            {mentions?.map((notification) => (
+              <div key={notification.mention.id}>
+                <div className="flex items-center gap-2">
+                  {notification.team && (
+                    <TeamLogo tm={notification.team} size={20} />
+                  )}
+                  {!notification.team && <PublicIcon fontSize="small" />}
+                  <div>
+                    <strong>{notification.play.author_name}</strong> mentioned
+                    you on:
                   </div>
                 </div>
-              ))}
+                <div
+                  onClick={() =>
+                    handleClick(
+                      notification.video.id,
+                      notification.play.id,
+                      notification.play.start_time,
+                      notification.mention.id,
+                      notification.team ? notification.team.id : null,
+                      notification.mention.viewed,
+                    )
+                  }
+                  className={`flex w-full flex-col gap-2 ${
+                    !notification.mention.viewed ? "bg-purple-100" : ""
+                  } ${hoverBorder}`}
+                  style={
+                    !notification.mention.viewed
+                      ? isDark
+                        ? { backgroundColor: `${colors.purple[200]}` }
+                        : { backgroundColor: `${colors.purple[50]}` }
+                      : backgroundStyle
+                  }
+                >
+                  <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
+                    {notification.video.title}
+                  </div>
+                  <Divider
+                    sx={{
+                      marginLeft: "12px",
+                      marginRight: "12px",
+                    }}
+                  ></Divider>
+                  <div className="mx-4 text-center">
+                    {notification.play.title}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
           {mentions && mentions.length > 0 ? (
             <div className="flex flex-col items-center justify-center">

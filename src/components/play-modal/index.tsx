@@ -61,15 +61,13 @@ const PlayModal = ({
     private: false,
   });
   const [mentions, setMentions] = useState<PlayerType[]>([]);
-  const [affiliatedPlayers, setAffiliatedPlayers] = useState<
-    PlayerType[] | null
-  >(null);
+  const [players, setPlayers] = useState<PlayerType[] | null>(null);
   const [playTags, setPlayTags] = useState<CreateNewTagType[]>([]);
   const [tags, setTags] = useState<CreateNewTagType[] | null>(null);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
-  const fetchAffiliatedPlayers = async () => {
-    const { data } = await supabase
+  const fetchPlayers = async () => {
+    const affiliatedPlayers = supabase
       .from("player_view")
       .select()
       .match({
@@ -77,7 +75,17 @@ const PlayModal = ({
         role: "player",
         verified: true,
       });
-    if (data) setAffiliatedPlayers(data);
+    const allPlayers = supabase
+      .from("player_view")
+      .select("*")
+      .eq("role", "player");
+    const { data } = video.private ? await affiliatedPlayers : await allPlayers;
+    if (data) {
+      const uniquePlayers = [
+        ...new Map(data.map((x) => [x.profile_id, x])).values(),
+      ];
+      setPlayers(uniquePlayers);
+    }
   };
 
   const fetchTags = async () => {
@@ -140,7 +148,7 @@ const PlayModal = ({
   const handleMention = async (player: string, name: string, play: string) => {
     await supabase.from("play_mentions").insert({
       play_id: play,
-      sender_id: `${user.currentAffiliation?.affId}`,
+      sender_id: `${user.userId}`,
       receiver_id: player,
       receiver_name: name,
       sender_name: `${user.name}`,
@@ -168,15 +176,18 @@ const PlayModal = ({
     const { data } = await supabase
       .from("plays")
       .insert({
-        exclusive_to: isPrivate ? `${user.currentAffiliation?.team.id}` : null,
-        author_id: `${user.currentAffiliation?.affId}`,
+        exclusive_to:
+          isPrivate && user.currentAffiliation?.team.id
+            ? user.currentAffiliation.team.id
+            : null,
+        author_id: `${user.userId}`,
         video_id: video.id,
         highlight: playDetails.highlight,
         title: playDetails.title,
         note: playDetails.note,
         start_time: playDetails.start!,
         end_time: playDetails.end!,
-        author_role: `${user.currentAffiliation?.role}`,
+        author_role: user.currentAffiliation?.role ?? "guest",
         author_name: `${user.name}`,
         private: isPrivate ? true : false,
       })
@@ -184,7 +195,7 @@ const PlayModal = ({
       .single();
     if (data) {
       mentions?.forEach((mention) => {
-        void handleMention(mention.id, mention.name, data.id);
+        void handleMention(mention.profile_id, mention.name, data.id);
       });
       playTags.forEach((tag) => {
         void handleTag(data.id, `${tag.id}`);
@@ -238,7 +249,7 @@ const PlayModal = ({
   }, [playDetails]);
 
   useEffect(() => {
-    if (user.currentAffiliation) void fetchAffiliatedPlayers();
+    if (user.isLoggedIn && user.userId) void fetchPlayers();
     void fetchTags();
   }, [video]);
 
@@ -298,9 +309,7 @@ const PlayModal = ({
             maxRows={5}
           />
           <PlayTags tags={playTags} setTags={setPlayTags} allTags={tags} />
-          {user.currentAffiliation && (
-            <Mentions players={affiliatedPlayers} setMentions={setMentions} />
-          )}
+          <Mentions players={players} setMentions={setMentions} />
           <div className="flex w-full justify-around">
             <div className="flex items-center justify-center">
               <div className="text-xl font-bold tracking-tight">

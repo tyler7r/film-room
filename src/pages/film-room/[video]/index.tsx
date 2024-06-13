@@ -38,13 +38,13 @@ const FilmRoom = () => {
   const fetchActivePlay = async () => {
     if (playParam && user.isLoggedIn) {
       const { data } = await supabase
-        .from("plays")
-        .select(`*, mentions:play_mentions (receiver_name), tags(title)`, {
+        .from("play_preview")
+        .select(`*`, {
           count: "exact",
         })
-        .eq("id", playParam)
+        .eq("play->>id", playParam)
         .single();
-      if (data) setActivePlay(data);
+      if (data) setActivePlay(data.play);
     }
   };
 

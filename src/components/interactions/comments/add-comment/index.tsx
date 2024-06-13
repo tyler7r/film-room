@@ -1,5 +1,6 @@
 import SendIcon from "@mui/icons-material/Send";
 import { IconButton, TextField } from "@mui/material";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
@@ -10,6 +11,8 @@ type CommentProps = {
 
 const AddComment = ({ playId }: CommentProps) => {
   const { user } = useAuthContext();
+  const router = useRouter();
+
   const [comment, setComment] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
 
@@ -20,14 +23,18 @@ const AddComment = ({ playId }: CommentProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!user.isLoggedIn || !user.userId) {
+      void router.push("/login");
+      return;
+    }
     const { data } = await supabase
       .from("comments")
       .insert({
         play_id: playId,
         comment,
         author_name: `${user.name}`,
-        comment_author: `${user.currentAffiliation?.affId}`,
-        team_id: `${user.currentAffiliation?.team.id}`,
+        comment_author: user.userId,
+        team_id: user.currentAffiliation?.team.id ?? null,
       })
       .select();
     if (data) {

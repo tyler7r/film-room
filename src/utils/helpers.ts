@@ -53,12 +53,14 @@ export const isValidYoutubeLink = (link: string) => {
   else return false;
 };
 
-export const getNumberOfPages = (isMobile: boolean, count: number) => {
-  if (isMobile) {
-    if (count % 5 !== 0) return Math.floor(count / 5) + 1;
-    else return count / 5;
-  } else {
-    if (count % 10 !== 0) return Math.floor(count / 10) + 1;
-    else return count / 10;
-  }
+export const getToAndFrom = (itemsPerPage: number, page: number) => {
+  const from = (page - 1) * itemsPerPage;
+  const to = from + itemsPerPage - 1;
+
+  return { from, to };
+};
+
+export const getNumberOfPages = (itemPerPage: number, count: number) => {
+  if (count % itemPerPage !== 0) return Math.floor(count / itemPerPage) + 1;
+  else return count / itemPerPage;
 };

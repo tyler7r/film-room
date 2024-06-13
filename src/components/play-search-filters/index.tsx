@@ -1,5 +1,7 @@
 import DeleteIcon from "@mui/icons-material/Delete";
+import LockIcon from "@mui/icons-material/Lock";
 import SearchIcon from "@mui/icons-material/Search";
+import StarIcon from "@mui/icons-material/Star";
 import {
   Button,
   Checkbox,
@@ -38,7 +40,9 @@ const PlaySearchFilters = ({
   };
 
   const handleYourMentionsBtnClick = () => {
-    setSearchOptions({ ...searchOptions, receiver_name: `${user.name}` });
+    if (searchOptions.topic === user.name)
+      setSearchOptions({ ...searchOptions, topic: "" });
+    else setSearchOptions({ ...searchOptions, topic: `${user.name}` });
   };
 
   const clearSearchOptions = () => {
@@ -46,8 +50,7 @@ const PlaySearchFilters = ({
       ...searchOptions,
       only_highlights: false,
       role: "",
-      receiver_name: "",
-      tag: "",
+      topic: "",
       private_only: false,
     });
   };
@@ -56,7 +59,7 @@ const PlaySearchFilters = ({
     <div className="flex w-4/5 flex-col items-center justify-center gap-1">
       <div className="relative mb-2 flex w-full flex-1 flex-shrink-0">
         <label htmlFor="search" className="sr-only">
-          Search
+          Search by tag or mentions...
         </label>
         <TextField
           InputProps={{
@@ -68,33 +71,24 @@ const PlaySearchFilters = ({
             endAdornment: user.isLoggedIn && user.name && (
               <Button
                 size="small"
-                sx={{ margin: "4px" }}
+                sx={{ margin: "2px", fontSize: "12px" }}
                 onClick={() => handleYourMentionsBtnClick()}
               >
-                Only Your Mentions
+                My Mentions
               </Button>
             ),
           }}
           className="w-full"
-          placeholder="Search by mentions..."
-          name="receiver_name"
+          placeholder="Search by tags or mentions..."
+          name="topic"
           autoComplete="search-by-mentions"
           id="search-by-mentions"
           onChange={changeHandler}
-          value={searchOptions.receiver_name}
+          value={searchOptions.topic}
         />
       </div>
-      <div className="flex w-full items-center justify-center gap-2">
-        <TextField
-          className="w-full"
-          placeholder="Search by tags..."
-          name="tag"
-          autoComplete="search-by-tag"
-          id="search-by-tag"
-          onChange={changeHandler}
-          value={searchOptions.tag}
-        />
-        <FormControl className="w-4/5">
+      <div className="flex w-full gap-2">
+        <FormControl className="w-full">
           <InputLabel>Search by author role...</InputLabel>
           <Select
             value={searchOptions.role}
@@ -108,33 +102,27 @@ const PlaySearchFilters = ({
             <MenuItem value={"player"}>Player Notes</MenuItem>
           </Select>
         </FormControl>
-      </div>
-      <div className="flex gap-4">
         <div className="flex items-center justify-center">
-          <div className="text-xl font-bold tracking-tight">
-            Private Plays Only?
-          </div>
           <Checkbox
-            checked={searchOptions.private_only}
-            onChange={() => {
-              setSearchOptions({
-                ...searchOptions,
-                private_only: !searchOptions.private_only,
-              });
-            }}
-            size="medium"
-          />
-        </div>
-        <div className="flex items-center justify-center">
-          <div className="text-xl font-bold tracking-tight">
-            Highlights only?
-          </div>
-          <Checkbox
+            icon={<StarIcon color="action" fontSize="large" />}
+            checkedIcon={<StarIcon color="secondary" fontSize="large" />}
             checked={searchOptions.only_highlights}
             onChange={() => {
               setSearchOptions({
                 ...searchOptions,
                 only_highlights: !searchOptions.only_highlights,
+              });
+            }}
+            size="medium"
+          />
+          <Checkbox
+            checked={searchOptions.private_only}
+            checkedIcon={<LockIcon color="primary" fontSize="large" />}
+            icon={<LockIcon color="action" fontSize="large" />}
+            onChange={() => {
+              setSearchOptions({
+                ...searchOptions,
+                private_only: !searchOptions.private_only,
               });
             }}
             size="medium"

@@ -1,7 +1,7 @@
 import { Pagination, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages } from "~/utils/helpers";
+import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { AnnouncementType } from "~/utils/types";
 import Announcement from "../announcement";
@@ -17,9 +17,10 @@ const Announcements = ({ teamId }: AnnouncementsProps) => {
     null,
   );
   const [page, setPage] = useState<number>(1);
+  const itemsPerPage = isMobile ? 3 : 5;
 
   const fetchAnnouncements = async () => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const { data, count } = await supabase
       .from("announcements")
       .select("*", { count: "exact" })
@@ -29,14 +30,6 @@ const Announcements = ({ teamId }: AnnouncementsProps) => {
     if (data && data.length > 0) setAnncs(data);
     else setAnncs(null);
     if (count) setAnnouncementCount(count);
-  };
-
-  const getFromAndTo = () => {
-    const itemPerPage = isMobile ? 3 : 5;
-    const from = (page - 1) * itemPerPage;
-    const to = from + itemPerPage - 1;
-
-    return { from, to };
   };
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -62,6 +55,11 @@ const Announcements = ({ teamId }: AnnouncementsProps) => {
   }, []);
 
   useEffect(() => {
+    if (page === 1) void fetchAnnouncements();
+    else setPage(1);
+  }, [isMobile]);
+
+  useEffect(() => {
     void fetchAnnouncements();
   }, [page]);
 
@@ -84,7 +82,7 @@ const Announcements = ({ teamId }: AnnouncementsProps) => {
           size="small"
           variant="text"
           shape="rounded"
-          count={getNumberOfPages(isMobile, announcementCount)}
+          count={getNumberOfPages(isMobile ? 3 : 5, announcementCount)}
           page={page}
           onChange={handlePageChange}
         />

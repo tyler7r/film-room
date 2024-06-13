@@ -3,6 +3,7 @@ import { IconButton } from "@mui/material";
 import React, { useEffect } from "react";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
+import type { PlayType } from "~/utils/types";
 
 type CommentBtnProps = {
   playId: string;
@@ -10,6 +11,7 @@ type CommentBtnProps = {
   setCommentCount: (commentCount: number) => void;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  activePlay: PlayType | null | undefined;
 };
 
 const CommentBtn = ({
@@ -18,6 +20,7 @@ const CommentBtn = ({
   setIsOpen,
   commentCount,
   setCommentCount,
+  activePlay,
 }: CommentBtnProps) => {
   const { isMobile } = useMobileContext();
 
@@ -36,7 +39,8 @@ const CommentBtn = ({
 
   useEffect(() => {
     void fetchInitialCommentNumber();
-  }, []);
+  }, [activePlay]);
+
   return (
     <div className="flex items-center">
       <IconButton onClick={handleCommentClick}>

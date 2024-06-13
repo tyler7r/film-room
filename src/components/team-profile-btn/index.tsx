@@ -4,12 +4,9 @@ import { Button, Menu, MenuItem, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAffiliatedContext } from "~/contexts/affiliations";
-import { useAuthContext } from "~/contexts/auth";
-import { type TeamAffiliationType } from "~/utils/types";
-import TeamLogo from "../team-logo";
+import TeamAffiliation from "../team-affiliation";
 
 const TeamPageButton = () => {
-  const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
   const router = useRouter();
 
@@ -24,12 +21,6 @@ const TeamPageButton = () => {
     setAnchorEl(null);
   };
 
-  const handleItemClick = (tm: TeamAffiliationType) => {
-    handleClose();
-    setUser({ ...user, currentAffiliation: tm });
-    router.push(`/team-hub/${tm.team.id}`);
-  };
-
   return (
     <div>
       <Button
@@ -42,21 +33,11 @@ const TeamPageButton = () => {
       </Button>
       <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
         {affiliations?.map((aff) => (
-          <MenuItem
-            key={aff.team.id}
-            className="flex items-center justify-center gap-2"
-            onClick={() => handleItemClick(aff)}
-          >
-            <TeamLogo tm={aff.team} size={35} />
-            <div className="flex flex-col">
-              <Typography variant="overline" fontWeight="bold" fontSize="small">
-                {aff.team.full_name}
-              </Typography>
-              {aff.team.id === user.currentAffiliation?.team.id && (
-                <div className="text-center text-xs">ACTIVE</div>
-              )}
-            </div>
-          </MenuItem>
+          <TeamAffiliation
+            aff={aff}
+            key={aff.affId}
+            handleClose={handleClose}
+          />
         ))}
         <MenuItem
           className="flex items-center justify-center gap-2"

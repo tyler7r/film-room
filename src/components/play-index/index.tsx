@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages } from "~/utils/helpers";
+import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
@@ -26,10 +26,8 @@ type PlayIndexProps = {
 export type PlaySearchOptions = {
   role?: string | undefined;
   only_highlights?: boolean;
-  receiver_name?: string;
-  tag?: string;
+  topic: string;
   private_only?: boolean;
-  loggedIn: boolean;
   currentAffiliation: string | undefined;
 };
 
@@ -52,75 +50,112 @@ const PlayIndex = ({
     only_highlights: false,
     role: "",
     private_only: false,
-    tag: "",
-    loggedIn: user.isLoggedIn,
+    topic: "",
     currentAffiliation: user.currentAffiliation?.team.id,
   });
+  const itemsPerPage = isMobile ? 10 : 20;
 
   const fetchPlays = async (options?: PlaySearchOptions) => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const plays = supabase
-      .from(`plays`)
-      .select(`*, mentions:play_mentions(receiver_name), tags(title)`, {
+      .from("play_preview")
+      .select(`*`, {
         count: "exact",
       })
-      .eq("video_id", videoId)
-      .order("start_time")
+      .eq("video->>id", videoId)
+      .order("play->>start_time")
       .range(from, to);
-    if (options?.receiver_name) {
-      void plays.select(`*, mentions:play_mentions!inner(receiver_name)`);
-      void plays.ilike(
-        "play_mentions.receiver_name",
-        options?.receiver_name && options.receiver_name !== ""
-          ? `%${options.receiver_name}%`
-          : "%%",
-      );
-    }
-    if (options?.tag) {
-      void plays.select(
-        `*, mentions:play_mentions(receiver_name), tags!inner(title))`,
-      );
-      void plays.ilike(
-        "tags.title",
-        options?.tag && options.tag !== "" ? `%${options.tag}%` : "%%",
-      );
-    }
     if (options?.only_highlights) {
-      void plays.eq("highlight", true);
+      void plays.eq("play->>highlight", true);
     }
     if (options?.private_only) {
-      void plays.eq("private", true);
+      void plays.eq("play->>private", true);
     }
     if (options?.role) {
-      void plays.eq("author_role", options.role);
+      void plays.eq("play->>author_role", options.role);
     }
     if (activePlay) {
-      void plays.neq("id", activePlay.id);
+      void plays.neq("play->>id", activePlay.id);
     }
-    if (options?.currentAffiliation) {
+    if (user.currentAffiliation?.team.id) {
       void plays.or(
-        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
+        `play->>private.eq.false, play->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
       );
     } else {
-      void plays.eq("private", false);
+      void plays.eq("play->>private", false);
     }
-
     const { data, count } = await plays;
-    if (data) setPlays(data);
+    if (data) setPlays(data.map((play) => play.play));
     if (count) setPlayCount(count);
+  };
+
+  const fetchPlaysBySearch = async (options: PlaySearchOptions) => {
+    const { from, to } = getToAndFrom(itemsPerPage, page);
+    const playsByMention = supabase
+      .from("plays_via_user_mention")
+      .select("*")
+      .eq("video->>id", videoId)
+      .ilike(
+        "mention->>receiver_name",
+        options.topic ? `%${options.topic}%` : "%%",
+      )
+      .order("play->>start_time")
+      .range(from, to);
+    const playsByTag = supabase
+      .from("plays_via_tag")
+      .select("*")
+      .eq("video->>id", videoId)
+      .ilike("tag->>title", options.topic ? `%${options.topic}%` : "%%")
+      .order("play->>start_time")
+      .range(from, to);
+    if (options.only_highlights) {
+      void playsByMention.eq("play->>highlight", true);
+      void playsByTag.eq("play->>highlight", true);
+    }
+    if (options.private_only) {
+      void playsByMention.eq("play->>private", true);
+      void playsByTag.eq("play->>private", true);
+    }
+    if (options.role) {
+      void playsByMention.eq("play->>author_role", options.role);
+      void playsByTag.eq("play->>author_role", options.role);
+    }
+    if (activePlay) {
+      void playsByMention.neq("play->>id", activePlay.id);
+      void playsByTag.neq("play->>id", activePlay.id);
+    }
+    if (user.currentAffiliation?.team.id) {
+      void playsByMention.or(
+        `play->>private.eq.false, play->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
+      );
+      void playsByTag.or(
+        `play->>private.eq.false, play->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
+      );
+    } else {
+      void playsByMention.eq("play->>private", false);
+      void playsByTag.eq("play->>private", false);
+    }
+    if (options.topic !== "") {
+      const getTags = await playsByTag;
+      const getMentions = await playsByMention;
+      let ps: PlayType[] | null = null;
+      if (getTags.data) {
+        ps = getTags.data.map((play) => play.play);
+      }
+      if (getMentions.data) {
+        ps = ps
+          ? [...ps, ...getMentions.data?.map((play) => play.play)]
+          : getMentions.data.map((play) => play.play);
+      }
+      const uniquePlays = [...new Map(ps?.map((x) => [x.id, x])).values()];
+      setPlays(ps ? uniquePlays : null);
+      setPlayCount(ps ? uniquePlays.length : null);
+    }
   };
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
     setPage(value);
-  };
-
-  const getFromAndTo = () => {
-    const itemPerPage = isMobile ? 5 : 10;
-    const from = (page - 1) * itemPerPage;
-    const to = from + itemPerPage - 1;
-
-    return { from, to };
   };
 
   useEffect(() => {
@@ -144,13 +179,21 @@ const PlayIndex = ({
     setSearchOptions({
       ...searchOptions,
       currentAffiliation: user.currentAffiliation?.team.id,
-      loggedIn: user.isLoggedIn,
     });
   }, [user]);
 
   useEffect(() => {
-    void fetchPlays(searchOptions);
-  }, [searchOptions, videoId, page, isMobile, activePlay]);
+    if (page === 1 && searchOptions.topic !== "")
+      void fetchPlaysBySearch(searchOptions);
+    else if (page === 1 && searchOptions.topic === "")
+      void fetchPlays(searchOptions);
+    else setPage(1);
+  }, [searchOptions, isMobile]);
+
+  useEffect(() => {
+    if (searchOptions.topic !== "") void fetchPlaysBySearch(searchOptions);
+    else void fetchPlays(searchOptions);
+  }, [videoId, page, activePlay]);
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -233,7 +276,7 @@ const PlayIndex = ({
             size="large"
             variant="text"
             shape="rounded"
-            count={getNumberOfPages(isMobile, playCount)}
+            count={getNumberOfPages(itemsPerPage, playCount)}
             page={page}
             onChange={handlePageChange}
           />

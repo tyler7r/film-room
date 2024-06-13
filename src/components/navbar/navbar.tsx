@@ -31,23 +31,29 @@ export const Navbar = () => {
   const fetchUnreadMentions = async (options?: FetchOptions) => {
     if (options?.loggedIn && options?.userId) {
       const { count } = await supabase
-        .from("inbox_mentions")
+        .from("mention_notification")
         .select("*", { count: "exact" })
-        .match({ receiver_id: `${user.userId}`, viewed: false });
+        .match({
+          "mention->>receiver_id": `${user.userId}`,
+          "mention->>viewed": false,
+        });
       if (count && count > 0) setUnreadMentionCount(count);
       else setUnreadMentionCount(0);
-    }
+    } else setUnreadMentionCount(0);
   };
 
   const fetchUnreadComments = async (options?: FetchOptions) => {
     if (options?.userId && options.loggedIn) {
       const { count } = await supabase
-        .from("comment_notifications")
+        .from("comment_notification")
         .select("*", { count: "exact" })
-        .match({ play_author_id: `${user.userId}`, viewed_by_author: false });
+        .match({
+          "play->>author_id": `${user.userId}`,
+          "comment->>viewed": false,
+        });
       if (count && count > 0) setUnreadCommentCount(count);
       else setUnreadCommentCount(0);
-    }
+    } else setUnreadCommentCount(0);
   };
 
   const fetchUnreadCount = async () => {

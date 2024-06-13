@@ -135,7 +135,7 @@ const LikeBtn = ({
 
   useEffect(() => {
     void fetchLikeCount();
-    void fetchIfUserLiked();
+    if (user.isLoggedIn) void fetchIfUserLiked();
   }, [activePlay]);
 
   return (
