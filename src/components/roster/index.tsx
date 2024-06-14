@@ -1,4 +1,3 @@
-import { Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType, TeamType } from "~/utils/types";
@@ -53,9 +52,9 @@ const Roster = ({ team, role }: RosterProps) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-2">
-      <Typography variant="h2" fontSize={42}>
+      <div className="font-serif text-4xl font-bold italic tracking-tighter">
         Roster
-      </Typography>
+      </div>
       {!roster && (
         <div className="text-xl font-bold">No Active Player Accounts</div>
       )}

@@ -1,4 +1,4 @@
-import { Pagination, Typography } from "@mui/material";
+import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
@@ -65,9 +65,9 @@ const Announcements = ({ teamId }: AnnouncementsProps) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4 p-2">
-      <Typography variant="h2" fontSize={42} style={{ textAlign: "center" }}>
+      <div className="font-serif text-4xl font-bold italic tracking-tighter">
         Team Announcements
-      </Typography>
+      </div>
       {!anncs && (
         <div className="text-2xl font-bold tracking-tight">
           No team announcements!

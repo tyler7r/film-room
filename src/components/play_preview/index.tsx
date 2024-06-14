@@ -17,7 +17,7 @@ type PlayPreviewProps = {
 };
 
 const PlayPreview = ({ preview }: PlayPreviewProps) => {
-  const { screenWidth, isMobile } = useMobileContext();
+  const { isMobile } = useMobileContext();
   const { hoverText } = useIsDarkContext();
   const { user } = useAuthContext();
   const router = useRouter();
@@ -111,8 +111,8 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
       </div>
       <YouTube
         opts={{
-          width: `${isMobile ? screenWidth : 640}`,
-          height: `${isMobile ? screenWidth / 1.778 : 390}`,
+          width: `${isMobile ? 480 : 640}`,
+          height: `${isMobile ? 295 : 390}`,
           playerVars: {
             end: preview.play.end_time,
             enablejsapi: 1,
@@ -121,8 +121,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             fs: 1,
             controls: 0,
             rel: 0,
-            color: "red",
-            origin: "https://www.youtube.com",
+            origin: `http://localhost:9000`,
           },
         }}
         onReady={videoOnReady}

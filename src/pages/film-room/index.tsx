@@ -1,7 +1,8 @@
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Button, Divider, Pagination, Typography } from "@mui/material";
+import { Button, Divider, Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
+import PageTitle from "~/components/page-title";
 import Video from "~/components/video";
 import VideoSearchFilters from "~/components/video-search-filters";
 import { useAuthContext } from "~/contexts/auth";
@@ -116,14 +117,8 @@ const FilmRoomHome = () => {
   }, [page]);
 
   return (
-    <div className="mb-4 flex w-full flex-col items-center justify-center">
-      <Typography
-        variant="h1"
-        fontSize={64}
-        sx={{ marginTop: "24px", textAlign: "center" }}
-      >
-        The Film Room
-      </Typography>
+    <div className="mb-4 flex w-full flex-col items-center justify-center p-4">
+      <PageTitle title="The Film Room" />
       <AddVideo />
       <Divider
         flexItem
