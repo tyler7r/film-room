@@ -1,5 +1,8 @@
-import { Button, Divider } from "@mui/material";
+import { Button, Divider, colors } from "@mui/material";
 import { useEffect, useState } from "react";
+import EmptyMessage from "~/components/empty-msg";
+import PageTitle from "~/components/page-title";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import Comment from "../comment";
 
@@ -24,6 +27,7 @@ const CommentIndex = ({
   setCommentCount,
   isActivePlay,
 }: CommentIndexProps) => {
+  const { isDark } = useIsDarkContext();
   const [index, setIndex] = useState<CommentIndexType | null>(null);
   const [page, setPage] = useState<number>(0);
   const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState<boolean>(false);
@@ -82,9 +86,9 @@ const CommentIndex = ({
   }, []);
 
   return (
-    <div className="flex w-full flex-col gap-2 px-6">
-      <div className="text-4xl font-bold tracking-tighter">Comments</div>
-      <div className="flex flex-col gap-2 px-2">
+    <div className="flex w-full flex-col gap-2">
+      <PageTitle title="Comments" size="small" />
+      <div className="flex flex-col gap-2 px-6">
         {index?.map((comment) => (
           <Comment key={comment.id} comment={comment} />
         ))}
@@ -97,14 +101,19 @@ const CommentIndex = ({
             Load More
           </Button>
         ) : (
-          <div className="text-xl font-bold tracking-tight">No comments!</div>
+          <EmptyMessage size="small" message="comments" />
         )}
       </div>
       {!isActivePlay && (
         <Divider
           flexItem
-          sx={{ marginTop: "8px", marginBottom: "8px" }}
-          variant="middle"
+          sx={{
+            height: "2px",
+            marginTop: "8px",
+            marginBottom: "8px",
+            background: isDark ? colors.common.white : colors.grey[600],
+          }}
+          variant="fullWidth"
         />
       )}
     </div>

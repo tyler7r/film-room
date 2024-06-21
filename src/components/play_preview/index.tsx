@@ -189,7 +189,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
         id="player"
         videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
       />
-      <div className="flex w-full items-center gap-4 px-2">
+      <div className="flex w-full items-center gap-3 px-1">
         <div className="flex items-center justify-center gap-2">
           <LikeBtn playId={preview.play.id} />
           <CommentBtn
@@ -227,8 +227,8 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
         </div>
       </div>
       {isExpanded && (
-        <div className="flex w-full flex-col gap-4">
-          <div className="">
+        <div className="flex w-full flex-col items-center gap-2">
+          <div className="w-full">
             <strong
               onClick={() =>
                 void router.push(`/profile/${preview.play.author_id}`)
@@ -239,19 +239,21 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             </strong>
             {preview.play.note}
           </div>
-          <div>
+          <div className="flex w-full gap-2">
             {tags?.map((tag) => (
               <Button key={tag.title + tag.id} size="small">
                 #{tag.title}
               </Button>
             ))}
           </div>
-          <AddComment playId={preview.play.id} />
-          <CommentIndex
-            playId={preview.play.id}
-            setCommentCount={setCommentCount}
-            isActivePlay={false}
-          />
+          <div className="flex w-full flex-col items-center gap-4">
+            <AddComment playId={preview.play.id} />
+            <CommentIndex
+              playId={preview.play.id}
+              setCommentCount={setCommentCount}
+              isActivePlay={false}
+            />
+          </div>
         </div>
       )}
     </div>

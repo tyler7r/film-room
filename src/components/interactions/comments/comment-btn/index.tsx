@@ -46,7 +46,7 @@ const CommentBtn = ({
       <IconButton onClick={handleCommentClick}>
         <ModeCommentIcon
           color="primary"
-          fontSize={isMobile ? "medium" : "large"}
+          fontSize={isMobile ? "small" : "medium"}
         />
       </IconButton>
       <div className="text-lg font-bold md:text-2xl">{commentCount}</div>

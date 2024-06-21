@@ -59,7 +59,7 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
 
   return (
     <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
-      {!videos && <EmptyMessage message="videos" />}
+      {!videos && <EmptyMessage size="large" message="videos" />}
       {videos?.map((v) => <Video video={v} key={v.id} />)}
       {videos && videoCount && (
         <Pagination

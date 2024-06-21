@@ -37,10 +37,10 @@ const Comment = ({ comment }: CommentProps) => {
   };
 
   return (
-    <div className="flex items-center gap-2 text-lg">
-      <div>
+    <div className="flex items-center gap-2">
+      <div className="">
         <strong
-          className={`tracking-tight ${hoverText}`}
+          className={`${hoverText}`}
           onClick={() => handleAuthorClick(comment.comment_author)}
         >{`${comment.author_name}: `}</strong>
         {comment.comment}
@@ -51,7 +51,7 @@ const Comment = ({ comment }: CommentProps) => {
         includePopover={true}
         small={true}
       />
-      {comment.comment_author === user.currentAffiliation?.affId &&
+      {comment.comment_author === user.userId &&
         (isDeleteMenuOpen ? (
           <div className="ml-4 flex gap-1">
             <Button

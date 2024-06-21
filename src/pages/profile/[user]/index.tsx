@@ -340,7 +340,7 @@ const Profile = () => {
               <PlayPreview key={play.play.id} preview={play} />
             ))
           ) : (
-            <EmptyMessage message="user created plays" />
+            <EmptyMessage size="medium" message="user created plays" />
           ))}
         {actionBarStatus.mentions &&
           (feed.mentions ? (
@@ -351,7 +351,7 @@ const Profile = () => {
               />
             ))
           ) : (
-            <EmptyMessage message="user mentions" />
+            <EmptyMessage size="medium" message="user mentions" />
           ))}
         {actionBarStatus.highlights &&
           (feed.highlights ? (
@@ -362,7 +362,7 @@ const Profile = () => {
               />
             ))
           ) : (
-            <EmptyMessage message="user highlights" />
+            <EmptyMessage size="medium" message="user highlights" />
           ))}
       </div>
     )

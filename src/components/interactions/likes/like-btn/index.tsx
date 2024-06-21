@@ -149,7 +149,7 @@ const LikeBtn = ({
           >
             <FavoriteIcon
               color="primary"
-              fontSize={small ? "small" : isMobile ? "medium" : "large"}
+              fontSize={small ? "small" : isMobile ? "small" : "medium"}
             />
           </IconButton>
         ) : (
@@ -160,7 +160,7 @@ const LikeBtn = ({
           >
             <FavoriteBorderIcon
               color="primary"
-              fontSize={small ? "small" : isMobile ? "medium" : "large"}
+              fontSize={small ? "small" : isMobile ? "small" : "medium"}
             />
           </IconButton>
         )}
