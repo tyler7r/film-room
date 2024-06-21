@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType, TeamType } from "~/utils/types";
+import EmptyMessage from "../empty-msg";
+import PageTitle from "../page-title";
 import Player from "../player";
 import PlayerEdit from "../player-edit";
 
@@ -51,12 +53,10 @@ const Roster = ({ team, role }: RosterProps) => {
   }, [team.id]);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-2">
-      <div className="font-serif text-4xl font-bold italic tracking-tighter">
-        Roster
-      </div>
+    <div className="flex w-full flex-col items-center justify-center gap-4">
+      <PageTitle size="medium" title="Roster" />
       {!roster && (
-        <div className="text-xl font-bold">No Active Player Accounts</div>
+        <EmptyMessage message="active player accounts" size="small" />
       )}
       <div className="flex flex-wrap items-center justify-center gap-4">
         {(role === "player" || role === "guest") &&

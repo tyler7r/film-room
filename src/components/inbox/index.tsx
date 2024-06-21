@@ -1,9 +1,10 @@
-import { Button, Divider, Drawer, Typography } from "@mui/material";
+import { Button, Divider, Drawer } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
+import PageTitle from "../page-title";
 import InboxComments from "./comments";
 import InboxMentions from "./mentions";
 import TeamHeader from "./team-header";
@@ -18,16 +19,13 @@ const Inbox = () => {
 
   return (
     <Drawer open={isOpen} anchor="right" onClose={() => setIsOpen(false)}>
-      <div className="p-2" style={{ width: screenWidth * 0.5 }}>
-        <Typography
-          className="p-2 text-center"
-          sx={{ fontWeight: "800" }}
-          variant="h2"
-        >
-          Inbox
-        </Typography>
+      <div
+        className="flex flex-col gap-2 p-2"
+        style={{ width: screenWidth * 0.5 }}
+      >
+        <PageTitle size="large" title="Inbox" />
         {!user.isLoggedIn && (
-          <div className="mb-4 flex items-center justify-center gap-2">
+          <div className="mb-4 mt-4 flex items-center justify-center gap-2">
             <Button
               variant="contained"
               size="medium"

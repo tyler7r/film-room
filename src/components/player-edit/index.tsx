@@ -13,7 +13,7 @@ type PlayerEditProps = {
 };
 
 const PlayerEdit = ({ player }: PlayerEditProps) => {
-  const { backgroundStyle } = useIsDarkContext();
+  const { backgroundStyle, hoverText } = useIsDarkContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [edit, setEdit] = useState<number | null>(player.number);
   const [isValidNumber, setIsValidNumber] = useState<boolean>(false);
@@ -101,7 +101,7 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
       className="flex items-center justify-center gap-4 rounded-lg p-2"
       style={backgroundStyle}
     >
-      <div>{player.name}</div>
+      <div className={`font-bold`}>{player.name}</div>
       <form onSubmit={handleSubmit}>
         <TextField
           size="small"

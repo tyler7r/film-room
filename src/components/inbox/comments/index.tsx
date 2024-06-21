@@ -7,6 +7,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider, IconButton, colors } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import EmptyMessage from "~/components/empty-msg";
 import TeamLogo from "~/components/team-logo";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
@@ -156,10 +157,10 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   }, [isUnreadOnly]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <div
         ref={topRef}
-        className="flex items-center text-2xl font-bold lg:mb-2 lg:text-3xl"
+        className="flex items-center justify-between text-2xl font-bold lg:mb-2 lg:text-3xl"
       >
         <div>Recent Comments</div>
         {hide && (
@@ -251,7 +252,7 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
               </Button>
             </div>
           ) : (
-            <div className="-mt-4 pl-2 font-bold">No recent comments</div>
+            <EmptyMessage message="recent comments" size="small" />
           )}
         </>
       )}

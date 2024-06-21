@@ -3,6 +3,7 @@ import { Divider, colors } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
+import PageTitle from "~/components/page-title";
 import PlayPreview from "~/components/play_preview";
 import ProfileActionBar from "~/components/profile-action-bar";
 import TeamAffiliation from "~/components/team-affiliation";
@@ -254,7 +255,7 @@ const Profile = () => {
       <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
         <div className="flex flex-col justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
-            <div className="text-center text-6xl font-bold">{profile.name}</div>
+            <PageTitle size="x-large" title={profile.name} />
             <div className="text-lg font-light leading-5 tracking-tight">
               Member since {profile.join_date.substring(0, 4)}
             </div>
@@ -300,7 +301,7 @@ const Profile = () => {
             </div>
           )}
         </div>
-        <div className="align-center flex flex-wrap justify-center gap-1">
+        <div className="align-center my-4 flex flex-wrap justify-center gap-1">
           {profileAffiliations?.map((aff) => (
             <TeamAffiliation key={aff.affId} aff={aff} />
           ))}
@@ -310,8 +311,9 @@ const Profile = () => {
             {lastWatched && (
               <div className="flex w-11/12 flex-col items-center justify-center gap-3">
                 <div className="flex items-center gap-2 text-2xl font-bold">
-                  <PlayArrowIcon />
-                  <div>Continue Watching</div>
+                  <PlayArrowIcon fontSize="large" />
+                  {/* <div>Continue Watching</div> */}
+                  <PageTitle size="small" title="Continue Watching" />
                 </div>
                 <div
                   className="w-full"

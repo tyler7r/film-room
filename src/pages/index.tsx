@@ -47,7 +47,7 @@ const Home = () => {
     <Profile />
   ) : (
     <div className="flex flex-col items-center justify-center gap-6 p-4">
-      <PageTitle title="Edge Control" />
+      <PageTitle size="x-large" title="Edge Control" />
       <div className="flex gap-4">
         <Button
           variant="outlined"

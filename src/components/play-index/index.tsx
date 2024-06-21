@@ -246,14 +246,14 @@ const PlayIndex = ({
         )}
         <div className="flex gap-4">
           <div className="flex items-center justify-center gap-1 text-center">
-            <StarIcon color="secondary" fontSize="large" />
-            <Typography fontSize={16} variant="overline">
+            <StarIcon color="secondary" fontSize="medium" />
+            <Typography fontSize={14} variant="overline">
               = Highlight Play
             </Typography>
           </div>
           <div className="flex items-center justify-center gap-1 text-center">
-            <LockIcon color="action" fontSize="large" />
-            <Typography fontSize={16} variant="overline">
+            <LockIcon color="action" fontSize="medium" />
+            <Typography fontSize={14} variant="overline">
               = Private Play
             </Typography>
           </div>

@@ -7,6 +7,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { TeamType, VideoType } from "~/utils/types";
+import PageTitle from "../page-title";
 import TeamLogo from "../team-logo";
 
 type VideoProps = {
@@ -62,16 +63,16 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
               : { backgroundColor: `${colors.purple[50]}` }
         }
         key={video.id}
-        className={`${hoverBorder} flex w-full flex-col gap-1`}
+        className={`${hoverBorder} flex w-full flex-col p-2`}
         onClick={() => handleClick(video.id)}
       >
         <Typography
           color={isDark ? `white` : `black`}
           component="span"
-          className="flex flex-col items-center justify-center gap-1"
+          className="flex flex-col items-center justify-center gap-2"
         >
           {!video.private && (
-            <div className="mb-1 flex items-center justify-center gap-1">
+            <div className="flex items-center justify-center gap-1">
               <div className="lg:text-md text-sm tracking-tighter">PUBLIC</div>
               <PublicIcon fontSize="small" />
             </div>
@@ -84,14 +85,19 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
               <TeamLogo tm={exclusiveTeam} size={20} />
             </div>
           )}
-          <div className="flex gap-2 text-center text-xl font-medium tracking-wide">
-            {video.season && <div>{video.season}</div>}
+          <div
+            className={`text-center text-base font-bold leading-5 lg:text-lg ${
+              isDark ? "text-purple-400" : "text-purple-A400"
+            }`}
+          >
+            {/* {video.season && <div>{video.season}</div>}
             {video.tournament && <div>{video.tournament}</div>}
-            {video.week && <div>{video.week}</div>}
+            {video.week && <div>{video.week}</div>} */}
+            {video.season} -{" "}
+            {video.week?.toLocaleUpperCase() ||
+              video.tournament?.toLocaleUpperCase()}
           </div>
-          <div className="text-center text-2xl font-extrabold tracking-tighter lg:text-3xl">
-            {video.title}
-          </div>
+          <PageTitle size="small" title={video.title} />
         </Typography>
       </div>
     )

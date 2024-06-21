@@ -5,6 +5,8 @@ import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { AnnouncementType } from "~/utils/types";
 import Announcement from "../announcement";
+import EmptyMessage from "../empty-msg";
+import PageTitle from "../page-title";
 
 type AnnouncementsProps = {
   teamId: string;
@@ -65,14 +67,8 @@ const Announcements = ({ teamId }: AnnouncementsProps) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4 p-2">
-      <div className="font-serif text-4xl font-bold italic tracking-tighter">
-        Team Announcements
-      </div>
-      {!anncs && (
-        <div className="text-2xl font-bold tracking-tight">
-          No team announcements!
-        </div>
-      )}
+      <PageTitle size="medium" title="Announcements" />
+      {!anncs && <EmptyMessage message="team announcements" size="small" />}
       {anncs?.map((annc) => <Announcement annc={annc} key={annc.id} />)}
       {anncs && announcementCount && (
         <Pagination

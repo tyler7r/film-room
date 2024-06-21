@@ -3,10 +3,12 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
+import PageTitle from "~/components/page-title";
 import PlayIndex from "~/components/play-index";
 import PlayModal from "~/components/play-modal";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayType, VideoType } from "~/utils/types";
 
@@ -14,6 +16,7 @@ const FilmRoom = () => {
   const router = useRouter();
   const { screenWidth } = useMobileContext();
   const { user } = useAuthContext();
+  const { isDark } = useIsDarkContext();
   const playParam = useSearchParams().get("play") ?? null;
   const startParam = useSearchParams().get("start") ?? null;
 
@@ -77,14 +80,18 @@ const FilmRoom = () => {
 
   return (
     video && (
-      <div className="m-4 flex w-full flex-col items-center justify-center gap-2">
+      <div className="m-4 flex w-full flex-col items-center justify-center gap-3">
         <div className="flex flex-col items-center justify-center gap-1 text-center">
-          <div className="text-xl leading-5 tracking-wider">
-            {video.season} {video.tournament}
+          <div
+            className={`${
+              isDark ? "text-grey-400" : "text-grey-600"
+            } text-lg font-bold leading-4 lg:text-2xl`}
+          >
+            {video.season} -{" "}
+            {video.tournament?.toLocaleUpperCase() ||
+              video.week?.toLocaleUpperCase()}
           </div>
-          <div className="text-4xl font-bold tracking-tight lg:text-5xl">
-            {video.title}
-          </div>
+          <PageTitle title={video.title} size="large" />
         </div>
         <Divider
           flexItem

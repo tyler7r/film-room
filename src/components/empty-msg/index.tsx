@@ -12,7 +12,7 @@ const EmptyMessage = ({ message, size }: EmptyMessageProps) => {
 
   return (
     <div
-      className={`p-2 text-center font-bold ${fontSize} ${
+      className={`text-center font-bold ${fontSize} ${
         isDark ? "text-grey-400" : "text-grey-600"
       }`}
     >
