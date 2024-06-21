@@ -199,10 +199,12 @@ const Play = ({
       {isExpanded && (
         <div className="flex flex-col items-center justify-center gap-4">
           <div className="flex w-full flex-col gap-1 self-start p-2 pl-4 pr-4 text-xl">
-            <div>
-              <strong className="tracking-tight">Description: </strong>
-              {play.note}
-            </div>
+            {play.note && (
+              <div>
+                <strong className="tracking-tight">Description: </strong>
+                {play.note}
+              </div>
+            )}
             <div className="flex flex-wrap">
               {tags?.map((tag) => (
                 <Button

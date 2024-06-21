@@ -144,7 +144,7 @@ export type VideoType = {
 
 export type PlayType = {
   id: string;
-  note: string;
+  note: string | null;
   author_id: string;
   highlight: boolean;
   exclusive_to: string | null;
@@ -163,7 +163,7 @@ export type IndexPlayType = {
   video_id: string | null;
   highlight: boolean;
   id: string;
-  note: string;
+  note: string | null;
   exclusive_to: string | null;
   private: boolean;
   author_name: string;

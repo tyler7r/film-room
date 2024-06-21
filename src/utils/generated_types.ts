@@ -470,7 +470,7 @@ export type Database = {
           exclusive_to: string | null;
           highlight: boolean;
           id: string;
-          note: string;
+          note: string | null;
           private: boolean;
           start_time: number;
           title: string;
@@ -485,7 +485,7 @@ export type Database = {
           exclusive_to?: string | null;
           highlight?: boolean;
           id?: string;
-          note: string;
+          note?: string | null;
           private?: boolean;
           start_time: number;
           title: string;
@@ -500,7 +500,7 @@ export type Database = {
           exclusive_to?: string | null;
           highlight?: boolean;
           id?: string;
-          note?: string;
+          note?: string | null;
           private?: boolean;
           start_time?: number;
           title?: string;
