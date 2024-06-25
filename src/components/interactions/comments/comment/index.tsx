@@ -1,7 +1,6 @@
-import DeleteIcon from "@mui/icons-material/Delete";
-import { Button, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import DeleteMenu from "~/components/delete-menu";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -51,29 +50,13 @@ const Comment = ({ comment }: CommentProps) => {
         includePopover={true}
         small={true}
       />
-      {comment.comment_author === user.userId &&
-        (isDeleteMenuOpen ? (
-          <div className="ml-4 flex gap-1">
-            <Button
-              size="small"
-              variant="contained"
-              onClick={() => void handleDelete()}
-            >
-              Delete
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setIsDeleteMenuOpen(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        ) : (
-          <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
-            <DeleteIcon color="action" />
-          </IconButton>
-        ))}
+      {comment.comment_author === user.userId && (
+        <DeleteMenu
+          isOpen={isDeleteMenuOpen}
+          setIsOpen={setIsDeleteMenuOpen}
+          handleDelete={handleDelete}
+        />
+      )}
     </div>
   );
 };

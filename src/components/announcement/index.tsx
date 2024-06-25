@@ -1,12 +1,12 @@
-import DeleteIcon from "@mui/icons-material/Delete";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import { Button, Divider, IconButton } from "@mui/material";
+import { Divider, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { AnnouncementType, LikeListType } from "~/utils/types";
+import DeleteMenu from "../delete-menu";
 import LikePopover from "../interactions/likes/like-popover";
 
 type AnnouncementProps = {
@@ -140,29 +140,13 @@ const Announcement = ({ annc }: AnnouncementProps) => {
           )}
           <div className="text-lg font-bold">{likeCount}</div>
         </div>
-        {annc.author_id === user.currentAffiliation?.affId &&
-          (isDeleteMenuOpen ? (
-            <div className="ml-4 flex gap-1">
-              <Button
-                size="small"
-                variant="contained"
-                onClick={() => void handleDelete()}
-              >
-                Delete
-              </Button>
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() => setIsDeleteMenuOpen(false)}
-              >
-                Cancel
-              </Button>
-            </div>
-          ) : (
-            <IconButton size="small" onClick={() => setIsDeleteMenuOpen(true)}>
-              <DeleteIcon color="action" />
-            </IconButton>
-          ))}
+        {annc.author_id === user.currentAffiliation?.affId && (
+          <DeleteMenu
+            isOpen={isDeleteMenuOpen}
+            setIsOpen={setIsDeleteMenuOpen}
+            handleDelete={handleDelete}
+          />
+        )}
       </div>
       {likeList && (
         <LikePopover

@@ -1,6 +1,3 @@
-import ClearIcon from "@mui/icons-material/Clear";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
@@ -15,6 +12,7 @@ import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { MentionType, PlayPreviewType, TagType } from "~/utils/types";
+import DeleteMenu from "../delete-menu";
 import AddComment from "../interactions/comments/add-comment";
 import CommentBtn from "../interactions/comments/comment-btn";
 import CommentIndex from "../interactions/comments/comment-index";
@@ -180,27 +178,13 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             anchorEl={anchorEl}
             handlePopoverClose={handlePopoverClose}
           />
-          {preview.play.author_id === user.userId &&
-            (isDeleteMenuOpen ? (
-              <div className="ml-4 flex gap-1">
-                <IconButton size="small" onClick={() => void handleDelete()}>
-                  <DeleteIcon color="primary" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => setIsDeleteMenuOpen(false)}
-                >
-                  <ClearIcon fontSize="small" color="action" />
-                </IconButton>
-              </div>
-            ) : (
-              <IconButton
-                size="small"
-                onClick={() => setIsDeleteMenuOpen(true)}
-              >
-                <DeleteOutlineIcon color="action" />
-              </IconButton>
-            ))}
+          {preview.play.author_id === user.userId && (
+            <DeleteMenu
+              isOpen={isDeleteMenuOpen}
+              setIsOpen={setIsDeleteMenuOpen}
+              handleDelete={handleDelete}
+            />
+          )}
         </div>
       </div>
       <YouTube

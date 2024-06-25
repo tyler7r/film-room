@@ -1,11 +1,10 @@
 import CheckIcon from "@mui/icons-material/Check";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import { Button, IconButton, TextField } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType } from "~/utils/types";
+import DeleteMenu from "../delete-menu";
 import Player from "../player";
 
 type PlayerEditProps = {
@@ -66,35 +65,11 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
       className="flex items-center justify-center gap-2 rounded-lg px-2"
     >
       <Player player={player} />
-      <div className="flex">
-        {isDeleteMenuOpen ? (
-          <div className="ml-4 flex gap-1">
-            <Button
-              size="small"
-              variant="contained"
-              onClick={() => void handleDelete()}
-            >
-              Remove
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setIsDeleteMenuOpen(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        ) : (
-          <div className="flex">
-            <IconButton size="small" onClick={() => setIsOpen(true)}>
-              <EditIcon color="primary" />
-            </IconButton>
-            <IconButton size="small" onClick={() => setIsDeleteMenuOpen(true)}>
-              <DeleteIcon color="action" />
-            </IconButton>
-          </div>
-        )}
-      </div>
+      <DeleteMenu
+        isOpen={isOpen}
+        setIsOpen={setIsDeleteMenuOpen}
+        handleDelete={handleDelete}
+      />
     </div>
   ) : (
     <div
