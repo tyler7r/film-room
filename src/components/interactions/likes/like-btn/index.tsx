@@ -143,24 +143,26 @@ const LikeBtn = ({
       <div className="flex items-center justify-center">
         {isLiked ? (
           <IconButton
+            size="small"
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
             onClick={(e) => void handleUnlike(e)}
           >
             <FavoriteIcon
               color="primary"
-              fontSize={small ? "small" : isMobile ? "small" : "medium"}
+              fontSize={small ? "small" : isMobile ? "medium" : "large"}
             />
           </IconButton>
         ) : (
           <IconButton
+            size="small"
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
             onClick={(e) => void handleLike(e)}
           >
             <FavoriteBorderIcon
               color="primary"
-              fontSize={small ? "small" : isMobile ? "small" : "medium"}
+              fontSize={small ? "small" : isMobile ? "medium" : "large"}
             />
           </IconButton>
         )}

@@ -67,7 +67,12 @@ const AddComment = ({ playId }: CommentProps) => {
         value={comment}
         InputProps={{
           endAdornment: (
-            <IconButton color="primary" type="submit" disabled={!isValid}>
+            <IconButton
+              size="small"
+              color="primary"
+              type="submit"
+              disabled={!isValid}
+            >
               <SendIcon />
             </IconButton>
           ),

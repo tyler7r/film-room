@@ -233,6 +233,24 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchStats(options);
+          void fetchFeed(options);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (user.userId) void fetchLastWatched();
   }, [user]);
 

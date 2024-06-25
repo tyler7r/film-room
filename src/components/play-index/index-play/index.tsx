@@ -267,11 +267,11 @@ const IndexPlay = ({
               activePlay={null}
             />
             {isExpanded ? (
-              <IconButton onClick={() => setIsExpanded(false)}>
+              <IconButton size="small" onClick={() => setIsExpanded(false)}>
                 <KeyboardArrowUpIcon color="primary" fontSize="large" />
               </IconButton>
             ) : (
-              <IconButton onClick={() => setIsExpanded(true)}>
+              <IconButton size="small" onClick={() => setIsExpanded(true)}>
                 <KeyboardArrowDownIcon color="primary" fontSize="large" />
               </IconButton>
             )}
@@ -307,7 +307,6 @@ const IndexPlay = ({
             <CommentIndex
               playId={play.play.id}
               setCommentCount={setCommentCount}
-              isActivePlay={false}
             />
           </div>
         </div>

@@ -88,8 +88,11 @@ const FilmRoom = () => {
             } text-lg font-bold leading-4 lg:text-2xl`}
           >
             {video.season} -{" "}
-            {video.tournament?.toLocaleUpperCase() ||
-              video.week?.toLocaleUpperCase()}
+            {video.week
+              ? video.week.toLocaleUpperCase()
+              : video.tournament
+                ? video.tournament.toLocaleUpperCase()
+                : null}
           </div>
           <PageTitle title={video.title} size="large" />
         </div>

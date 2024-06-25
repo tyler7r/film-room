@@ -39,21 +39,21 @@ const ProfileActionBar = ({
     <div className="flex w-full justify-center">
       <div className="flex w-3/5 justify-around">
         <IconButton
-          size="large"
+          size="small"
           onClick={() => handleModalToggle("createdPlays")}
           color={actionBarStatus.createdPlays ? "primary" : "default"}
         >
           <CreateIcon sx={{ fontSize: "48px" }} />
         </IconButton>
         <IconButton
-          size="large"
+          size="small"
           onClick={() => handleModalToggle("mentions")}
           color={actionBarStatus.mentions ? "primary" : "default"}
         >
           <LocalOfferIcon sx={{ fontSize: "48px" }} />
         </IconButton>
         <IconButton
-          size="large"
+          size="small"
           onClick={() => handleModalToggle("highlights")}
           color={actionBarStatus.highlights ? "primary" : "default"}
         >

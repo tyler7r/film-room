@@ -1,3 +1,6 @@
+import ClearIcon from "@mui/icons-material/Clear";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
@@ -37,6 +40,8 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
 
   const [mentions, setMentions] = useState<MentionType[] | null>(null);
   const [tags, setTags] = useState<TagType[] | null>(null);
+
+  const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
   const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
@@ -131,6 +136,10 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
     void router.push(`/film-room/${videoId}`);
   };
 
+  const handleDelete = async () => {
+    await supabase.from("plays").delete().eq("id", preview.play.id);
+  };
+
   useEffect(() => {
     void fetchMentions();
     void fetchTags();
@@ -154,21 +163,45 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
           </div>
           <div className="p-2">{preview.play.title}</div>
         </div>
-        <IconButton
-          onMouseEnter={handlePopoverOpen}
-          onMouseLeave={handlePopoverClose}
-          onClick={() =>
-            handleVideoClick(preview.video.id, preview.video.exclusive_to)
-          }
-        >
-          <ShortcutIcon fontSize="large" color="primary" />
-        </IconButton>
-        <StandardPopover
-          content="Go to Video"
-          open={open}
-          anchorEl={anchorEl}
-          handlePopoverClose={handlePopoverClose}
-        />
+        <div className="flex items-center gap-1">
+          <IconButton
+            onMouseEnter={handlePopoverOpen}
+            onMouseLeave={handlePopoverClose}
+            onClick={() =>
+              handleVideoClick(preview.video.id, preview.video.exclusive_to)
+            }
+            size="small"
+          >
+            <ShortcutIcon fontSize="large" color="primary" />
+          </IconButton>
+          <StandardPopover
+            content="Go to Video"
+            open={open}
+            anchorEl={anchorEl}
+            handlePopoverClose={handlePopoverClose}
+          />
+          {preview.play.author_id === user.userId &&
+            (isDeleteMenuOpen ? (
+              <div className="ml-4 flex gap-1">
+                <IconButton size="small" onClick={() => void handleDelete()}>
+                  <DeleteIcon color="primary" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => setIsDeleteMenuOpen(false)}
+                >
+                  <ClearIcon fontSize="small" color="action" />
+                </IconButton>
+              </div>
+            ) : (
+              <IconButton
+                size="small"
+                onClick={() => setIsDeleteMenuOpen(true)}
+              >
+                <DeleteOutlineIcon color="action" />
+              </IconButton>
+            ))}
+        </div>
       </div>
       <YouTube
         opts={{
@@ -220,34 +253,15 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             activePlay={null}
           />
           {isExpanded ? (
-            <IconButton onClick={() => setIsExpanded(false)}>
+            <IconButton size="small" onClick={() => setIsExpanded(false)}>
               <KeyboardArrowUpIcon color="primary" fontSize="large" />
             </IconButton>
           ) : (
-            <IconButton onClick={() => setIsExpanded(true)}>
+            <IconButton size="small" onClick={() => setIsExpanded(true)}>
               <KeyboardArrowDownIcon color="primary" fontSize="large" />
             </IconButton>
           )}
         </div>
-        {/* {mentions && (
-          <div className="flex items-center justify-center">
-            <Divider flexItem orientation="vertical" variant="middle" />
-            <LocalOfferIcon />
-          </div>
-        )}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {mentions?.map((mention) => (
-            <div
-              onClick={() =>
-                void router.push(`/profile/${mention.receiver_id}`)
-              }
-              className={`tracking text-center font-bold ${hoverText} text-sm leading-3 md:text-base`}
-              key={mention.id}
-            >
-              @{mention.receiver_name}
-            </div>
-          ))}
-        </div> */}
       </div>
       {isExpanded && (
         <div className="flex w-full flex-col items-center gap-2">
@@ -274,7 +288,6 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             <CommentIndex
               playId={preview.play.id}
               setCommentCount={setCommentCount}
-              isActivePlay={false}
             />
           </div>
         </div>

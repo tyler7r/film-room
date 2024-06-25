@@ -82,7 +82,7 @@ const Search = () => {
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <IconButton type="submit">
+              <IconButton type="submit" size="small">
                 <SearchIcon />
               </IconButton>
             </InputAdornment>

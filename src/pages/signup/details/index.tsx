@@ -162,6 +162,7 @@ const SignupDetails = () => {
           InputProps={{
             endAdornment: (
               <IconButton
+                size="small"
                 aria-label="toggle password visibility"
                 onClick={() => setShowPwd(!showPwd)}
               >
@@ -184,6 +185,7 @@ const SignupDetails = () => {
           InputProps={{
             endAdornment: (
               <IconButton
+                size="small"
                 aria-label="toggle password visibility"
                 onClick={() => setShowConfirmPwd(!showConfirmPwd)}
               >

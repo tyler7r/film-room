@@ -97,6 +97,7 @@ const Login = () => {
           InputProps={{
             endAdornment: (
               <IconButton
+                size="small"
                 aria-label="toggle password visibility"
                 onClick={() => setShowPwd(!showPwd)}
               >

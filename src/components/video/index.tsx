@@ -90,12 +90,12 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
               isDark ? "text-purple-400" : "text-purple-A400"
             }`}
           >
-            {/* {video.season && <div>{video.season}</div>}
-            {video.tournament && <div>{video.tournament}</div>}
-            {video.week && <div>{video.week}</div>} */}
             {video.season} -{" "}
-            {video.week?.toLocaleUpperCase() ||
-              video.tournament?.toLocaleUpperCase()}
+            {video.week
+              ? video.week.toLocaleUpperCase()
+              : video.tournament
+                ? video.tournament.toLocaleUpperCase()
+                : null}
           </div>
           <PageTitle size="small" title={video.title} />
         </Typography>

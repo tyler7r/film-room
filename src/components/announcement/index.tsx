@@ -159,7 +159,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
               </Button>
             </div>
           ) : (
-            <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
+            <IconButton size="small" onClick={() => setIsDeleteMenuOpen(true)}>
               <DeleteIcon color="action" />
             </IconButton>
           ))}

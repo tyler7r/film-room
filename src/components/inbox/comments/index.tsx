@@ -164,20 +164,20 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
       >
         <div>Recent Comments</div>
         {hide && (
-          <IconButton onClick={() => setHide(false)}>
+          <IconButton size="small" onClick={() => setHide(false)}>
             <KeyboardArrowRightIcon />
           </IconButton>
         )}
         {!hide && (
           <div className="flex gap-2">
-            <IconButton onClick={() => handleUnreadClick()}>
+            <IconButton size="small" onClick={() => handleUnreadClick()}>
               {isUnreadOnly ? (
                 <MailIcon color="primary" />
               ) : (
                 <MailOutlineIcon color="primary" />
               )}
             </IconButton>
-            <IconButton onClick={() => setHide(true)}>
+            <IconButton size="small" onClick={() => setHide(true)}>
               <ExpandMoreIcon />
             </IconButton>
           </div>

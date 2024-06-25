@@ -1,14 +1,12 @@
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import Comment from "../comment";
 
 type CommentIndexProps = {
   playId: string;
   setCommentCount: (count: number) => void;
-  isActivePlay: boolean;
 };
 
 type CommentIndexType = {
@@ -21,12 +19,7 @@ type CommentIndexType = {
   team_id: string | null;
 }[];
 
-const CommentIndex = ({
-  playId,
-  setCommentCount,
-  isActivePlay,
-}: CommentIndexProps) => {
-  const { isDark } = useIsDarkContext();
+const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
   const [index, setIndex] = useState<CommentIndexType | null>(null);
   const [page, setPage] = useState<number>(0);
   const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState<boolean>(false);

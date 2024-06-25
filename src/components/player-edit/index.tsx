@@ -13,7 +13,7 @@ type PlayerEditProps = {
 };
 
 const PlayerEdit = ({ player }: PlayerEditProps) => {
-  const { backgroundStyle, hoverText } = useIsDarkContext();
+  const { backgroundStyle } = useIsDarkContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [edit, setEdit] = useState<number | null>(player.number);
   const [isValidNumber, setIsValidNumber] = useState<boolean>(false);
@@ -89,7 +89,7 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
             <IconButton size="small" onClick={() => setIsOpen(true)}>
               <EditIcon color="primary" />
             </IconButton>
-            <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
+            <IconButton size="small" onClick={() => setIsDeleteMenuOpen(true)}>
               <DeleteIcon color="action" />
             </IconButton>
           </div>

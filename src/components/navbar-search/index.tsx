@@ -37,14 +37,14 @@ const NavbarSearch = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <IconButton type="submit">
+                <IconButton size="small" type="submit">
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setIsOpen(false)}>
+                <IconButton size="small" onClick={() => setIsOpen(false)}>
                   <CloseIcon />
                 </IconButton>
               </InputAdornment>

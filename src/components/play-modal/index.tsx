@@ -341,7 +341,7 @@ const PlayModal = ({
                     },
                   }}
                 >
-                  <IconButton>
+                  <IconButton size="small">
                     <InfoOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -403,7 +403,7 @@ const PlayModal = ({
           },
         }}
       >
-        <IconButton>
+        <IconButton size="small">
           <InfoOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>
@@ -428,7 +428,7 @@ const PlayModal = ({
           },
         }}
       >
-        <IconButton>
+        <IconButton size="small">
           <InfoOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>
