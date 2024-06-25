@@ -38,9 +38,9 @@ const Comment = ({ comment }: CommentProps) => {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="">
+      <div>
         <strong
-          className={`${hoverText}`}
+          className={hoverText}
           onClick={() => handleAuthorClick(comment.comment_author)}
         >{`${comment.author_name}: `}</strong>
         {comment.comment}

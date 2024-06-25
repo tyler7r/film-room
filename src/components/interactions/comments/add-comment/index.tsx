@@ -50,7 +50,7 @@ const AddComment = ({ playId }: CommentProps) => {
 
   return (
     <form
-      className="flex w-4/5 items-center justify-center gap-2"
+      className="flex w-full items-center justify-center gap-2"
       onSubmit={handleSubmit}
     >
       <TextField

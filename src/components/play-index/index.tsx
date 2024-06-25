@@ -9,9 +9,9 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { PlayType } from "~/utils/types";
+import type { PlayPreviewType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
-import Play from "./play";
+import IndexPlay from "./index-play";
 import Plays from "./plays";
 
 type PlayIndexProps = {
@@ -19,8 +19,8 @@ type PlayIndexProps = {
   videoId: string;
   scrollToPlayer: () => void;
   duration: number;
-  setActivePlay: (play: PlayType) => void;
-  activePlay: PlayType | null;
+  setActivePlay: (play: PlayPreviewType) => void;
+  activePlay: PlayPreviewType | null;
 };
 
 export type PlaySearchOptions = {
@@ -32,16 +32,16 @@ export type PlaySearchOptions = {
 };
 
 const PlayIndex = ({
-  setActivePlay,
   player,
   videoId,
   scrollToPlayer,
+  setActivePlay,
   activePlay,
 }: PlayIndexProps) => {
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
 
-  const [plays, setPlays] = useState<PlayType[] | null>(null);
+  const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [playCount, setPlayCount] = useState<number | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
@@ -75,7 +75,7 @@ const PlayIndex = ({
       void plays.eq("play->>author_role", options.role);
     }
     if (activePlay) {
-      void plays.neq("play->>id", activePlay.id);
+      void plays.neq("play->>id", activePlay.play.id);
     }
     if (user.currentAffiliation?.team.id) {
       void plays.or(
@@ -85,7 +85,7 @@ const PlayIndex = ({
       void plays.eq("play->>private", false);
     }
     const { data, count } = await plays;
-    if (data) setPlays(data.map((play) => play.play));
+    if (data) setPlays(data);
     if (count) setPlayCount(count);
   };
 
@@ -121,8 +121,8 @@ const PlayIndex = ({
       void playsByTag.eq("play->>author_role", options.role);
     }
     if (activePlay) {
-      void playsByMention.neq("play->>id", activePlay.id);
-      void playsByTag.neq("play->>id", activePlay.id);
+      void playsByMention.neq("play->>id", activePlay.play.id);
+      void playsByTag.neq("play->>id", activePlay.play.id);
     }
     if (user.currentAffiliation?.team.id) {
       void playsByMention.or(
@@ -138,18 +138,16 @@ const PlayIndex = ({
     if (options.topic !== "") {
       const getTags = await playsByTag;
       const getMentions = await playsByMention;
-      let ps: PlayType[] | null = null;
+      let ps: PlayPreviewType[] | null = null;
       if (getTags.data) {
-        ps = getTags.data.map((play) => play.play);
+        ps = getTags.data;
       }
       if (getMentions.data) {
-        ps = ps
-          ? [...ps, ...getMentions.data?.map((play) => play.play)]
-          : getMentions.data.map((play) => play.play);
+        ps = ps ? [...ps, ...getMentions.data] : getMentions.data;
       }
-      const uniquePlays = [...new Map(ps?.map((x) => [x.id, x])).values()];
+      const uniquePlays = [...new Map(ps?.map((x) => [x.play.id, x])).values()];
       setPlays(ps ? uniquePlays : null);
-      setPlayCount(ps ? uniquePlays.length : null);
+      setPlayCount(uniquePlays.length > 0 ? uniquePlays.length : null);
     }
   };
 
@@ -183,9 +181,9 @@ const PlayIndex = ({
   }, [user]);
 
   useEffect(() => {
-    if (page === 1 && searchOptions.topic !== "")
+    if (page === 1 && searchOptions.topic !== "") {
       void fetchPlaysBySearch(searchOptions);
-    else if (page === 1 && searchOptions.topic === "")
+    } else if (page === 1 && searchOptions.topic === "")
       void fetchPlays(searchOptions);
     else setPage(1);
   }, [searchOptions, isMobile]);
@@ -200,7 +198,7 @@ const PlayIndex = ({
       {activePlay && (
         <div className="flex w-11/12 flex-col items-center justify-center gap-2">
           <div className="tracking-tightest text-xl font-bold">Active Play</div>
-          <Play
+          <IndexPlay
             setIsFiltersOpen={setIsFiltersOpen}
             scrollToPlayer={scrollToPlayer}
             play={activePlay}
@@ -268,7 +266,7 @@ const PlayIndex = ({
           searchOptions={searchOptions}
           videoId={videoId}
         />
-        {plays && playCount && (
+        {playCount && (
           <Pagination
             showFirstButton
             showLastButton

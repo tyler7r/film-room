@@ -1,7 +1,6 @@
-import { Button, Divider, colors } from "@mui/material";
+import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
-import PageTitle from "~/components/page-title";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import Comment from "../comment";
@@ -87,7 +86,6 @@ const CommentIndex = ({
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <PageTitle title="Comments" size="small" />
       <div className="flex flex-col gap-2 px-6">
         {index?.map((comment) => (
           <Comment key={comment.id} comment={comment} />
@@ -104,18 +102,6 @@ const CommentIndex = ({
           <EmptyMessage size="small" message="comments" />
         )}
       </div>
-      {!isActivePlay && (
-        <Divider
-          flexItem
-          sx={{
-            height: "2px",
-            marginTop: "8px",
-            marginBottom: "8px",
-            background: isDark ? colors.common.white : colors.grey[600],
-          }}
-          variant="fullWidth"
-        />
-      )}
     </div>
   );
 };

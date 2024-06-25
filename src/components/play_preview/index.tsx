@@ -1,5 +1,6 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import { Button, Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
@@ -189,6 +190,24 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
         id="player"
         videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
       />
+      {mentions && (
+        <div className="flex items-center gap-2 p-2">
+          <LocalOfferIcon />
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {mentions?.map((mention) => (
+              <div
+                onClick={() =>
+                  void router.push(`/profile/${mention.receiver_id}`)
+                }
+                className={`tracking text-center font-bold ${hoverText} text-base leading-3`}
+                key={mention.id}
+              >
+                @{mention.receiver_name}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="flex w-full items-center gap-3 px-1">
         <div className="flex items-center justify-center gap-2">
           <LikeBtn playId={preview.play.id} />
@@ -210,21 +229,25 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             </IconButton>
           )}
         </div>
-        {mentions && (
-          <Divider flexItem orientation="vertical" variant="middle" />
+        {/* {mentions && (
+          <div className="flex items-center justify-center">
+            <Divider flexItem orientation="vertical" variant="middle" />
+            <LocalOfferIcon />
+          </div>
         )}
-        <div className="grid grid-flow-col-dense gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {mentions?.map((mention) => (
             <div
               onClick={() =>
                 void router.push(`/profile/${mention.receiver_id}`)
               }
-              className={`tracking text-center font-bold ${hoverText} text-sm md:text-base`}
+              className={`tracking text-center font-bold ${hoverText} text-sm leading-3 md:text-base`}
+              key={mention.id}
             >
               @{mention.receiver_name}
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
       {isExpanded && (
         <div className="flex w-full flex-col items-center gap-2">
