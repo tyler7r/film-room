@@ -330,7 +330,6 @@ const Profile = () => {
               <div className="flex w-11/12 flex-col items-center justify-center gap-3">
                 <div className="flex items-center gap-2 text-2xl font-bold">
                   <PlayArrowIcon fontSize="large" />
-                  {/* <div>Continue Watching</div> */}
                   <PageTitle size="small" title="Continue Watching" />
                 </div>
                 <div

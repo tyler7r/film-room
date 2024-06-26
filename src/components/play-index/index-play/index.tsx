@@ -8,6 +8,7 @@ import { Button, Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
+import DeleteMenu from "~/components/delete-menu";
 import AddComment from "~/components/interactions/comments/add-comment";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
 import CommentIndex from "~/components/interactions/comments/comment-index";
@@ -51,6 +52,7 @@ const IndexPlay = ({
   const [mentions, setMentions] = useState<MentionType[] | null>(null);
   const [tags, setTags] = useState<TagType[] | null>(null);
 
+  const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
@@ -163,6 +165,11 @@ const IndexPlay = ({
     return `${month}/${day}`;
   };
 
+  const handleDelete = async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    await supabase.from("plays").delete().eq("id", play.play.id);
+  };
+
   useEffect(() => {
     void fetchMentions();
     void fetchTags();
@@ -223,6 +230,15 @@ const IndexPlay = ({
                   handlePopoverClose={handlePopoverClose}
                 />
               </>
+            )}
+            {play.play.author_id === user.userId && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <DeleteMenu
+                  isOpen={isDeleteMenuOpen}
+                  setIsOpen={setIsDeleteMenuOpen}
+                  handleDelete={handleDelete}
+                />
+              </div>
             )}
           </div>
           <div className="flex items-center justify-center gap-2">

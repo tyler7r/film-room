@@ -28,7 +28,6 @@ const Plays = ({
   return plays && plays.length > 0 ? (
     <div className="grid w-11/12 grid-cols-1 justify-center gap-4">
       {plays.map((play) => (
-        // <PlayPreview preview={play} key={play.play.id} />
         <IndexPlay
           setActivePlay={setActivePlay}
           key={play.play.id}

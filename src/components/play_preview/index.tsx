@@ -162,6 +162,13 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
           <div className="p-2">{preview.play.title}</div>
         </div>
         <div className="flex items-center gap-1">
+          {preview.play.author_id === user.userId && (
+            <DeleteMenu
+              isOpen={isDeleteMenuOpen}
+              setIsOpen={setIsDeleteMenuOpen}
+              handleDelete={handleDelete}
+            />
+          )}
           <IconButton
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
@@ -178,13 +185,6 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             anchorEl={anchorEl}
             handlePopoverClose={handlePopoverClose}
           />
-          {preview.play.author_id === user.userId && (
-            <DeleteMenu
-              isOpen={isDeleteMenuOpen}
-              setIsOpen={setIsDeleteMenuOpen}
-              handleDelete={handleDelete}
-            />
-          )}
         </div>
       </div>
       <YouTube
@@ -248,7 +248,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
         </div>
       </div>
       {isExpanded && (
-        <div className="flex w-full flex-col items-center gap-2">
+        <div className="my-4 flex w-full flex-col items-center gap-2">
           <div className="w-full">
             <strong
               onClick={() =>
