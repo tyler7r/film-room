@@ -25,7 +25,8 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
   const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
-  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
+  const { backgroundStyle, isDark, hoverBorder, hoverText } =
+    useIsDarkContext();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -192,8 +193,18 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
                   )}
                   {!notification.team && <PublicIcon fontSize="small" />}
                   <div>
-                    <strong>{notification.play.author_name}</strong> mentioned
-                    you on:
+                    <strong
+                      className={hoverText}
+                      onClick={() => {
+                        setIsOpen(false);
+                        void router.push(
+                          `/profile/${notification.play.author_id}`,
+                        );
+                      }}
+                    >
+                      {notification.play.author_name}
+                    </strong>{" "}
+                    mentioned you on:
                   </div>
                 </div>
                 <div

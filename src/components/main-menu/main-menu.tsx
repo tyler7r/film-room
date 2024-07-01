@@ -17,24 +17,28 @@ const MainMenu = ({ size }: MainMenuProps) => {
     <div style={backgroundStyle} className="flex items-center justify-around">
       <Button
         variant="text"
-        size={size}
-        onClick={() => router.push("/film-room")}
-        sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+        sx={{
+          fontSize: "18px",
+          fontWeight: "bold",
+        }}
       >
-        Film Room
+        Profile
       </Button>
       <Button
         variant="text"
-        size={size}
-        sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+        onClick={() => void router.push("/film-room")}
+        sx={{
+          fontSize: "18px",
+          fontWeight: "bold",
+        }}
       >
-        Highlight Factory
+        Film Room
       </Button>
       <TeamPageButton />
       <Button
         sx={{
-          fontSize: { lg: "20px" },
-          lineHeight: { lg: "28px" },
+          fontWeight: "bold",
+          fontSize: "18px",
           display: "flex",
           gap: 1,
         }}

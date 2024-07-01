@@ -1,5 +1,7 @@
 import CheckIcon from "@mui/icons-material/Check";
-import { Button, TextField } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
+import { IconButton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -48,6 +50,7 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
 
   const handleDelete = async () => {
     setIsOpen(false);
+    setIsDeleteMenuOpen(false);
     await supabase.from("affiliations").delete().eq("id", player.id);
   };
 
@@ -62,11 +65,14 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
   return !isOpen ? (
     <div
       style={backgroundStyle}
-      className="flex items-center justify-center gap-2 rounded-lg px-2"
+      className="flex items-center justify-center gap-1 rounded-lg px-2"
     >
       <Player player={player} />
+      <IconButton size="small" onClick={() => setIsOpen(true)}>
+        <EditIcon color="primary" />
+      </IconButton>
       <DeleteMenu
-        isOpen={isOpen}
+        isOpen={isDeleteMenuOpen}
         setIsOpen={setIsDeleteMenuOpen}
         handleDelete={handleDelete}
       />
@@ -77,7 +83,10 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
       style={backgroundStyle}
     >
       <div className={`font-bold`}>{player.name}</div>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center justify-center gap-1"
+      >
         <TextField
           size="small"
           name="num"
@@ -90,12 +99,12 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
           onChange={handleInput}
           value={edit ?? ""}
         />
-        <Button type="submit" disabled={!isValidNumber}>
-          <CheckIcon />
-        </Button>
-        <Button type="button" onClick={() => closeEdit()}>
-          Cancel
-        </Button>
+        <IconButton size="small" type="submit" disabled={!isValidNumber}>
+          <CheckIcon color="primary" />
+        </IconButton>
+        <IconButton size="small" type="button" onClick={() => closeEdit()}>
+          <CloseIcon />
+        </IconButton>
       </form>
     </div>
   );

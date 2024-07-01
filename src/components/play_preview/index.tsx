@@ -2,6 +2,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
+import StarIcon from "@mui/icons-material/Star";
 import { Button, Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -130,7 +131,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
 
   const handleVideoClick = async (videoId: string, teamId: string | null) => {
     if (teamId) void updateUserAffiliation(teamId);
-    void updateLastWatched(videoId, 0);
+    if (user.userId) void updateLastWatched(videoId, 0);
     void router.push(`/film-room/${videoId}`);
   };
 
@@ -147,6 +148,9 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
     <div className="flex flex-col rounded-md">
       <div className="flex items-center justify-between gap-2 p-2">
         <div className="flex items-center gap-2">
+          {preview.play.highlight && (
+            <StarIcon color="secondary" fontSize="large" />
+          )}
           <div
             className={`tracking text-center text-xl font-bold ${hoverText}`}
             onClick={() =>

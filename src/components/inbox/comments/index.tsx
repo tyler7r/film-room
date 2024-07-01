@@ -26,7 +26,8 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   const { affiliations } = useAffiliatedContext();
   const { setIsOpen, commentPage, setCommentPage, setCommentCount } =
     useInboxContext();
-  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
+  const { backgroundStyle, isDark, hoverBorder, hoverText } =
+    useIsDarkContext();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -196,7 +197,17 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
                     <PublicIcon fontSize="small" />
                   )}
                   <div>
-                    <strong>{notification.comment.author_name}</strong>{" "}
+                    <strong
+                      className={hoverText}
+                      onClick={() => {
+                        setIsOpen(false);
+                        void router.push(
+                          `/profile/${notification.play.author_id}`,
+                        );
+                      }}
+                    >
+                      {notification.comment.author_name}
+                    </strong>{" "}
                     commented on:
                   </div>
                 </div>

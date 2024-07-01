@@ -2,7 +2,9 @@ import CreateIcon from "@mui/icons-material/Create";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import StarIcon from "@mui/icons-material/Star";
 import { IconButton } from "@mui/material";
+import { useMobileContext } from "~/contexts/mobile";
 import type { ProfileActionBarType } from "~/utils/types";
+import PageTitle from "../page-title";
 
 type ProfileActionBarProps = {
   actionBarStatus: ProfileActionBarType;
@@ -13,6 +15,8 @@ const ProfileActionBar = ({
   actionBarStatus,
   setActionBarStatus,
 }: ProfileActionBarProps) => {
+  const { isMobile } = useMobileContext();
+
   const handleModalToggle = (modal: string) => {
     if (modal === "createdPlays") {
       setActionBarStatus({
@@ -36,29 +40,58 @@ const ProfileActionBar = ({
   };
 
   return (
-    <div className="flex w-full justify-center">
-      <div className="flex w-3/5 justify-around">
+    <div
+      className={`mt-2 flex ${
+        isMobile ? "w-full justify-center gap-4" : "w-4/5 justify-around"
+      }`}
+    >
+      <div
+        onClick={() => handleModalToggle("createdPlays")}
+        className="flex cursor-pointer flex-col items-center justify-center gap-1"
+      >
         <IconButton
           size="small"
-          onClick={() => handleModalToggle("createdPlays")}
           color={actionBarStatus.createdPlays ? "primary" : "default"}
         >
-          <CreateIcon sx={{ fontSize: "48px" }} />
+          <CreateIcon sx={{ fontSize: "42px" }} />
         </IconButton>
+        <PageTitle
+          title="created"
+          size="small"
+          purple={actionBarStatus.createdPlays ? true : false}
+        />
+      </div>
+      <div
+        className="flex cursor-pointer flex-col items-center justify-center gap-1"
+        onClick={() => handleModalToggle("mentions")}
+      >
         <IconButton
           size="small"
-          onClick={() => handleModalToggle("mentions")}
           color={actionBarStatus.mentions ? "primary" : "default"}
         >
-          <LocalOfferIcon sx={{ fontSize: "48px" }} />
+          <LocalOfferIcon sx={{ fontSize: "42px" }} />
         </IconButton>
+        <PageTitle
+          title="mentions"
+          size="small"
+          purple={actionBarStatus.mentions ? true : false}
+        />
+      </div>
+      <div
+        onClick={() => handleModalToggle("highlights")}
+        className="flex cursor-pointer flex-col items-center justify-center gap-1"
+      >
         <IconButton
           size="small"
-          onClick={() => handleModalToggle("highlights")}
           color={actionBarStatus.highlights ? "primary" : "default"}
         >
-          <StarIcon sx={{ fontSize: "48px" }} />
+          <StarIcon sx={{ fontSize: "42px" }} />
         </IconButton>
+        <PageTitle
+          title="highlights"
+          size="small"
+          purple={actionBarStatus.highlights ? true : false}
+        />
       </div>
     </div>
   );

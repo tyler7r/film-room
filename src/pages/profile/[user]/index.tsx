@@ -292,7 +292,7 @@ const Profile = () => {
                 onClick={() => changeActionBar("createdPlays")}
               >
                 <div className="text-3xl font-bold">{stats.playCount}</div>
-                <div className="font-light leading-4 tracking-tight">
+                <div className="font-serif font-light italic leading-4 tracking-tight">
                   created
                 </div>
               </div>
@@ -302,7 +302,7 @@ const Profile = () => {
                 onClick={() => changeActionBar("mentions")}
               >
                 <div className="text-3xl font-bold">{stats.mentionCount}</div>
-                <div className="font-light leading-4 tracking-tight">
+                <div className="font-serif font-light italic leading-4 tracking-tight">
                   mentions
                 </div>
               </div>
@@ -312,7 +312,7 @@ const Profile = () => {
                 onClick={() => changeActionBar("highlights")}
               >
                 <div className="text-3xl font-bold">{stats.highlightCount}</div>
-                <div className="font-light leading-4 tracking-tight">
+                <div className="font-serif font-light italic leading-4 tracking-tight">
                   highlights
                 </div>
               </div>
@@ -347,7 +347,7 @@ const Profile = () => {
             )}
           </div>
         )}
-        <div className="w-full">
+        <div className="flex w-full items-center justify-center">
           <ProfileActionBar
             actionBarStatus={actionBarStatus}
             setActionBarStatus={setActionBarStatus}

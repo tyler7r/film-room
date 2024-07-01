@@ -28,7 +28,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
       .from("plays_via_tag")
       .select("*", { count: "exact" })
       .ilike("tag->>title", topic ? `%${topic}%` : "%%")
-      .order("play->>created_at")
+      .order("play->>created_at", { ascending: false })
       .range(from, to);
     if (user.currentAffiliation?.team.id) {
       void plays.or(

@@ -72,7 +72,7 @@ const Signup = () => {
         className="flex w-4/5 flex-col items-center justify-center gap-4 text-center"
       >
         <TextField
-          className="w-full"
+          className="w-full md:w-4/5 lg:w-3/5"
           name="email"
           autoComplete="email"
           required
