@@ -64,7 +64,7 @@ const Profile = () => {
   const { user, setUser } = useAuthContext();
 
   const [options, setOptions] = useState<FetchOptions>({
-    profileId: (router.query.user as string) || user.userId,
+    profileId: router.query.user as string,
     currentAffiliation: user.currentAffiliation?.team.id,
   });
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -324,7 +324,7 @@ const Profile = () => {
             <TeamAffiliation key={aff.affId} aff={aff} />
           ))}
         </div>
-        {!router.query.user && (
+        {router.query.user === user.userId && (
           <div className="flex w-full items-center justify-center">
             {lastWatched && (
               <div className="flex w-11/12 flex-col items-center justify-center gap-3">
