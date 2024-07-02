@@ -22,7 +22,7 @@ export type Database = MergeDeep<
             viewed: boolean;
           };
         };
-        player_view: {
+        user_view: {
           Row: {
             email: string;
             id: string;

@@ -68,7 +68,7 @@ const PlayModal = ({
 
   const fetchPlayers = async () => {
     const affiliatedPlayers = supabase
-      .from("player_view")
+      .from("user_view")
       .select()
       .match({
         team_id: user.currentAffiliation?.team.id,
@@ -76,7 +76,7 @@ const PlayModal = ({
         verified: true,
       });
     const allPlayers = supabase
-      .from("player_view")
+      .from("user_view")
       .select("*")
       .eq("role", "player");
     const { data } = video.private ? await affiliatedPlayers : await allPlayers;
