@@ -30,6 +30,8 @@ const TeamMentions = ({ mentions, setMentions, teams }: TeamVideosProps) => {
         <FormControl className="w-full text-start">
           <InputLabel>Team Mentions</InputLabel>
           <Select
+            id="team-mentions"
+            name="team-mentions"
             multiple
             value={mentions}
             onChange={handleChange}
@@ -41,7 +43,11 @@ const TeamMentions = ({ mentions, setMentions, teams }: TeamVideosProps) => {
               (team) =>
                 team.full_name && (
                   <MenuItem key={team.id} value={team.full_name}>
-                    <Checkbox checked={mentions.indexOf(team.full_name) > -1} />
+                    <Checkbox
+                      checked={mentions.indexOf(team.full_name) > -1}
+                      id="include-team"
+                      name="include-team"
+                    />
                     <ListItemText primary={team.full_name} />
                   </MenuItem>
                 ),

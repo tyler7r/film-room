@@ -135,6 +135,8 @@ const TransferOwnershipModal = ({
                 onChange={handleChange}
                 label="Change Team Owner"
                 required
+                name="change-owner"
+                id="change-owner"
               >
                 <MenuItem value="">None</MenuItem>
                 {users.map((user) => (

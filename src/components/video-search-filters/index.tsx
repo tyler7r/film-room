@@ -66,6 +66,7 @@ const VideoSearchFilters = ({
             label="Search by division..."
             name="division"
             autoWidth
+            id="division"
           >
             <MenuItem value="">All Divisions</MenuItem>
             {divisions.map((div) => (
@@ -83,6 +84,7 @@ const VideoSearchFilters = ({
             label="Search by year..."
             name="season"
             autoWidth
+            id="season"
           >
             <MenuItem value="">All Years</MenuItem>
             {recentYears.map((yr) => (
@@ -98,6 +100,7 @@ const VideoSearchFilters = ({
           Private videos only?
         </div>
         <Checkbox
+          id="private-only"
           checked={searchOptions.privateOnly}
           onChange={() => {
             setPage(1);
@@ -107,6 +110,7 @@ const VideoSearchFilters = ({
             });
           }}
           size="medium"
+          name="private-only"
         />
       </div>
     </div>

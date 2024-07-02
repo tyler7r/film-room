@@ -316,6 +316,8 @@ const PlayModal = ({
                   })
                 }
                 size="medium"
+                name="highlight-play"
+                id="highlight-play"
               />
             </div>
             {!video.private && user.currentAffiliation && (
@@ -351,6 +353,8 @@ const PlayModal = ({
                     })
                   }
                   size="medium"
+                  name="private-only"
+                  id="private-only"
                 />
               </div>
             )}

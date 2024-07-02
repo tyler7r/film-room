@@ -198,6 +198,8 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
                         });
                       }}
                       size="medium"
+                      name="private-tag"
+                      id="private-tag"
                     />
                   </div>
                 )}

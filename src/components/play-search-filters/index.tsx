@@ -96,6 +96,7 @@ const PlaySearchFilters = ({
             label="Search by author role..."
             name="role"
             autoWidth
+            id="author-role"
           >
             <MenuItem value="">All Notes</MenuItem>
             <MenuItem value={"coach"}>Coach Notes</MenuItem>
@@ -114,6 +115,8 @@ const PlaySearchFilters = ({
               });
             }}
             size="medium"
+            id="highlights-search"
+            name="highlights-search"
           />
           <Checkbox
             checked={searchOptions.private_only}
@@ -126,6 +129,8 @@ const PlaySearchFilters = ({
               });
             }}
             size="medium"
+            id="private-search"
+            name="private-search"
           />
         </div>
       </div>

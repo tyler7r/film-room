@@ -146,6 +146,8 @@ const TeamSelect = () => {
             value={team.id}
             onChange={(e) => handleChange(e, 1)}
             className="w-full text-start"
+            name="team-select"
+            id="team-select"
           >
             <MenuItem value={""}>None</MenuItem>
             {teams
@@ -163,6 +165,8 @@ const TeamSelect = () => {
                   checked={team.isCoach}
                   onChange={() => setTeam({ ...team, isCoach: !team.isCoach })}
                   size="medium"
+                  name="is-coach-1"
+                  id="is-coach-1"
                 />
               }
               labelPlacement="start"
@@ -180,6 +184,8 @@ const TeamSelect = () => {
               value={team2.id}
               onChange={(e) => handleChange(e, 2)}
               className="w-full text-start"
+              id="team-2-select"
+              name="team-2-select"
             >
               <MenuItem value={""}>None</MenuItem>
               {teams
@@ -199,6 +205,8 @@ const TeamSelect = () => {
                       setTeam2({ ...team2, isCoach: !team2.isCoach })
                     }
                     size="medium"
+                    id="is-coach-2"
+                    name="is-coach-2"
                   />
                 }
                 labelPlacement="start"
