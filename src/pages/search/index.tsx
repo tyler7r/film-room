@@ -73,6 +73,8 @@ const Search = () => {
     justify-center gap-2"
     >
       <TextField
+        name="search"
+        id="search"
         className="w-4/5"
         sx={{ marginBottom: "16px" }}
         label="Search"

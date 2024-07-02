@@ -21,6 +21,7 @@ const Mentions = ({ setMentions, players }: MentionsProps) => {
     players && (
       <div className="w-full">
         <Autocomplete
+          id="mentions"
           onChange={(event, newValue) => handleChange(event, newValue)}
           options={players}
           getOptionLabel={(option) => `${option.name}`}
@@ -31,6 +32,8 @@ const Mentions = ({ setMentions, players }: MentionsProps) => {
               {...params}
               label="Player Mentions"
               placeholder="Mentions..."
+              id="player-mentions"
+              name="player-mentions"
             />
           )}
           limitTags={3}
