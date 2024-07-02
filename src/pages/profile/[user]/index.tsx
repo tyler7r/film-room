@@ -6,6 +6,7 @@ import EmptyMessage from "~/components/empty-msg";
 import PageTitle from "~/components/page-title";
 import PlayPreview from "~/components/play_preview";
 import ProfileActionBar from "~/components/profile-action-bar";
+import CreatedFeed from "~/components/profile-feed/created";
 import TeamAffiliation from "~/components/team-affiliation";
 import Video from "~/components/video";
 import { useAffiliatedContext } from "~/contexts/affiliations";
@@ -353,14 +354,21 @@ const Profile = () => {
             setActionBarStatus={setActionBarStatus}
           />
         </div>
-        {actionBarStatus.createdPlays &&
-          (feed.plays ? (
-            feed.plays.map((play) => (
-              <PlayPreview key={play.play.id} preview={play} />
-            ))
-          ) : (
-            <EmptyMessage size="medium" message="user created plays" />
-          ))}
+        {actionBarStatus.createdPlays && (
+          // (feed.plays ? (
+          //   <div>
+          //     {feed.plays.map((play) => (
+          //       <PlayPreview key={play.play.id} preview={play} />
+          //     ))}
+          //   </div>
+          // ) : (
+          //   <EmptyMessage size="medium" message="user created plays" />
+          // ))
+          <CreatedFeed
+            profileId={options.profileId}
+            currentAffiliation={options.currentAffiliation}
+          />
+        )}
         {actionBarStatus.mentions &&
           (feed.mentions ? (
             feed.mentions.map((play) => (

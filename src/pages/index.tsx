@@ -126,9 +126,11 @@ const Home = () => {
         </div>
         <KeyboardDoubleArrowDownIcon fontSize="large" color="primary" />
       </div>
-      {plays?.map((play) => (
-        <PlayPreview preview={play} key={Math.random() * 10000000} />
-      ))}
+      <div className="grid grid-cols-1 gap-6">
+        {plays?.map((play) => (
+          <PlayPreview preview={play} key={Math.random() * 10000000} />
+        ))}
+      </div>
       {plays && playCount && (
         <Pagination
           showFirstButton
