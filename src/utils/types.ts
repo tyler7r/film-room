@@ -324,3 +324,26 @@ export type MentionType = {
   viewed: boolean;
   id: string;
 };
+
+export type LastWatchedType = {
+  last_watched: string | null;
+  last_watched_time: number | null;
+  videos: {
+    division: string;
+    exclusive_to: string | null;
+    id: string;
+    link: string;
+    private: boolean;
+    season: string;
+    title: string;
+    tournament: string | null;
+    uploaded_at: string;
+    week: string | null;
+  } | null;
+};
+
+export type StatsType = {
+  mentionCount: number;
+  playCount: number;
+  highlightCount: number;
+};

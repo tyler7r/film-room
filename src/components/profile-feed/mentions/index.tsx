@@ -12,7 +12,7 @@ export type FeedProps = {
   currentAffiliation: string | undefined;
 };
 
-const CreatedFeed = ({ profileId, currentAffiliation }: FeedProps) => {
+const MentionsFeed = ({ profileId, currentAffiliation }: FeedProps) => {
   const { isMobile } = useMobileContext();
   const itemsPerPage = isMobile ? 10 : 20;
 
@@ -23,13 +23,13 @@ const CreatedFeed = ({ profileId, currentAffiliation }: FeedProps) => {
 
   const topRef = useRef<HTMLDivElement | null>(null);
 
-  const fetchCreatedPlays = async () => {
+  const fetchMentionPlays = async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     if (profileId) {
       const plays = supabase
-        .from("play_preview")
+        .from("plays_via_user_mention")
         .select("*", { count: "exact" })
-        .eq("play->>author_id", profileId)
+        .eq("mention->>receiver_id", profileId)
         .range(from, to);
       if (currentAffiliation) {
         void plays.or(
@@ -56,12 +56,12 @@ const CreatedFeed = ({ profileId, currentAffiliation }: FeedProps) => {
   };
 
   useEffect(() => {
-    if (page === 1) void fetchCreatedPlays();
+    if (page === 1) void fetchMentionPlays();
     else setPage(1);
   }, [isMobile]);
 
   useEffect(() => {
-    void fetchCreatedPlays();
+    void fetchMentionPlays();
   }, [profileId, currentAffiliation, page]);
 
   return plays ? (
@@ -86,8 +86,8 @@ const CreatedFeed = ({ profileId, currentAffiliation }: FeedProps) => {
       )}
     </div>
   ) : (
-    <EmptyMessage size="medium" message="user created plays" />
+    <EmptyMessage size="medium" message="user mentions" />
   );
 };
 
-export default CreatedFeed;
+export default MentionsFeed;
