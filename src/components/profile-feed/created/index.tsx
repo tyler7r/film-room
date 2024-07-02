@@ -5,7 +5,7 @@ import PlayPreview from "~/components/play_preview";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { PlayPreviewType } from "~/utils/types";
+import type { PlayPreviewType } from "~/utils/types";
 
 export type FeedProps = {
   profileId: string | undefined;

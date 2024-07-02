@@ -2,7 +2,7 @@ import { Divider, colors } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { StatsType } from "~/utils/types";
+import type { StatsType } from "~/utils/types";
 
 type ProfileStatsProps = {
   profileId: string | undefined;
