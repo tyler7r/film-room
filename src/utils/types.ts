@@ -245,6 +245,7 @@ export type TeamActionBarType = {
   settings: boolean;
   announcement: boolean;
   requests: boolean;
+  transferOwner: boolean;
 };
 
 export type ProfileActionBarType = {

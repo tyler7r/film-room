@@ -25,6 +25,7 @@ const TeamHub = () => {
     settings: false,
     announcement: false,
     requests: false,
+    transferOwner: false,
   });
 
   const fetchUserRole = () => {
@@ -51,6 +52,23 @@ const TeamHub = () => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("team_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "teams" },
+        () => {
+          if (team) void fetchUserRole();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (team) {
       setLoading(false);
       void fetchUserRole();
@@ -60,7 +78,7 @@ const TeamHub = () => {
   useEffect(() => {
     setLoading(true);
     void fetchTeam();
-  }, [router.query.team]);
+  }, [router.query.team, role]);
 
   return loading ? (
     <Typography variant="h1" fontSize={72}>
