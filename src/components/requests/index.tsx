@@ -16,7 +16,7 @@ const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
 
   const fetchRequests = async () => {
     const { data, count } = await supabase
-      .from("player_view")
+      .from("user_view")
       .select("*", { count: "exact" })
       .match({ team_id: team.id, verified: false });
     if (data && data.length > 0) {

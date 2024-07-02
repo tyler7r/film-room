@@ -52,7 +52,7 @@ const Profile = () => {
   const fetchProfile = async (options?: FetchOptions) => {
     if (options?.profileId) {
       const { data } = await supabase
-        .from("player_view")
+        .from("user_view")
         .select("*, teams!affiliations_team_id_fkey(*)")
         .match({ profile_id: options.profileId, verified: true });
       if (data?.[0]) {

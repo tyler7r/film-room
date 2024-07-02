@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { TeamActionBarType, TeamType } from "~/utils/types";
 import AnnouncementModal from "../announcement-modal";
 import Requests from "../requests";
+import TransferOwnershipModal from "../transfer-ownership";
 
 type TeamActionBarProps = {
   role: string;
@@ -27,18 +28,28 @@ const TeamActionBar = ({
         settings: open,
         announcement: false,
         requests: false,
+        transferOwner: false,
       });
     } else if (modal === "announcement") {
       setActionBarStatus({
         settings: false,
         announcement: open,
         requests: false,
+        transferOwner: false,
+      });
+    } else if (modal === "requests") {
+      setActionBarStatus({
+        settings: false,
+        announcement: false,
+        requests: open,
+        transferOwner: false,
       });
     } else {
       setActionBarStatus({
         settings: false,
         announcement: false,
-        requests: open,
+        requests: false,
+        transferOwner: open,
       });
     }
   };
@@ -73,7 +84,14 @@ const TeamActionBar = ({
               )}
             </Button>
           </div>
-          <Button onClick={() => router.push(`/team-settings/${team.id}`)}>
+          <Button
+            onClick={() =>
+              handleModalToggle("transferOwner", !actionBarStatus.transferOwner)
+            }
+          >
+            Transfer Ownership
+          </Button>
+          <Button onClick={() => void router.push(`/team-settings/${team.id}`)}>
             Team Settings
           </Button>
         </div>
@@ -114,6 +132,11 @@ const TeamActionBar = ({
         team={team}
         isOpen={actionBarStatus.requests}
         setRequestCount={setRequestCount}
+      />
+      <TransferOwnershipModal
+        toggleOpen={handleModalToggle}
+        team={team}
+        isOpen={actionBarStatus.transferOwner}
       />
     </div>
   );

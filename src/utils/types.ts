@@ -22,7 +22,7 @@ export type Database = MergeDeep<
             viewed: boolean;
           };
         };
-        player_view: {
+        user_view: {
           Row: {
             email: string;
             id: string;
@@ -245,6 +245,7 @@ export type TeamActionBarType = {
   settings: boolean;
   announcement: boolean;
   requests: boolean;
+  transferOwner: boolean;
 };
 
 export type ProfileActionBarType = {

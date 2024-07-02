@@ -16,7 +16,7 @@ const Roster = ({ team, role }: RosterProps) => {
 
   const fetchRoster = async () => {
     const { data } = await supabase
-      .from("player_view")
+      .from("user_view")
       .select("*")
       .match({
         team_id: team.id,
