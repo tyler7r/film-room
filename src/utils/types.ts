@@ -144,7 +144,7 @@ export type VideoType = {
 
 export type PlayType = {
   id: string;
-  note: string;
+  note: string | null;
   author_id: string;
   highlight: boolean;
   exclusive_to: string | null;
@@ -163,7 +163,7 @@ export type IndexPlayType = {
   video_id: string | null;
   highlight: boolean;
   id: string;
-  note: string;
+  note: string | null;
   exclusive_to: string | null;
   private: boolean;
   author_name: string;
@@ -323,4 +323,27 @@ export type MentionType = {
   sender_name: string;
   viewed: boolean;
   id: string;
+};
+
+export type LastWatchedType = {
+  last_watched: string | null;
+  last_watched_time: number | null;
+  videos: {
+    division: string;
+    exclusive_to: string | null;
+    id: string;
+    link: string;
+    private: boolean;
+    season: string;
+    title: string;
+    tournament: string | null;
+    uploaded_at: string;
+    week: string | null;
+  } | null;
+};
+
+export type StatsType = {
+  mentionCount: number;
+  playCount: number;
+  highlightCount: number;
 };

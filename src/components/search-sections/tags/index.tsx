@@ -28,7 +28,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
       .from("plays_via_tag")
       .select("*", { count: "exact" })
       .ilike("tag->>title", topic ? `%${topic}%` : "%%")
-      .order("play->>created_at")
+      .order("play->>created_at", { ascending: false })
       .range(from, to);
     if (user.currentAffiliation?.team.id) {
       void plays.or(
@@ -39,7 +39,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
     }
     const { data, count } = await plays;
     const uniquePlays = [...new Map(data?.map((x) => [x.play.id, x])).values()];
-    setPlayTags(uniquePlays);
+    setPlayTags(uniquePlays.length > 0 ? uniquePlays : null);
     if (uniquePlays.length > 0) setPlayCount(uniquePlays.length);
     else setPlayCount(null);
     if (!count) setPlayCount(null);
@@ -61,7 +61,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
 
   return (
     <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
-      {!playTags && <EmptyMessage message="plays with that tag" />}
+      {!playTags && <EmptyMessage size="large" message="plays with that tag" />}
       {playTags?.map((play) => (
         <PlayPreview key={play.play.id} preview={play} />
       ))}

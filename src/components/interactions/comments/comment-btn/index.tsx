@@ -43,10 +43,10 @@ const CommentBtn = ({
 
   return (
     <div className="flex items-center">
-      <IconButton onClick={handleCommentClick}>
+      <IconButton size="small" onClick={handleCommentClick}>
         <ModeCommentIcon
           color="primary"
-          fontSize={isMobile ? "medium" : "large"}
+          fontSize={isMobile ? "small" : "large"}
         />
       </IconButton>
       <div className="text-lg font-bold md:text-2xl">{commentCount}</div>

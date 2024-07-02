@@ -1,12 +1,12 @@
-import { Button, Divider } from "@mui/material";
+import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
+import EmptyMessage from "~/components/empty-msg";
 import { supabase } from "~/utils/supabase";
 import Comment from "../comment";
 
 type CommentIndexProps = {
   playId: string;
   setCommentCount: (count: number) => void;
-  isActivePlay: boolean;
 };
 
 type CommentIndexType = {
@@ -19,11 +19,7 @@ type CommentIndexType = {
   team_id: string | null;
 }[];
 
-const CommentIndex = ({
-  playId,
-  setCommentCount,
-  isActivePlay,
-}: CommentIndexProps) => {
+const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
   const [index, setIndex] = useState<CommentIndexType | null>(null);
   const [page, setPage] = useState<number>(0);
   const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState<boolean>(false);
@@ -82,9 +78,8 @@ const CommentIndex = ({
   }, []);
 
   return (
-    <div className="flex w-full flex-col gap-2 px-6">
-      <div className="text-4xl font-bold tracking-tighter">Comments</div>
-      <div className="flex flex-col gap-2 px-2">
+    <div className="flex w-full flex-col gap-2">
+      <div className="flex flex-col gap-2 px-6">
         {index?.map((comment) => (
           <Comment key={comment.id} comment={comment} />
         ))}
@@ -97,16 +92,9 @@ const CommentIndex = ({
             Load More
           </Button>
         ) : (
-          <div className="text-xl font-bold tracking-tight">No comments!</div>
+          <EmptyMessage size="small" message="comments" />
         )}
       </div>
-      {!isActivePlay && (
-        <Divider
-          flexItem
-          sx={{ marginTop: "8px", marginBottom: "8px" }}
-          variant="middle"
-        />
-      )}
     </div>
   );
 };

@@ -7,6 +7,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider, IconButton, colors } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import EmptyMessage from "~/components/empty-msg";
 import TeamLogo from "~/components/team-logo";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
@@ -25,7 +26,8 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   const { affiliations } = useAffiliatedContext();
   const { setIsOpen, commentPage, setCommentPage, setCommentCount } =
     useInboxContext();
-  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
+  const { backgroundStyle, isDark, hoverBorder, hoverText } =
+    useIsDarkContext();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -156,27 +158,27 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   }, [isUnreadOnly]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <div
         ref={topRef}
-        className="flex items-center text-2xl font-bold lg:mb-2 lg:text-3xl"
+        className="flex items-center justify-between text-2xl font-bold lg:mb-2 lg:text-3xl"
       >
         <div>Recent Comments</div>
         {hide && (
-          <IconButton onClick={() => setHide(false)}>
+          <IconButton size="small" onClick={() => setHide(false)}>
             <KeyboardArrowRightIcon />
           </IconButton>
         )}
         {!hide && (
           <div className="flex gap-2">
-            <IconButton onClick={() => handleUnreadClick()}>
+            <IconButton size="small" onClick={() => handleUnreadClick()}>
               {isUnreadOnly ? (
                 <MailIcon color="primary" />
               ) : (
                 <MailOutlineIcon color="primary" />
               )}
             </IconButton>
-            <IconButton onClick={() => setHide(true)}>
+            <IconButton size="small" onClick={() => setHide(true)}>
               <ExpandMoreIcon />
             </IconButton>
           </div>
@@ -195,7 +197,17 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
                     <PublicIcon fontSize="small" />
                   )}
                   <div>
-                    <strong>{notification.comment.author_name}</strong>{" "}
+                    <strong
+                      className={hoverText}
+                      onClick={() => {
+                        setIsOpen(false);
+                        void router.push(
+                          `/profile/${notification.play.author_id}`,
+                        );
+                      }}
+                    >
+                      {notification.comment.author_name}
+                    </strong>{" "}
                     commented on:
                   </div>
                 </div>
@@ -251,7 +263,7 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
               </Button>
             </div>
           ) : (
-            <div className="-mt-4 pl-2 font-bold">No recent comments</div>
+            <EmptyMessage message="recent comments" size="small" />
           )}
         </>
       )}

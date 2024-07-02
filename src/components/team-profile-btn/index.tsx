@@ -26,8 +26,11 @@ const TeamPageButton = () => {
       <Button
         variant="text"
         onClick={handleClick}
-        endIcon={<ExpandMoreIcon />}
-        sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+        endIcon={<ExpandMoreIcon fontSize="large" />}
+        sx={{
+          fontSize: "18px",
+          fontWeight: "bold",
+        }}
       >
         Team Hub
       </Button>
@@ -43,7 +46,7 @@ const TeamPageButton = () => {
           className="flex items-center justify-center gap-2"
           onClick={() => {
             handleClose();
-            router.push(`/team-select`);
+            void router.push(`/team-select`);
           }}
         >
           <AddIcon />

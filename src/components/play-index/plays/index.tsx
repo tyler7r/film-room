@@ -1,13 +1,14 @@
 import type { YouTubePlayer } from "react-youtube";
-import type { PlayType } from "~/utils/types";
+import EmptyMessage from "~/components/empty-msg";
+import type { PlayPreviewType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
-import Play from "../play";
+import IndexPlay from "../index-play";
 
 type PlaysProps = {
-  plays: PlayType[] | null;
+  plays: PlayPreviewType[] | null;
   player: YouTubePlayer | null;
   scrollToPlayer: () => void;
-  setActivePlay: (play: PlayType) => void;
+  setActivePlay: (play: PlayPreviewType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
   setIsFiltersOpen: (isFiltersOpen: boolean) => void;
@@ -27,9 +28,9 @@ const Plays = ({
   return plays && plays.length > 0 ? (
     <div className="grid w-11/12 grid-cols-1 justify-center gap-4">
       {plays.map((play) => (
-        <Play
+        <IndexPlay
           setActivePlay={setActivePlay}
-          key={play.id}
+          key={play.play.id}
           scrollToPlayer={scrollToPlayer}
           play={play}
           player={player}
@@ -41,9 +42,7 @@ const Plays = ({
       ))}
     </div>
   ) : (
-    <div className="text-center text-2xl font-bold tracking-tight">
-      Play directory is empty!
-    </div>
+    <EmptyMessage message="plays" size="medium" />
   );
 };
 

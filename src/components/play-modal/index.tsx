@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Divider,
   IconButton,
   Modal,
   TextField,
@@ -16,6 +15,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType, VideoType } from "~/utils/types";
+import PageTitle from "../page-title";
 import Mentions from "../play-mentions";
 import PlayTags from "../play-tags";
 
@@ -184,7 +184,7 @@ const PlayModal = ({
         video_id: video.id,
         highlight: playDetails.highlight,
         title: playDetails.title,
-        note: playDetails.note,
+        note: playDetails.note === "" ? null : playDetails.note,
         start_time: playDetails.start!,
         end_time: playDetails.end!,
         author_role: user.currentAffiliation?.role ?? "guest",
@@ -209,7 +209,6 @@ const PlayModal = ({
     if (
       typeof playDetails.end !== "number" ||
       typeof playDetails.start !== "number" ||
-      playDetails.note === "" ||
       playDetails.title === ""
     ) {
       setIsValidPlay(false);
@@ -274,13 +273,7 @@ const PlayModal = ({
         >
           X
         </Button>
-        <Divider
-          flexItem
-          variant="middle"
-          sx={{ margin: "8px", marginLeft: "64px", marginRight: "64px" }}
-        >
-          <div className="text-3xl font-bold">CREATE NEW PLAY</div>
-        </Divider>
+        <PageTitle title="Create New Play" size="medium" />
         <form
           onSubmit={handleSubmit}
           className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
@@ -300,7 +293,6 @@ const PlayModal = ({
             className="w-full"
             name="note"
             autoComplete="note"
-            required
             id="note"
             label="Note"
             onChange={handleInput}
@@ -346,7 +338,7 @@ const PlayModal = ({
                     },
                   }}
                 >
-                  <IconButton>
+                  <IconButton size="small">
                     <InfoOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -408,7 +400,7 @@ const PlayModal = ({
           },
         }}
       >
-        <IconButton>
+        <IconButton size="small">
           <InfoOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>
@@ -433,7 +425,7 @@ const PlayModal = ({
           },
         }}
       >
-        <IconButton>
+        <IconButton size="small">
           <InfoOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>

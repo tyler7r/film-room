@@ -49,7 +49,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
 
   return (
     <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
-      {!users && <EmptyMessage message="users" />}
+      {!users && <EmptyMessage size="large" message="users" />}
       <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
         {users?.map((u) => <User user={u} key={u.id} />)}
       </div>

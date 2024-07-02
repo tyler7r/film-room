@@ -118,7 +118,7 @@ const FilmRoomHome = () => {
 
   return (
     <div className="mb-4 flex w-full flex-col items-center justify-center p-4">
-      <PageTitle title="The Film Room" />
+      <PageTitle title="The Film Room" size="x-large" />
       <AddVideo />
       <Divider
         flexItem

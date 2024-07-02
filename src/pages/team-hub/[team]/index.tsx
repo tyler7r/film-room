@@ -8,12 +8,15 @@ import TeamActionBar from "~/components/team-action-bar";
 import TeamLogo from "~/components/team-logo";
 import TeamVideos from "~/components/team-videos";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { TeamActionBarType, TeamType } from "~/utils/types";
 
 const TeamHub = () => {
   const router = useRouter();
   const { user } = useAuthContext();
+  const { isDark } = useIsDarkContext();
+
   const [team, setTeam] = useState<TeamType | null>(null);
 
   const [role, setRole] = useState<string | null>(null);
@@ -66,12 +69,16 @@ const TeamHub = () => {
   ) : (
     team && (
       <div className="flex w-full flex-col items-center justify-center gap-4 p-2">
-        <div className="m-2 flex items-center justify-center gap-5">
+        <div className="m-2 flex items-center justify-center gap-3">
           <TeamLogo size={150} tm={team} />
           <div className="flex flex-col items-center justify-center gap-2 text-center">
-            <PageTitle title={team.full_name} />
-            <div className="text-3xl font-bold tracking-tight text-purple-A400">
-              {team.division}
+            <PageTitle size="large" title={team.full_name} />
+            <div
+              className={`text-3xl font-bold ${
+                isDark ? "text-purple-400" : "text-purple-A400"
+              }`}
+            >
+              {team.division.toLocaleUpperCase()}
             </div>
           </div>
         </div>
@@ -84,9 +91,7 @@ const TeamHub = () => {
         {role !== "guest" && <Announcements teamId={team.id} />}
         <Roster team={team} role={role ? role : "guest"} />
         <div className="my-4 flex w-full flex-col items-center justify-center gap-4">
-          <div className="font-serif text-4xl font-bold italic tracking-tighter">
-            Team Film
-          </div>
+          <PageTitle size="medium" title="Team Film" />
           <TeamVideos teamId={team.id} />
         </div>
       </div>

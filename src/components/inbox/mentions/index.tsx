@@ -7,6 +7,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider, IconButton, colors } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import EmptyMessage from "~/components/empty-msg";
 import TeamLogo from "~/components/team-logo";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
@@ -24,7 +25,8 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   const { user, setUser } = useAuthContext();
   const { affiliations } = useAffiliatedContext();
   const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
-  const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
+  const { backgroundStyle, isDark, hoverBorder, hoverText } =
+    useIsDarkContext();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -154,27 +156,27 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   }, [isUnreadOnly]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <div
         ref={topRef}
         className="flex items-center justify-between text-2xl font-bold lg:mb-2 lg:text-3xl"
       >
         <div>Recent Mentions</div>
         {hide && (
-          <IconButton onClick={() => setHide(false)}>
+          <IconButton size="small" onClick={() => setHide(false)}>
             <KeyboardArrowRightIcon />
           </IconButton>
         )}
         {!hide && (
           <div className="flex gap-2">
-            <IconButton onClick={() => handleUnreadClick()}>
+            <IconButton size="small" onClick={() => handleUnreadClick()}>
               {isUnreadOnly ? (
                 <MailIcon color="primary" />
               ) : (
                 <MailOutlineIcon color="primary" />
               )}
             </IconButton>
-            <IconButton onClick={() => setHide(true)}>
+            <IconButton size="small" onClick={() => setHide(true)}>
               <ExpandMoreIcon />
             </IconButton>
           </div>
@@ -191,8 +193,18 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
                   )}
                   {!notification.team && <PublicIcon fontSize="small" />}
                   <div>
-                    <strong>{notification.play.author_name}</strong> mentioned
-                    you on:
+                    <strong
+                      className={hoverText}
+                      onClick={() => {
+                        setIsOpen(false);
+                        void router.push(
+                          `/profile/${notification.play.author_id}`,
+                        );
+                      }}
+                    >
+                      {notification.play.author_name}
+                    </strong>{" "}
+                    mentioned you on:
                   </div>
                 </div>
                 <div
@@ -252,7 +264,7 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
               </Button>
             </div>
           ) : (
-            <div className="-mt-4 pl-2 font-bold">No recent mentions</div>
+            <EmptyMessage message="recent mentions" size="small" />
           )}
         </>
       )}

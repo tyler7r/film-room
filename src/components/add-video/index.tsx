@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Divider,
   FormControl,
   InputLabel,
   MenuItem,
@@ -24,6 +23,7 @@ import type {
   VideoUploadType,
 } from "~/utils/types";
 import FormMessage from "../form-message";
+import PageTitle from "../page-title";
 import TeamMentions from "../team-mentions";
 
 const AddVideo = () => {
@@ -216,13 +216,7 @@ const AddVideo = () => {
         >
           X
         </Button>
-        <Divider
-          flexItem
-          variant="middle"
-          sx={{ margin: "8px", marginLeft: "64px", marginRight: "64px" }}
-        >
-          <div className="text-3xl font-bold">ADD A VIDEO</div>
-        </Divider>
+        <PageTitle title="Add a Video" size="medium" />
         <form
           onSubmit={handleSubmit}
           className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"

@@ -1,6 +1,7 @@
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { IconButton } from "@mui/material";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
@@ -25,6 +26,7 @@ const LikeBtn = ({
 }: LikeBtnProps) => {
   const { user } = useAuthContext();
   const { isMobile } = useMobileContext();
+  const router = useRouter();
 
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
@@ -66,6 +68,10 @@ const LikeBtn = ({
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!user.isLoggedIn) {
+      void router.push("/login");
+      return;
+    }
     const plays = supabase
       .from("play_likes")
       .insert({
@@ -143,6 +149,7 @@ const LikeBtn = ({
       <div className="flex items-center justify-center">
         {isLiked ? (
           <IconButton
+            size="small"
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
             onClick={(e) => void handleUnlike(e)}
@@ -154,6 +161,7 @@ const LikeBtn = ({
           </IconButton>
         ) : (
           <IconButton
+            size="small"
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
             onClick={(e) => void handleLike(e)}

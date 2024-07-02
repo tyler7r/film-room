@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useIsDarkContext } from "~/pages/_app";
 import type { PlayerType } from "~/utils/types";
 
@@ -6,13 +7,19 @@ type PlayerProps = {
 };
 
 const Player = ({ player }: PlayerProps) => {
-  const { backgroundStyle } = useIsDarkContext();
+  const { backgroundStyle, hoverText } = useIsDarkContext();
+  const router = useRouter();
   return (
     <div
       style={backgroundStyle}
-      className="flex items-center justify-around gap-2 rounded-lg p-2 font-bold"
+      className={`flex items-center justify-around gap-2 rounded-lg p-2 font-bold`}
     >
-      <div className="text-lg">{player.name}</div>
+      <div
+        onClick={() => void router.push(`/profile/${player.profile_id}`)}
+        className={`${hoverText} text-lg`}
+      >
+        {player.name}
+      </div>
       {player.number && <div>#{player.number}</div>}
     </div>
   );

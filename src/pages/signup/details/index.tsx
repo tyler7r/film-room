@@ -1,10 +1,11 @@
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { Button, IconButton, TextField, Typography } from "@mui/material";
+import { Button, IconButton, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
+import PageTitle from "~/components/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { validatePwdMatch } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
@@ -129,15 +130,13 @@ const SignupDetails = () => {
 
   return (
     <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
-      <Typography variant="h1" fontSize={54}>
-        Finish Account
-      </Typography>
+      <PageTitle title="Finish Account" size="x-large" />
       <form
         onSubmit={handleSubmit}
         className="flex w-4/5 max-w-screen-md flex-col items-center justify-center gap-6 text-center"
       >
         <TextField
-          className="w-full"
+          className="w-full md:w-4/5 lg:w-3/5"
           name="name"
           autoComplete="full-name"
           required
@@ -149,7 +148,7 @@ const SignupDetails = () => {
           value={data.name}
         />
         <TextField
-          className="w-full"
+          className="w-full md:w-4/5 lg:w-3/5"
           name="password"
           autoComplete="password"
           required
@@ -162,6 +161,7 @@ const SignupDetails = () => {
           InputProps={{
             endAdornment: (
               <IconButton
+                size="small"
                 aria-label="toggle password visibility"
                 onClick={() => setShowPwd(!showPwd)}
               >
@@ -171,7 +171,7 @@ const SignupDetails = () => {
           }}
         />
         <TextField
-          className="w-full"
+          className="w-full md:w-4/5 lg:w-3/5"
           name="confirmPwd"
           autoComplete="confirmPwd"
           required
@@ -184,6 +184,7 @@ const SignupDetails = () => {
           InputProps={{
             endAdornment: (
               <IconButton
+                size="small"
                 aria-label="toggle password visibility"
                 onClick={() => setShowConfirmPwd(!showConfirmPwd)}
               >

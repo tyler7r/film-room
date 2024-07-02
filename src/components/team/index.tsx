@@ -4,6 +4,7 @@ import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import type { TeamType } from "~/utils/types";
+import PageTitle from "../page-title";
 import TeamLogo from "../team-logo";
 
 type TeamProps = {
@@ -40,7 +41,7 @@ const Team = ({ team }: TeamProps) => {
       <TeamLogo tm={team} size={55} />
       <Divider variant="middle" orientation="vertical" flexItem />
       <div className="flex flex-col items-center justify-center">
-        <div className="text-center text-2xl font-bold">{team.full_name}</div>
+        <PageTitle title={team.full_name} size="small" />
         {team.id === user.currentAffiliation?.team.id && (
           <div className="text-sm">ACTIVE</div>
         )}

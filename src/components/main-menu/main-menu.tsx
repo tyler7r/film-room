@@ -1,5 +1,6 @@
 import { Badge, Button } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import TeamPageButton from "../team-profile-btn";
@@ -10,31 +11,45 @@ type MainMenuProps = {
 
 const MainMenu = ({ size }: MainMenuProps) => {
   const router = useRouter();
+  const { user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
   const { isOpen, setIsOpen, unreadCount } = useInboxContext();
+
+  const handleProfileClick = () => {
+    if (user.userId) {
+      void router.push(`/profile/${user.userId}`);
+    } else {
+      void router.push(`/login`);
+    }
+  };
 
   return (
     <div style={backgroundStyle} className="flex items-center justify-around">
       <Button
+        onClick={handleProfileClick}
         variant="text"
-        size={size}
-        onClick={() => router.push("/film-room")}
-        sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+        sx={{
+          fontSize: "18px",
+          fontWeight: "bold",
+        }}
       >
-        Film Room
+        Profile
       </Button>
       <Button
         variant="text"
-        size={size}
-        sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+        onClick={() => void router.push("/film-room")}
+        sx={{
+          fontSize: "18px",
+          fontWeight: "bold",
+        }}
       >
-        Highlight Factory
+        Film Room
       </Button>
       <TeamPageButton />
       <Button
         sx={{
-          fontSize: { lg: "20px" },
-          lineHeight: { lg: "28px" },
+          fontWeight: "bold",
+          fontSize: "18px",
           display: "flex",
           gap: 1,
         }}

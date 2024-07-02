@@ -50,24 +50,34 @@ const AddComment = ({ playId }: CommentProps) => {
 
   return (
     <form
-      className="flex w-full items-center justify-center gap-2 px-6"
+      className="flex w-full items-center justify-center gap-2"
       onSubmit={handleSubmit}
     >
       <TextField
         className="w-full"
         multiline
+        size="small"
         maxRows={4}
-        variant="filled"
-        label="New Comment"
+        variant="standard"
+        label="Add a comment..."
         name="comment"
         autoComplete="comment"
         id="comment"
         onChange={changeHandler}
         value={comment}
+        InputProps={{
+          endAdornment: (
+            <IconButton
+              size="small"
+              color="primary"
+              type="submit"
+              disabled={!isValid}
+            >
+              <SendIcon />
+            </IconButton>
+          ),
+        }}
       />
-      <IconButton color="primary" type="submit" disabled={!isValid}>
-        <SendIcon fontSize="large" />
-      </IconButton>
     </form>
   );
 };

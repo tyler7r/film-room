@@ -49,7 +49,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
 
   return (
     <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
-      {!teams && <EmptyMessage message="teams" />}
+      {!teams && <EmptyMessage size="large" message="teams" />}
       <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
         {teams?.map((team) => <Team team={team} key={team.id} />)}
       </div>

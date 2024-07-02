@@ -1,9 +1,10 @@
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { Button, IconButton, TextField, Typography } from "@mui/material";
+import { Button, IconButton, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
+import PageTitle from "~/components/page-title";
 import { validateEmail } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";
@@ -66,15 +67,13 @@ const Login = () => {
 
   return (
     <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
-      <Typography variant="h1" fontSize={72}>
-        Log In
-      </Typography>
+      <PageTitle size="x-large" title="Login" />
       <form
         onSubmit={handleSubmit}
         className="flex w-4/5 flex-col items-center justify-center gap-4 text-center"
       >
         <TextField
-          className="w-full"
+          className="w-full md:w-4/5 lg:w-3/5"
           name="email"
           autoComplete="email"
           required
@@ -86,7 +85,7 @@ const Login = () => {
           value={formData.email}
         />
         <TextField
-          className="w-full"
+          className="w-full md:w-4/5 lg:w-3/5"
           name="password"
           autoComplete="email"
           required
@@ -98,6 +97,7 @@ const Login = () => {
           InputProps={{
             endAdornment: (
               <IconButton
+                size="small"
                 aria-label="toggle password visibility"
                 onClick={() => setShowPwd(!showPwd)}
               >

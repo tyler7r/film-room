@@ -1,11 +1,12 @@
 import CheckIcon from "@mui/icons-material/Check";
-import DeleteIcon from "@mui/icons-material/Delete";
+import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import { Button, IconButton, TextField } from "@mui/material";
+import { IconButton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType } from "~/utils/types";
+import DeleteMenu from "../delete-menu";
 import Player from "../player";
 
 type PlayerEditProps = {
@@ -49,6 +50,7 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
 
   const handleDelete = async () => {
     setIsOpen(false);
+    setIsDeleteMenuOpen(false);
     await supabase.from("affiliations").delete().eq("id", player.id);
   };
 
@@ -63,46 +65,28 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
   return !isOpen ? (
     <div
       style={backgroundStyle}
-      className="flex items-center justify-center gap-2 rounded-lg px-2"
+      className="flex items-center justify-center gap-1 rounded-lg px-2"
     >
       <Player player={player} />
-      <div className="flex">
-        {isDeleteMenuOpen ? (
-          <div className="ml-4 flex gap-1">
-            <Button
-              size="small"
-              variant="contained"
-              onClick={() => void handleDelete()}
-            >
-              Remove
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setIsDeleteMenuOpen(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        ) : (
-          <div className="flex">
-            <IconButton size="small" onClick={() => setIsOpen(true)}>
-              <EditIcon color="primary" />
-            </IconButton>
-            <IconButton onClick={() => setIsDeleteMenuOpen(true)}>
-              <DeleteIcon color="action" />
-            </IconButton>
-          </div>
-        )}
-      </div>
+      <IconButton size="small" onClick={() => setIsOpen(true)}>
+        <EditIcon color="primary" />
+      </IconButton>
+      <DeleteMenu
+        isOpen={isDeleteMenuOpen}
+        setIsOpen={setIsDeleteMenuOpen}
+        handleDelete={handleDelete}
+      />
     </div>
   ) : (
     <div
       className="flex items-center justify-center gap-4 rounded-lg p-2"
       style={backgroundStyle}
     >
-      <div>{player.name}</div>
-      <form onSubmit={handleSubmit}>
+      <div className={`font-bold`}>{player.name}</div>
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center justify-center gap-1"
+      >
         <TextField
           size="small"
           name="num"
@@ -115,12 +99,12 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
           onChange={handleInput}
           value={edit ?? ""}
         />
-        <Button type="submit" disabled={!isValidNumber}>
-          <CheckIcon />
-        </Button>
-        <Button type="button" onClick={() => closeEdit()}>
-          Cancel
-        </Button>
+        <IconButton size="small" type="submit" disabled={!isValidNumber}>
+          <CheckIcon color="primary" />
+        </IconButton>
+        <IconButton size="small" type="button" onClick={() => closeEdit()}>
+          <CloseIcon />
+        </IconButton>
       </form>
     </div>
   );

@@ -4,6 +4,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
+import EmptyMessage from "../empty-msg";
 import Video from "../video";
 
 export type TeamVideoType = {
@@ -110,7 +111,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
         />
       )}
       {!videos && (
-        <div className="text-xl font-bold">No videos in the database!</div>
+        <EmptyMessage message="team videos in the database" size="small" />
       )}
     </div>
   );

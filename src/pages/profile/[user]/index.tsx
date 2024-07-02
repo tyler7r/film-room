@@ -1,18 +1,19 @@
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { Divider, colors } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import EmptyMessage from "~/components/empty-msg";
-import PlayPreview from "~/components/play_preview";
+import PageTitle from "~/components/page-title";
 import ProfileActionBar from "~/components/profile-action-bar";
+import CreatedFeed from "~/components/profile-feed/created";
+import HighlightsFeed from "~/components/profile-feed/highlights";
+import MentionsFeed from "~/components/profile-feed/mentions";
+import ProfileStats from "~/components/profile-stats";
 import TeamAffiliation from "~/components/team-affiliation";
 import Video from "~/components/video";
 import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type {
-  PlayPreviewType,
+  LastWatchedType,
   ProfileActionBarType,
   TeamAffiliationType,
 } from "~/utils/types";
@@ -22,65 +23,26 @@ type FetchOptions = {
   currentAffiliation: string | undefined;
 };
 
-type LastWatchedType = {
-  last_watched: string | null;
-  last_watched_time: number | null;
-  videos: {
-    division: string;
-    exclusive_to: string | null;
-    id: string;
-    link: string;
-    private: boolean;
-    season: string;
-    title: string;
-    tournament: string | null;
-    uploaded_at: string;
-    week: string | null;
-  } | null;
-};
-
 type ProfileType = {
   name: string;
   join_date: string;
 };
 
-type StatsType = {
-  mentionCount: number;
-  playCount: number;
-  highlightCount: number;
-};
-
-type FeedType = {
-  mentions: PlayPreviewType[] | null;
-  plays: PlayPreviewType[] | null;
-  highlights: PlayPreviewType[] | null;
-};
-
 const Profile = () => {
   const router = useRouter();
-  const { isDark } = useIsDarkContext();
   const { affiliations } = useAffiliatedContext();
   const { user, setUser } = useAuthContext();
 
   const [options, setOptions] = useState<FetchOptions>({
-    profileId: (router.query.user as string) || user.userId,
+    profileId: router.query.user as string,
     currentAffiliation: user.currentAffiliation?.team.id,
   });
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [profileAffiliations, setProfileAffiliations] = useState<
     TeamAffiliationType[] | null
   >(null);
-  const [stats, setStats] = useState<StatsType>({
-    mentionCount: 0,
-    playCount: 0,
-    highlightCount: 0,
-  });
+
   const [lastWatched, setLastWatched] = useState<LastWatchedType | null>(null);
-  const [feed, setFeed] = useState<FeedType>({
-    mentions: null,
-    plays: null,
-    highlights: null,
-  });
   const [actionBarStatus, setActionBarStatus] = useState<ProfileActionBarType>({
     createdPlays: true,
     mentions: false,
@@ -103,86 +65,6 @@ const Profile = () => {
         }));
         setProfileAffiliations(typedAffiliations);
       }
-    }
-  };
-
-  const fetchStats = async (options?: FetchOptions) => {
-    if (options?.profileId) {
-      const getMentions = await supabase
-        .from("plays_via_user_mention")
-        .select("*", {
-          count: "exact",
-        })
-        .eq("mention->>receiver_id", options.profileId);
-      const getHighlights = await supabase
-        .from("plays_via_user_mention")
-        .select("*", {
-          count: "exact",
-        })
-        .match({
-          "play->>highlight": true,
-          "mention->>receiver_id": options.profileId,
-        });
-      const getPlays = await supabase
-        .from("play_preview")
-        .select("*", {
-          count: "exact",
-        })
-        .eq("play->>author_id", options.profileId);
-      setStats({
-        mentionCount: getMentions.count ? getMentions.count : 0,
-        highlightCount: getHighlights.count ? getHighlights.count : 0,
-        playCount: getPlays.count ? getPlays.count : 0,
-      });
-    }
-  };
-
-  const fetchFeed = async (options?: FetchOptions) => {
-    if (options?.profileId) {
-      const mentions = supabase
-        .from("plays_via_user_mention")
-        .select("*")
-        .eq("mention->>receiver_id", options.profileId);
-      const highlights = supabase
-        .from("plays_via_user_mention")
-        .select("*")
-        .match({
-          "play->>highlight": true,
-          "mention->>receiver_id": options.profileId,
-        });
-      const plays = supabase
-        .from("play_preview")
-        .select("*")
-        .eq("play->>author_id", options.profileId);
-      if (options.currentAffiliation) {
-        void mentions.or(
-          `play->>private.eq.false, play->>exclusive_to.eq.${options.currentAffiliation}`,
-        );
-        void highlights.or(
-          `play->>private.eq.false, play->>exclusive_to.eq.${options.currentAffiliation}`,
-        );
-        void plays.or(
-          `play->>private.eq.false, play->>exclusive_to.eq.${options.currentAffiliation}`,
-        );
-      } else {
-        void mentions.eq("play->>private", false);
-        void highlights.eq("play->>private", false);
-        void plays.eq("play->>private", false);
-      }
-      const getMentions = await mentions;
-      const getHighlights = await highlights;
-      const getPlays = await plays;
-      setFeed({
-        mentions:
-          getMentions.data && getMentions.data.length > 0
-            ? getMentions.data
-            : null,
-        highlights:
-          getHighlights.data && getHighlights.data.length > 0
-            ? getHighlights.data
-            : null,
-        plays: getPlays.data && getPlays.data.length > 0 ? getPlays.data : null,
-      });
     }
   };
 
@@ -245,73 +127,35 @@ const Profile = () => {
 
   useEffect(() => {
     void fetchProfile(options);
-    void fetchStats(options);
-    void fetchFeed(options);
   }, [options]);
 
   return (
     profile && (
       <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
-        <div className="flex flex-col justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
-            <div className="text-center text-6xl font-bold">{profile.name}</div>
+            <PageTitle size="x-large" title={profile.name} />
             <div className="text-lg font-light leading-5 tracking-tight">
               Member since {profile.join_date.substring(0, 4)}
             </div>
           </div>
-          {stats && (
-            <div
-              className="flex cursor-default items-center justify-around rounded-md p-2"
-              style={
-                isDark
-                  ? { backgroundColor: `${colors.purple[200]}` }
-                  : { backgroundColor: `${colors.purple[50]}` }
-              }
-            >
-              <div
-                className="flex cursor-pointer flex-col items-center justify-center"
-                onClick={() => changeActionBar("createdPlays")}
-              >
-                <div className="text-3xl font-bold">{stats.playCount}</div>
-                <div className="font-light leading-4 tracking-tight">
-                  created
-                </div>
-              </div>
-              <Divider flexItem orientation="vertical" />
-              <div
-                className="flex cursor-pointer flex-col items-center justify-center"
-                onClick={() => changeActionBar("mentions")}
-              >
-                <div className="text-3xl font-bold">{stats.mentionCount}</div>
-                <div className="font-light leading-4 tracking-tight">
-                  mentions
-                </div>
-              </div>
-              <Divider flexItem orientation="vertical" />
-              <div
-                className="flex cursor-pointer flex-col items-center justify-center"
-                onClick={() => changeActionBar("highlights")}
-              >
-                <div className="text-3xl font-bold">{stats.highlightCount}</div>
-                <div className="font-light leading-4 tracking-tight">
-                  highlights
-                </div>
-              </div>
-            </div>
-          )}
+          <ProfileStats
+            profileId={options.profileId}
+            changeActionBar={changeActionBar}
+          />
         </div>
-        <div className="align-center flex flex-wrap justify-center gap-1">
+        <div className="my-4 flex flex-wrap items-center justify-center gap-1">
           {profileAffiliations?.map((aff) => (
             <TeamAffiliation key={aff.affId} aff={aff} />
           ))}
         </div>
-        {!router.query.user && (
+        {router.query.user === user.userId && (
           <div className="flex w-full items-center justify-center">
             {lastWatched && (
               <div className="flex w-11/12 flex-col items-center justify-center gap-3">
                 <div className="flex items-center gap-2 text-2xl font-bold">
-                  <PlayArrowIcon />
-                  <div>Continue Watching</div>
+                  <PlayArrowIcon fontSize="large" />
+                  <PageTitle size="small" title="Continue Watching" />
                 </div>
                 <div
                   className="w-full"
@@ -328,42 +172,30 @@ const Profile = () => {
             )}
           </div>
         )}
-        <div className="w-full">
+        <div className="flex w-full items-center justify-center">
           <ProfileActionBar
             actionBarStatus={actionBarStatus}
             setActionBarStatus={setActionBarStatus}
           />
         </div>
-        {actionBarStatus.createdPlays &&
-          (feed.plays ? (
-            feed.plays.map((play) => (
-              <PlayPreview key={play.play.id} preview={play} />
-            ))
-          ) : (
-            <EmptyMessage message="user created plays" />
-          ))}
-        {actionBarStatus.mentions &&
-          (feed.mentions ? (
-            feed.mentions.map((play) => (
-              <PlayPreview
-                key={`${play.play.id + play.play.title}`}
-                preview={play}
-              />
-            ))
-          ) : (
-            <EmptyMessage message="user mentions" />
-          ))}
-        {actionBarStatus.highlights &&
-          (feed.highlights ? (
-            feed.highlights?.map((play) => (
-              <PlayPreview
-                key={`${play.play.id + play.video.id}`}
-                preview={play}
-              />
-            ))
-          ) : (
-            <EmptyMessage message="user highlights" />
-          ))}
+        {actionBarStatus.createdPlays && (
+          <CreatedFeed
+            profileId={options.profileId}
+            currentAffiliation={options.currentAffiliation}
+          />
+        )}
+        {actionBarStatus.mentions && (
+          <MentionsFeed
+            profileId={options.profileId}
+            currentAffiliation={options.currentAffiliation}
+          />
+        )}
+        {actionBarStatus.highlights && (
+          <HighlightsFeed
+            profileId={options.profileId}
+            currentAffiliation={options.currentAffiliation}
+          />
+        )}
       </div>
     )
   );

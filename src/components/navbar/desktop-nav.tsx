@@ -33,7 +33,10 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                 <NavbarSearch />
               ) : (
                 <div className="flex items-center justify-between gap-2">
-                  <IconButton onClick={() => setIsSearchOpen(true)}>
+                  <IconButton
+                    size="small"
+                    onClick={() => setIsSearchOpen(true)}
+                  >
                     <SearchIcon fontSize="large" />
                   </IconButton>
                   {user.currentAffiliation && (
@@ -59,7 +62,10 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                 <NavbarSearch />
               ) : (
                 <div className="flex items-center justify-between gap-2">
-                  <IconButton onClick={() => setIsSearchOpen(true)}>
+                  <IconButton
+                    size="small"
+                    onClick={() => setIsSearchOpen(true)}
+                  >
                     <SearchIcon fontSize="large" />
                   </IconButton>
                   <Button

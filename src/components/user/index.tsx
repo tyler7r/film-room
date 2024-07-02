@@ -39,7 +39,7 @@ const User = ({ user }: UserProps) => {
       className={`${hoverBorder} flex w-full items-center gap-4 `}
       onClick={() => handleClick(user.id)}
     >
-      <div className="w-full grow text-center text-2xl font-bold">
+      <div className="w-full grow text-center font-serif text-2xl font-bold italic">
         {user.name}
       </div>
       <Divider orientation="vertical" flexItem variant="middle" />
