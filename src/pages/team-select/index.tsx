@@ -138,7 +138,7 @@ const TeamSelect = () => {
         className="flex w-4/5 max-w-screen-md flex-col items-center justify-center gap-6 text-center"
       >
         <FormControl className="g-4 flex w-full flex-col">
-          <InputLabel>Team Select</InputLabel>
+          <InputLabel htmlFor="team-select">Team Select</InputLabel>
           <Select
             native={false}
             label="team-select"
@@ -176,7 +176,7 @@ const TeamSelect = () => {
         </FormControl>
         {isMultipleTeams && team && (
           <FormControl className="g-4 flex w-full flex-col">
-            <InputLabel>Team 2 Select</InputLabel>
+            <InputLabel htmlFor="team-2-select">Team 2 Select</InputLabel>
             <Select
               native={false}
               label="team-2-select"

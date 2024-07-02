@@ -243,7 +243,7 @@ const AddVideo = () => {
           />
           <div className="flex w-full gap-4 text-start">
             <FormControl className="w-full" required>
-              <InputLabel>Division</InputLabel>
+              <InputLabel htmlFor="divisions">Division</InputLabel>
               <Select
                 value={videoData.division}
                 onChange={handleDivision}

@@ -89,7 +89,7 @@ const PlaySearchFilters = ({
       </div>
       <div className="flex w-full gap-2">
         <FormControl className="w-full">
-          <InputLabel>Search by author role...</InputLabel>
+          <InputLabel htmlFor="role">Search by author role...</InputLabel>
           <Select
             value={searchOptions.role}
             onChange={handleChange}

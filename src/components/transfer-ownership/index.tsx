@@ -129,7 +129,7 @@ const TransferOwnershipModal = ({
             onSubmit={handleSubmit}
           >
             <FormControl className="w-full">
-              <InputLabel>Change Team Owner</InputLabel>
+              <InputLabel htmlFor="change-owner">Change Team Owner</InputLabel>
               <Select
                 value={newOwner}
                 onChange={handleChange}

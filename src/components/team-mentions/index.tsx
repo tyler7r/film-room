@@ -28,7 +28,7 @@ const TeamMentions = ({ mentions, setMentions, teams }: TeamVideosProps) => {
     mentions && (
       <div className="w-full">
         <FormControl className="w-full text-start">
-          <InputLabel>Team Mentions</InputLabel>
+          <InputLabel htmlFor="team-mentions">Team Mentions</InputLabel>
           <Select
             id="team-mentions"
             name="team-mentions"

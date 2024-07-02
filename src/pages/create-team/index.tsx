@@ -197,7 +197,7 @@ const CreateTeam = () => {
           value={details.name}
         />
         <FormControl className="g-4 flex w-full flex-col">
-          <InputLabel>Team Division</InputLabel>
+          <InputLabel htmlFor="team-division">Team Division</InputLabel>
           <Select
             native={false}
             label="team-division"
