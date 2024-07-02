@@ -86,7 +86,9 @@ const MentionsFeed = ({ profileId, currentAffiliation }: FeedProps) => {
       )}
     </div>
   ) : (
-    <EmptyMessage size="medium" message="user mentions" />
+    <div className="mt-4">
+      <EmptyMessage size="medium" message="user mentions" />
+    </div>
   );
 };
 

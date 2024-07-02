@@ -67,7 +67,7 @@ const VideoSearchFilters = ({
             name="division"
             autoWidth
           >
-            <MenuItem value="">No Filter</MenuItem>
+            <MenuItem value="">All Divisions</MenuItem>
             {divisions.map((div) => (
               <MenuItem key={div} value={div}>
                 {div}
@@ -84,7 +84,7 @@ const VideoSearchFilters = ({
             name="season"
             autoWidth
           >
-            <MenuItem value="">No Filter</MenuItem>
+            <MenuItem value="">All Years</MenuItem>
             {recentYears.map((yr) => (
               <MenuItem key={yr} value={yr}>
                 {yr}

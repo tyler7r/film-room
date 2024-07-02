@@ -1,4 +1,6 @@
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
+import PersonIcon from "@mui/icons-material/Person";
+import SearchIcon from "@mui/icons-material/Search";
 import { Button, Divider, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -24,8 +26,6 @@ const Home = () => {
   const [playCount, setPlayCount] = useState<number | null>(null);
 
   const topRef = useRef<HTMLDivElement | null>(null);
-
-  // const [isBtnDisabled, setIsBtnDisabled] = useState<boolean>(false);
 
   const fetchPlays = async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
@@ -70,7 +70,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4">
-      <Divider flexItem>
+      <Divider flexItem variant="middle">
         <PageTitle size="x-large" title="Inside Break" />
       </Divider>
       {user.userId ? (
@@ -79,6 +79,7 @@ const Home = () => {
             variant="outlined"
             size="large"
             onClick={() => void router.push(`/profile/${user.userId}`)}
+            startIcon={<PersonIcon />}
           >
             Profile
           </Button>
@@ -86,6 +87,7 @@ const Home = () => {
             variant="outlined"
             size="large"
             onClick={() => void router.push("/search")}
+            startIcon={<SearchIcon />}
           >
             Search
           </Button>

@@ -73,7 +73,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
   return (
     stats && (
       <div
-        className="flex cursor-default items-center justify-around rounded-md p-2"
+        className="flex w-full cursor-default items-center justify-around gap-2 rounded-md p-2 md:w-4/5"
         style={
           isDark
             ? { backgroundColor: `${colors.purple[200]}` }
@@ -85,7 +85,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           onClick={() => changeActionBar("createdPlays")}
         >
           <div className="text-3xl font-bold">{stats.playCount}</div>
-          <div className="font-serif font-light italic leading-4 tracking-tight">
+          <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
             created
           </div>
         </div>
@@ -95,7 +95,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           onClick={() => changeActionBar("mentions")}
         >
           <div className="text-3xl font-bold">{stats.mentionCount}</div>
-          <div className="font-serif font-light italic leading-4 tracking-tight">
+          <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
             mentions
           </div>
         </div>
@@ -105,7 +105,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           onClick={() => changeActionBar("highlights")}
         >
           <div className="text-3xl font-bold">{stats.highlightCount}</div>
-          <div className="font-serif font-light italic leading-4 tracking-tight">
+          <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
             highlights
           </div>
         </div>

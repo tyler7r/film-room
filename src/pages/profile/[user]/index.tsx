@@ -132,7 +132,7 @@ const Profile = () => {
   return (
     profile && (
       <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
-        <div className="flex flex-col justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
             <PageTitle size="x-large" title={profile.name} />
             <div className="text-lg font-light leading-5 tracking-tight">

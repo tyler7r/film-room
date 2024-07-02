@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Divider,
   IconButton,
   Modal,
   TextField,
@@ -274,9 +273,7 @@ const PlayModal = ({
         >
           X
         </Button>
-        <Divider flexItem variant="middle" sx={{ margin: "8px" }}>
-          <PageTitle title="Create New Play" size="medium" />
-        </Divider>
+        <PageTitle title="Create New Play" size="medium" />
         <form
           onSubmit={handleSubmit}
           className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
