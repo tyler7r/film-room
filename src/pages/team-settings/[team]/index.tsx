@@ -184,7 +184,7 @@ const TeamSettings = ({
           value={details?.name}
         />
         <FormControl className="g-4 flex w-full flex-col">
-          <InputLabel>Team Division</InputLabel>
+          <InputLabel htmlFor="team-division">Team Division</InputLabel>
           <Select
             native={false}
             label="team-division"
@@ -192,6 +192,8 @@ const TeamSettings = ({
             value={details?.division}
             onChange={handleChange}
             className="w-full text-start"
+            id="team-division"
+            name="team-division"
           >
             <MenuItem value={""}>None</MenuItem>
             {divisions.map((div) => (
@@ -209,6 +211,7 @@ const TeamSettings = ({
         >
           {imagePreview === "" ? "Upload Logo" : "Change Logo"}
           <input
+            name="file-upload"
             id="file_upload"
             type="file"
             onChange={(e) => {

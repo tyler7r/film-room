@@ -152,7 +152,12 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
             )}
             freeSolo
             renderInput={(params) => (
-              <TextField {...params} label="Play Tags" />
+              <TextField
+                {...params}
+                label="Play Tags"
+                id="play-tags"
+                name="play-tags"
+              />
             )}
           />
           <Dialog open={open} onClose={handleClose}>
@@ -163,6 +168,7 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
                   Please add the tag that we're missing!
                 </DialogContentText>
                 <TextField
+                  name="tag-title"
                   autoFocus
                   margin="dense"
                   id="title"
@@ -192,6 +198,8 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
                         });
                       }}
                       size="medium"
+                      name="private-tag"
+                      id="private-tag"
                     />
                   </div>
                 )}

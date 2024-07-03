@@ -59,13 +59,14 @@ const VideoSearchFilters = ({
       </div>
       <div className="flex w-full gap-2">
         <FormControl className="w-full">
-          <InputLabel>Search by division...</InputLabel>
+          <InputLabel htmlFor="division">Search by division...</InputLabel>
           <Select
             value={searchOptions.division}
             onChange={handleChange}
             label="Search by division..."
             name="division"
             autoWidth
+            id="division"
           >
             <MenuItem value="">All Divisions</MenuItem>
             {divisions.map((div) => (
@@ -76,13 +77,14 @@ const VideoSearchFilters = ({
           </Select>
         </FormControl>
         <FormControl className="w-full">
-          <InputLabel>Search by year...</InputLabel>
+          <InputLabel htmlFor="season">Search by year...</InputLabel>
           <Select
             value={searchOptions.season}
             onChange={handleChange}
             label="Search by year..."
             name="season"
             autoWidth
+            id="season"
           >
             <MenuItem value="">All Years</MenuItem>
             {recentYears.map((yr) => (
@@ -98,6 +100,7 @@ const VideoSearchFilters = ({
           Private videos only?
         </div>
         <Checkbox
+          id="private-only"
           checked={searchOptions.privateOnly}
           onChange={() => {
             setPage(1);
@@ -107,6 +110,7 @@ const VideoSearchFilters = ({
             });
           }}
           size="medium"
+          name="private-only"
         />
       </div>
     </div>

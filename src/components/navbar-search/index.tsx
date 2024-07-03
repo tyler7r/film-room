@@ -55,7 +55,6 @@ const NavbarSearch = () => {
           name="topic"
           autoComplete="search"
           id="search"
-          // label="Search"
           onChange={changeHandler}
           value={topic}
         />

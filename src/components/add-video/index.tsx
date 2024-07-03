@@ -243,12 +243,14 @@ const AddVideo = () => {
           />
           <div className="flex w-full gap-4 text-start">
             <FormControl className="w-full" required>
-              <InputLabel>Division</InputLabel>
+              <InputLabel htmlFor="divisions">Division</InputLabel>
               <Select
                 value={videoData.division}
                 onChange={handleDivision}
                 label="Division"
                 required
+                name="divisions"
+                id="divisions"
               >
                 <MenuItem value="">No Division</MenuItem>
                 {divisions.map((div) => (
@@ -307,6 +309,8 @@ const AddVideo = () => {
                   setVideoData({ ...videoData, private: !videoData.private });
                 }}
                 size="medium"
+                name="private-only"
+                id="private-only"
               />
             </div>
           )}
