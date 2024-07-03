@@ -54,16 +54,20 @@ const Profile = () => {
       const { data } = await supabase
         .from("user_view")
         .select("*, teams!affiliations_team_id_fkey(*)")
-        .match({ profile_id: options.profileId, verified: true });
+        .eq("profile_id", options.profileId);
       if (data?.[0]) {
         setProfile({ name: data[0].name, join_date: data[0].join_date });
-        const typedAffiliations: TeamAffiliationType[] = data.map((aff) => ({
-          team: aff.teams!,
-          role: aff.role,
-          affId: aff.id,
-          number: aff.number,
-        }));
-        setProfileAffiliations(typedAffiliations);
+        const typedAffiliations: TeamAffiliationType[] = data
+          .filter((aff) => aff.verified)
+          .map((aff) => ({
+            team: aff.teams!,
+            role: aff.role,
+            affId: aff.id,
+            number: aff.number,
+          }));
+        if (typedAffiliations && typedAffiliations.length > 0)
+          setProfileAffiliations(typedAffiliations);
+        else setProfileAffiliations(null);
       }
     }
   };
@@ -144,11 +148,13 @@ const Profile = () => {
             changeActionBar={changeActionBar}
           />
         </div>
-        <div className="my-4 flex flex-wrap items-center justify-center gap-1">
-          {profileAffiliations?.map((aff) => (
-            <TeamAffiliation key={aff.affId} aff={aff} />
-          ))}
-        </div>
+        {profileAffiliations && (
+          <div className="my-4 flex flex-wrap items-center justify-center gap-1">
+            {profileAffiliations.map((aff) => (
+              <TeamAffiliation key={aff.affId} aff={aff} />
+            ))}
+          </div>
+        )}
         {router.query.user === user.userId && (
           <div className="flex w-full items-center justify-center">
             {lastWatched && (

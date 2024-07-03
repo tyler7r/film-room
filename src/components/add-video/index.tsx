@@ -164,30 +164,33 @@ const AddVideo = () => {
       setIsValidForm(false);
       return;
     }
-    const { data } = await supabase
-      .from("videos")
-      .insert({
-        title,
-        link,
-        season,
-        division,
-        week: week === "" ? null : week,
-        tournament: tournament === "" ? null : tournament,
-        private: videoData.private,
-        exclusive_to: videoData.private
-          ? user.currentAffiliation?.team.id
-          : null,
-      })
-      .select()
-      .single();
-    if (data) {
-      teamMentions.forEach((mention) => {
-        const team = teams?.find((t) => t.full_name === mention);
-        if (team) {
-          void handleTeamMention(team.id, data.id);
-        }
-      });
-      void reset();
+    if (user.userId) {
+      const { data } = await supabase
+        .from("videos")
+        .insert({
+          title,
+          link,
+          season,
+          division,
+          week: week === "" ? null : week,
+          tournament: tournament === "" ? null : tournament,
+          private: videoData.private,
+          exclusive_to: videoData.private
+            ? user.currentAffiliation?.team.id
+            : null,
+          author_id: `${user.userId}`,
+        })
+        .select()
+        .single();
+      if (data) {
+        teamMentions.forEach((mention) => {
+          const team = teams?.find((t) => t.full_name === mention);
+          if (team) {
+            void handleTeamMention(team.id, data.id);
+          }
+        });
+        void reset();
+      }
     }
   };
 

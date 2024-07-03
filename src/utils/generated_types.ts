@@ -262,27 +262,6 @@ export type Database = {
           },
         ]
       }
-      play_comments: {
-        Row: {
-          comment_id: string
-          id: string
-          play_id: string
-          viewed_by_author: boolean
-        }
-        Insert: {
-          comment_id?: string
-          id?: string
-          play_id?: string
-          viewed_by_author?: boolean
-        }
-        Update: {
-          comment_id?: string
-          id?: string
-          play_id?: string
-          viewed_by_author?: boolean
-        }
-        Relationships: []
-      }
       play_likes: {
         Row: {
           created_at: string
@@ -674,6 +653,7 @@ export type Database = {
       }
       videos: {
         Row: {
+          author_id: string
           division: string
           exclusive_to: string | null
           id: string
@@ -686,6 +666,7 @@ export type Database = {
           week: string | null
         }
         Insert: {
+          author_id: string
           division: string
           exclusive_to?: string | null
           id?: string
@@ -698,6 +679,7 @@ export type Database = {
           week?: string | null
         }
         Update: {
+          author_id?: string
           division?: string
           exclusive_to?: string | null
           id?: string
@@ -716,6 +698,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "videos_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "videos_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "user_view"
+            referencedColumns: ["profile_id"]
           },
         ]
       }

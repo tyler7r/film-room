@@ -79,7 +79,10 @@ const PlayModal = ({
       .from("user_view")
       .select("*")
       .eq("role", "player");
-    const { data } = video.private ? await affiliatedPlayers : await allPlayers;
+    const { data } =
+      video.private && user.currentAffiliation?.team.id
+        ? await affiliatedPlayers
+        : await allPlayers;
     if (data) {
       const uniquePlayers = [
         ...new Map(data.map((x) => [x.profile_id, x])).values(),
