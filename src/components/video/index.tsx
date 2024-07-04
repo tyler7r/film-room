@@ -1,5 +1,5 @@
 import PublicIcon from "@mui/icons-material/Public";
-import { Typography, colors } from "@mui/material";
+import { colors } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAffiliatedContext } from "~/contexts/affiliations";
@@ -7,6 +7,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { TeamType, VideoType } from "~/utils/types";
+import DeleteMenu from "../delete-menu";
 import PageTitle from "../page-title";
 import TeamLogo from "../team-logo";
 
@@ -25,6 +26,7 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
   const [exclusiveTeam, setExclusiveTeam] = useState<
     TeamType | null | undefined
   >(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
 
   const fetchExclusiveToTeam = () => {
     if (video?.exclusive_to) {
@@ -48,6 +50,12 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
     }
   };
 
+  const handleDelete = async () => {
+    if (video) {
+      await supabase.from("videos").delete().eq("id", video.id);
+    } else return;
+  };
+
   useEffect(() => {
     void fetchExclusiveToTeam();
   }, []);
@@ -66,25 +74,34 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
         className={`${hoverBorder} flex w-full flex-col p-2`}
         onClick={() => handleClick(video.id)}
       >
-        <Typography
-          color={isDark ? `white` : `black`}
-          component="span"
-          className="flex flex-col items-center justify-center gap-2"
-        >
-          {!video.private && (
-            <div className="flex items-center justify-center gap-1">
-              <div className="lg:text-md text-sm tracking-tighter">PUBLIC</div>
-              <PublicIcon fontSize="small" />
-            </div>
-          )}
-          {video.private && exclusiveTeam && (
-            <div className="justify mb-1 flex items-center justify-center gap-2">
-              <div className="lg:text-md text-sm tracking-tighter">
-                PRIVATE TO:{" "}
+        <div className="flex flex-col items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2">
+            {!video.private && (
+              <div className="flex items-center justify-center gap-1">
+                <div className="text-sm font-bold tracking-tighter lg:text-base">
+                  PUBLIC
+                </div>
+                <PublicIcon fontSize="small" />
               </div>
-              <TeamLogo tm={exclusiveTeam} size={20} />
-            </div>
-          )}
+            )}
+            {video.private && exclusiveTeam && (
+              <div className="justify flex items-center justify-center gap-2">
+                <div className="text-sm font-bold tracking-tighter lg:text-base">
+                  PRIVATE TO:{" "}
+                </div>
+                <TeamLogo tm={exclusiveTeam} size={20} />
+              </div>
+            )}
+            {video.author_id === user.userId && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <DeleteMenu
+                  isOpen={isDeleteOpen}
+                  setIsOpen={setIsDeleteOpen}
+                  handleDelete={handleDelete}
+                />
+              </div>
+            )}
+          </div>
           <div
             className={`text-center text-base font-bold leading-5 lg:text-lg ${
               isDark ? "text-purple-400" : "text-purple-A400"
@@ -98,7 +115,7 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
                 : null}
           </div>
           <PageTitle size="small" title={video.title} />
-        </Typography>
+        </div>
       </div>
     )
   );

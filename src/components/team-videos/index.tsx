@@ -19,6 +19,7 @@ export type TeamVideoType = {
     tournament: string | null;
     uploaded_at: string;
     week: string | null;
+    author_id: string;
   } | null;
 }[];
 
