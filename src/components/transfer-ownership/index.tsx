@@ -94,7 +94,7 @@ const TransferOwnershipModal = ({
   }, [newOwner]);
 
   useEffect(() => {
-    void fetchUsers();
+    if (user.userId) void fetchUsers();
     if (user.userId) void fetchUserNewRole();
   }, []);
 

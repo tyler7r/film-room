@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { TeamType, UserType } from "~/utils/types";
+import EmptyMessage from "../empty-msg";
 import TeamLogo from "../team-logo";
 
 type UserProps = {
@@ -44,7 +45,11 @@ const User = ({ user }: UserProps) => {
       </div>
       <Divider orientation="vertical" flexItem variant="middle" />
       <div className="flex w-full shrink items-center justify-center gap-4">
-        {userTeams?.map((team) => <TeamLogo tm={team} size={45} />)}
+        {userTeams ? (
+          userTeams.map((team) => <TeamLogo tm={team} size={45} />)
+        ) : (
+          <EmptyMessage message="affiliations" size="small" />
+        )}
       </div>
     </div>
   );

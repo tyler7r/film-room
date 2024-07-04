@@ -140,6 +140,7 @@ export type VideoType = {
   uploaded_at: string;
   week: string | null;
   division: string;
+  author_id: string;
 };
 
 export type PlayType = {
@@ -340,6 +341,7 @@ export type LastWatchedType = {
     tournament: string | null;
     uploaded_at: string;
     week: string | null;
+    author_id: string;
   } | null;
 };
 

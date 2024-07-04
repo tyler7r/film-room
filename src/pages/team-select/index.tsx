@@ -146,7 +146,7 @@ const TeamSelect = () => {
             value={team.id}
             onChange={(e) => handleChange(e, 1)}
             className="w-full text-start"
-            name="team-select"
+            // name="team-select"
             id="team-select"
           >
             <MenuItem value={""}>None</MenuItem>

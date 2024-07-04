@@ -31,7 +31,7 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
   >(undefined);
 
   const fetchAffiliations = async () => {
-    if (user.userId && user.isLoggedIn) {
+    if (user.userId) {
       const { data } = await supabase
         .from("affiliations")
         .select(
@@ -45,8 +45,10 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
           affId: tm.id,
           number: tm.number,
         }));
-        setAffiliations(typedAffiliations);
-        setUser({ ...user, currentAffiliation: typedAffiliations[0] });
+        if (user.isLoggedIn) {
+          setAffiliations(typedAffiliations);
+          setUser({ ...user, currentAffiliation: typedAffiliations[0] });
+        }
       }
     }
   };
