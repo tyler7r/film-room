@@ -2,7 +2,6 @@ import PublicIcon from "@mui/icons-material/Public";
 import { colors } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -19,8 +18,8 @@ type VideoProps = {
 
 const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
   const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
-  const { affiliations } = useAffiliatedContext();
-  const { user } = useAuthContext();
+  // const { affiliations } = useAffiliatedContext();
+  const { user, affiliations } = useAuthContext();
   const router = useRouter();
 
   const [exclusiveTeam, setExclusiveTeam] = useState<

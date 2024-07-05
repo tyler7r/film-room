@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
+import PageTitle from "~/components/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import { type MessageType, type TeamType } from "~/utils/types";
@@ -127,9 +128,7 @@ const TeamSelect = () => {
     <div>Loading...</div>
   ) : teams ? (
     <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
-      <Typography variant="h1" fontSize={54}>
-        Join a Team!
-      </Typography>
+      <PageTitle title="Team Select" size="large" />
       <form
         onSubmit={(e) => {
           void handleSubmit(e, team);

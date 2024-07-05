@@ -9,7 +9,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import TeamLogo from "~/components/team-logo";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
@@ -22,8 +21,8 @@ type InboxCommentsProps = {
 };
 
 const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
-  const { user, setUser } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
+  const { user, setUser, affiliations } = useAuthContext();
+  // const { affiliations } = useAuthContext();
   const { setIsOpen, commentPage, setCommentPage, setCommentCount } =
     useInboxContext();
   const { backgroundStyle, isDark, hoverBorder, hoverText } =

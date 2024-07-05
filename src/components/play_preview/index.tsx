@@ -7,7 +7,6 @@ import { Button, Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
@@ -27,8 +26,8 @@ type PlayPreviewProps = {
 const PlayPreview = ({ preview }: PlayPreviewProps) => {
   const { isMobile } = useMobileContext();
   const { hoverText } = useIsDarkContext();
-  const { user, setUser } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
+  const { user, setUser, affiliations } = useAuthContext();
+  // const { affiliations } = useAffiliatedContext();
   const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);

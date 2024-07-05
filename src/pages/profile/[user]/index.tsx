@@ -9,7 +9,6 @@ import MentionsFeed from "~/components/profile-feed/mentions";
 import ProfileStats from "~/components/profile-stats";
 import TeamAffiliation from "~/components/team-affiliation";
 import Video from "~/components/video";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type {
@@ -30,8 +29,8 @@ type ProfileType = {
 
 const Profile = () => {
   const router = useRouter();
-  const { affiliations } = useAffiliatedContext();
-  const { user, setUser } = useAuthContext();
+  // const { affiliations } = useAffiliatedContext();
+  const { user, setUser, affiliations } = useAuthContext();
 
   const [options, setOptions] = useState<FetchOptions>({
     profileId: router.query.user as string,

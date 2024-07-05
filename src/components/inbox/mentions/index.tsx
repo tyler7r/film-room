@@ -9,7 +9,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import TeamLogo from "~/components/team-logo";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
@@ -22,8 +21,8 @@ type InboxMentionsProps = {
 };
 
 const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
-  const { user, setUser } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
+  const { user, setUser, affiliations } = useAuthContext();
+  // const { affiliations } = useAffiliatedContext();
   const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
   const { backgroundStyle, isDark, hoverBorder, hoverText } =
     useIsDarkContext();

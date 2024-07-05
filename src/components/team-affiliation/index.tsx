@@ -1,6 +1,5 @@
 import { Divider } from "@mui/material";
 import { useRouter } from "next/router";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import type { TeamAffiliationType } from "~/utils/types";
@@ -13,8 +12,8 @@ type TeamAffiliationProps = {
 
 const TeamAffiliation = ({ aff, handleClose }: TeamAffiliationProps) => {
   const { hoverBorder } = useIsDarkContext();
-  const { user, setUser } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
+  const { user, setUser, affiliations } = useAuthContext();
+  // const { affiliations } = useAffiliatedContext();
   const router = useRouter();
 
   const handleTeamClick = (

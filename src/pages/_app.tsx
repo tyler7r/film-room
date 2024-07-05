@@ -8,7 +8,6 @@ import { type AppType } from "next/app";
 import { createContext, useContext, useState } from "react";
 
 import { Navbar } from "~/components/navbar/navbar";
-import { IsAffiliated } from "~/contexts/affiliations";
 import { IsAuth } from "~/contexts/auth";
 import { TheInbox } from "~/contexts/inbox";
 import { IsMobile } from "~/contexts/mobile";
@@ -83,14 +82,14 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <CssBaseline />
         <IsAuth>
           <IsMobile>
-            <IsAffiliated>
-              <TheInbox>
-                <GlobalSearch>
-                  <Navbar />
-                  <Component {...pageProps} />
-                </GlobalSearch>
-              </TheInbox>
-            </IsAffiliated>
+            {/* <IsAffiliated> */}
+            <TheInbox>
+              <GlobalSearch>
+                <Navbar />
+                <Component {...pageProps} />
+              </GlobalSearch>
+            </TheInbox>
+            {/* </IsAffiliated> */}
           </IsMobile>
         </IsAuth>
       </IsDarkContext.Provider>

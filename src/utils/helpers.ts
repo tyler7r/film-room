@@ -25,6 +25,7 @@ export const divisions = [
   "D1 College Women's",
   "D3 College Men's",
   "D3 College Women's",
+  "Youth",
   "Other",
 ];
 

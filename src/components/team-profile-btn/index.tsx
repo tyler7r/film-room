@@ -3,11 +3,12 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Button, Menu, MenuItem, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useAffiliatedContext } from "~/contexts/affiliations";
+import { useAuthContext } from "~/contexts/auth";
 import TeamAffiliation from "../team-affiliation";
 
 const TeamPageButton = () => {
-  const { affiliations } = useAffiliatedContext();
+  const { affiliations } = useAuthContext();
+  // const { affiliations } = useAffiliatedContext();
   const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
