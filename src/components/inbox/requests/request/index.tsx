@@ -5,7 +5,7 @@ import TeamLogo from "~/components/team-logo";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { UserTeamType } from "~/utils/types";
+import type { UserTeamType } from "~/utils/types";
 
 type PendingRequestProps = {
   request: UserTeamType;

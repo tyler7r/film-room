@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { UserTeamType } from "~/utils/types";
+import type { UserTeamType } from "~/utils/types";
 import PendingRequest from "./request";
 
 type PendingTeamRequestsProps = {
