@@ -7,6 +7,7 @@ import { useMobileContext } from "~/contexts/mobile";
 import PageTitle from "../page-title";
 import InboxComments from "./comments";
 import InboxMentions from "./mentions";
+import PendingTeamRequests from "./requests";
 import TeamHeader from "./team-header";
 
 const Inbox = () => {
@@ -16,6 +17,7 @@ const Inbox = () => {
   const router = useRouter();
   const [hideMentions, setHideMentions] = useState<boolean>(false);
   const [hideComments, setHideComments] = useState<boolean>(false);
+  const [hideRequests, setHideRequests] = useState<boolean>(false);
 
   return (
     <Drawer open={isOpen} anchor="right" onClose={() => setIsOpen(false)}>
@@ -53,6 +55,8 @@ const Inbox = () => {
         )}
         <div className="flex flex-col gap-3">
           <TeamHeader />
+          <Divider></Divider>
+          <PendingTeamRequests hide={hideRequests} setHide={setHideRequests} />
           <Divider></Divider>
           <InboxMentions hide={hideMentions} setHide={setHideMentions} />
           <Divider />

@@ -57,7 +57,7 @@ const TransferOwnershipModal = ({
       .eq("team_id", team.id)
       .eq("user_id", `${user.userId}`)
       .eq("verified", true)
-      .single();
+      .maybeSingle();
     if (data) setNewRole(data.role);
   };
 
