@@ -2,12 +2,12 @@ import { Autocomplete, TextField } from "@mui/material";
 import type { SyntheticEvent } from "react";
 import { type PlayerType } from "~/utils/types";
 
-type MentionsProps = {
+type PlayMentionsProps = {
   setMentions: (mentions: PlayerType[]) => void;
   players: PlayerType[] | null;
 };
 
-const Mentions = ({ setMentions, players }: MentionsProps) => {
+const PlayMentions = ({ setMentions, players }: PlayMentionsProps) => {
   const handleChange = (
     event: SyntheticEvent<Element, Event>,
     newValue: PlayerType[],
@@ -43,4 +43,4 @@ const Mentions = ({ setMentions, players }: MentionsProps) => {
   );
 };
 
-export default Mentions;
+export default PlayMentions;

@@ -157,11 +157,11 @@ const CreateTeam = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (!user.isLoggedIn) {
-  //     void router.push("/login");
-  //   }
-  // }, [user.isLoggedIn]);
+  useEffect(() => {
+    if (!user.isLoggedIn) {
+      void router.push("/login");
+    }
+  }, [user.isLoggedIn]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-8 p-4">
@@ -246,7 +246,6 @@ const CreateTeam = () => {
               id="num"
               label="Number"
               type="number"
-              autoFocus
               onChange={handleInput}
               value={details.num ?? ""}
             />

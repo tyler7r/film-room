@@ -16,7 +16,7 @@ import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType, VideoType } from "~/utils/types";
 import PageTitle from "../page-title";
-import Mentions from "../play-mentions";
+import PlayMentions from "../play-mentions";
 import PlayTags from "../play-tags";
 
 type PlayModalProps = {
@@ -304,7 +304,7 @@ const PlayModal = ({
             maxRows={5}
           />
           <PlayTags tags={playTags} setTags={setPlayTags} allTags={tags} />
-          <Mentions players={players} setMentions={setMentions} />
+          <PlayMentions players={players} setMentions={setMentions} />
           <div className="flex w-full justify-around">
             <div className="flex items-center justify-center">
               <div className="text-xl font-bold tracking-tight">
