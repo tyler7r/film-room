@@ -32,7 +32,7 @@ type TeamDetailsType = {
 };
 
 const CreateTeam = () => {
-  const { user, setUser } = useAuthContext();
+  const { user } = useAuthContext();
   const { colorText } = useIsDarkContext();
 
   const router = useRouter();

@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { supabase } from "~/utils/supabase";
-import { TeamAffiliationType, type UserSession } from "~/utils/types";
+import type { TeamAffiliationType, UserSession } from "~/utils/types";
 
 type AuthProps = {
   children: ReactNode;
