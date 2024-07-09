@@ -1,9 +1,11 @@
+import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { IconButton } from "@mui/material";
+import { IconButton, MenuItem, Typography } from "@mui/material";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import EmptyMessage from "~/components/empty-msg";
 import { useAuthContext } from "~/contexts/auth";
+import { useInboxContext } from "~/contexts/inbox";
 import { supabase } from "~/utils/supabase";
 import type { UserTeamType } from "~/utils/types";
 import PendingRequest from "./request";
@@ -15,6 +17,9 @@ type PendingTeamRequestsProps = {
 
 const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
   const { user } = useAuthContext();
+  const { setIsOpen } = useInboxContext();
+  const router = useRouter();
+
   const [pendingRequests, setPendingRequests] = useState<UserTeamType[] | null>(
     null,
   );
@@ -29,6 +34,15 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
       if (data && data.length > 0) setPendingRequests(data);
       else setPendingRequests(null);
     } else setPendingRequests(null);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    if (user.isLoggedIn) {
+      void router.push("/team-select");
+    } else {
+      void router.push("/login");
+    }
   };
 
   useEffect(() => {
@@ -54,37 +68,50 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <div className="text-2xl font-bold lg:mb-2 lg:text-3xl">
-          Pending Join Requests
-        </div>
-        {hide && (
-          <IconButton size="small" onClick={() => setHide(false)}>
-            <KeyboardArrowRightIcon />
-          </IconButton>
-        )}
-        {!hide && (
-          <>
-            <IconButton size="small" onClick={() => setHide(true)}>
-              <ExpandMoreIcon />
-            </IconButton>
-          </>
-        )}
-      </div>
-      {!hide && (
-        <div className="flex flex-col gap-2">
-          {pendingRequests?.map((req) => (
-            <PendingRequest
-              key={req.affiliations.id}
-              request={req}
-              reload={reload}
-              setReload={setReload}
-            />
-          ))}
-          {!pendingRequests && (
-            <EmptyMessage message="pending join requests" size="small" />
+      {pendingRequests ? (
+        <>
+          <div className="flex items-center justify-between">
+            <div className="text-lg font-bold lg:mb-2 lg:text-xl">
+              Pending Join Requests
+            </div>
+            {hide && (
+              <IconButton size="small" onClick={() => setHide(false)}>
+                <KeyboardArrowRightIcon />
+              </IconButton>
+            )}
+            {!hide && (
+              <>
+                <IconButton size="small" onClick={() => setHide(true)}>
+                  <ExpandMoreIcon />
+                </IconButton>
+              </>
+            )}
+          </div>
+          {!hide && (
+            <div className="flex flex-col gap-2">
+              {pendingRequests.map((req) => (
+                <PendingRequest
+                  key={req.affiliations.id}
+                  request={req}
+                  reload={reload}
+                  setReload={setReload}
+                />
+              ))}
+            </div>
           )}
-        </div>
+        </>
+      ) : (
+        <MenuItem
+          className="flex items-center justify-center gap-2"
+          onClick={() => {
+            handleClose();
+          }}
+        >
+          <AddIcon />
+          <Typography variant="overline" fontWeight="bold" fontSize="small">
+            Join a New Team
+          </Typography>
+        </MenuItem>
       )}
     </div>
   );

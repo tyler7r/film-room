@@ -8,7 +8,6 @@ import TeamAffiliation from "../team-affiliation";
 
 const TeamPageButton = () => {
   const { affiliations } = useAuthContext();
-  // const { affiliations } = useAffiliatedContext();
   const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
