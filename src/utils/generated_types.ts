@@ -653,7 +653,7 @@ export type Database = {
       }
       videos: {
         Row: {
-          author_id: string
+          author_id: string | null
           division: string
           exclusive_to: string | null
           id: string
@@ -666,7 +666,7 @@ export type Database = {
           week: string | null
         }
         Insert: {
-          author_id: string
+          author_id?: string | null
           division: string
           exclusive_to?: string | null
           id?: string
@@ -679,7 +679,7 @@ export type Database = {
           week?: string | null
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
           division?: string
           exclusive_to?: string | null
           id?: string

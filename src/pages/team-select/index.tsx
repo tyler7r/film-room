@@ -123,7 +123,7 @@ const TeamSelect = () => {
     teams && (
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center justify-center gap-6 p-4"
+        className="mt-10 flex flex-col items-center justify-center gap-6 p-4"
       >
         <div className="flex w-full flex-col items-center justify-center gap-4">
           <PageTitle title="Select Your Teams" size="large" />

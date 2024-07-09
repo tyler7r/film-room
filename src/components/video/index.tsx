@@ -18,7 +18,6 @@ type VideoProps = {
 
 const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
   const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
-  // const { affiliations } = useAffiliatedContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
 
@@ -106,11 +105,11 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
               isDark ? "text-purple-400" : "text-purple-A400"
             }`}
           >
-            {video.season} -{" "}
+            {video.season}
             {video.week
-              ? video.week.toLocaleUpperCase()
+              ? `- ${video.week.toLocaleUpperCase()}`
               : video.tournament
-                ? video.tournament.toLocaleUpperCase()
+                ? ` ${video.tournament.toLocaleUpperCase()}`
                 : null}
           </div>
           <PageTitle size="small" title={video.title} />

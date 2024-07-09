@@ -82,7 +82,7 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
             />
           ))}
           {!pendingRequests && (
-            <EmptyMessage message="pending team requests" size="small" />
+            <EmptyMessage message="pending join requests" size="small" />
           )}
         </div>
       )}

@@ -140,7 +140,7 @@ export type VideoType = {
   uploaded_at: string;
   week: string | null;
   division: string;
-  author_id: string;
+  author_id: string | null;
 };
 
 export type PlayType = {
