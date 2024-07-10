@@ -1,5 +1,5 @@
 import { Autocomplete, TextField } from "@mui/material";
-import { SyntheticEvent } from "react";
+import type { SyntheticEvent } from "react";
 import type { TeamType } from "~/utils/types";
 
 type TeamVideosProps = {

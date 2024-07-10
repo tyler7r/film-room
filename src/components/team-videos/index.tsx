@@ -4,7 +4,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { TeamVideoType } from "~/utils/types";
+import type { TeamVideoType } from "~/utils/types";
 import EmptyMessage from "../empty-msg";
 import Video from "../video";
 
