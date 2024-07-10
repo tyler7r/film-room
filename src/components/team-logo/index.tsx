@@ -7,16 +7,18 @@ import type { TeamType } from "~/utils/types";
 type TeamLogoProps = {
   tm: TeamType;
   size?: number;
+  inactive?: boolean;
 };
 
-const TeamLogo = ({ tm, size }: TeamLogoProps) => {
+const TeamLogo = ({ tm, size, inactive }: TeamLogoProps) => {
   const { colorBackground } = useIsDarkContext();
   const { setIsOpen } = useInboxContext();
   const router = useRouter();
 
   const handleClick = () => {
     setIsOpen(false);
-    void router.push(`/team-hub/${tm.id}`);
+    if (inactive) return;
+    else void router.push(`/team-hub/${tm.id}`);
   };
 
   return tm.logo ? (

@@ -11,7 +11,7 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "gen-types": "npx supabase gen types typescript --project-id tqyavwqbewvvgoizsipl --schema public > ./src/utils/generated_types.ts"
+    "gen-types": "npx supabase gen types --lang=typescript --project-id tqyavwqbewvvgoizsipl --schema public > ./src/utils/generated_types.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

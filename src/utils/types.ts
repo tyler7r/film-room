@@ -71,6 +71,12 @@ export type Database = MergeDeep<
             team: TeamType;
           };
         };
+        team_video_view: {
+          Row: {
+            video: VideoType;
+            team: TeamType;
+          };
+        };
         user_teams: {
           Row: {
             affiliations: AffiliationType;
@@ -140,7 +146,7 @@ export type VideoType = {
   uploaded_at: string;
   week: string | null;
   division: string;
-  author_id: string | null;
+  author_id: string;
 };
 
 export type PlayType = {
@@ -196,7 +202,7 @@ export type VideoUploadType = {
   link: string;
   title: string;
   private: boolean;
-  exclusive_to: string | null;
+  exclusive_to: string;
   week: string | null;
   season: string;
   tournament: string | null;
@@ -349,4 +355,9 @@ export type StatsType = {
   mentionCount: number;
   playCount: number;
   highlightCount: number;
+};
+
+export type TeamVideoType = {
+  team: TeamType;
+  video: VideoType;
 };

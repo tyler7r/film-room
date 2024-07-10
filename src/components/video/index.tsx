@@ -107,10 +107,11 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
           >
             {video.season}
             {video.week
-              ? `- ${video.week.toLocaleUpperCase()}`
+              ? ` Week ${video.week.toLocaleUpperCase()}`
               : video.tournament
                 ? ` ${video.tournament.toLocaleUpperCase()}`
                 : null}
+            {` - ${video.division}`}
           </div>
           <PageTitle size="small" title={video.title} />
         </div>

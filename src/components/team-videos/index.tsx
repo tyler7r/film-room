@@ -4,24 +4,9 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
+import { TeamVideoType } from "~/utils/types";
 import EmptyMessage from "../empty-msg";
 import Video from "../video";
-
-export type TeamVideoType = {
-  video: {
-    division: string;
-    exclusive_to: string | null;
-    id: string;
-    link: string;
-    private: boolean;
-    season: string;
-    title: string;
-    tournament: string | null;
-    uploaded_at: string;
-    week: string | null;
-    author_id: string;
-  } | null;
-}[];
 
 type TeamVideosProps = {
   teamId: string;
@@ -37,8 +22,8 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
   const { user } = useAuthContext();
   const [page, setPage] = useState<number>(1);
 
-  const [videos, setVideos] = useState<TeamVideoType | null>(null);
-  const [videoCount, setVideoCount] = useState<number>(0);
+  const [videos, setVideos] = useState<TeamVideoType[] | null>(null);
+  const [videoCount, setVideoCount] = useState<number | null>(null);
   const [options, setOptions] = useState<SearchOptions>({
     loggedIn: user.isLoggedIn,
     currentAffiliation: user.currentAffiliation?.team.id,
@@ -49,25 +34,25 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
   const fetchVideos = async (options?: SearchOptions) => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const videos = supabase
-      .from("team_videos")
-      .select(`uploaded_at, video:videos!inner(*)`, {
+      .from("team_video_view")
+      .select("*", {
         count: "exact",
       })
-      .match({ team_id: teamId })
-      .order("uploaded_at", { ascending: false })
+      .eq("team->>id", teamId)
+      .order("video->>uploaded_at", { ascending: false })
       .range(from, to);
     if (options?.currentAffiliation) {
       void videos.or(
-        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
-        { referencedTable: "videos" },
+        `video->>private.eq.false, video->>exclusive_to.eq.${options.currentAffiliation}`,
       );
     } else {
-      void videos.eq("video.private", false);
+      void videos.eq("video->>private", false);
     }
     const { data, count } = await videos;
     if (data && data.length > 0) setVideos(data);
     else setVideos(null);
     if (count) setVideoCount(count);
+    else setVideoCount(null);
   };
 
   const handleChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -95,7 +80,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
     <div className="flex w-11/12 flex-col items-center justify-center">
       <div className="flex w-full flex-col gap-4">
         {videos?.map((video) => (
-          <Video video={video.video} key={video.video?.id} />
+          <Video video={video.video} key={video.video.id} />
         ))}
       </div>
       {videos && videoCount && (

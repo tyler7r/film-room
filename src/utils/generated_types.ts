@@ -487,17 +487,17 @@ export type Database = {
             referencedColumns: ["profile_id"]
           },
           {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "public_plays_exclusive_to_fkey"
             columns: ["exclusive_to"]
             isOneToOne: false
             referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_plays_video_id_fkey"
-            columns: ["video_id"]
-            isOneToOne: false
-            referencedRelation: "videos"
             referencedColumns: ["id"]
           },
         ]
@@ -535,13 +535,6 @@ export type Database = {
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "public_profiles_last_watched_fkey"
-            columns: ["last_watched"]
-            isOneToOne: false
-            referencedRelation: "videos"
-            referencedColumns: ["id"]
-          },
         ]
       }
       tags: {
@@ -576,17 +569,14 @@ export type Database = {
       team_videos: {
         Row: {
           team_id: string
-          uploaded_at: string
           video_id: string
         }
         Insert: {
           team_id?: string
-          uploaded_at?: string
           video_id?: string
         }
         Update: {
           team_id?: string
-          uploaded_at?: string
           video_id?: string
         }
         Relationships: [
@@ -598,7 +588,7 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "public_team_videos_video_id_fkey"
+            foreignKeyName: "team_videos_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "videos"
@@ -653,52 +643,48 @@ export type Database = {
       }
       videos: {
         Row: {
-          author_id: string | null
+          author_id: string
           division: string
           exclusive_to: string | null
           id: string
+          keywords: string | null
           link: string
           private: boolean
-          season: string
+          season: string | null
           title: string
           tournament: string | null
           uploaded_at: string
           week: string | null
         }
         Insert: {
-          author_id?: string | null
+          author_id: string
           division: string
           exclusive_to?: string | null
           id?: string
+          keywords?: string | null
           link: string
           private?: boolean
-          season: string
+          season?: string | null
           title: string
           tournament?: string | null
           uploaded_at?: string
           week?: string | null
         }
         Update: {
-          author_id?: string | null
+          author_id?: string
           division?: string
           exclusive_to?: string | null
           id?: string
+          keywords?: string | null
           link?: string
           private?: boolean
-          season?: string
+          season?: string | null
           title?: string
           tournament?: string | null
           uploaded_at?: string
           week?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "public_videos_exclusive_to_fkey"
-            columns: ["exclusive_to"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "videos_author_id_fkey"
             columns: ["author_id"]
@@ -712,6 +698,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_view"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "videos_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -758,6 +751,13 @@ export type Database = {
         }
         Relationships: []
       }
+      team_video_view: {
+        Row: {
+          team: Json | null
+          video: Json | null
+        }
+        Relationships: []
+      }
       transition_comment_notification: {
         Row: {
           comment: Json | null
@@ -767,7 +767,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "public_plays_video_id_fkey"
+            foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "videos"
@@ -821,7 +821,7 @@ export type Database = {
             referencedColumns: ["profile_id"]
           },
           {
-            foreignKeyName: "public_plays_video_id_fkey"
+            foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "videos"
@@ -837,7 +837,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "public_plays_video_id_fkey"
+            foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "videos"
@@ -854,17 +854,17 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "public_plays_exclusive_to_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_plays_video_id_fkey"
-            columns: ["video_id"]
-            isOneToOne: false
-            referencedRelation: "videos"
             referencedColumns: ["id"]
           },
         ]

@@ -22,7 +22,6 @@ type InboxCommentsProps = {
 
 const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   const { user, setUser, affiliations } = useAuthContext();
-  // const { affiliations } = useAuthContext();
   const { setIsOpen, commentPage, setCommentPage, setCommentCount } =
     useInboxContext();
   const { backgroundStyle, isDark, hoverBorder, hoverText } =
