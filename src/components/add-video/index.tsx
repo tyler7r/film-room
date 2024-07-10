@@ -30,6 +30,7 @@ const AddVideo = () => {
   const { user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
   const { affiliations } = useAuthContext();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<MessageType>({
     status: "error",
@@ -96,7 +97,7 @@ const AddVideo = () => {
       tournament: "",
       division: "",
     });
-    setTeamMentions([]);
+    setTeamMentions(null);
     setIsOpen(false);
   };
 

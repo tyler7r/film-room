@@ -101,7 +101,7 @@ const FilmRoomHome = () => {
   }, [page]);
 
   return (
-    <div className="mb-4 flex w-full flex-col items-center justify-center p-4">
+    <div className="flex w-full flex-col items-center justify-center p-4">
       <PageTitle title="The Film Room" size="x-large" />
       <AddVideo />
       <Divider

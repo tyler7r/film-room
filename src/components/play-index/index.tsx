@@ -18,7 +18,6 @@ type PlayIndexProps = {
   player: YouTubePlayer | null;
   videoId: string;
   scrollToPlayer: () => void;
-  duration: number;
   setActivePlay: (play: PlayPreviewType) => void;
   activePlay: PlayPreviewType | null;
 };

@@ -24,7 +24,6 @@ const FilmRoom = () => {
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
-  const [videoDuration, setVideoDuration] = useState<number>(0);
   const [activePlay, setActivePlay] = useState<PlayPreviewType | null>(null);
 
   const [isPlayModalOpen, setIsPlayModalOpen] = useState<boolean>(false);
@@ -54,8 +53,6 @@ const FilmRoom = () => {
   const videoOnReady = async (e: YouTubeEvent) => {
     const video = e.target;
     setPlayer(video);
-    const duration = await video.getDuration();
-    setVideoDuration(duration);
     const time = Number(startParam);
     if (time) {
       void video.seekTo(time, true);
@@ -132,7 +129,6 @@ const FilmRoom = () => {
           player={player}
           videoId={video.id}
           scrollToPlayer={scrollToPlayer}
-          duration={videoDuration}
           setActivePlay={setActivePlay}
           activePlay={activePlay}
         />
