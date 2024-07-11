@@ -15,7 +15,7 @@ import {
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import type { CreateNewTagType } from "../play-modal";
+import type { CreateNewTagType } from "../add-play";
 
 type NewTagType = {
   title: string;

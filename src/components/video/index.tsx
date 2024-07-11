@@ -107,7 +107,7 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
           >
             {video.season}
             {video.week
-              ? ` Week ${video.week.toLocaleUpperCase()}`
+              ? ` ${video.week.toLocaleUpperCase()}`
               : video.tournament
                 ? ` ${video.tournament.toLocaleUpperCase()}`
                 : null}

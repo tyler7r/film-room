@@ -429,7 +429,6 @@ export type Database = {
         Row: {
           author_id: string
           author_name: string
-          author_role: string
           created_at: string
           end_time: number
           exclusive_to: string | null
@@ -444,7 +443,6 @@ export type Database = {
         Insert: {
           author_id: string
           author_name: string
-          author_role: string
           created_at?: string
           end_time: number
           exclusive_to?: string | null
@@ -459,7 +457,6 @@ export type Database = {
         Update: {
           author_id?: string
           author_name?: string
-          author_role?: string
           created_at?: string
           end_time?: number
           exclusive_to?: string | null

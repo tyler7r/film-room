@@ -25,6 +25,11 @@ const PlayMentions = ({ setMentions, players }: PlayMentionsProps) => {
           onChange={(event, newValue) => handleChange(event, newValue)}
           options={players}
           getOptionLabel={(option) => `${option.name}`}
+          renderOption={(props, option) => (
+            <li {...props} key={option.profile_id}>
+              {option.name}
+            </li>
+          )}
           filterSelectedOptions
           multiple
           renderInput={(params) => (

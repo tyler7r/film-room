@@ -361,3 +361,13 @@ export type TeamVideoType = {
   team: TeamType;
   video: VideoType;
 };
+
+export type NewPlayType = {
+  start: number | null | undefined;
+  end: number | null | undefined;
+  title: string;
+  note: string;
+  highlight: boolean;
+  private: boolean;
+  exclusive_to: string;
+};
