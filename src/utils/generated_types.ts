@@ -716,6 +716,13 @@ export type Database = {
         }
         Relationships: []
       }
+      last_watched_view: {
+        Row: {
+          profile: Json | null
+          video: Json | null
+        }
+        Relationships: []
+      }
       mention_notification: {
         Row: {
           mention: Json | null

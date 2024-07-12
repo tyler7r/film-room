@@ -29,7 +29,6 @@ type ProfileType = {
 
 const Profile = () => {
   const router = useRouter();
-  // const { affiliations } = useAffiliatedContext();
   const { user, setUser, affiliations } = useAuthContext();
 
   const [options, setOptions] = useState<FetchOptions>({
@@ -72,13 +71,15 @@ const Profile = () => {
   };
 
   const fetchLastWatched = async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("last_watched, last_watched_time, videos(*)")
-      .eq("id", `${user.userId}`)
-      .single();
-    if (data?.last_watched) setLastWatched(data);
-    else setLastWatched(null);
+    if (user.userId === options.profileId) {
+      const { data } = await supabase
+        .from("last_watched_view")
+        .select()
+        .eq("profile->>id", `${user.userId}`)
+        .single();
+      if (data) setLastWatched(data);
+      else setLastWatched(null);
+    }
   };
 
   const changeActionBar = (
@@ -165,12 +166,12 @@ const Profile = () => {
                 <div
                   className="w-full"
                   onClick={() =>
-                    updateUserAffiliation(lastWatched.videos?.exclusive_to)
+                    updateUserAffiliation(lastWatched.video.exclusive_to)
                   }
                 >
                   <Video
-                    video={lastWatched.videos}
-                    startTime={`${lastWatched.last_watched_time}`}
+                    video={lastWatched.video}
+                    startTime={`${lastWatched.profile.last_watched_time}`}
                   />
                 </div>
               </div>

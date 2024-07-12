@@ -63,6 +63,12 @@ export type Database = MergeDeep<
             team: TeamType;
           };
         };
+        last_watched_view: {
+          Row: {
+            profile: UserType;
+            video: VideoType;
+          };
+        };
         mention_notification: {
           Row: {
             play: PlayType;
@@ -333,21 +339,8 @@ export type MentionType = {
 };
 
 export type LastWatchedType = {
-  last_watched: string | null;
-  last_watched_time: number | null;
-  videos: {
-    division: string;
-    exclusive_to: string | null;
-    id: string;
-    link: string;
-    private: boolean;
-    season: string;
-    title: string;
-    tournament: string | null;
-    uploaded_at: string;
-    week: string | null;
-    author_id: string;
-  } | null;
+  profile: UserType;
+  video: VideoType;
 };
 
 export type StatsType = {
