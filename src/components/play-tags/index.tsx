@@ -1,13 +1,20 @@
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   Autocomplete,
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   TextField,
+  Tooltip,
   createFilterOptions,
   type AutocompleteChangeDetails,
   type AutocompleteChangeReason,
@@ -15,14 +22,9 @@ import {
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
+import { NewTagType } from "~/utils/types";
 import type { CreateNewTagType } from "../add-play";
-
-type NewTagType = {
-  title: string;
-  exclusive_to?: string | null;
-  private: boolean;
-  inputValue?: string;
-};
+import TeamLogo from "../team-logo";
 
 type PlayTagsProps = {
   tags: CreateNewTagType[];
@@ -33,14 +35,14 @@ type PlayTagsProps = {
 const filter = createFilterOptions<CreateNewTagType>();
 
 const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
-  const { user } = useAuthContext();
+  const { affiliations } = useAuthContext();
   const [open, toggleOpen] = useState<boolean>(false);
   const [isValidNewTag, setIsValidNewTag] = useState<boolean>(false);
 
   const [newTag, setNewTag] = useState<NewTagType>({
     title: "",
     private: false,
-    exclusive_to: null,
+    exclusive_to: "public",
   });
 
   const handleChange = (
@@ -55,6 +57,7 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
       setNewTag({
         title: details.option.title,
         private: false,
+        exclusive_to: "public",
       });
     } else if (reason === "createOption") {
       const t = newValue[newValue.length - 1] as string;
@@ -62,6 +65,7 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
       setNewTag({
         title: t,
         private: false,
+        exclusive_to: "public",
       });
     } else {
       setTags(
@@ -79,12 +83,21 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
     }
   };
 
+  const handlePrivacyStatus = (e: SelectChangeEvent) => {
+    const status = e.target.value;
+    if (status === "public" || status === "") {
+      setNewTag({ ...newTag, private: false, exclusive_to: "public" });
+    } else {
+      setNewTag({ ...newTag, private: true, exclusive_to: status });
+    }
+  };
+
   const handleClose = () => {
     toggleOpen(false);
     setNewTag({
       title: "",
       private: false,
-      exclusive_to: null,
+      exclusive_to: "public",
     });
   };
 
@@ -97,9 +110,7 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
       .insert({
         title: newTag.title,
         private: newTag.private,
-        exclusive_to: newTag.private
-          ? `${user.currentAffiliation?.team.id}`
-          : null,
+        exclusive_to: newTag.private ? newTag.exclusive_to : null,
       })
       .select("title, id")
       .single();
@@ -167,23 +178,74 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
                 <DialogContentText>
                   Please add the tag that we're missing!
                 </DialogContentText>
-                <TextField
-                  name="tag-title"
-                  autoFocus
-                  margin="dense"
-                  id="title"
-                  value={newTag.title}
-                  onChange={(event) =>
-                    setNewTag({
-                      ...newTag,
-                      title: event.target.value,
-                    })
-                  }
-                  label="Title"
-                  type="text"
-                  variant="standard"
-                />
-                {user.currentAffiliation?.team.id && (
+                <div className="flex w-full flex-col gap-4">
+                  <TextField
+                    name="tag-title"
+                    autoFocus
+                    margin="dense"
+                    id="title"
+                    value={newTag.title}
+                    onChange={(event) =>
+                      setNewTag({
+                        ...newTag,
+                        title: event.target.value,
+                      })
+                    }
+                    label="Title"
+                    type="text"
+                    variant="standard"
+                  />
+                  <FormControl>
+                    <div className="flex w-full items-center justify-center gap-2">
+                      <InputLabel>Privacy Status</InputLabel>
+                      <Select
+                        value={newTag.exclusive_to}
+                        onChange={handlePrivacyStatus}
+                        label="Privacy Status"
+                        name="privacy"
+                        id="privacy-status"
+                        className="w-full"
+                      >
+                        <MenuItem value="public">Public</MenuItem>
+                        {affiliations?.map((aff) => (
+                          <MenuItem key={aff.team.id} value={aff.team.id}>
+                            <div className="flex gap-2">
+                              <div>
+                                Private to:{" "}
+                                <strong>{aff.team.full_name}</strong>
+                              </div>
+                              {aff.team.logo && (
+                                <TeamLogo tm={aff.team} size={25} />
+                              )}
+                            </div>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <Tooltip
+                        title={
+                          "Private tags are only viewable by your teammates and coaches, even on public plays. Public tags are viewable by all users."
+                        }
+                        slotProps={{
+                          popper: {
+                            modifiers: [
+                              {
+                                name: "offset",
+                                options: {
+                                  offset: [0, -14],
+                                },
+                              },
+                            ],
+                          },
+                        }}
+                      >
+                        <IconButton size="small">
+                          <InfoOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </FormControl>
+                </div>
+                {/* {user.currentAffiliation?.team.id && (
                   <div className="flex items-center justify-center">
                     <div className="text-lg font-bold tracking-tight">
                       Keep this tag private to{" "}
@@ -202,7 +264,7 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
                       id="private-tag"
                     />
                   </div>
-                )}
+                )} */}
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>

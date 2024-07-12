@@ -155,7 +155,6 @@ export type PlayType = {
   author_id: string;
   highlight: boolean;
   exclusive_to: string | null;
-  author_role: string;
   author_name: string;
   start_time: number;
   end_time: number;
@@ -370,4 +369,11 @@ export type NewPlayType = {
   highlight: boolean;
   private: boolean;
   exclusive_to: string;
+};
+
+export type NewTagType = {
+  title: string;
+  exclusive_to: string;
+  private: boolean;
+  inputValue?: string;
 };

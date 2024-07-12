@@ -14,14 +14,14 @@ import type { NewPlayType, TeamType, VideoType } from "~/utils/types";
 
 type PrivacyStatusProps = {
   video: VideoType;
-  playDetails: NewPlayType;
-  setPlayDetails: (playDetails: NewPlayType) => void;
+  newDetails: NewPlayType;
+  setNewDetails: (newDetails: NewPlayType) => void;
 };
 
 const PrivacyStatus = ({
   video,
-  playDetails,
-  setPlayDetails,
+  newDetails,
+  setNewDetails,
 }: PrivacyStatusProps) => {
   const { affiliations } = useAuthContext();
   const exclusiveTeam: TeamType | null =
@@ -31,13 +31,9 @@ const PrivacyStatus = ({
   const handlePrivacyStatus = (e: SelectChangeEvent) => {
     const status = e.target.value;
     if (status === "public" || status === "") {
-      setPlayDetails({
-        ...playDetails,
-        private: false,
-        exclusive_to: "public",
-      });
+      setNewDetails({ ...newDetails, private: false, exclusive_to: "public" });
     } else {
-      setPlayDetails({ ...playDetails, private: true, exclusive_to: status });
+      setNewDetails({ ...newDetails, private: true, exclusive_to: status });
     }
   };
 
@@ -50,7 +46,7 @@ const PrivacyStatus = ({
       <div className="flex w-full items-center justify-center gap-2">
         {video.private && video.exclusive_to && (
           <Select
-            value={playDetails.exclusive_to}
+            value={newDetails.exclusive_to}
             onChange={handlePrivacyStatus}
             label="Privacy Status"
             name="privacy"
@@ -71,7 +67,7 @@ const PrivacyStatus = ({
         )}
         {!video.private && (
           <Select
-            value={playDetails.exclusive_to}
+            value={newDetails.exclusive_to}
             onChange={handlePrivacyStatus}
             label="Privacy Status"
             name="privacy"

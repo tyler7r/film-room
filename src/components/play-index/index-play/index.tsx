@@ -86,7 +86,7 @@ const IndexPlay = ({
         `tag->>private.eq.false, tag->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
       );
     } else {
-      void tags.eq("play->>private", false);
+      void tags.eq("tag->>private", false);
     }
     const { data } = await tags;
     if (data) {

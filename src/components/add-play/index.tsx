@@ -193,13 +193,15 @@ const NewPlayModal = ({
         })
         .select()
         .single();
-      if (data && mentions) {
-        mentions.forEach((mention) => {
+      if (data) {
+        mentions?.forEach((mention) => {
           void handleMention(mention.profile_id, mention.name, data.id);
         });
-        playTags.forEach((tag) => {
-          void handleTag(data.id, `${tag.id}`);
-        });
+        if (playTags.length > 0) {
+          playTags.forEach((tag) => {
+            void handleTag(data.id, `${tag.id}`);
+          });
+        }
         void updateLastWatched();
         void resetPlay();
       }
@@ -335,8 +337,8 @@ const NewPlayModal = ({
           <PlayMentions players={players} setMentions={setMentions} />
           <PrivacyStatus
             video={video}
-            playDetails={playDetails}
-            setPlayDetails={setPlayDetails}
+            newDetails={playDetails}
+            setNewDetails={setPlayDetails}
           />
           <div className="flex items-center justify-center gap-2">
             <Button
