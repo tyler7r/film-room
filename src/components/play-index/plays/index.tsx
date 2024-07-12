@@ -11,7 +11,6 @@ type PlaysProps = {
   setActivePlay: (play: PlayPreviewType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
-  setIsFiltersOpen: (isFiltersOpen: boolean) => void;
   videoId: string;
 };
 
@@ -22,7 +21,6 @@ const Plays = ({
   scrollToPlayer,
   searchOptions,
   setSearchOptions,
-  setIsFiltersOpen,
   videoId,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
@@ -36,7 +34,6 @@ const Plays = ({
           player={player}
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
-          setIsFiltersOpen={setIsFiltersOpen}
           videoId={videoId}
         />
       ))}

@@ -28,7 +28,6 @@ type PlayProps = {
   setActivePlay: (play: PlayPreviewType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
-  setIsFiltersOpen: (isFiltersOpen: boolean) => void;
   videoId: string;
 };
 
@@ -40,7 +39,6 @@ const IndexPlay = ({
   setActivePlay,
   searchOptions,
   setSearchOptions,
-  setIsFiltersOpen,
   videoId,
 }: PlayProps) => {
   const { backgroundStyle, hoverText } = useIsDarkContext();
@@ -130,18 +128,15 @@ const IndexPlay = ({
 
   const handleMentionClick = (e: React.MouseEvent, mention: string) => {
     e.stopPropagation();
-    setIsFiltersOpen(true);
     setSearchOptions({ ...searchOptions, topic: mention });
   };
 
   const handleTagClick = (tag: string) => {
-    setIsFiltersOpen(true);
     setSearchOptions({ ...searchOptions, topic: tag });
   };
 
   const handleHighlightClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFiltersOpen(true);
     setSearchOptions({
       ...searchOptions,
       only_highlights: !searchOptions.only_highlights,
@@ -150,7 +145,6 @@ const IndexPlay = ({
 
   const handlePrivateClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFiltersOpen(true);
     setSearchOptions({
       ...searchOptions,
       private_only: !searchOptions.private_only,

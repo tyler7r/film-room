@@ -39,7 +39,6 @@ const PlayIndex = ({
   const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [playCount, setPlayCount] = useState<number | null>(null);
-  const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
 
   const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
     only_highlights: false,
@@ -193,7 +192,6 @@ const PlayIndex = ({
         <div className="flex w-11/12 flex-col items-center justify-center gap-2">
           <div className="tracking-tightest text-xl font-bold">Active Play</div>
           <IndexPlay
-            setIsFiltersOpen={setIsFiltersOpen}
             scrollToPlayer={scrollToPlayer}
             play={activePlay}
             player={player}
@@ -215,7 +213,6 @@ const PlayIndex = ({
           setSearchOptions={setSearchOptions}
         />
         <Plays
-          setIsFiltersOpen={setIsFiltersOpen}
           scrollToPlayer={scrollToPlayer}
           player={player}
           plays={plays}

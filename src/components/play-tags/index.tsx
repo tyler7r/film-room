@@ -12,17 +12,17 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   TextField,
   Tooltip,
   createFilterOptions,
   type AutocompleteChangeDetails,
   type AutocompleteChangeReason,
+  type SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { NewTagType } from "~/utils/types";
+import type { NewTagType } from "~/utils/types";
 import type { CreateNewTagType } from "../add-play";
 import TeamLogo from "../team-logo";
 
