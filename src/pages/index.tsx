@@ -138,7 +138,7 @@ const Home = () => {
           showFirstButton
           showLastButton
           sx={{ marginTop: "8px" }}
-          size="small"
+          size="medium"
           variant="text"
           shape="rounded"
           count={getNumberOfPages(itemsPerPage, playCount)}

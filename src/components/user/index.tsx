@@ -5,20 +5,25 @@ import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { TeamType, UserType } from "~/utils/types";
 import EmptyMessage from "../empty-msg";
+import PageTitle from "../page-title";
 import TeamLogo from "../team-logo";
 
 type UserProps = {
   user: UserType;
+  goToProfile: boolean;
+  small?: boolean;
 };
 
-const User = ({ user }: UserProps) => {
+const User = ({ user, goToProfile, small }: UserProps) => {
   const { backgroundStyle, hoverBorder } = useIsDarkContext();
   const router = useRouter();
 
   const [userTeams, setUserTeams] = useState<TeamType[] | null>(null);
 
-  const handleClick = (userId: string) => {
-    void router.push(`/profile/${userId}`);
+  const handleClick = () => {
+    if (goToProfile) {
+      void router.push(`/profile/${user.id}`);
+    }
   };
 
   const fetchUserTeams = async () => {
@@ -37,16 +42,20 @@ const User = ({ user }: UserProps) => {
   return (
     <div
       style={backgroundStyle}
-      className={`${hoverBorder} flex w-full items-center gap-4 `}
-      onClick={() => handleClick(user.id)}
+      className={`${hoverBorder} flex w-full items-center ${
+        small ? "gap-2" : "gap-4"
+      } `}
+      onClick={handleClick}
     >
-      <div className="w-full grow text-center font-serif text-2xl font-bold italic">
-        {user.name}
-      </div>
+      <PageTitle title={`${user.name}`} size={small ? "x-small" : "small"} />
       <Divider orientation="vertical" flexItem variant="middle" />
-      <div className="flex w-full shrink items-center justify-center gap-4">
+      <div
+        className={`flex w-full shrink items-center justify-center ${
+          small ? "gap-2" : "gap-4"
+        }`}
+      >
         {userTeams ? (
-          userTeams.map((team) => <TeamLogo tm={team} size={45} />)
+          userTeams.map((team) => <TeamLogo tm={team} size={small ? 35 : 45} />)
         ) : (
           <EmptyMessage message="affiliations" size="small" />
         )}

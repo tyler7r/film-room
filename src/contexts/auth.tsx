@@ -33,7 +33,6 @@ export const isAuthContext = createContext<AuthContextProps>({
 });
 
 export const IsAuth = ({ children }: AuthProps) => {
-  // const { setAffiliations } = useAffiliatedContext();
   const [user, setUser] = useState<UserSession>({
     isLoggedIn: false,
     userId: undefined,

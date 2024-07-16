@@ -277,7 +277,7 @@ export type RequestType = {
 }[];
 
 export type UserType = {
-  email: string | null;
+  email: string | null | undefined;
   id: string;
   last_watched: string | null;
   last_watched_time: number | null;

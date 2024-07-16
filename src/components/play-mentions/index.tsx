@@ -1,6 +1,7 @@
 import { Autocomplete, TextField } from "@mui/material";
 import type { SyntheticEvent } from "react";
 import { type PlayerType } from "~/utils/types";
+import User from "../user";
 
 type PlayMentionsProps = {
   setMentions: (mentions: PlayerType[]) => void;
@@ -27,7 +28,19 @@ const PlayMentions = ({ setMentions, players }: PlayMentionsProps) => {
           getOptionLabel={(option) => `${option.name}`}
           renderOption={(props, option) => (
             <li {...props} key={option.profile_id}>
-              {option.name}
+              {/* {option.name} */}
+              <User
+                user={{
+                  email: option.email,
+                  id: option.profile_id,
+                  last_watched: null,
+                  last_watched_time: null,
+                  name: option.name,
+                  join_date: option.join_date,
+                }}
+                goToProfile={false}
+                small={true}
+              />
             </li>
           )}
           filterSelectedOptions

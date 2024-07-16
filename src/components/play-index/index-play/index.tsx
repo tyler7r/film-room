@@ -126,13 +126,18 @@ const IndexPlay = ({
     }, duration);
   };
 
-  const handleMentionClick = (e: React.MouseEvent, mention: string) => {
-    e.stopPropagation();
-    setSearchOptions({ ...searchOptions, topic: mention });
-  };
+  // const handleMentionClick = (e: React.MouseEvent, mention: string) => {
+  //   e.stopPropagation();
+  //   setSearchOptions({ ...searchOptions, topic: mention });
+  // };
 
-  const handleTagClick = (tag: string) => {
-    setSearchOptions({ ...searchOptions, topic: tag });
+  // const handleTagClick = (tag: string) => {
+  //   setSearchOptions({ ...searchOptions, topic: tag });
+  // };
+
+  const handleMentionAndTagClick = (e: React.MouseEvent, topic: string) => {
+    e.stopPropagation();
+    setSearchOptions({ ...searchOptions, topic: topic });
   };
 
   const handleHighlightClick = (e: React.MouseEvent) => {
@@ -255,7 +260,9 @@ const IndexPlay = ({
               <LocalOfferIcon />
               {mentions?.map((mention) => (
                 <div
-                  onClick={(e) => handleMentionClick(e, mention.receiver_name)}
+                  onClick={(e) =>
+                    handleMentionAndTagClick(e, mention.receiver_name)
+                  }
                   className={`tracking text-center font-bold ${hoverText}`}
                   key={mention.id}
                 >
@@ -306,7 +313,7 @@ const IndexPlay = ({
               <Button
                 key={tag.title + tag.id}
                 size="small"
-                onClick={() => handleTagClick(tag.title)}
+                onClick={(e) => handleMentionAndTagClick(e, tag.title)}
               >
                 #{tag.title}
               </Button>
