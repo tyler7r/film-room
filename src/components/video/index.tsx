@@ -35,13 +35,15 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
 
   const handleClick = async (id: string) => {
     if (!startTime) {
-      await supabase
-        .from("profiles")
-        .update({
-          last_watched: id,
-          last_watched_time: 0,
-        })
-        .eq("id", `${user.userId}`);
+      if (user.userId) {
+        await supabase
+          .from("profiles")
+          .update({
+            last_watched: id,
+            last_watched_time: 0,
+          })
+          .eq("id", user.userId);
+      }
       void router.push(`/film-room/${id}`);
     } else {
       void router.push(`/film-room/${id}?start=${startTime}`);

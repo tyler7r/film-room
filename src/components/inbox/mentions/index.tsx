@@ -76,14 +76,16 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   };
 
   const updateLastWatched = async (video: string, time: number) => {
-    await supabase
-      .from("profiles")
-      .update({
-        last_watched: video,
-        last_watched_time: time,
-      })
-      .eq("id", `${user.userId}`)
-      .select();
+    if (user.userId) {
+      await supabase
+        .from("profiles")
+        .update({
+          last_watched: video,
+          last_watched_time: time,
+        })
+        .eq("id", user.userId)
+        .select();
+    }
   };
 
   const updateMention = async (mentionId: string) => {

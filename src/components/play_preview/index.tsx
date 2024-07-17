@@ -115,10 +115,12 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
   };
 
   const updateLastWatched = async (video: string, time: number) => {
-    await supabase
-      .from("profiles")
-      .update({ last_watched: video, last_watched_time: time })
-      .eq("id", `${user.userId}`);
+    if (user.userId) {
+      await supabase
+        .from("profiles")
+        .update({ last_watched: video, last_watched_time: time })
+        .eq("id", user.userId);
+    }
   };
 
   const updateUserAffiliation = (teamId: string) => {
