@@ -153,6 +153,8 @@ export type VideoType = {
   week: string | null;
   division: string;
   author_id: string;
+  duplicate_check: string;
+  keywords: string;
 };
 
 export type PlayType = {

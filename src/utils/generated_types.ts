@@ -584,13 +584,6 @@ export type Database = {
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "team_videos_video_id_fkey"
-            columns: ["video_id"]
-            isOneToOne: false
-            referencedRelation: "videos"
-            referencedColumns: ["id"]
-          },
         ]
       }
       teams: {
@@ -640,11 +633,12 @@ export type Database = {
       }
       videos: {
         Row: {
-          author_id: string
+          author_id: string | null
           division: string
+          duplicate_check: string
           exclusive_to: string | null
           id: string
-          keywords: string | null
+          keywords: string
           link: string
           private: boolean
           season: string | null
@@ -654,11 +648,12 @@ export type Database = {
           week: string | null
         }
         Insert: {
-          author_id: string
+          author_id?: string | null
           division: string
+          duplicate_check?: string
           exclusive_to?: string | null
           id?: string
-          keywords?: string | null
+          keywords: string
           link: string
           private?: boolean
           season?: string | null
@@ -668,11 +663,12 @@ export type Database = {
           week?: string | null
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
           division?: string
+          duplicate_check?: string
           exclusive_to?: string | null
           id?: string
-          keywords?: string | null
+          keywords?: string
           link?: string
           private?: boolean
           season?: string | null

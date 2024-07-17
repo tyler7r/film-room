@@ -41,6 +41,10 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
 
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
+  useEffect(() => {
+    console.log(preview);
+  }, []);
+
   const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
   };

@@ -160,22 +160,30 @@ const AddVideo = () => {
           keywords: `${title} ${season} ${
             week === "" ? null : `Week ${week}`
           } ${tournament === "" ? null : tournament} ${division}`,
+          duplicate_check: videoData.private ? `${videoData.exclusive_to}` : "",
         })
         .select()
         .single();
-      if (data && teamMentions) {
-        teamMentions.forEach((mention) => {
+      if (data) {
+        teamMentions?.forEach((mention) => {
           void handleTeamMention(mention.id, data.id);
         });
         void reset();
       }
       if (error)
-        setMessage({
-          text: `A ${
-            videoData.private ? "private" : "public"
-          } video with this link has already been published.`,
-          status: "error",
-        });
+        if (error.code === "23505") {
+          setMessage({
+            text: `A ${
+              videoData.private ? "private" : "public"
+            } video with this link has already been published.`,
+            status: "error",
+          });
+        } else {
+          setMessage({
+            text: `There was a problem publishing this video: ${error.message}`,
+            status: "error",
+          });
+        }
     }
   };
 

@@ -51,17 +51,31 @@ const IndexPlay = ({
   const [tags, setTags] = useState<TagType[] | null>(null);
 
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<{
+    anchor1: HTMLElement | null;
+    anchor2: HTMLElement | null;
+  }>({
+    anchor1: null,
+    anchor2: null,
+  });
 
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
+  const handlePopoverOpen = (
+    e: React.MouseEvent<HTMLElement>,
+    target: "a" | "b" | "c",
+  ) => {
+    if (target === "a") {
+      setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
+    } else {
+      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
+    }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl(null);
+    setAnchorEl({ anchor1: null, anchor2: null });
   };
 
-  const open = Boolean(anchorEl);
+  const open1 = Boolean(anchorEl.anchor1);
+  const open2 = Boolean(anchorEl.anchor2);
 
   const fetchMentions = async () => {
     const { data } = await supabase
@@ -125,15 +139,6 @@ const IndexPlay = ({
       void player?.pauseVideo();
     }, duration);
   };
-
-  // const handleMentionClick = (e: React.MouseEvent, mention: string) => {
-  //   e.stopPropagation();
-  //   setSearchOptions({ ...searchOptions, topic: mention });
-  // };
-
-  // const handleTagClick = (tag: string) => {
-  //   setSearchOptions({ ...searchOptions, topic: tag });
-  // };
 
   const handleMentionAndTagClick = (e: React.MouseEvent, topic: string) => {
     e.stopPropagation();
@@ -216,7 +221,7 @@ const IndexPlay = ({
               <>
                 <div
                   className="flex cursor-pointer items-center"
-                  onMouseEnter={handlePopoverOpen}
+                  onMouseEnter={(e) => handlePopoverOpen(e, "a")}
                   onMouseLeave={handlePopoverClose}
                   onClick={() => handleRestartClick(play.play.start_time)}
                 >
@@ -224,20 +229,11 @@ const IndexPlay = ({
                 </div>
                 <StandardPopover
                   content="Restart Play"
-                  open={open}
-                  anchorEl={anchorEl}
+                  open={open1}
+                  anchorEl={anchorEl.anchor1}
                   handlePopoverClose={handlePopoverClose}
                 />
               </>
-            )}
-            {play.play.author_id === user.userId && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <DeleteMenu
-                  isOpen={isDeleteMenuOpen}
-                  setIsOpen={setIsDeleteMenuOpen}
-                  handleDelete={handleDelete}
-                />
-              </div>
             )}
           </div>
           <div className="flex items-center justify-center gap-2">
@@ -257,7 +253,19 @@ const IndexPlay = ({
           </div>
           {mentions && (
             <div className="flex items-center justify-center gap-2">
-              <LocalOfferIcon />
+              <IconButton
+                size="small"
+                onMouseEnter={(e) => handlePopoverOpen(e, "b")}
+                onMouseLeave={handlePopoverClose}
+              >
+                <LocalOfferIcon />
+              </IconButton>
+              <StandardPopover
+                content="Player Mentions"
+                open={open2}
+                handlePopoverClose={handlePopoverClose}
+                anchorEl={anchorEl.anchor2}
+              />
               {mentions?.map((mention) => (
                 <div
                   onClick={(e) =>
@@ -283,6 +291,15 @@ const IndexPlay = ({
               setCommentCount={setCommentCount}
               activePlay={null}
             />
+            {play.play.author_id === user.userId && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <DeleteMenu
+                  isOpen={isDeleteMenuOpen}
+                  setIsOpen={setIsDeleteMenuOpen}
+                  handleDelete={handleDelete}
+                />
+              </div>
+            )}
             {isExpanded ? (
               <IconButton size="small" onClick={() => setIsExpanded(false)}>
                 <KeyboardArrowUpIcon color="primary" fontSize="large" />
@@ -297,17 +314,19 @@ const IndexPlay = ({
       </div>
       {isExpanded && (
         <div className="flex w-full flex-col items-center gap-2 px-8">
-          <div className="w-full">
-            <strong
-              onClick={() =>
-                void router.push(`/profile/${play.play.author_id}`)
-              }
-              className={hoverText}
-            >
-              Note:{" "}
-            </strong>
-            {play.play.note}
-          </div>
+          {play.play.note && (
+            <div className="w-full">
+              <strong
+                onClick={() =>
+                  void router.push(`/profile/${play.play.author_id}`)
+                }
+                className={hoverText}
+              >
+                Note:{" "}
+              </strong>
+              {play.play.note}
+            </div>
+          )}
           <div className="flex w-full gap-2">
             {tags?.map((tag) => (
               <Button
