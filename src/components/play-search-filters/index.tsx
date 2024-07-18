@@ -94,7 +94,7 @@ const PlaySearchFilters = ({
 
   return (
     <div className="flex w-11/12 flex-col items-center justify-center gap-2 p-2 md:w-4/5">
-      <div className="flex w-full gap-1">
+      <div className="flex w-full items-center gap-1">
         <label htmlFor="search" className="sr-only">
           {isAuthorSearch
             ? "Search by author name"
@@ -145,8 +145,16 @@ const PlaySearchFilters = ({
           value={isAuthorSearch ? searchOptions.author : searchOptions.topic}
         />
         <Checkbox
-          icon={<StarIcon color="action" fontSize="large" />}
-          checkedIcon={<StarIcon color="secondary" fontSize="large" />}
+          icon={
+            <IconButton size="small">
+              <StarIcon color="action" fontSize="large" />
+            </IconButton>
+          }
+          checkedIcon={
+            <IconButton size="small">
+              <StarIcon color="secondary" fontSize="large" />
+            </IconButton>
+          }
           checked={searchOptions.only_highlights}
           onChange={() => {
             setSearchOptions({
@@ -154,7 +162,7 @@ const PlaySearchFilters = ({
               only_highlights: !searchOptions.only_highlights,
             });
           }}
-          size="medium"
+          size="small"
           id="highlights-search"
           name="highlights-search"
           onMouseEnter={(e) => handlePopoverOpen(e, "b")}

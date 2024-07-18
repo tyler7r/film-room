@@ -298,7 +298,7 @@ const NewPlayModal = ({
             value={playDetails.title}
             inputProps={{ maxLength: 100 }}
           />
-          <div className="flex w-full gap-2">
+          <div className="flex w-full items-center justify-center gap-2">
             <TextField
               className="w-full"
               name="note"

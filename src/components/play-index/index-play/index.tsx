@@ -1,24 +1,23 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import LockIcon from "@mui/icons-material/Lock";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StarIcon from "@mui/icons-material/Star";
-import { Button, Divider, IconButton } from "@mui/material";
+import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import DeleteMenu from "~/components/delete-menu";
-import AddComment from "~/components/interactions/comments/add-comment";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
-import CommentIndex from "~/components/interactions/comments/comment-index";
 import LikeBtn from "~/components/interactions/likes/like-btn";
 import StandardPopover from "~/components/standard-popover";
+import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { MentionType, PlayPreviewType, TagType } from "~/utils/types";
+import type { PlayPreviewType, TeamType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
+import ExpandedPlay from "./expanded";
+import Mentions from "./mentions";
 
 type PlayProps = {
   player: YouTubePlayer | null;
@@ -42,13 +41,11 @@ const IndexPlay = ({
   videoId,
 }: PlayProps) => {
   const { backgroundStyle, hoverText } = useIsDarkContext();
-  const { user } = useAuthContext();
+  const { user, affiliations } = useAuthContext();
   const router = useRouter();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
-  const [mentions, setMentions] = useState<MentionType[] | null>(null);
-  const [tags, setTags] = useState<TagType[] | null>(null);
 
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<{
@@ -59,9 +56,13 @@ const IndexPlay = ({
     anchor2: null,
   });
 
+  const exclusiveTeam: TeamType | undefined = affiliations?.find(
+    (aff) => aff.team.id === play.play.exclusive_to,
+  )?.team;
+
   const handlePopoverOpen = (
     e: React.MouseEvent<HTMLElement>,
-    target: "a" | "b" | "c",
+    target: "a" | "b",
   ) => {
     if (target === "a") {
       setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
@@ -76,36 +77,6 @@ const IndexPlay = ({
 
   const open1 = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
-
-  const fetchMentions = async () => {
-    const { data } = await supabase
-      .from("plays_via_user_mention")
-      .select("*")
-      .eq("play->>id", play.play.id);
-    if (data && data.length > 0) {
-      const mentions: MentionType[] = data.map((mention) => mention.mention);
-      setMentions(mentions);
-    } else setMentions(null);
-  };
-
-  const fetchTags = async () => {
-    const tags = supabase
-      .from("plays_via_tag")
-      .select("*")
-      .eq("play->>id", play.play.id);
-    if (user.currentAffiliation?.team.id) {
-      void tags.or(
-        `tag->>private.eq.false, tag->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
-      );
-    } else {
-      void tags.eq("tag->>private", false);
-    }
-    const { data } = await tags;
-    if (data) {
-      const tags: TagType[] = data.map((tag) => tag.tag);
-      setTags(tags);
-    } else setTags(null);
-  };
 
   const updateLastWatched = async (time: number) => {
     if (user.userId) {
@@ -174,11 +145,6 @@ const IndexPlay = ({
     await supabase.from("plays").delete().eq("id", play.play.id);
   };
 
-  useEffect(() => {
-    void fetchMentions();
-    void fetchTags();
-  }, [activePlay]);
-
   return (
     <div className={`flex w-full flex-col gap-4`}>
       <div className="grid gap-1 rounded-md p-2" style={backgroundStyle}>
@@ -208,12 +174,20 @@ const IndexPlay = ({
                   <StarIcon color="secondary" fontSize="large" />
                 </div>
               )}
-              {play.play.private && (
+              {play.play.private && exclusiveTeam && (
                 <div
                   className="flex items-center justify-center"
                   onClick={(e) => handlePrivateClick(e)}
+                  onMouseEnter={(e) => handlePopoverOpen(e, "b")}
+                  onMouseLeave={handlePopoverClose}
                 >
-                  <LockIcon fontSize="large" color="action" />
+                  <TeamLogo tm={exclusiveTeam} size={30} inactive={true} />
+                  <StandardPopover
+                    open={open2}
+                    anchorEl={anchorEl.anchor2}
+                    content={`Play is private to ${exclusiveTeam?.full_name}`}
+                    handlePopoverClose={handlePopoverClose}
+                  />
                 </div>
               )}
             </div>
@@ -251,34 +225,11 @@ const IndexPlay = ({
             <Divider flexItem orientation="vertical" variant="middle" />
             <div>{play.play.title}</div>
           </div>
-          {mentions && (
-            <div className="flex items-center justify-center gap-2">
-              <IconButton
-                size="small"
-                onMouseEnter={(e) => handlePopoverOpen(e, "b")}
-                onMouseLeave={handlePopoverClose}
-              >
-                <LocalOfferIcon />
-              </IconButton>
-              <StandardPopover
-                content="Player Mentions"
-                open={open2}
-                handlePopoverClose={handlePopoverClose}
-                anchorEl={anchorEl.anchor2}
-              />
-              {mentions?.map((mention) => (
-                <div
-                  onClick={(e) =>
-                    handleMentionAndTagClick(e, mention.receiver_name)
-                  }
-                  className={`tracking text-center font-bold ${hoverText}`}
-                  key={mention.id}
-                >
-                  @{mention.receiver_name}
-                </div>
-              ))}
-            </div>
-          )}
+          <Mentions
+            activePlay={activePlay}
+            play={play}
+            handleMentionAndTagClick={handleMentionAndTagClick}
+          />
         </div>
         <div className="flex w-full items-center justify-center gap-3 px-1">
           <div className="flex items-center justify-center gap-2">
@@ -313,39 +264,11 @@ const IndexPlay = ({
         </div>
       </div>
       {isExpanded && (
-        <div className="flex w-full flex-col items-center gap-2 px-8">
-          {play.play.note && (
-            <div className="w-full">
-              <strong
-                onClick={() =>
-                  void router.push(`/profile/${play.play.author_id}`)
-                }
-                className={hoverText}
-              >
-                Note:{" "}
-              </strong>
-              {play.play.note}
-            </div>
-          )}
-          <div className="flex w-full gap-2">
-            {tags?.map((tag) => (
-              <Button
-                key={tag.title + tag.id}
-                size="small"
-                onClick={(e) => handleMentionAndTagClick(e, tag.title)}
-              >
-                #{tag.title}
-              </Button>
-            ))}
-          </div>
-          <div className="flex w-full flex-col items-center gap-4">
-            <AddComment playId={play.play.id} />
-            <CommentIndex
-              playId={play.play.id}
-              setCommentCount={setCommentCount}
-            />
-          </div>
-        </div>
+        <ExpandedPlay
+          play={play}
+          handleMentionAndTagClick={handleMentionAndTagClick}
+          setCommentCount={setCommentCount}
+        />
       )}
     </div>
   );
