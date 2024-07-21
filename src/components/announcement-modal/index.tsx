@@ -1,4 +1,5 @@
 import { Button, TextField } from "@mui/material";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
@@ -6,12 +7,14 @@ import { type MessageType, type TeamType } from "~/utils/types";
 import FormMessage from "../form-message";
 
 type AnnouncementProps = {
-  team: TeamType | null;
+  team: TeamType;
   toggleOpen: (modal: string, open: boolean) => void;
 };
 
 const AnnouncementModal = ({ toggleOpen, team }: AnnouncementProps) => {
   const { user } = useAuthContext();
+  const router = useRouter();
+
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
     status: "error",
@@ -26,29 +29,33 @@ const AnnouncementModal = ({ toggleOpen, team }: AnnouncementProps) => {
 
   const handleAnnouncement = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { data } = await supabase
-      .from("announcements")
-      .insert({
-        team_id: `${team?.id}`,
-        text: announcement,
-        author_name: user.name!,
-        author_id: user.currentAffiliation?.affId,
-      })
-      .select();
-    if (data) {
-      setMessage({ text: "Announcement sent!", status: "success" });
-      setTimeout(() => {
-        toggleOpen("announcement", false);
-        setIsValidAnnouncement(false);
-        setAnnouncement("");
-        setMessage({ text: undefined, status: "error" });
-      }, 1000);
+    if (user.userId && user.name) {
+      const { data } = await supabase
+        .from("announcements")
+        .insert({
+          team_id: team.id,
+          text: announcement,
+          author_name: user.name,
+          author_id: user.userId,
+        })
+        .select();
+      if (data) {
+        setMessage({ text: "Announcement sent!", status: "success" });
+        setTimeout(() => {
+          toggleOpen("announcement", false);
+          setIsValidAnnouncement(false);
+          setAnnouncement("");
+          setMessage({ text: undefined, status: "error" });
+        }, 1000);
+      } else {
+        setMessage({
+          text: "There was an error sending the announcement!",
+          status: "error",
+        });
+        setIsValidAnnouncement(true);
+      }
     } else {
-      setMessage({
-        text: "There was an error sending the announcement!",
-        status: "error",
-      });
-      setIsValidAnnouncement(true);
+      void router.push("/login");
     }
   };
 

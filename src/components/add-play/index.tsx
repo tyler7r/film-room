@@ -35,7 +35,7 @@ const NewPlayModal = ({
   isNewPlayOpen,
 }: NewPlayModalProps) => {
   const router = useRouter();
-  const { user } = useAuthContext();
+  const { user, affIds } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
 
   const [isPlayStarted, setIsPlayStarted] = useState(false);
@@ -66,20 +66,18 @@ const NewPlayModal = ({
 
   const open = Boolean(anchorEl);
 
-  const fetchPlayers = async (currentAffiliation: string | undefined) => {
-    const affiliatedPlayers = supabase.from("user_view").select().match({
-      team_id: currentAffiliation,
-      role: "player",
-      verified: true,
-    });
-    const allPlayers = supabase
-      .from("user_view")
-      .select("*")
-      .eq("role", "player");
-    const { data } =
-      video.private && currentAffiliation
-        ? await affiliatedPlayers
-        : await allPlayers;
+  const fetchPlayers = async () => {
+    const players = supabase.from("user_view").select();
+    if (video.exclusive_to) {
+      void players.match({
+        team_id: video.exclusive_to,
+        role: "player",
+        verified: true,
+      });
+    } else {
+      void players.eq("role", "player");
+    }
+    const { data } = await players;
     if (data) {
       const uniquePlayers = [
         ...new Map(data.map((x) => [x.profile_id, x])).values(),
@@ -90,10 +88,8 @@ const NewPlayModal = ({
 
   const fetchTags = async () => {
     const tags = supabase.from("tags").select("title, id");
-    if (user.currentAffiliation?.team.id) {
-      void tags.or(
-        `private.eq.false, exclusive_to.eq.${user.currentAffiliation.team.id}`,
-      );
+    if (affIds) {
+      void tags.or(`private.eq.false, exclusive_to.in.(${affIds})`);
     } else {
       void tags.eq("private", false);
     }
@@ -251,9 +247,9 @@ const NewPlayModal = ({
   }, [playDetails]);
 
   useEffect(() => {
-    void fetchPlayers(user.currentAffiliation?.team.id);
+    void fetchPlayers();
     void fetchTags();
-  }, [video, user]);
+  }, [video]);
 
   return !isNewPlayOpen ? (
     <PlayModalBtn
