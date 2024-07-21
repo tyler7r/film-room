@@ -5,7 +5,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { PlayPreviewType, TeamType } from "~/utils/types";
+import type { PlayPreviewType } from "~/utils/types";
 import PlaySearchFilters from "../play-search-filters";
 import IndexPlay from "./index-play";
 import Plays from "./plays";
@@ -22,8 +22,7 @@ export type PlaySearchOptions = {
   author?: string | undefined;
   only_highlights?: boolean;
   topic: string;
-  private_only?: boolean;
-  currentAffiliation: TeamType | undefined;
+  private_only?: string;
 };
 
 const PlayIndex = ({
@@ -33,7 +32,7 @@ const PlayIndex = ({
   setActivePlay,
   activePlay,
 }: PlayIndexProps) => {
-  const { user, affIds } = useAuthContext();
+  const { affIds } = useAuthContext();
   const { isMobile } = useMobileContext();
 
   const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
@@ -43,9 +42,8 @@ const PlayIndex = ({
   const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
     only_highlights: false,
     author: "",
-    private_only: false,
+    private_only: "all",
     topic: "",
-    currentAffiliation: user.currentAffiliation?.team,
   });
   const itemsPerPage = isMobile ? 10 : 20;
 
@@ -62,9 +60,6 @@ const PlayIndex = ({
     if (options?.only_highlights) {
       void plays.eq("play->>highlight", true);
     }
-    if (options?.private_only) {
-      void plays.eq("play->>private", true);
-    }
     if (options?.author && options.author !== "") {
       void plays.ilike("play->>author_name", `%${options.author}%`);
     }
@@ -72,9 +67,13 @@ const PlayIndex = ({
       void plays.neq("play->>id", activePlay.play.id);
     }
     if (affIds) {
-      void plays.or(
-        `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-      );
+      if (options?.private_only === "all") {
+        void plays.or(
+          `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
+        );
+      } else if (options?.private_only && options.private_only !== "all") {
+        void plays.eq("play->>exclusive_to", options.private_only);
+      }
     } else {
       void plays.eq("play->>private", false);
     }
@@ -106,10 +105,6 @@ const PlayIndex = ({
         void playsByMention.eq("play->>highlight", true);
         void playsByTag.eq("play->>highlight", true);
       }
-      if (options.private_only) {
-        void playsByMention.eq("play->>private", true);
-        void playsByTag.eq("play->>private", true);
-      }
       if (activePlay) {
         void playsByMention.neq("play->>id", activePlay.play.id);
         void playsByTag.neq("play->>id", activePlay.play.id);
@@ -119,12 +114,17 @@ const PlayIndex = ({
         void playsByTag.ilike("play->>author_name", options.author);
       }
       if (affIds) {
-        void playsByMention.or(
-          `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-        );
-        void playsByTag.or(
-          `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-        );
+        if (options?.private_only === "all") {
+          void playsByMention.or(
+            `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
+          );
+          void playsByTag.or(
+            `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
+          );
+        } else if (options.private_only && options.private_only !== "all") {
+          void playsByMention.eq("play->>exclusive_to", options.private_only);
+          void playsByTag.eq("play->>exclusive_to", options.private_only);
+        }
       } else {
         void playsByMention.eq("play->>private", false);
         void playsByTag.eq("play->>private", false);
@@ -165,13 +165,6 @@ const PlayIndex = ({
       void supabase.removeChannel(channel);
     };
   }, []);
-
-  useEffect(() => {
-    setSearchOptions({
-      ...searchOptions,
-      currentAffiliation: user.currentAffiliation?.team,
-    });
-  }, [user]);
 
   useEffect(() => {
     if (page === 1 && searchOptions.topic !== "") {

@@ -19,7 +19,6 @@ import type {
 
 type FetchOptions = {
   profileId?: string | undefined;
-  currentAffiliation: string | undefined;
 };
 
 type ProfileType = {
@@ -29,11 +28,10 @@ type ProfileType = {
 
 const Profile = () => {
   const router = useRouter();
-  const { user, setUser, affiliations } = useAuthContext();
+  const { user } = useAuthContext();
 
   const [options, setOptions] = useState<FetchOptions>({
     profileId: router.query.user as string,
-    currentAffiliation: user.currentAffiliation?.team.id,
   });
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [profileAffiliations, setProfileAffiliations] = useState<
@@ -107,19 +105,6 @@ const Profile = () => {
           });
   };
 
-  const updateUserAffiliation = (teamId: string | null | undefined) => {
-    if (teamId) {
-      const team = affiliations?.find((aff) => aff.team.id === teamId);
-      if (user.currentAffiliation?.team.id === teamId) return;
-      else {
-        setUser({
-          ...user,
-          currentAffiliation: team ? team : user.currentAffiliation,
-        });
-      }
-    } else return;
-  };
-
   useEffect(() => {
     if (user.userId) void fetchLastWatched();
   }, [user]);
@@ -128,7 +113,6 @@ const Profile = () => {
     setOptions({
       ...options,
       profileId: router.query.user as string,
-      currentAffiliation: user.currentAffiliation?.team.id,
     });
   }, [router.query.user, user]);
 
@@ -166,17 +150,10 @@ const Profile = () => {
                   <PlayArrowIcon fontSize="large" />
                   <PageTitle size="small" title="Continue Watching" />
                 </div>
-                <div
-                  className="w-full"
-                  onClick={() =>
-                    updateUserAffiliation(lastWatched.video.exclusive_to)
-                  }
-                >
-                  <Video
-                    video={lastWatched.video}
-                    startTime={`${lastWatched.profile.last_watched_time}`}
-                  />
-                </div>
+                <Video
+                  video={lastWatched.video}
+                  startTime={`${lastWatched.profile.last_watched_time}`}
+                />
               </div>
             )}
           </div>

@@ -6,8 +6,13 @@ import StarIcon from "@mui/icons-material/Star";
 import {
   Button,
   Checkbox,
+  FormControl,
   IconButton,
   InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   TextField,
 } from "@mui/material";
 import { useState } from "react";
@@ -25,17 +30,15 @@ const PlaySearchFilters = ({
   searchOptions,
   setSearchOptions,
 }: PlaySearchFilterProps) => {
-  const { user } = useAuthContext();
+  const { user, affiliations } = useAuthContext();
 
   const [isAuthorSearch, setIsAuthorSearch] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
-    anchor3: HTMLElement | null;
   }>({
     anchor1: null,
     anchor2: null,
-    anchor3: null,
   });
 
   const handlePopoverOpen = (
@@ -44,20 +47,17 @@ const PlaySearchFilters = ({
   ) => {
     if (target === "a") {
       setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
-    } else if (target === "b") {
-      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
     } else {
-      setAnchorEl({ ...anchorEl, anchor3: e.currentTarget });
+      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
     }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
+    setAnchorEl({ anchor1: null, anchor2: null });
   };
 
   const open1 = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
-  const open3 = Boolean(anchorEl.anchor3);
 
   const handleModeChange = () => {
     if (isAuthorSearch) {
@@ -78,13 +78,22 @@ const PlaySearchFilters = ({
     }
   };
 
+  const handlePrivacyStatus = (e: SelectChangeEvent) => {
+    const status = e.target.value;
+    if (status === "all" || status === "") {
+      setSearchOptions({ ...searchOptions, private_only: "all" });
+    } else {
+      setSearchOptions({ ...searchOptions, private_only: status });
+    }
+  };
+
   const clearSearchOptions = () => {
     setSearchOptions({
       ...searchOptions,
       only_highlights: false,
       author: "",
       topic: "",
-      private_only: false,
+      private_only: "all",
     });
   };
 
@@ -94,56 +103,85 @@ const PlaySearchFilters = ({
 
   return (
     <div className="flex w-11/12 flex-col items-center justify-center gap-2 p-2 md:w-4/5">
-      <div className="flex w-full items-center gap-1">
-        <label htmlFor="search" className="sr-only">
-          {isAuthorSearch
-            ? "Search by author name"
-            : "Search by tag, mention, or play title..."}
-        </label>
-        <TextField
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <div className="flex">
-                <Checkbox
-                  icon={<CreateIcon color="action" fontSize="small" />}
-                  checkedIcon={<CreateIcon color="primary" fontSize="small" />}
-                  checked={isAuthorSearch}
-                  onChange={handleModeChange}
-                  size="medium"
-                  id="highlights-search"
-                  name="highlights-search"
-                  onMouseEnter={(e) => handlePopoverOpen(e, "a")}
-                  onMouseLeave={handlePopoverClose}
-                />
-                <StandardPopover
-                  open={open1}
-                  anchorEl={anchorEl.anchor1}
-                  handlePopoverClose={handlePopoverClose}
-                  content={isAuthorSearch ? "Topic search" : "Author Search"}
-                />
-                <IconButton size="small" onClick={clearTopic}>
-                  <ClearIcon color="primary" fontSize="small" />
-                </IconButton>
-              </div>
-            ),
-          }}
-          className="w-full"
-          placeholder={
-            isAuthorSearch
+      <div className="flex w-full items-center justify-center gap-1">
+        <div className="flex w-full flex-col items-center justify-center gap-4 md:flex-row md:gap-2">
+          <label htmlFor="search" className="sr-only">
+            {isAuthorSearch
               ? "Search by author name"
-              : "Search by tag, mention, or play title..."
-          }
-          name="topic"
-          autoComplete="search-by-mentions"
-          id="search-by-mentions"
-          onChange={changeHandler}
-          value={isAuthorSearch ? searchOptions.author : searchOptions.topic}
-        />
+              : "Search by tag, mention, or play title..."}
+          </label>
+          <TextField
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <div className="flex">
+                  <Checkbox
+                    icon={<CreateIcon color="action" fontSize="small" />}
+                    checkedIcon={
+                      <CreateIcon color="primary" fontSize="small" />
+                    }
+                    checked={isAuthorSearch}
+                    onChange={handleModeChange}
+                    size="medium"
+                    id="highlights-search"
+                    name="highlights-search"
+                    onMouseEnter={(e) => handlePopoverOpen(e, "a")}
+                    onMouseLeave={handlePopoverClose}
+                  />
+                  <StandardPopover
+                    open={open1}
+                    anchorEl={anchorEl.anchor1}
+                    handlePopoverClose={handlePopoverClose}
+                    content={isAuthorSearch ? "Topic search" : "Author Search"}
+                  />
+                  <IconButton size="small" onClick={clearTopic}>
+                    <ClearIcon color="primary" fontSize="small" />
+                  </IconButton>
+                </div>
+              ),
+            }}
+            className="w-full"
+            placeholder={
+              isAuthorSearch
+                ? "Search by author name"
+                : "Search by tag, mention, or play title..."
+            }
+            name="topic"
+            autoComplete="search-by-mentions"
+            id="search-by-mentions"
+            onChange={changeHandler}
+            value={isAuthorSearch ? searchOptions.author : searchOptions.topic}
+          />
+          {affiliations && (
+            <FormControl className="w-full">
+              <InputLabel>Plays by Team</InputLabel>
+              <Select
+                value={searchOptions.private_only}
+                onChange={handlePrivacyStatus}
+                label="Privacy Status"
+                name="privacy"
+                id="privacy-status"
+                className="w-full"
+              >
+                <MenuItem value="all">All Plays</MenuItem>
+                {affiliations?.map((div) => (
+                  <MenuItem key={div.team.id} value={div.team.id}>
+                    <div className="flex gap-2">
+                      <div>
+                        Plays private to: <strong>{div.team.full_name}</strong>
+                      </div>
+                      {div.team.logo && <TeamLogo tm={div.team} size={25} />}
+                    </div>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        </div>
         <Checkbox
           icon={
             <IconButton size="small">
@@ -174,32 +212,6 @@ const PlaySearchFilters = ({
           handlePopoverClose={handlePopoverClose}
           content="Highlights only"
         />
-        {user.currentAffiliation?.team && (
-          <IconButton
-            className="flex cursor-pointer items-center"
-            onMouseEnter={(e) => handlePopoverOpen(e, "c")}
-            onMouseLeave={handlePopoverClose}
-            onClick={() =>
-              setSearchOptions({
-                ...searchOptions,
-                private_only: !searchOptions.private_only,
-              })
-            }
-            size="small"
-          >
-            <TeamLogo
-              tm={user.currentAffiliation.team}
-              size={30}
-              inactive={true}
-            />
-            <StandardPopover
-              content={`Plays private to ${user.currentAffiliation.team.full_name} only`}
-              open={open3}
-              anchorEl={anchorEl.anchor3}
-              handlePopoverClose={handlePopoverClose}
-            />
-          </IconButton>
-        )}
       </div>
       <Button
         endIcon={<DeleteIcon />}

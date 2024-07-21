@@ -13,7 +13,6 @@ import Inbox from "../inbox";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 import NavbarSearch from "../navbar-search";
-import TeamLogo from "../team-logo";
 import { type ChildrenNavProps } from "./navbar";
 
 const MobileNav = ({ logout }: ChildrenNavProps) => {
@@ -44,9 +43,6 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
                   >
                     <SearchIcon fontSize="large" />
                   </IconButton>
-                  {user.currentAffiliation && (
-                    <TeamLogo tm={user.currentAffiliation.team}></TeamLogo>
-                  )}
                   <Button variant="contained" size="small" onClick={logout}>
                     Logout
                   </Button>

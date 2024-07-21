@@ -57,7 +57,6 @@ const Inbox = () => {
           <TeamHeader />
           <Divider></Divider>
           <PendingTeamRequests hide={hideRequests} setHide={setHideRequests} />
-          <Divider></Divider>
           <InboxMentions hide={hideMentions} setHide={setHideMentions} />
           <Divider />
           <InboxComments hide={hideComments} setHide={setHideComments} />

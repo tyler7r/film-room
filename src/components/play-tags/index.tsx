@@ -245,26 +245,6 @@ const PlayTags = ({ tags, setTags, allTags }: PlayTagsProps) => {
                     </div>
                   </FormControl>
                 </div>
-                {/* {user.currentAffiliation?.team.id && (
-                  <div className="flex items-center justify-center">
-                    <div className="text-lg font-bold tracking-tight">
-                      Keep this tag private to{" "}
-                      {`${user.currentAffiliation?.team.full_name} `}
-                    </div>
-                    <Checkbox
-                      checked={newTag.private}
-                      onChange={() => {
-                        setNewTag({
-                          ...newTag,
-                          private: !newTag.private,
-                        });
-                      }}
-                      size="medium"
-                      name="private-tag"
-                      id="private-tag"
-                    />
-                  </div>
-                )} */}
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>

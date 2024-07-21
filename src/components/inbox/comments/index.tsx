@@ -3,12 +3,10 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import MailIcon from "@mui/icons-material/Mail";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider, IconButton, colors } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
-import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
@@ -21,7 +19,7 @@ type InboxCommentsProps = {
 };
 
 const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
-  const { user, setUser, affiliations } = useAuthContext();
+  const { user } = useAuthContext();
   const { setIsOpen, commentPage, setCommentPage, setCommentCount } =
     useInboxContext();
   const { backgroundStyle, isDark, hoverBorder, hoverText } =
@@ -66,7 +64,7 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   };
 
   const getFromAndTo = () => {
-    const itemPerPage = 4;
+    const itemPerPage = 5;
     let from = commentPage * itemPerPage;
     const to = from + itemPerPage;
 
@@ -176,27 +174,19 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
           <div className="flex flex-col gap-5 md:px-2 lg:px-4">
             {comments?.map((notification) => (
               <div key={notification.play.id + notification.comment.created_at}>
-                <div className="flex items-center gap-2">
-                  {notification.team && (
-                    <TeamLogo tm={notification.team} size={20} />
-                  )}
-                  {!notification.play.private && (
-                    <PublicIcon fontSize="small" />
-                  )}
-                  <div>
-                    <strong
-                      className={hoverText}
-                      onClick={() => {
-                        setIsOpen(false);
-                        void router.push(
-                          `/profile/${notification.play.author_id}`,
-                        );
-                      }}
-                    >
-                      {notification.comment.author_name}
-                    </strong>{" "}
-                    commented on:
-                  </div>
+                <div>
+                  <strong
+                    className={hoverText}
+                    onClick={() => {
+                      setIsOpen(false);
+                      void router.push(
+                        `/profile/${notification.play.author_id}`,
+                      );
+                    }}
+                  >
+                    {notification.comment.author_name}
+                  </strong>{" "}
+                  commented on:
                 </div>
                 <div
                   onClick={() =>

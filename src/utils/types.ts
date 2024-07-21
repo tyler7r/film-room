@@ -54,7 +54,6 @@ export type Database = MergeDeep<
             play: PlayType;
             video: VideoType;
             comment: CommentType;
-            team: TeamType;
           };
         };
         last_watched_view: {
@@ -117,7 +116,6 @@ export type UserSession = {
   userId: string | undefined;
   email: string | undefined;
   name: string | undefined;
-  currentAffiliation: TeamAffiliationType | undefined;
 };
 
 export type TeamType = {
@@ -301,7 +299,6 @@ export type MentionNotificationType = {
 export type CommentNotificationType = {
   play: PlayType;
   video: VideoType;
-  team: TeamType;
   comment: CommentType;
 };
 

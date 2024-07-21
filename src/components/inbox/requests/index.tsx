@@ -1,7 +1,6 @@
-import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { IconButton, MenuItem, Typography } from "@mui/material";
+import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
@@ -67,8 +66,8 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
   }, [reload]);
 
   return (
-    <div className="flex flex-col gap-2">
-      {pendingRequests ? (
+    <div className="flex flex-col gap-3">
+      {pendingRequests && (
         <>
           <div className="flex items-center justify-between">
             <div className="text-lg font-bold lg:mb-2 lg:text-xl">
@@ -99,19 +98,8 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
               ))}
             </div>
           )}
+          <Divider flexItem />
         </>
-      ) : (
-        <MenuItem
-          className="flex items-center justify-center gap-2"
-          onClick={() => {
-            handleClose();
-          }}
-        >
-          <AddIcon />
-          <Typography variant="overline" fontWeight="bold" fontSize="small">
-            Join a New Team
-          </Typography>
-        </MenuItem>
       )}
     </div>
   );

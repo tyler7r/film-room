@@ -27,7 +27,6 @@ export const isAuthContext = createContext<AuthContextProps>({
     userId: undefined,
     email: undefined,
     name: undefined,
-    currentAffiliation: undefined,
   },
   setUser: () => null,
   affiliations: null,
@@ -42,7 +41,6 @@ export const IsAuth = ({ children }: AuthProps) => {
     userId: undefined,
     email: undefined,
     name: undefined,
-    currentAffiliation: undefined,
   });
   const [affiliations, setAffiliations] = useState<
     TeamAffiliationType[] | null
@@ -74,10 +72,8 @@ export const IsAuth = ({ children }: AuthProps) => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event: string, session) => {
-        // console.log({ event: event, aff: user.currentAffiliation });
         if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
           setUser({
-            currentAffiliation: user.currentAffiliation,
             isLoggedIn: true,
             userId: session.user.id,
             email: session.user.email,
@@ -90,7 +86,6 @@ export const IsAuth = ({ children }: AuthProps) => {
             userId: undefined,
             email: undefined,
             name: undefined,
-            currentAffiliation: undefined,
           });
           setAffiliations(null);
           setAffIds(null);
@@ -100,7 +95,6 @@ export const IsAuth = ({ children }: AuthProps) => {
             userId: undefined,
             email: undefined,
             name: undefined,
-            currentAffiliation: undefined,
           });
           setAffiliations(null);
           setAffIds(null);

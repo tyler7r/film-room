@@ -16,7 +16,7 @@ type PlayerEditProps = {
 const PlayerEdit = ({ player }: PlayerEditProps) => {
   const { backgroundStyle } = useIsDarkContext();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [edit, setEdit] = useState<number | null>(player.number);
+  const [edit, setEdit] = useState<number | null>(player.affiliation.number);
   const [isValidNumber, setIsValidNumber] = useState<boolean>(false);
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
@@ -34,7 +34,7 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
       .update({
         number: edit,
       })
-      .eq("id", player.id)
+      .eq("id", player.affiliation.id)
       .select();
     if (data) {
       setTimeout(() => {
@@ -44,14 +44,17 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
   };
 
   const closeEdit = () => {
-    setEdit(player.number);
+    setEdit(player.affiliation.number);
     setIsOpen(false);
   };
 
   const handleDelete = async () => {
     setIsOpen(false);
     setIsDeleteMenuOpen(false);
-    await supabase.from("affiliations").delete().eq("id", player.id);
+    await supabase
+      .from("affiliations")
+      .delete()
+      .eq("id", player.affiliation.id);
   };
 
   useEffect(() => {
@@ -82,7 +85,7 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
       className="flex items-center justify-center gap-4 rounded-lg p-2"
       style={backgroundStyle}
     >
-      <div className={`font-bold`}>{player.name}</div>
+      <div className={`font-bold`}>{player.profile.name}</div>
       <form
         onSubmit={handleSubmit}
         className="flex items-center justify-center gap-1"

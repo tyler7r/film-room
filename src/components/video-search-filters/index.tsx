@@ -1,10 +1,17 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
-import { IconButton, InputAdornment, TextField } from "@mui/material";
-import { useState } from "react";
+import {
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+} from "@mui/material";
 import { useAuthContext } from "~/contexts/auth";
 import type { SearchOptions } from "~/pages/film-room";
-import StandardPopover from "../standard-popover";
 import TeamLogo from "../team-logo";
 
 type VideoSearchFilterProps = {
@@ -16,30 +23,20 @@ const VideoSearchFilters = ({
   searchOptions,
   setSearchOptions,
 }: VideoSearchFilterProps) => {
-  const { user } = useAuthContext();
-
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
+  const { affiliations } = useAuthContext();
 
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSearchOptions({ ...searchOptions, [name]: value });
   };
 
-  const handlePrivateOnly = () => {
-    setSearchOptions({
-      ...searchOptions,
-      privateOnly: !searchOptions.privateOnly,
-    });
+  const handlePrivacyStatus = (e: SelectChangeEvent) => {
+    const status = e.target.value;
+    if (status === "all" || status === "") {
+      setSearchOptions({ ...searchOptions, privateOnly: "all" });
+    } else {
+      setSearchOptions({ ...searchOptions, privateOnly: status });
+    }
   };
 
   const clearSearch = () => {
@@ -47,7 +44,7 @@ const VideoSearchFilters = ({
   };
 
   return (
-    <div className="flex w-4/5 flex-col items-center justify-center gap-2">
+    <div className="flex w-full flex-col items-center justify-center gap-2">
       <div className="flex w-full gap-2 md:w-4/5">
         <label htmlFor="search" className="sr-only">
           Search
@@ -73,26 +70,30 @@ const VideoSearchFilters = ({
           onChange={changeHandler}
           value={searchOptions.topic}
         />
-        {user.currentAffiliation?.team && (
-          <IconButton
-            className="flex cursor-pointer items-center"
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-            onClick={handlePrivateOnly}
-            size="small"
-          >
-            <TeamLogo
-              tm={user.currentAffiliation.team}
-              size={40}
-              inactive={true}
-            />
-            <StandardPopover
-              content={`Videos private to ${user.currentAffiliation.team.full_name} only`}
-              open={open}
-              anchorEl={anchorEl}
-              handlePopoverClose={handlePopoverClose}
-            />
-          </IconButton>
+        {affiliations && (
+          <FormControl className="w-full">
+            <InputLabel>Videos by Team</InputLabel>
+            <Select
+              value={searchOptions.privateOnly}
+              onChange={handlePrivacyStatus}
+              label="Privacy Status"
+              name="privacy"
+              id="privacy-status"
+              className="w-full"
+            >
+              <MenuItem value="all">All Videos</MenuItem>
+              {affiliations?.map((div) => (
+                <MenuItem key={div.team.id} value={div.team.id}>
+                  <div className="flex gap-2">
+                    <div>
+                      Videos private to: <strong>{div.team.full_name}</strong>
+                    </div>
+                    {div.team.logo && <TeamLogo tm={div.team} size={25} />}
+                  </div>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         )}
       </div>
     </div>

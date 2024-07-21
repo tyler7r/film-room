@@ -12,7 +12,7 @@ import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
 
 export type SearchOptions = {
-  privateOnly?: boolean;
+  privateOnly?: string;
   topic?: string;
 };
 
@@ -24,7 +24,7 @@ const FilmRoomHome = () => {
   const [page, setPage] = useState<number>(1);
   const [videoCount, setVideoCount] = useState<number | null>(null);
   const [searchOptions, setSearchOptions] = useState<SearchOptions>({
-    privateOnly: false,
+    privateOnly: "all",
     topic: "",
   });
 
@@ -38,12 +38,13 @@ const FilmRoomHome = () => {
       .order("uploaded_at", { ascending: false })
       .range(from, to);
     if (affIds) {
-      void videos.or(`private.eq.false, exclusive_to.in.(${affIds})`);
+      if (options?.privateOnly === "all") {
+        void videos.or(`private.eq.false, exclusive_to.in.(${affIds})`);
+      } else if (options?.privateOnly && options.privateOnly !== "all") {
+        void videos.eq("exclusive_to", options.privateOnly);
+      }
     } else {
       void videos.eq("private", false);
-    }
-    if (options?.privateOnly) {
-      void videos.eq("private", true);
     }
     if (options?.topic && options.topic !== "") {
       void videos.or(

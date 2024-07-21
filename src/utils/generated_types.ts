@@ -150,7 +150,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "public_comment_likes_comment_id_fkey"
+            foreignKeyName: "comment_likes_comment_id_fkey"
             columns: ["comment_id"]
             isOneToOne: false
             referencedRelation: "comments"
@@ -173,7 +173,6 @@ export type Database = {
           created_at: string
           id: string
           play_id: string
-          team_id: string | null
           viewed: boolean
         }
         Insert: {
@@ -183,7 +182,6 @@ export type Database = {
           created_at?: string
           id?: string
           play_id?: string
-          team_id?: string | null
           viewed?: boolean
         }
         Update: {
@@ -193,7 +191,6 @@ export type Database = {
           created_at?: string
           id?: string
           play_id?: string
-          team_id?: string | null
           viewed?: boolean
         }
         Relationships: [
@@ -205,25 +202,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "public_comments_play_id_fkey"
+            foreignKeyName: "comments_play_id_fkey"
             columns: ["play_id"]
             isOneToOne: false
             referencedRelation: "plays"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "public_comments_play_id_fkey"
+            foreignKeyName: "comments_play_id_fkey"
             columns: ["play_id"]
             isOneToOne: false
             referencedRelation: "transition_mention_view"
             referencedColumns: ["play_id"]
-          },
-          {
-            foreignKeyName: "public_comments_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -630,7 +620,6 @@ export type Database = {
         Row: {
           comment: Json | null
           play: Json | null
-          team: Json | null
           video: Json | null
         }
         Relationships: []
@@ -685,7 +674,6 @@ export type Database = {
         Row: {
           comment: Json | null
           play: Json | null
-          team: Json | null
           video_id: string | null
         }
         Relationships: [

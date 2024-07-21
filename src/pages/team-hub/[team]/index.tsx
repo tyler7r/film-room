@@ -14,7 +14,7 @@ import type { TeamActionBarType, TeamType } from "~/utils/types";
 
 const TeamHub = () => {
   const router = useRouter();
-  const { user } = useAuthContext();
+  const { user, affiliations } = useAuthContext();
   const { isDark } = useIsDarkContext();
 
   const [team, setTeam] = useState<TeamType | null>(null);
@@ -29,15 +29,11 @@ const TeamHub = () => {
   });
 
   const fetchUserRole = () => {
+    const affRole = affiliations?.find((aff) => aff.team.id === team?.id)?.role;
     if (team?.owner === user.userId) {
       setRole("owner");
-    } else if (
-      user.currentAffiliation &&
-      user.currentAffiliation?.team.id === team?.id
-    ) {
-      setRole(user.currentAffiliation.role);
     } else {
-      setRole("guest");
+      setRole(affRole ? affRole : "guest");
     }
   };
 

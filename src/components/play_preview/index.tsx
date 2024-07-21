@@ -95,7 +95,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
       .from("plays_via_tag")
       .select("*")
       .eq("play->>id", preview.play.id);
-    if (user.currentAffiliation?.team.id) {
+    if (affIds) {
       void tags.or(`tag->>private.eq.false, tag->>exclusive_to.in.(${affIds})`);
     } else {
       void tags.eq("tag->>private", false);
@@ -116,19 +116,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
     }
   };
 
-  const updateUserAffiliation = (teamId: string) => {
-    const team = affiliations?.find((aff) => aff.team.id === teamId);
-    if (user.currentAffiliation?.team.id === teamId) return;
-    else {
-      setUser({
-        ...user,
-        currentAffiliation: team ? team : user.currentAffiliation,
-      });
-    }
-  };
-
-  const handleVideoClick = async (videoId: string, teamId: string | null) => {
-    if (teamId) void updateUserAffiliation(teamId);
+  const handleVideoClick = async (videoId: string) => {
     if (user.userId) void updateLastWatched(videoId, 0);
     void router.push(`/film-room/${videoId}`);
   };
@@ -174,9 +162,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
           <IconButton
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
-            onClick={() =>
-              handleVideoClick(preview.video.id, preview.video.exclusive_to)
-            }
+            onClick={() => handleVideoClick(preview.video.id)}
             size="small"
           >
             <ShortcutIcon fontSize="large" color="primary" />
