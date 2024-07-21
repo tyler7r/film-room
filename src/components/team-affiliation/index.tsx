@@ -1,6 +1,5 @@
 import { Divider } from "@mui/material";
 import { useRouter } from "next/router";
-import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import type { TeamAffiliationType } from "~/utils/types";
 import TeamLogo from "../team-logo";
@@ -12,8 +11,6 @@ type TeamAffiliationProps = {
 
 const TeamAffiliation = ({ aff, handleClose }: TeamAffiliationProps) => {
   const { hoverBorder } = useIsDarkContext();
-  const { user, setUser, affiliations } = useAuthContext();
-  // const { affiliations } = useAffiliatedContext();
   const router = useRouter();
 
   const handleTeamClick = (
@@ -21,12 +18,6 @@ const TeamAffiliation = ({ aff, handleClose }: TeamAffiliationProps) => {
     teamId: string,
   ) => {
     e.stopPropagation();
-    const isAffiliatedTeam = affiliations?.find(
-      (aff) => aff.team.id === teamId,
-    );
-    if (isAffiliatedTeam) {
-      setUser({ ...user, currentAffiliation: isAffiliatedTeam });
-    }
     if (handleClose) handleClose();
     void router.push(`/team-hub/${teamId}`);
   };

@@ -51,17 +51,20 @@ const Profile = () => {
     if (options?.profileId) {
       const { data } = await supabase
         .from("user_view")
-        .select("*, teams!affiliations_team_id_fkey(*)")
-        .eq("profile_id", options.profileId);
+        .select("*")
+        .eq("profile->>id", options.profileId);
       if (data?.[0]) {
-        setProfile({ name: data[0].name, join_date: data[0].join_date });
+        setProfile({
+          name: data[0].profile.name,
+          join_date: data[0].profile.join_date,
+        });
         const typedAffiliations: TeamAffiliationType[] = data
-          .filter((aff) => aff.verified)
+          .filter((aff) => aff.affiliation.verified)
           .map((aff) => ({
-            team: aff.teams!,
-            role: aff.role,
-            affId: aff.id,
-            number: aff.number,
+            team: aff.team,
+            role: aff.affiliation.role,
+            number: aff.affiliation.number,
+            affId: aff.affiliation.id,
           }));
         if (typedAffiliations && typedAffiliations.length > 0)
           setProfileAffiliations(typedAffiliations);
@@ -185,22 +188,13 @@ const Profile = () => {
           />
         </div>
         {actionBarStatus.createdPlays && (
-          <CreatedFeed
-            profileId={options.profileId}
-            currentAffiliation={options.currentAffiliation}
-          />
+          <CreatedFeed profileId={options.profileId} />
         )}
         {actionBarStatus.mentions && (
-          <MentionsFeed
-            profileId={options.profileId}
-            currentAffiliation={options.currentAffiliation}
-          />
+          <MentionsFeed profileId={options.profileId} />
         )}
         {actionBarStatus.highlights && (
-          <HighlightsFeed
-            profileId={options.profileId}
-            currentAffiliation={options.currentAffiliation}
-          />
+          <HighlightsFeed profileId={options.profileId} />
         )}
       </div>
     )

@@ -95,30 +95,17 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
       .eq("id", mentionId);
   };
 
-  const updateUserAffiliation = (teamId: string) => {
-    const team = affiliations?.find((aff) => aff.team.id === teamId);
-    if (user.currentAffiliation?.team.id === teamId) return;
-    else {
-      setUser({
-        ...user,
-        currentAffiliation: team ? team : user.currentAffiliation,
-      });
-    }
-  };
-
   const handleClick = async (
     videoId: string,
     playId: string,
     start: number,
     mentionId: string,
-    teamId: string | null,
     viewed: boolean,
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set("play", playId);
     params.set("start", `${start}`);
     if (!viewed) void updateMention(mentionId);
-    if (teamId) void updateUserAffiliation(teamId);
     void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
@@ -214,7 +201,6 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
                       notification.play.id,
                       notification.play.start_time,
                       notification.mention.id,
-                      notification.team ? notification.team.id : null,
                       notification.mention.viewed,
                     )
                   }

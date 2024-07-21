@@ -53,14 +53,14 @@ export const IsAuth = ({ children }: AuthProps) => {
     if (profileId) {
       const { data } = await supabase
         .from("user_view")
-        .select("*, teams!affiliations_team_id_fkey(*)")
-        .match({ profile_id: profileId, verified: true });
+        .select("*")
+        .match({ "profile->>id": profileId, "affiliation->>verified": true });
       if (data) {
         const typedAffiliations: TeamAffiliationType[] = data.map((aff) => ({
-          team: aff.teams!,
-          role: aff.role,
-          affId: aff.id,
-          number: aff.number,
+          team: aff.team,
+          role: aff.affiliation.role,
+          number: aff.affiliation.number,
+          affId: aff.affiliation.id,
         }));
         if (typedAffiliations && typedAffiliations.length > 0) {
           setAffiliations(typedAffiliations);

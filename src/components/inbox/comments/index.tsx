@@ -97,30 +97,17 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
       .eq("id", commentId);
   };
 
-  const updateUserAffiliation = (teamId: string) => {
-    const team = affiliations?.find((aff) => aff.team.id === teamId);
-    if (user.currentAffiliation?.team.id === teamId) return;
-    else {
-      setUser({
-        ...user,
-        currentAffiliation: team ? team : user.currentAffiliation,
-      });
-    }
-  };
-
   const handleClick = async (
     videoId: string,
     playId: string,
     start: number,
     commentId: string,
-    teamId: string,
     viewed: boolean,
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set("play", playId);
     params.set("start", `${start}`);
     if (!viewed) void updateComment(commentId);
-    void updateUserAffiliation(teamId);
     void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
@@ -218,7 +205,6 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
                       notification.play.id,
                       notification.play.start_time,
                       notification.comment.id,
-                      notification.team.id,
                       notification.comment.viewed,
                     )
                   }

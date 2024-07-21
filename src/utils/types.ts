@@ -24,15 +24,9 @@ export type Database = MergeDeep<
         };
         user_view: {
           Row: {
-            email: string;
-            id: string;
-            join_date: string;
-            name: string;
-            number: number | null;
-            profile_id: string;
-            role: string;
-            team_id: string;
-            verified: boolean;
+            affiliation: AffiliationType;
+            profile: UserType;
+            team: TeamType;
           };
         };
         play_preview: {
@@ -113,8 +107,8 @@ export type TeamAffiliationType = {
     full_name: string;
     owner: string | null;
   };
-  role: string;
   affId: string;
+  role: string;
   number?: number | null;
 };
 
@@ -194,15 +188,9 @@ export type IndexPlayType = {
 };
 
 export type PlayerType = {
-  id: string;
-  name: string;
-  join_date: string;
-  profile_id: string;
-  role: string;
-  team_id: string;
-  verified: boolean;
-  number: number | null;
-  email?: string;
+  team: TeamType;
+  profile: UserType;
+  affiliation: AffiliationType;
 };
 
 export type VideoUploadType = {
@@ -283,7 +271,7 @@ export type UserType = {
   id: string;
   last_watched: string | null;
   last_watched_time: number | null;
-  name: string | null;
+  name: string;
   join_date: string;
 };
 

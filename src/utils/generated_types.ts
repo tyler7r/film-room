@@ -49,13 +49,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "affiliations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
-          },
         ]
       }
       announcement_likes: {
@@ -92,13 +85,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "public_announcement_likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
-          },
         ]
       }
       announcements: {
@@ -111,7 +97,7 @@ export type Database = {
           text: string
         }
         Insert: {
-          author_id?: string
+          author_id: string
           author_name: string
           created_at?: string
           id?: string
@@ -128,24 +114,17 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "announcements_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "announcements_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_announcements_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "affiliations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_announcements_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
             referencedColumns: ["id"]
           },
         ]
@@ -183,13 +162,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_comment_likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
           },
         ]
       }
@@ -231,13 +203,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comments_comment_author_fkey"
-            columns: ["comment_author"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "public_comments_play_id_fkey"
@@ -303,13 +268,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "public_play_likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
-          },
         ]
       }
       play_mentions: {
@@ -352,25 +310,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "play_mentions_receiver_id_fkey"
-            columns: ["receiver_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
-          },
-          {
             foreignKeyName: "play_mentions_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "play_mentions_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "public_play_mentions2_play_id_fkey"
@@ -477,13 +421,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "plays_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
-          },
-          {
             foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
@@ -506,7 +443,7 @@ export type Database = {
           join_date: string
           last_watched: string | null
           last_watched_time: number | null
-          name: string | null
+          name: string
         }
         Insert: {
           email?: string | null
@@ -514,7 +451,7 @@ export type Database = {
           join_date?: string
           last_watched?: string | null
           last_watched_time?: number | null
-          name?: string | null
+          name?: string
         }
         Update: {
           email?: string | null
@@ -522,7 +459,7 @@ export type Database = {
           join_date?: string
           last_watched?: string | null
           last_watched_time?: number | null
-          name?: string | null
+          name?: string
         }
         Relationships: [
           {
@@ -622,13 +559,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "teams_owner_fkey"
-            columns: ["owner"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
-          },
         ]
       }
       videos: {
@@ -684,13 +614,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "videos_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "videos_exclusive_to_fkey"
@@ -800,25 +723,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "play_mentions_receiver_id_fkey"
-            columns: ["receiver_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
-          },
-          {
             foreignKeyName: "plays_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "plays_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "plays_video_id_fkey"
@@ -878,32 +787,11 @@ export type Database = {
       }
       user_view: {
         Row: {
-          email: string | null
-          id: string | null
-          join_date: string | null
-          name: string | null
-          number: number | null
-          profile_id: string | null
-          role: string | null
-          team_id: string | null
-          verified: boolean | null
+          affiliation: Json | null
+          profile: Json | null
+          team: Json | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "affiliations_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Functions: {

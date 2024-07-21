@@ -70,17 +70,17 @@ const NewPlayModal = ({
     const players = supabase.from("user_view").select();
     if (video.exclusive_to) {
       void players.match({
-        team_id: video.exclusive_to,
-        role: "player",
-        verified: true,
+        "team->>id": video.exclusive_to,
+        "affiliation->>role": "player",
+        "affiliation->>verified": true,
       });
     } else {
-      void players.eq("role", "player");
+      void players.eq("affiliation->>role", "player");
     }
     const { data } = await players;
     if (data) {
       const uniquePlayers = [
-        ...new Map(data.map((x) => [x.profile_id, x])).values(),
+        ...new Map(data.map((x) => [x.profile.id, x])).values(),
       ];
       setPlayers(uniquePlayers);
     }
@@ -191,7 +191,7 @@ const NewPlayModal = ({
         .single();
       if (data) {
         mentions?.forEach((mention) => {
-          void handleMention(mention.profile_id, mention.name, data.id);
+          void handleMention(mention.profile.id, mention.profile.name, data.id);
         });
         if (playTags.length > 0) {
           playTags.forEach((tag) => {
