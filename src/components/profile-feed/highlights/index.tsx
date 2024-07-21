@@ -2,18 +2,16 @@ import { Pagination } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import PlayPreview from "~/components/play_preview";
+import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
+import { FeedProps } from "../created";
 
-type FeedProps = {
-  profileId: string | undefined;
-  currentAffiliation: string | undefined;
-};
-
-const HighlightsFeed = ({ profileId, currentAffiliation }: FeedProps) => {
+const HighlightsFeed = ({ profileId }: FeedProps) => {
   const { isMobile } = useMobileContext();
+  const { affIds } = useAuthContext();
   const itemsPerPage = isMobile ? 10 : 20;
 
   const [page, setPage] = useState<number>(1);
@@ -31,9 +29,9 @@ const HighlightsFeed = ({ profileId, currentAffiliation }: FeedProps) => {
         .select("*", { count: "exact" })
         .match({ "mention->>receiver_id": profileId, "play->>highlight": true })
         .range(from, to);
-      if (currentAffiliation) {
+      if (affIds) {
         void plays.or(
-          `play->>private.eq.false, play->>exclusive_to.eq.${currentAffiliation}`,
+          `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
         );
       } else {
         void plays.eq("play->>private", false);
@@ -62,7 +60,7 @@ const HighlightsFeed = ({ profileId, currentAffiliation }: FeedProps) => {
 
   useEffect(() => {
     void fetchHighlightPlays();
-  }, [profileId, currentAffiliation, page]);
+  }, [profileId, affIds, page]);
 
   return plays ? (
     <div className="flex flex-col items-center justify-center">

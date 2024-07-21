@@ -26,8 +26,7 @@ type PlayPreviewProps = {
 const PlayPreview = ({ preview }: PlayPreviewProps) => {
   const { isMobile } = useMobileContext();
   const { hoverText } = useIsDarkContext();
-  const { user, setUser, affiliations } = useAuthContext();
-  // const { affiliations } = useAffiliatedContext();
+  const { user, setUser, affiliations, affIds } = useAuthContext();
   const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -40,10 +39,6 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
   const [tags, setTags] = useState<TagType[] | null>(null);
 
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    console.log(preview);
-  }, []);
 
   const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
@@ -101,11 +96,9 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
       .select("*")
       .eq("play->>id", preview.play.id);
     if (user.currentAffiliation?.team.id) {
-      void tags.or(
-        `tag->>private.eq.false, tag->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
-      );
+      void tags.or(`tag->>private.eq.false, tag->>exclusive_to.in.(${affIds})`);
     } else {
-      void tags.eq("play->>private", false);
+      void tags.eq("tag->>private", false);
     }
     const { data } = await tags;
     if (data) {

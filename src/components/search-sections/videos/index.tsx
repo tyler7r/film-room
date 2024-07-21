@@ -29,10 +29,8 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
       .select("*", { count: "exact" })
       .ilike("title", `%${topic}%`)
       .range(from, to);
-    if (options?.currentAffiliation) {
-      void videos.or(
-        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
-      );
+    if (options?.affIds) {
+      void videos.or(`private.eq.false, exclusive_to.in.(${options.affIds})`);
     } else {
       void videos.eq("private", false);
     }
@@ -49,13 +47,13 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
   };
 
   useEffect(() => {
-    if (page === 1) void fetchVideos();
+    if (page === 1) void fetchVideos(options);
     else setPage(1);
-  }, [topic, isMobile]);
+  }, [topic, isMobile, options]);
 
   useEffect(() => {
     void fetchVideos(options);
-  }, [page, options]);
+  }, [page]);
 
   return (
     <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">

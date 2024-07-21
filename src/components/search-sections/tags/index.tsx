@@ -14,7 +14,7 @@ type SearchPlayTagsProps = {
 
 const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
   const { isMobile } = useMobileContext();
-  const { user } = useAuthContext();
+  const { user, affIds } = useAuthContext();
 
   const [playTags, setPlayTags] = useState<PlayPreviewType[] | null>(null);
   const [playCount, setPlayCount] = useState<number | null>(null);
@@ -30,9 +30,9 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
       .ilike("tag->>title", topic ? `%${topic}%` : "%%")
       .order("play->>created_at", { ascending: false })
       .range(from, to);
-    if (user.currentAffiliation?.team.id) {
+    if (affIds) {
       void plays.or(
-        `play->>private.eq.false, play->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
+        `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
       );
     } else {
       void plays.eq("play->>private", false);
@@ -53,7 +53,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
   useEffect(() => {
     if (page === 1) void fetchPlaysByTag();
     else setPage(1);
-  }, [topic, isMobile]);
+  }, [topic, isMobile, affIds]);
 
   useEffect(() => {
     void fetchPlaysByTag();

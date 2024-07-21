@@ -12,20 +12,18 @@ import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
 
 export type SearchOptions = {
-  currentAffiliation?: string;
   privateOnly?: boolean;
   topic?: string;
 };
 
 const FilmRoomHome = () => {
-  const { user } = useAuthContext();
+  const { affIds } = useAuthContext();
   const { isMobile } = useMobileContext();
 
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [videoCount, setVideoCount] = useState<number | null>(null);
   const [searchOptions, setSearchOptions] = useState<SearchOptions>({
-    currentAffiliation: user.currentAffiliation?.team.id,
     privateOnly: false,
     topic: "",
   });
@@ -39,10 +37,8 @@ const FilmRoomHome = () => {
       .select("*", { count: "exact" })
       .order("uploaded_at", { ascending: false })
       .range(from, to);
-    if (options?.currentAffiliation) {
-      void videos.or(
-        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
-      );
+    if (affIds) {
+      void videos.or(`private.eq.false, exclusive_to.in.(${affIds})`);
     } else {
       void videos.eq("private", false);
     }
@@ -83,13 +79,6 @@ const FilmRoomHome = () => {
       void supabase.removeChannel(channel);
     };
   }, []);
-
-  useEffect(() => {
-    setSearchOptions({
-      ...searchOptions,
-      currentAffiliation: user.currentAffiliation?.team.id,
-    });
-  }, [user]);
 
   useEffect(() => {
     if (page === 1) void fetchVideos(searchOptions);

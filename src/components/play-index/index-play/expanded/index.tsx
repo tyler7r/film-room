@@ -22,7 +22,7 @@ const ExpandedPlay = ({
   handleMentionAndTagClick,
 }: ExpandedPlayProps) => {
   const { hoverText } = useIsDarkContext();
-  const { user } = useAuthContext();
+  const { affIds } = useAuthContext();
   const router = useRouter();
 
   const [tags, setTags] = useState<TagType[] | null>(null);
@@ -32,10 +32,8 @@ const ExpandedPlay = ({
       .from("plays_via_tag")
       .select("*")
       .eq("play->>id", play.play.id);
-    if (user.currentAffiliation?.team.id) {
-      void tags.or(
-        `tag->>private.eq.false, tag->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
-      );
+    if (affIds) {
+      void tags.or(`tag->>private.eq.false, tag->>exclusive_to.in.(${affIds})`);
     } else {
       void tags.eq("tag->>private", false);
     }

@@ -33,7 +33,7 @@ const PlayIndex = ({
   setActivePlay,
   activePlay,
 }: PlayIndexProps) => {
-  const { user } = useAuthContext();
+  const { user, affIds } = useAuthContext();
   const { isMobile } = useMobileContext();
 
   const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
@@ -71,9 +71,9 @@ const PlayIndex = ({
     if (activePlay) {
       void plays.neq("play->>id", activePlay.play.id);
     }
-    if (user.currentAffiliation?.team.id) {
+    if (affIds) {
       void plays.or(
-        `play->>private.eq.false, play->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
+        `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
       );
     } else {
       void plays.eq("play->>private", false);
@@ -118,12 +118,12 @@ const PlayIndex = ({
         void playsByMention.ilike("play->>author_name", options.author);
         void playsByTag.ilike("play->>author_name", options.author);
       }
-      if (user.currentAffiliation?.team.id) {
+      if (affIds) {
         void playsByMention.or(
-          `play->>private.eq.false, play->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
+          `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
         );
         void playsByTag.or(
-          `play->>private.eq.false, play->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
+          `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
         );
       } else {
         void playsByMention.eq("play->>private", false);

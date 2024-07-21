@@ -17,6 +17,8 @@ type AuthContextProps = {
   setUser: (user: UserSession) => void;
   affiliations: TeamAffiliationType[] | null;
   setAffiliations: (affiliations: TeamAffiliationType[] | null) => void;
+  affIds: string[] | null;
+  setAffIds: (affIds: string[] | null) => void;
 };
 
 export const isAuthContext = createContext<AuthContextProps>({
@@ -30,6 +32,8 @@ export const isAuthContext = createContext<AuthContextProps>({
   setUser: () => null,
   affiliations: null,
   setAffiliations: () => null,
+  affIds: null,
+  setAffIds: () => null,
 });
 
 export const IsAuth = ({ children }: AuthProps) => {
@@ -43,25 +47,26 @@ export const IsAuth = ({ children }: AuthProps) => {
   const [affiliations, setAffiliations] = useState<
     TeamAffiliationType[] | null
   >(null);
+  const [affIds, setAffIds] = useState<string[] | null>(null);
 
   const fetchAffiliations = async (profileId?: string) => {
     if (profileId) {
       const { data } = await supabase
         .from("user_view")
         .select("*, teams!affiliations_team_id_fkey(*)")
-        .eq("profile_id", profileId);
+        .match({ profile_id: profileId, verified: true });
       if (data) {
-        const typedAffiliations: TeamAffiliationType[] = data
-          .filter((aff) => aff.verified)
-          .map((aff) => ({
-            team: aff.teams!,
-            role: aff.role,
-            affId: aff.id,
-            number: aff.number,
-          }));
-        if (typedAffiliations && typedAffiliations.length > 0)
+        const typedAffiliations: TeamAffiliationType[] = data.map((aff) => ({
+          team: aff.teams!,
+          role: aff.role,
+          affId: aff.id,
+          number: aff.number,
+        }));
+        if (typedAffiliations && typedAffiliations.length > 0) {
           setAffiliations(typedAffiliations);
-        else setAffiliations(null);
+          const affIds = typedAffiliations.map((aff) => aff.team.id);
+          affIds ? setAffIds(affIds) : setAffIds(null);
+        } else setAffiliations(null);
       }
     } else setAffiliations(null);
   };
@@ -88,6 +93,7 @@ export const IsAuth = ({ children }: AuthProps) => {
             currentAffiliation: undefined,
           });
           setAffiliations(null);
+          setAffIds(null);
         } else {
           setUser({
             isLoggedIn: false,
@@ -97,6 +103,7 @@ export const IsAuth = ({ children }: AuthProps) => {
             currentAffiliation: undefined,
           });
           setAffiliations(null);
+          setAffIds(null);
         }
       },
     );
@@ -122,9 +129,20 @@ export const IsAuth = ({ children }: AuthProps) => {
     };
   }, [user.userId]);
 
+  useEffect(() => {
+    console.log(affIds);
+  }, [affIds]);
+
   return (
     <isAuthContext.Provider
-      value={{ user, setUser, affiliations, setAffiliations }}
+      value={{
+        user,
+        setUser,
+        affiliations,
+        setAffiliations,
+        affIds,
+        setAffIds,
+      }}
     >
       {children}
     </isAuthContext.Provider>

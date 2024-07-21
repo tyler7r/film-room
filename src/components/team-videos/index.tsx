@@ -12,26 +12,17 @@ type TeamVideosProps = {
   teamId: string;
 };
 
-type SearchOptions = {
-  loggedIn: boolean;
-  currentAffiliation: string | undefined;
-};
-
 const TeamVideos = ({ teamId }: TeamVideosProps) => {
   const { isMobile } = useMobileContext();
-  const { user } = useAuthContext();
+  const { affIds } = useAuthContext();
   const [page, setPage] = useState<number>(1);
 
   const [videos, setVideos] = useState<TeamVideoType[] | null>(null);
   const [videoCount, setVideoCount] = useState<number | null>(null);
-  const [options, setOptions] = useState<SearchOptions>({
-    loggedIn: user.isLoggedIn,
-    currentAffiliation: user.currentAffiliation?.team.id,
-  });
 
   const itemsPerPage = isMobile ? 10 : 20;
 
-  const fetchVideos = async (options?: SearchOptions) => {
+  const fetchVideos = async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const videos = supabase
       .from("team_video_view")
@@ -41,9 +32,9 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
       .eq("team->>id", teamId)
       .order("video->>uploaded_at", { ascending: false })
       .range(from, to);
-    if (options?.currentAffiliation) {
+    if (affIds) {
       void videos.or(
-        `video->>private.eq.false, video->>exclusive_to.eq.${options.currentAffiliation}`,
+        `video->>private.eq.false, video->>exclusive_to.in.(${affIds})`,
       );
     } else {
       void videos.eq("video->>private", false);
@@ -61,20 +52,13 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
   };
 
   useEffect(() => {
-    setOptions({
-      loggedIn: user.isLoggedIn,
-      currentAffiliation: user.currentAffiliation?.team.id,
-    });
-  }, [user]);
-
-  useEffect(() => {
-    if (page === 1) void fetchVideos(options);
+    if (page === 1) void fetchVideos();
     else setPage(1);
-  }, [isMobile]);
+  }, [isMobile, affIds, teamId]);
 
   useEffect(() => {
-    void fetchVideos(options);
-  }, [teamId, options, page]);
+    void fetchVideos();
+  }, [page]);
 
   return (
     <div className="flex w-11/12 flex-col items-center justify-center">
