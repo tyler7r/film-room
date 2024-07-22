@@ -6,6 +6,7 @@ import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
+import PageTitle from "../page-title";
 import PlaySearchFilters from "../play-search-filters";
 import IndexPlay from "./index-play";
 import Plays from "./plays";
@@ -190,8 +191,8 @@ const PlayIndex = ({
   return (
     <div className="flex w-full flex-col items-center">
       {activePlay && (
-        <div className="flex w-11/12 flex-col items-center justify-center gap-2">
-          <div className="tracking-tightest text-xl font-bold">Active Play</div>
+        <div className="flex w-11/12 flex-col items-center justify-center gap-2 md:w-4/5">
+          <PageTitle title="Active Play" size="small" />
           <IndexPlay
             scrollToPlayer={scrollToPlayer}
             play={activePlay}
