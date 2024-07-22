@@ -3,6 +3,7 @@ import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import StarIcon from "@mui/icons-material/Star";
+import UpdateIcon from "@mui/icons-material/Update";
 import {
   Button,
   Checkbox,
@@ -16,6 +17,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useState } from "react";
+import { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import type { PlaySearchOptions } from "../play-index";
 import StandardPopover from "../standard-popover";
@@ -24,21 +26,25 @@ import TeamLogo from "../team-logo";
 type PlaySearchFilterProps = {
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
+  player: YouTubePlayer | null;
 };
 
 const PlaySearchFilters = ({
   searchOptions,
   setSearchOptions,
+  player,
 }: PlaySearchFilterProps) => {
-  const { user, affiliations } = useAuthContext();
+  const { affiliations } = useAuthContext();
 
   const [isAuthorSearch, setIsAuthorSearch] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
+    anchor3: HTMLElement | null;
   }>({
     anchor1: null,
     anchor2: null,
+    anchor3: null,
   });
 
   const handlePopoverOpen = (
@@ -47,17 +53,20 @@ const PlaySearchFilters = ({
   ) => {
     if (target === "a") {
       setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
-    } else {
+    } else if (target === "b") {
       setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
+    } else {
+      setAnchorEl({ ...anchorEl, anchor3: e.currentTarget });
     }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null });
+    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
   };
 
   const open1 = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
+  const open3 = Boolean(anchorEl.anchor3);
 
   const handleModeChange = () => {
     if (isAuthorSearch) {
@@ -87,6 +96,18 @@ const PlaySearchFilters = ({
     }
   };
 
+  const setTimestamp = async () => {
+    if (searchOptions.timestamp !== 0) {
+      setSearchOptions({ ...searchOptions, timestamp: 0 });
+      return;
+    }
+    if (player) {
+      const time = (await player.getCurrentTime()) - 1;
+      const roundedTime = Math.round(time!);
+      setSearchOptions({ ...searchOptions, timestamp: roundedTime });
+    }
+  };
+
   const clearSearchOptions = () => {
     setSearchOptions({
       ...searchOptions,
@@ -94,6 +115,7 @@ const PlaySearchFilters = ({
       author: "",
       topic: "",
       private_only: "all",
+      timestamp: 0,
     });
   };
 
@@ -102,13 +124,13 @@ const PlaySearchFilters = ({
   };
 
   return (
-    <div className="flex w-11/12 flex-col items-center justify-center gap-2 p-2 md:w-4/5">
+    <div className="flex w-full flex-col items-center justify-center gap-2 p-2 md:w-11/12">
       <div className="flex w-full items-center justify-center gap-1">
-        <div className="flex w-full flex-col items-center justify-center gap-4 md:flex-row md:gap-2">
+        <div className="flex w-full flex-col items-center gap-4 lg:flex-row lg:gap-2">
           <label htmlFor="search" className="sr-only">
             {isAuthorSearch
               ? "Search by author name"
-              : "Search by tag, mention, or play title..."}
+              : "Search by tag, or player mention"}
           </label>
           <TextField
             InputProps={{
@@ -148,7 +170,7 @@ const PlaySearchFilters = ({
             placeholder={
               isAuthorSearch
                 ? "Search by author name"
-                : "Search by tag, mention, or play title..."
+                : "Search by play tag or player mention"
             }
             name="topic"
             autoComplete="search-by-mentions"
@@ -182,36 +204,59 @@ const PlaySearchFilters = ({
             </FormControl>
           )}
         </div>
-        <Checkbox
-          icon={
-            <IconButton size="small">
-              <StarIcon color="action" fontSize="large" />
-            </IconButton>
-          }
-          checkedIcon={
-            <IconButton size="small">
-              <StarIcon color="secondary" fontSize="large" />
-            </IconButton>
-          }
-          checked={searchOptions.only_highlights}
-          onChange={() => {
-            setSearchOptions({
-              ...searchOptions,
-              only_highlights: !searchOptions.only_highlights,
-            });
-          }}
-          size="small"
-          id="highlights-search"
-          name="highlights-search"
-          onMouseEnter={(e) => handlePopoverOpen(e, "b")}
-          onMouseLeave={handlePopoverClose}
-        />
-        <StandardPopover
-          open={open2}
-          anchorEl={anchorEl.anchor2}
-          handlePopoverClose={handlePopoverClose}
-          content="Highlights only"
-        />
+        <div className="flex h-full flex-col items-center justify-center gap-2 lg:gap-0">
+          <Checkbox
+            icon={
+              <IconButton size="small">
+                <StarIcon color="action" fontSize="large" />
+              </IconButton>
+            }
+            checkedIcon={
+              <IconButton size="small">
+                <StarIcon color="secondary" fontSize="large" />
+              </IconButton>
+            }
+            checked={searchOptions.only_highlights}
+            onChange={() => {
+              setSearchOptions({
+                ...searchOptions,
+                only_highlights: !searchOptions.only_highlights,
+              });
+            }}
+            size="small"
+            id="highlights-search"
+            name="highlights-search"
+            onMouseEnter={(e) => handlePopoverOpen(e, "b")}
+            onMouseLeave={handlePopoverClose}
+          />
+          <StandardPopover
+            open={open2}
+            anchorEl={anchorEl.anchor2}
+            handlePopoverClose={handlePopoverClose}
+            content="Highlights only"
+          />
+          <IconButton
+            size="small"
+            onClick={setTimestamp}
+            onMouseEnter={(e) => handlePopoverOpen(e, "c")}
+            onMouseLeave={handlePopoverClose}
+          >
+            <UpdateIcon
+              fontSize="large"
+              color={searchOptions.timestamp === 0 ? "action" : "primary"}
+            />
+          </IconButton>
+          <StandardPopover
+            open={open3}
+            anchorEl={anchorEl.anchor3}
+            handlePopoverClose={handlePopoverClose}
+            content={`${
+              searchOptions.timestamp === 0
+                ? "Plays found at this timestamp or later"
+                : "All plays"
+            }`}
+          />
+        </div>
       </div>
       <Button
         endIcon={<DeleteIcon />}

@@ -23,6 +23,7 @@ export type PlaySearchOptions = {
   only_highlights?: boolean;
   topic: string;
   private_only?: string;
+  timestamp: number;
 };
 
 const PlayIndex = ({
@@ -44,6 +45,7 @@ const PlayIndex = ({
     author: "",
     private_only: "all",
     topic: "",
+    timestamp: 0,
   });
   const itemsPerPage = isMobile ? 10 : 20;
 
@@ -77,6 +79,9 @@ const PlayIndex = ({
     } else {
       void plays.eq("play->>private", false);
     }
+    if (options?.timestamp) {
+      void plays.gte("play->>end_time", options.timestamp);
+    }
     const { data, count } = await plays;
     if (data) setPlays(data);
     if (count) setPlayCount(count);
@@ -89,9 +94,7 @@ const PlayIndex = ({
         .from("plays_via_user_mention")
         .select("*")
         .eq("video->>id", videoId)
-        .or(
-          `mention->>receiver_name.ilike.%${options.topic}%, play->>title.ilike.%${options.topic}%`,
-        )
+        .ilike("mention->>receiver_name", `%${options.topic}%`)
         .order("play->>start_time")
         .range(from, to);
       const playsByTag = supabase
@@ -129,8 +132,13 @@ const PlayIndex = ({
         void playsByMention.eq("play->>private", false);
         void playsByTag.eq("play->>private", false);
       }
+      if (options.timestamp) {
+        void playsByMention.gte("play->>end_time", options.timestamp);
+        void playsByTag.gte("play->>end_time", options.timestamp);
+      }
       const getTags = await playsByTag;
       const getMentions = await playsByMention;
+      console.log({ getTags, getMentions });
       let ps: PlayPreviewType[] | null = null;
       if (getTags.data) {
         ps = getTags.data;
@@ -204,6 +212,7 @@ const PlayIndex = ({
         <PlaySearchFilters
           searchOptions={searchOptions}
           setSearchOptions={setSearchOptions}
+          player={player}
         />
         <Plays
           scrollToPlayer={scrollToPlayer}

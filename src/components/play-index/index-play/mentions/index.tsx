@@ -65,7 +65,7 @@ const Mentions = ({
         {mentions?.map((mention) => (
           <div
             onClick={(e) => handleMentionAndTagClick(e, mention.receiver_name)}
-            className={`tracking text-center font-bold ${hoverText}`}
+            className={`tracking text-center font-bold ${hoverText} items-center text-sm`}
             key={mention.id}
           >
             @{mention.receiver_name}

@@ -128,7 +128,7 @@ const IndexPlay = ({
     e.stopPropagation();
     setSearchOptions({
       ...searchOptions,
-      private_only: !searchOptions.private_only,
+      private_only: exclusiveTeam?.id ? exclusiveTeam.id : "all",
     });
   };
 
@@ -147,33 +147,57 @@ const IndexPlay = ({
 
   return (
     <div className={`flex w-full flex-col gap-4`}>
-      <div className="grid gap-1 rounded-md p-2" style={backgroundStyle}>
+      <div className="grid gap-1 rounded-md p-2 px-4" style={backgroundStyle}>
         <div
-          className="flex cursor-pointer flex-col gap-2"
+          className="flex cursor-pointer flex-col gap-1"
           onClick={() => handleClick(play.play.start_time, play)}
         >
           <div className="flex w-full items-center justify-center gap-4">
-            <div className="flex items-center gap-1 text-lg font-bold">
-              {play.play.start_time < 3600
-                ? new Date(play.play.start_time * 1000)
-                    .toISOString()
-                    .substring(14, 19)
-                : new Date(play.play.start_time * 1000)
-                    .toISOString()
-                    .substring(11, 19)}
-              <span className="text-sm font-light">
-                ({play.play.end_time - play.play.start_time}s)
-              </span>
-            </div>
-            <div className="mr-2 flex items-center justify-center gap-2">
-              {play.play.highlight && (
-                <div
-                  className="flex items-center justify-center"
-                  onClick={(e) => handleHighlightClick(e)}
-                >
-                  <StarIcon color="secondary" fontSize="large" />
-                </div>
+            {play.play.highlight && (
+              <div
+                className="flex items-center justify-center"
+                onClick={(e) => handleHighlightClick(e)}
+              >
+                <StarIcon color="secondary" fontSize="large" />
+              </div>
+            )}
+            <div className="flex w-full items-center justify-center gap-2">
+              <div className="flex items-center text-sm tracking-tight text-slate-600">
+                {convertTimestamp(play.play.created_at)}
+              </div>
+              <Divider flexItem orientation="vertical" variant="fullWidth" />
+              <div className="flex items-center justify-center gap-1 text-center font-bold">
+                {play.play.start_time < 3600
+                  ? new Date(play.play.start_time * 1000)
+                      .toISOString()
+                      .substring(14, 19)
+                  : new Date(play.play.start_time * 1000)
+                      .toISOString()
+                      .substring(11, 19)}
+                <span className="text-sm font-light">
+                  ({play.play.end_time - play.play.start_time}s)
+                </span>
+              </div>
+              {activePlay && (
+                <>
+                  <div
+                    className="flex cursor-pointer items-center"
+                    onMouseEnter={(e) => handlePopoverOpen(e, "a")}
+                    onMouseLeave={handlePopoverClose}
+                    onClick={() => handleRestartClick(play.play.start_time)}
+                  >
+                    <RestartAltIcon color="primary" fontSize="large" />
+                  </div>
+                  <StandardPopover
+                    content="Restart Play"
+                    open={open1}
+                    anchorEl={anchorEl.anchor1}
+                    handlePopoverClose={handlePopoverClose}
+                  />
+                </>
               )}
+            </div>
+            <div className="flex items-center justify-center gap-2">
               {play.play.private && exclusiveTeam && (
                 <div
                   className="flex items-center justify-center"
@@ -191,31 +215,10 @@ const IndexPlay = ({
                 </div>
               )}
             </div>
-            {activePlay && (
-              <>
-                <div
-                  className="flex cursor-pointer items-center"
-                  onMouseEnter={(e) => handlePopoverOpen(e, "a")}
-                  onMouseLeave={handlePopoverClose}
-                  onClick={() => handleRestartClick(play.play.start_time)}
-                >
-                  <RestartAltIcon color="primary" fontSize="large" />
-                </div>
-                <StandardPopover
-                  content="Restart Play"
-                  open={open1}
-                  anchorEl={anchorEl.anchor1}
-                  handlePopoverClose={handlePopoverClose}
-                />
-              </>
-            )}
           </div>
-          <div className="flex items-center justify-center gap-2">
-            <div className="mr-2 text-sm tracking-tight text-slate-600">
-              {convertTimestamp(play.play.created_at)}
-            </div>
+          <div className="flex flex-wrap items-center justify-center gap-2 text-center">
             <div
-              className={`tracking text-center text-2xl font-bold ${hoverText}`}
+              className={`tracking text-center text-xl font-bold ${hoverText} `}
               onClick={() =>
                 void router.push(`/profile/${play.play.author_id}`)
               }
@@ -231,36 +234,34 @@ const IndexPlay = ({
             handleMentionAndTagClick={handleMentionAndTagClick}
           />
         </div>
-        <div className="flex w-full items-center justify-center gap-3 px-1">
-          <div className="flex items-center justify-center gap-2">
-            <LikeBtn playId={play.play.id} />
-            <CommentBtn
-              isOpen={isExpanded}
-              setIsOpen={setIsExpanded}
-              playId={play.play.id}
-              commentCount={commentCount}
-              setCommentCount={setCommentCount}
-              activePlay={null}
-            />
-            {play.play.author_id === user.userId && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <DeleteMenu
-                  isOpen={isDeleteMenuOpen}
-                  setIsOpen={setIsDeleteMenuOpen}
-                  handleDelete={handleDelete}
-                />
-              </div>
-            )}
-            {isExpanded ? (
-              <IconButton size="small" onClick={() => setIsExpanded(false)}>
-                <KeyboardArrowUpIcon color="primary" fontSize="large" />
-              </IconButton>
-            ) : (
-              <IconButton size="small" onClick={() => setIsExpanded(true)}>
-                <KeyboardArrowDownIcon color="primary" fontSize="large" />
-              </IconButton>
-            )}
-          </div>
+        <div className="flex items-center justify-center gap-2">
+          <LikeBtn playId={play.play.id} />
+          <CommentBtn
+            isOpen={isExpanded}
+            setIsOpen={setIsExpanded}
+            playId={play.play.id}
+            commentCount={commentCount}
+            setCommentCount={setCommentCount}
+            activePlay={null}
+          />
+          {play.play.author_id === user.userId && (
+            <div onClick={(e) => e.stopPropagation()}>
+              <DeleteMenu
+                isOpen={isDeleteMenuOpen}
+                setIsOpen={setIsDeleteMenuOpen}
+                handleDelete={handleDelete}
+              />
+            </div>
+          )}
+          {isExpanded ? (
+            <IconButton size="small" onClick={() => setIsExpanded(false)}>
+              <KeyboardArrowUpIcon color="primary" fontSize="large" />
+            </IconButton>
+          ) : (
+            <IconButton size="small" onClick={() => setIsExpanded(true)}>
+              <KeyboardArrowDownIcon color="primary" fontSize="large" />
+            </IconButton>
+          )}
         </div>
       </div>
       {isExpanded && (

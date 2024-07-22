@@ -154,10 +154,7 @@ const LikeBtn = ({
             onMouseLeave={handlePopoverClose}
             onClick={(e) => void handleUnlike(e)}
           >
-            <FavoriteIcon
-              color="primary"
-              fontSize={small ? "small" : isMobile ? "medium" : "large"}
-            />
+            <FavoriteIcon color="primary" fontSize="medium" />
           </IconButton>
         ) : (
           <IconButton
@@ -166,17 +163,10 @@ const LikeBtn = ({
             onMouseLeave={handlePopoverClose}
             onClick={(e) => void handleLike(e)}
           >
-            <FavoriteBorderIcon
-              color="primary"
-              fontSize={small ? "small" : isMobile ? "medium" : "large"}
-            />
+            <FavoriteBorderIcon color="primary" fontSize="medium" />
           </IconButton>
         )}
-        <div
-          className={`font-bold ${small ? `text-lg` : `text-lg md:text-2xl`}`}
-        >
-          {likeCount}
-        </div>
+        <div className="text-lg font-bold">{likeCount}</div>
       </div>
       {likeList && (
         <LikePopover

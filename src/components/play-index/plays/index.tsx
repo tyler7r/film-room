@@ -24,7 +24,7 @@ const Plays = ({
   videoId,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
-    <div className="grid w-11/12 grid-cols-1 justify-center gap-4">
+    <div className="grid grid-cols-1 justify-center gap-6">
       {plays.map((play) => (
         <IndexPlay
           setActivePlay={setActivePlay}
