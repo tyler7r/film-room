@@ -15,12 +15,12 @@ const Player = ({ player }: PlayerProps) => {
       className={`flex items-center justify-around gap-2 rounded-lg p-2 font-bold`}
     >
       <div
-        onClick={() => void router.push(`/profile/${player.profile_id}`)}
+        onClick={() => void router.push(`/profile/${player.profile.id}`)}
         className={`${hoverText} text-lg`}
       >
-        {player.name}
+        {player.profile.name}
       </div>
-      {player.number && <div>#{player.number}</div>}
+      {player.affiliation.number && <div>#{player.affiliation.number}</div>}
     </div>
   );
 };

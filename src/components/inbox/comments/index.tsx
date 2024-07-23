@@ -3,13 +3,10 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import MailIcon from "@mui/icons-material/Mail";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import PublicIcon from "@mui/icons-material/Public";
 import { Button, Divider, IconButton, colors } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
-import TeamLogo from "~/components/team-logo";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
@@ -22,8 +19,7 @@ type InboxCommentsProps = {
 };
 
 const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
-  const { user, setUser } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
+  const { user } = useAuthContext();
   const { setIsOpen, commentPage, setCommentPage, setCommentCount } =
     useInboxContext();
   const { backgroundStyle, isDark, hoverBorder, hoverText } =
@@ -68,7 +64,7 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   };
 
   const getFromAndTo = () => {
-    const itemPerPage = 4;
+    const itemPerPage = 5;
     let from = commentPage * itemPerPage;
     const to = from + itemPerPage;
 
@@ -80,14 +76,16 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
   };
 
   const updateLastWatched = async (video: string, time: number) => {
-    await supabase
-      .from("profiles")
-      .update({
-        last_watched: video,
-        last_watched_time: time,
-      })
-      .eq("id", `${user.userId}`)
-      .select();
+    if (user.userId) {
+      await supabase
+        .from("profiles")
+        .update({
+          last_watched: video,
+          last_watched_time: time,
+        })
+        .eq("id", user.userId)
+        .select();
+    }
   };
 
   const updateComment = async (commentId: string) => {
@@ -97,30 +95,17 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
       .eq("id", commentId);
   };
 
-  const updateUserAffiliation = (teamId: string) => {
-    const team = affiliations?.find((aff) => aff.team.id === teamId);
-    if (user.currentAffiliation?.team.id === teamId) return;
-    else {
-      setUser({
-        ...user,
-        currentAffiliation: team ? team : user.currentAffiliation,
-      });
-    }
-  };
-
   const handleClick = async (
     videoId: string,
     playId: string,
     start: number,
     commentId: string,
-    teamId: string,
     viewed: boolean,
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set("play", playId);
     params.set("start", `${start}`);
     if (!viewed) void updateComment(commentId);
-    void updateUserAffiliation(teamId);
     void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
@@ -189,27 +174,19 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
           <div className="flex flex-col gap-5 md:px-2 lg:px-4">
             {comments?.map((notification) => (
               <div key={notification.play.id + notification.comment.created_at}>
-                <div className="flex items-center gap-2">
-                  {notification.team && (
-                    <TeamLogo tm={notification.team} size={20} />
-                  )}
-                  {!notification.play.private && (
-                    <PublicIcon fontSize="small" />
-                  )}
-                  <div>
-                    <strong
-                      className={hoverText}
-                      onClick={() => {
-                        setIsOpen(false);
-                        void router.push(
-                          `/profile/${notification.play.author_id}`,
-                        );
-                      }}
-                    >
-                      {notification.comment.author_name}
-                    </strong>{" "}
-                    commented on:
-                  </div>
+                <div>
+                  <strong
+                    className={hoverText}
+                    onClick={() => {
+                      setIsOpen(false);
+                      void router.push(
+                        `/profile/${notification.play.author_id}`,
+                      );
+                    }}
+                  >
+                    {notification.comment.author_name}
+                  </strong>{" "}
+                  commented on:
                 </div>
                 <div
                   onClick={() =>
@@ -218,7 +195,6 @@ const InboxComments = ({ hide, setHide }: InboxCommentsProps) => {
                       notification.play.id,
                       notification.play.start_time,
                       notification.comment.id,
-                      notification.team.id,
                       notification.comment.viewed,
                     )
                   }

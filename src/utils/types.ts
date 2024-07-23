@@ -24,15 +24,9 @@ export type Database = MergeDeep<
         };
         user_view: {
           Row: {
-            email: string;
-            id: string;
-            join_date: string;
-            name: string;
-            number: number | null;
-            profile_id: string;
-            role: string;
-            team_id: string;
-            verified: boolean;
+            affiliation: AffiliationType;
+            profile: UserType;
+            team: TeamType;
           };
         };
         play_preview: {
@@ -60,7 +54,12 @@ export type Database = MergeDeep<
             play: PlayType;
             video: VideoType;
             comment: CommentType;
-            team: TeamType;
+          };
+        };
+        last_watched_view: {
+          Row: {
+            profile: UserType;
+            video: VideoType;
           };
         };
         mention_notification: {
@@ -68,6 +67,12 @@ export type Database = MergeDeep<
             play: PlayType;
             video: VideoType;
             mention: MentionType;
+            team: TeamType;
+          };
+        };
+        team_video_view: {
+          Row: {
+            video: VideoType;
             team: TeamType;
           };
         };
@@ -101,8 +106,8 @@ export type TeamAffiliationType = {
     full_name: string;
     owner: string | null;
   };
-  role: string;
   affId: string;
+  role: string;
   number?: number | null;
 };
 
@@ -111,7 +116,6 @@ export type UserSession = {
   userId: string | undefined;
   email: string | undefined;
   name: string | undefined;
-  currentAffiliation: TeamAffiliationType | undefined;
 };
 
 export type TeamType = {
@@ -140,7 +144,9 @@ export type VideoType = {
   uploaded_at: string;
   week: string | null;
   division: string;
-  author_id: string;
+  author_id: string | null;
+  duplicate_check: string;
+  keywords: string;
 };
 
 export type PlayType = {
@@ -149,7 +155,6 @@ export type PlayType = {
   author_id: string;
   highlight: boolean;
   exclusive_to: string | null;
-  author_role: string;
   author_name: string;
   start_time: number;
   end_time: number;
@@ -181,22 +186,16 @@ export type IndexPlayType = {
 };
 
 export type PlayerType = {
-  id: string;
-  name: string;
-  join_date: string;
-  profile_id: string;
-  role: string;
-  team_id: string;
-  verified: boolean;
-  number: number | null;
-  email?: string;
+  team: TeamType;
+  profile: UserType;
+  affiliation: AffiliationType;
 };
 
 export type VideoUploadType = {
   link: string;
   title: string;
   private: boolean;
-  exclusive_to: string | null;
+  exclusive_to: string;
   week: string | null;
   season: string;
   tournament: string | null;
@@ -218,29 +217,9 @@ export type CommentType = {
   comment: string;
   comment_author: string;
   author_name: string;
-  team_id: string | null;
   play_id: string;
   viewed: boolean;
 };
-
-export type RealCommentType = {
-  comment: string;
-  comment_author_name: string;
-  comment_id: string;
-  created_at: string;
-  highlight: boolean;
-  note: string;
-  play_id: string;
-  play_title: string;
-  private: boolean;
-  start_time: number;
-  team_id: string;
-  play_author_id: string;
-  video_id: string;
-  video_title: string;
-  viewed: boolean;
-  team: TeamType | null;
-}[];
 
 export type TeamActionBarType = {
   settings: boolean;
@@ -266,11 +245,11 @@ export type RequestType = {
 }[];
 
 export type UserType = {
-  email: string | null;
+  email: string | null | undefined;
   id: string;
   last_watched: string | null;
   last_watched_time: number | null;
-  name: string | null;
+  name: string;
   join_date: string;
 };
 
@@ -300,7 +279,6 @@ export type MentionNotificationType = {
 export type CommentNotificationType = {
   play: PlayType;
   video: VideoType;
-  team: TeamType;
   comment: CommentType;
 };
 
@@ -328,25 +306,34 @@ export type MentionType = {
 };
 
 export type LastWatchedType = {
-  last_watched: string | null;
-  last_watched_time: number | null;
-  videos: {
-    division: string;
-    exclusive_to: string | null;
-    id: string;
-    link: string;
-    private: boolean;
-    season: string;
-    title: string;
-    tournament: string | null;
-    uploaded_at: string;
-    week: string | null;
-    author_id: string;
-  } | null;
+  profile: UserType;
+  video: VideoType;
 };
 
 export type StatsType = {
   mentionCount: number;
   playCount: number;
   highlightCount: number;
+};
+
+export type TeamVideoType = {
+  team: TeamType;
+  video: VideoType;
+};
+
+export type NewPlayType = {
+  start: number | null | undefined;
+  end: number | null | undefined;
+  title: string;
+  note: string;
+  highlight: boolean;
+  private: boolean;
+  exclusive_to: string;
+};
+
+export type NewTagType = {
+  title: string;
+  exclusive_to: string;
+  private: boolean;
+  inputValue?: string;
 };

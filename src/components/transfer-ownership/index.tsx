@@ -44,21 +44,23 @@ const TransferOwnershipModal = ({
     const { data } = await supabase
       .from("user_view")
       .select("*")
-      .match({ verified: true, team_id: team.id })
-      .neq("profile_id", user.userId);
+      .match({ "affiliation->>verified": true, "team->>id": team.id })
+      .neq("profile->>id", user.userId);
     if (data && data.length > 0) setUsers(data);
     else setUsers(null);
   };
 
   const fetchUserNewRole = async () => {
-    const { data } = await supabase
-      .from("affiliations")
-      .select("role")
-      .eq("team_id", team.id)
-      .eq("user_id", `${user.userId}`)
-      .eq("verified", true)
-      .single();
-    if (data) setNewRole(data.role);
+    if (user.userId) {
+      const { data } = await supabase
+        .from("affiliations")
+        .select("role")
+        .eq("team_id", team.id)
+        .eq("user_id", user.userId)
+        .eq("verified", true)
+        .maybeSingle();
+      if (data) setNewRole(data.role);
+    }
   };
 
   const handleChange = (e: SelectChangeEvent) => {
@@ -95,7 +97,7 @@ const TransferOwnershipModal = ({
 
   useEffect(() => {
     if (user.userId) void fetchUsers();
-    if (user.userId) void fetchUserNewRole();
+    void fetchUserNewRole();
   }, []);
 
   return (
@@ -140,8 +142,8 @@ const TransferOwnershipModal = ({
               >
                 <MenuItem value="">None</MenuItem>
                 {users.map((user) => (
-                  <MenuItem key={user.id} value={user.profile_id}>
-                    {user.name} - ({user.role})
+                  <MenuItem key={user.profile.id} value={user.profile.id}>
+                    {user.profile.name} - ({user.affiliation.role})
                   </MenuItem>
                 ))}
               </Select>

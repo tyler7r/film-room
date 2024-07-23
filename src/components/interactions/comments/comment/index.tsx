@@ -4,17 +4,8 @@ import DeleteMenu from "~/components/delete-menu";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
+import type { CommentType } from "~/utils/types";
 import LikeBtn from "../../likes/like-btn";
-
-type CommentType = {
-  author_name: string;
-  comment: string;
-  comment_author: string;
-  created_at: string;
-  id: string;
-  play_id: string;
-  team_id: string | null;
-};
 
 type CommentProps = {
   comment: CommentType;

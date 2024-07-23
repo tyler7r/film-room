@@ -7,7 +7,6 @@ import { Button, Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
@@ -27,8 +26,7 @@ type PlayPreviewProps = {
 const PlayPreview = ({ preview }: PlayPreviewProps) => {
   const { isMobile } = useMobileContext();
   const { hoverText } = useIsDarkContext();
-  const { user, setUser } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
+  const { user, affIds } = useAuthContext();
   const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -97,12 +95,10 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
       .from("plays_via_tag")
       .select("*")
       .eq("play->>id", preview.play.id);
-    if (user.currentAffiliation?.team.id) {
-      void tags.or(
-        `tag->>private.eq.false, tag->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
-      );
+    if (affIds) {
+      void tags.or(`tag->>private.eq.false, tag->>exclusive_to.in.(${affIds})`);
     } else {
-      void tags.eq("play->>private", false);
+      void tags.eq("tag->>private", false);
     }
     const { data } = await tags;
     if (data) {
@@ -112,25 +108,15 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
   };
 
   const updateLastWatched = async (video: string, time: number) => {
-    await supabase
-      .from("profiles")
-      .update({ last_watched: video, last_watched_time: time })
-      .eq("id", `${user.userId}`);
-  };
-
-  const updateUserAffiliation = (teamId: string) => {
-    const team = affiliations?.find((aff) => aff.team.id === teamId);
-    if (user.currentAffiliation?.team.id === teamId) return;
-    else {
-      setUser({
-        ...user,
-        currentAffiliation: team ? team : user.currentAffiliation,
-      });
+    if (user.userId) {
+      await supabase
+        .from("profiles")
+        .update({ last_watched: video, last_watched_time: time })
+        .eq("id", user.userId);
     }
   };
 
-  const handleVideoClick = async (videoId: string, teamId: string | null) => {
-    if (teamId) void updateUserAffiliation(teamId);
+  const handleVideoClick = async (videoId: string) => {
     if (user.userId) void updateLastWatched(videoId, 0);
     void router.push(`/film-room/${videoId}`);
   };
@@ -176,9 +162,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
           <IconButton
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
-            onClick={() =>
-              handleVideoClick(preview.video.id, preview.video.exclusive_to)
-            }
+            onClick={() => handleVideoClick(preview.video.id)}
             size="small"
           >
             <ShortcutIcon fontSize="large" color="primary" />

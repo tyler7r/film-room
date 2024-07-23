@@ -11,7 +11,6 @@ type PlaysProps = {
   setActivePlay: (play: PlayPreviewType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
-  setIsFiltersOpen: (isFiltersOpen: boolean) => void;
   videoId: string;
 };
 
@@ -22,11 +21,10 @@ const Plays = ({
   scrollToPlayer,
   searchOptions,
   setSearchOptions,
-  setIsFiltersOpen,
   videoId,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
-    <div className="grid w-11/12 grid-cols-1 justify-center gap-4">
+    <div className="grid w-11/12 grid-cols-1 justify-center gap-6 md:w-4/5">
       {plays.map((play) => (
         <IndexPlay
           setActivePlay={setActivePlay}
@@ -36,7 +34,6 @@ const Plays = ({
           player={player}
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
-          setIsFiltersOpen={setIsFiltersOpen}
           videoId={videoId}
         />
       ))}

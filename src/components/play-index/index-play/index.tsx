@@ -1,24 +1,23 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import LockIcon from "@mui/icons-material/Lock";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StarIcon from "@mui/icons-material/Star";
-import { Button, Divider, IconButton } from "@mui/material";
+import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import DeleteMenu from "~/components/delete-menu";
-import AddComment from "~/components/interactions/comments/add-comment";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
-import CommentIndex from "~/components/interactions/comments/comment-index";
 import LikeBtn from "~/components/interactions/likes/like-btn";
 import StandardPopover from "~/components/standard-popover";
+import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { MentionType, PlayPreviewType, TagType } from "~/utils/types";
+import type { PlayPreviewType, TeamType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
+import ExpandedPlay from "./expanded";
+import Mentions from "./mentions";
 
 type PlayProps = {
   player: YouTubePlayer | null;
@@ -28,7 +27,6 @@ type PlayProps = {
   setActivePlay: (play: PlayPreviewType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
-  setIsFiltersOpen: (isFiltersOpen: boolean) => void;
   videoId: string;
 };
 
@@ -40,60 +38,45 @@ const IndexPlay = ({
   setActivePlay,
   searchOptions,
   setSearchOptions,
-  setIsFiltersOpen,
   videoId,
 }: PlayProps) => {
   const { backgroundStyle, hoverText } = useIsDarkContext();
-  const { user } = useAuthContext();
+  const { user, affiliations } = useAuthContext();
   const router = useRouter();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
-  const [mentions, setMentions] = useState<MentionType[] | null>(null);
-  const [tags, setTags] = useState<TagType[] | null>(null);
 
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<{
+    anchor1: HTMLElement | null;
+    anchor2: HTMLElement | null;
+  }>({
+    anchor1: null,
+    anchor2: null,
+  });
 
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
+  const exclusiveTeam: TeamType | undefined = affiliations?.find(
+    (aff) => aff.team.id === play.play.exclusive_to,
+  )?.team;
+
+  const handlePopoverOpen = (
+    e: React.MouseEvent<HTMLElement>,
+    target: "a" | "b",
+  ) => {
+    if (target === "a") {
+      setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
+    } else {
+      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
+    }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl(null);
+    setAnchorEl({ anchor1: null, anchor2: null });
   };
 
-  const open = Boolean(anchorEl);
-
-  const fetchMentions = async () => {
-    const { data } = await supabase
-      .from("plays_via_user_mention")
-      .select("*")
-      .eq("play->>id", play.play.id);
-    if (data && data.length > 0) {
-      const mentions: MentionType[] = data.map((mention) => mention.mention);
-      setMentions(mentions);
-    } else setMentions(null);
-  };
-
-  const fetchTags = async () => {
-    const tags = supabase
-      .from("plays_via_tag")
-      .select("*")
-      .eq("play->>id", play.play.id);
-    if (user.currentAffiliation?.team.id) {
-      void tags.or(
-        `tag->>private.eq.false, tag->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
-      );
-    } else {
-      void tags.eq("play->>private", false);
-    }
-    const { data } = await tags;
-    if (data) {
-      const tags: TagType[] = data.map((tag) => tag.tag);
-      setTags(tags);
-    } else setTags(null);
-  };
+  const open1 = Boolean(anchorEl.anchor1);
+  const open2 = Boolean(anchorEl.anchor2);
 
   const updateLastWatched = async (time: number) => {
     if (user.userId) {
@@ -128,20 +111,13 @@ const IndexPlay = ({
     }, duration);
   };
 
-  const handleMentionClick = (e: React.MouseEvent, mention: string) => {
+  const handleMentionAndTagClick = (e: React.MouseEvent, topic: string) => {
     e.stopPropagation();
-    setIsFiltersOpen(true);
-    setSearchOptions({ ...searchOptions, topic: mention });
-  };
-
-  const handleTagClick = (tag: string) => {
-    setIsFiltersOpen(true);
-    setSearchOptions({ ...searchOptions, topic: tag });
+    setSearchOptions({ ...searchOptions, topic: topic });
   };
 
   const handleHighlightClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFiltersOpen(true);
     setSearchOptions({
       ...searchOptions,
       only_highlights: !searchOptions.only_highlights,
@@ -150,10 +126,9 @@ const IndexPlay = ({
 
   const handlePrivateClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFiltersOpen(true);
     setSearchOptions({
       ...searchOptions,
-      private_only: !searchOptions.private_only,
+      private_only: exclusiveTeam?.id ? exclusiveTeam.id : "all",
     });
   };
 
@@ -170,83 +145,80 @@ const IndexPlay = ({
     await supabase.from("plays").delete().eq("id", play.play.id);
   };
 
-  useEffect(() => {
-    void fetchMentions();
-    void fetchTags();
-  }, [activePlay]);
-
   return (
     <div className={`flex w-full flex-col gap-4`}>
-      <div className="grid gap-1 rounded-md p-2" style={backgroundStyle}>
+      <div className="grid gap-1 rounded-md p-2 px-4" style={backgroundStyle}>
         <div
-          className="flex cursor-pointer flex-col gap-2"
+          className="flex cursor-pointer flex-col gap-1"
           onClick={() => handleClick(play.play.start_time, play)}
         >
           <div className="flex w-full items-center justify-center gap-4">
-            <div className="flex items-center gap-1 text-lg font-bold">
-              {play.play.start_time < 3600
-                ? new Date(play.play.start_time * 1000)
-                    .toISOString()
-                    .substring(14, 19)
-                : new Date(play.play.start_time * 1000)
-                    .toISOString()
-                    .substring(11, 19)}
-              <span className="text-sm font-light">
-                ({play.play.end_time - play.play.start_time}s)
-              </span>
-            </div>
-            <div className="mr-2 flex items-center justify-center gap-2">
-              {play.play.highlight && (
-                <div
-                  className="flex items-center justify-center"
-                  onClick={(e) => handleHighlightClick(e)}
-                >
-                  <StarIcon color="secondary" fontSize="large" />
-                </div>
+            {play.play.highlight && (
+              <div
+                className="flex items-center justify-center"
+                onClick={(e) => handleHighlightClick(e)}
+              >
+                <StarIcon color="secondary" fontSize="large" />
+              </div>
+            )}
+            <div className="flex w-full items-center justify-center gap-2">
+              <div className="flex items-center text-sm tracking-tight text-slate-600">
+                {convertTimestamp(play.play.created_at)}
+              </div>
+              <Divider flexItem orientation="vertical" variant="fullWidth" />
+              <div className="flex items-center justify-center gap-1 text-center font-bold">
+                {play.play.start_time < 3600
+                  ? new Date(play.play.start_time * 1000)
+                      .toISOString()
+                      .substring(14, 19)
+                  : new Date(play.play.start_time * 1000)
+                      .toISOString()
+                      .substring(11, 19)}
+                <span className="text-sm font-light">
+                  ({play.play.end_time - play.play.start_time}s)
+                </span>
+              </div>
+              {activePlay && (
+                <>
+                  <div
+                    className="flex cursor-pointer items-center"
+                    onMouseEnter={(e) => handlePopoverOpen(e, "a")}
+                    onMouseLeave={handlePopoverClose}
+                    onClick={() => handleRestartClick(play.play.start_time)}
+                  >
+                    <RestartAltIcon color="primary" fontSize="large" />
+                  </div>
+                  <StandardPopover
+                    content="Restart Play"
+                    open={open1}
+                    anchorEl={anchorEl.anchor1}
+                    handlePopoverClose={handlePopoverClose}
+                  />
+                </>
               )}
-              {play.play.private && (
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              {play.play.private && exclusiveTeam && (
                 <div
                   className="flex items-center justify-center"
                   onClick={(e) => handlePrivateClick(e)}
+                  onMouseEnter={(e) => handlePopoverOpen(e, "b")}
+                  onMouseLeave={handlePopoverClose}
                 >
-                  <LockIcon fontSize="large" color="action" />
+                  <TeamLogo tm={exclusiveTeam} size={30} inactive={true} />
+                  <StandardPopover
+                    open={open2}
+                    anchorEl={anchorEl.anchor2}
+                    content={`Play is private to ${exclusiveTeam?.full_name}`}
+                    handlePopoverClose={handlePopoverClose}
+                  />
                 </div>
               )}
             </div>
-            {activePlay && (
-              <>
-                <div
-                  className="flex cursor-pointer items-center"
-                  onMouseEnter={handlePopoverOpen}
-                  onMouseLeave={handlePopoverClose}
-                  onClick={() => handleRestartClick(play.play.start_time)}
-                >
-                  <RestartAltIcon color="primary" fontSize="large" />
-                </div>
-                <StandardPopover
-                  content="Restart Play"
-                  open={open}
-                  anchorEl={anchorEl}
-                  handlePopoverClose={handlePopoverClose}
-                />
-              </>
-            )}
-            {play.play.author_id === user.userId && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <DeleteMenu
-                  isOpen={isDeleteMenuOpen}
-                  setIsOpen={setIsDeleteMenuOpen}
-                  handleDelete={handleDelete}
-                />
-              </div>
-            )}
           </div>
-          <div className="flex items-center justify-center gap-2">
-            <div className="mr-2 text-sm tracking-tight text-slate-600">
-              {convertTimestamp(play.play.created_at)}
-            </div>
+          <div className="flex flex-wrap items-center justify-center gap-2 text-center">
             <div
-              className={`tracking text-center text-2xl font-bold ${hoverText}`}
+              className={`tracking text-center text-xl font-bold ${hoverText} `}
               onClick={() =>
                 void router.push(`/profile/${play.play.author_id}`)
               }
@@ -256,76 +228,48 @@ const IndexPlay = ({
             <Divider flexItem orientation="vertical" variant="middle" />
             <div>{play.play.title}</div>
           </div>
-          {mentions && (
-            <div className="flex items-center justify-center gap-2">
-              <LocalOfferIcon />
-              {mentions?.map((mention) => (
-                <div
-                  onClick={(e) => handleMentionClick(e, mention.receiver_name)}
-                  className={`tracking text-center font-bold ${hoverText}`}
-                  key={mention.id}
-                >
-                  @{mention.receiver_name}
-                </div>
-              ))}
+          <Mentions
+            activePlay={activePlay}
+            play={play}
+            handleMentionAndTagClick={handleMentionAndTagClick}
+          />
+        </div>
+        <div className="flex items-center justify-center gap-2">
+          <LikeBtn playId={play.play.id} />
+          <CommentBtn
+            isOpen={isExpanded}
+            setIsOpen={setIsExpanded}
+            playId={play.play.id}
+            commentCount={commentCount}
+            setCommentCount={setCommentCount}
+            activePlay={null}
+          />
+          {play.play.author_id === user.userId && (
+            <div onClick={(e) => e.stopPropagation()}>
+              <DeleteMenu
+                isOpen={isDeleteMenuOpen}
+                setIsOpen={setIsDeleteMenuOpen}
+                handleDelete={handleDelete}
+              />
             </div>
           )}
-        </div>
-        <div className="flex w-full items-center justify-center gap-3 px-1">
-          <div className="flex items-center justify-center gap-2">
-            <LikeBtn playId={play.play.id} />
-            <CommentBtn
-              isOpen={isExpanded}
-              setIsOpen={setIsExpanded}
-              playId={play.play.id}
-              commentCount={commentCount}
-              setCommentCount={setCommentCount}
-              activePlay={null}
-            />
-            {isExpanded ? (
-              <IconButton size="small" onClick={() => setIsExpanded(false)}>
-                <KeyboardArrowUpIcon color="primary" fontSize="large" />
-              </IconButton>
-            ) : (
-              <IconButton size="small" onClick={() => setIsExpanded(true)}>
-                <KeyboardArrowDownIcon color="primary" fontSize="large" />
-              </IconButton>
-            )}
-          </div>
+          {isExpanded ? (
+            <IconButton size="small" onClick={() => setIsExpanded(false)}>
+              <KeyboardArrowUpIcon color="primary" fontSize="large" />
+            </IconButton>
+          ) : (
+            <IconButton size="small" onClick={() => setIsExpanded(true)}>
+              <KeyboardArrowDownIcon color="primary" fontSize="large" />
+            </IconButton>
+          )}
         </div>
       </div>
       {isExpanded && (
-        <div className="flex w-full flex-col items-center gap-2 px-8">
-          <div className="w-full">
-            <strong
-              onClick={() =>
-                void router.push(`/profile/${play.play.author_id}`)
-              }
-              className={hoverText}
-            >
-              Note:{" "}
-            </strong>
-            {play.play.note}
-          </div>
-          <div className="flex w-full gap-2">
-            {tags?.map((tag) => (
-              <Button
-                key={tag.title + tag.id}
-                size="small"
-                onClick={() => handleTagClick(tag.title)}
-              >
-                #{tag.title}
-              </Button>
-            ))}
-          </div>
-          <div className="flex w-full flex-col items-center gap-4">
-            <AddComment playId={play.play.id} />
-            <CommentIndex
-              playId={play.play.id}
-              setCommentCount={setCommentCount}
-            />
-          </div>
-        </div>
+        <ExpandedPlay
+          play={play}
+          handleMentionAndTagClick={handleMentionAndTagClick}
+          setCommentCount={setCommentCount}
+        />
       )}
     </div>
   );

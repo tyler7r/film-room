@@ -3,9 +3,9 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
+import NewPlayModal from "~/components/add-play";
 import PageTitle from "~/components/page-title";
 import PlayIndex from "~/components/play-index";
-import PlayModal from "~/components/play-modal";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
@@ -24,10 +24,9 @@ const FilmRoom = () => {
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
-  const [videoDuration, setVideoDuration] = useState<number>(0);
   const [activePlay, setActivePlay] = useState<PlayPreviewType | null>(null);
 
-  const [isPlayModalOpen, setIsPlayModalOpen] = useState<boolean>(false);
+  const [isNewPlayOpen, setIsNewPlayOpen] = useState<boolean>(false);
 
   const fetchVideo = async () => {
     const { data } = await supabase
@@ -54,8 +53,6 @@ const FilmRoom = () => {
   const videoOnReady = async (e: YouTubeEvent) => {
     const video = e.target;
     setPlayer(video);
-    const duration = await video.getDuration();
-    setVideoDuration(duration);
     const time = Number(startParam);
     if (time) {
       void video.seekTo(time, true);
@@ -80,7 +77,7 @@ const FilmRoom = () => {
 
   return (
     video && (
-      <div className="m-4 flex w-full flex-col items-center justify-center gap-3">
+      <div className="flex w-full flex-col items-center justify-center gap-2 p-4">
         <div className="flex flex-col items-center justify-center gap-1 text-center">
           <div
             className={`${
@@ -96,16 +93,12 @@ const FilmRoom = () => {
           </div>
           <PageTitle title={video.title} size="large" />
         </div>
-        <Divider
-          flexItem
-          variant="middle"
-          sx={{ marginLeft: "8px", marginRight: "8px", marginTop: "4px" }}
-        ></Divider>
-        <PlayModal
+        <Divider flexItem variant="middle" sx={{ marginTop: "8px" }} />
+        <NewPlayModal
           player={player}
           video={video}
-          isPlayModalOpen={isPlayModalOpen}
-          setIsPlayModalOpen={setIsPlayModalOpen}
+          isNewPlayOpen={isNewPlayOpen}
+          setIsNewPlayOpen={setIsNewPlayOpen}
         />
         {video.link && (
           <div ref={playerRef}>
@@ -132,7 +125,6 @@ const FilmRoom = () => {
           player={player}
           videoId={video.id}
           scrollToPlayer={scrollToPlayer}
-          duration={videoDuration}
           setActivePlay={setActivePlay}
           activePlay={activePlay}
         />

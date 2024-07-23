@@ -24,31 +24,30 @@ export const isAffiliatedContext = createContext<AffiliationContextProps>({
 });
 
 export const IsAffiliated = ({ children }: AffiliationProps) => {
-  const { user, setUser } = useAuthContext();
+  const { user } = useAuthContext();
 
   const [affiliations, setAffiliations] = useState<
     TeamAffiliationType[] | undefined
   >(undefined);
 
-  const fetchAffiliations = async () => {
-    if (user.userId) {
+  const fetchAffiliations = async (profileId?: string) => {
+    if (profileId) {
       const { data } = await supabase
-        .from("affiliations")
-        .select(
-          `role, id, number, teams!inner(id, name, city, division, logo, full_name, owner)`,
-        )
-        .match({ user_id: `${user.userId}`, verified: true });
-      if (data && data.length > 0) {
-        const typedAffiliations: TeamAffiliationType[] = data.map((tm) => ({
-          team: tm.teams!,
-          role: tm.role,
-          affId: tm.id,
-          number: tm.number,
-        }));
-        if (user.isLoggedIn) {
+        .from("user_view")
+        .select("*")
+        .eq("profile->>id", profileId);
+      if (data) {
+        const typedAffiliations: TeamAffiliationType[] = data
+          .filter((aff) => aff.affiliation.verified)
+          .map((aff) => ({
+            team: aff.team,
+            role: aff.affiliation.role,
+            number: aff.affiliation.number,
+            affId: aff.affiliation.id,
+          }));
+        if (typedAffiliations && typedAffiliations.length > 0)
           setAffiliations(typedAffiliations);
-          setUser({ ...user, currentAffiliation: typedAffiliations[0] });
-        }
+        else setAffiliations(undefined);
       }
     }
   };
@@ -60,7 +59,7 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
         "postgres_changes",
         { event: "*", schema: "public", table: "affiliations" },
         () => {
-          void fetchAffiliations();
+          void fetchAffiliations(user.userId);
         },
       )
       .subscribe();
@@ -71,10 +70,8 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
   }, []);
 
   useEffect(() => {
-    if (user.isLoggedIn) {
-      void fetchAffiliations();
-    } else setAffiliations(undefined);
-  }, [user.isLoggedIn]);
+    void fetchAffiliations(user.userId);
+  }, [user]);
 
   return (
     <isAffiliatedContext.Provider

@@ -1,7 +1,5 @@
 import { Divider } from "@mui/material";
 import { useRouter } from "next/router";
-import { useAffiliatedContext } from "~/contexts/affiliations";
-import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import type { TeamType } from "~/utils/types";
 import PageTitle from "../page-title";
@@ -13,21 +11,12 @@ type TeamProps = {
 
 const Team = ({ team }: TeamProps) => {
   const { hoverBorder, backgroundStyle } = useIsDarkContext();
-  const { user, setUser } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
   const router = useRouter();
 
   const handleTeamClick = (
     e: React.MouseEvent<HTMLDivElement>,
     teamId: string,
   ) => {
-    e.stopPropagation();
-    const isAffiliatedTeam = affiliations?.find(
-      (aff) => aff.team.id === teamId,
-    );
-    if (isAffiliatedTeam && user.currentAffiliation) {
-      setUser({ ...user, currentAffiliation: isAffiliatedTeam });
-    }
     void router.push(`/team-hub/${teamId}`);
   };
 
@@ -42,9 +31,6 @@ const Team = ({ team }: TeamProps) => {
       <Divider variant="middle" orientation="vertical" flexItem />
       <div className="flex flex-col items-center justify-center">
         <PageTitle title={team.full_name} size="small" />
-        {team.id === user.currentAffiliation?.team.id && (
-          <div className="text-sm">ACTIVE</div>
-        )}
       </div>
     </div>
   );

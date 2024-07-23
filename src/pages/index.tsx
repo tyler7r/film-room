@@ -14,7 +14,7 @@ import type { PlayPreviewType } from "~/utils/types";
 import { useIsDarkContext } from "./_app";
 
 const Home = () => {
-  const { user } = useAuthContext();
+  const { user, affIds } = useAuthContext();
   const { hoverText } = useIsDarkContext();
   const { isMobile } = useMobileContext();
 
@@ -34,9 +34,9 @@ const Home = () => {
       .select("*", { count: "exact" })
       .order("play->>created_at", { ascending: false })
       .range(from, to);
-    if (user.isLoggedIn && user.currentAffiliation?.team.id) {
+    if (affIds) {
       void plays.or(
-        `play->>private.eq.false, play->>exclusive_to.eq.${user.currentAffiliation.team.id}`,
+        `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
       );
     } else {
       void plays.eq("play->>private", false);
@@ -62,7 +62,7 @@ const Home = () => {
   useEffect(() => {
     if (page === 1) void fetchPlays();
     else setPage(1);
-  }, [isMobile]);
+  }, [isMobile, affIds]);
 
   useEffect(() => {
     void fetchPlays();
@@ -130,7 +130,7 @@ const Home = () => {
       </div>
       <div className="grid grid-cols-1 gap-6">
         {plays?.map((play) => (
-          <PlayPreview preview={play} key={Math.random() * 10000000} />
+          <PlayPreview preview={play} key={play.play.id} />
         ))}
       </div>
       {plays && playCount && (
@@ -138,7 +138,7 @@ const Home = () => {
           showFirstButton
           showLastButton
           sx={{ marginTop: "8px" }}
-          size="small"
+          size="medium"
           variant="text"
           shape="rounded"
           count={getNumberOfPages(itemsPerPage, playCount)}

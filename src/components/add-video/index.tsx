@@ -1,14 +1,16 @@
 import AddIcon from "@mui/icons-material/Add";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   Box,
   Button,
-  Checkbox,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Modal,
   Select,
   TextField,
+  Tooltip,
   type SelectChangeEvent,
 } from "@mui/material";
 import { useRouter } from "next/router";
@@ -17,19 +19,18 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { divisions, isValidYoutubeLink, proDivs } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type {
-  MessageType,
-  TeamMentionType,
-  VideoUploadType,
-} from "~/utils/types";
+import type { MessageType, TeamType, VideoUploadType } from "~/utils/types";
 import FormMessage from "../form-message";
 import PageTitle from "../page-title";
+import TeamLogo from "../team-logo";
 import TeamMentions from "../team-mentions";
 
 const AddVideo = () => {
   const router = useRouter();
   const { user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
+  const { affiliations } = useAuthContext();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<MessageType>({
     status: "error",
@@ -39,14 +40,14 @@ const AddVideo = () => {
     link: "",
     title: "",
     private: false,
-    exclusive_to: "",
+    exclusive_to: "public",
     week: "",
     season: "",
     tournament: "",
     division: "",
   });
-  const [teamMentions, setTeamMentions] = useState<string[]>([]);
-  const [teams, setTeams] = useState<TeamMentionType | null>(null);
+  const [teamMentions, setTeamMentions] = useState<TeamType[] | null>(null);
+  const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
 
   const handleOpen = () => {
@@ -58,8 +59,9 @@ const AddVideo = () => {
   };
 
   const fetchTeams = async () => {
-    const { data } = await supabase.from("teams").select("full_name, id");
-    if (data) setTeams(data);
+    const { data } = await supabase.from("teams").select();
+    if (data && data.length > 0) setTeams(data);
+    else setTeams(null);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,18 +77,27 @@ const AddVideo = () => {
     setVideoData({ ...videoData, division: div });
   };
 
+  const handlePrivacyStatus = (e: SelectChangeEvent) => {
+    const status = e.target.value;
+    if (status === "public" || status === "") {
+      setVideoData({ ...videoData, private: false, exclusive_to: "public" });
+    } else {
+      setVideoData({ ...videoData, private: true, exclusive_to: status });
+    }
+  };
+
   const reset = () => {
     setVideoData({
       link: "",
       title: "",
       private: false,
-      exclusive_to: "",
+      exclusive_to: "public",
       week: "",
       season: "",
       tournament: "",
       division: "",
     });
-    setTeamMentions([]);
+    setTeamMentions(null);
     setIsOpen(false);
   };
 
@@ -123,74 +134,56 @@ const AddVideo = () => {
     }
   }, [videoData]);
 
-  const checkIfDuplicateVideo = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { data } = await supabase
-      .from("videos")
-      .select()
-      .match(
-        videoData.private
-          ? {
-              link: videoData.link,
-              exclusive_to: user.currentAffiliation?.team.id,
-              private: videoData.private,
-            }
-          : { link: videoData.link, private: videoData.private },
-      )
-      .single();
-    if (data) return true;
-    else return false;
-  };
-
   const handleTeamMention = async (teamId: string, video: string) => {
     await supabase.from("team_videos").insert({
       team_id: teamId,
       video_id: video,
-      exclusive_to: videoData.private ? user.currentAffiliation?.team.id : null,
     });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const isVideoDuplicated = await checkIfDuplicateVideo(e);
     e.preventDefault();
     const { title, link, season, week, tournament, division } = videoData;
-    if (isVideoDuplicated) {
-      setMessage({
-        status: "error",
-        text: `This ${
-          videoData.private ? "private" : "public"
-        } video already exists!`,
-      });
-      setIsValidForm(false);
-      return;
-    }
     if (user.userId) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("videos")
         .insert({
           title,
           link,
           season,
           division,
-          week: week === "" ? null : week,
+          week: week === "" ? null : `Week ${week}`,
           tournament: tournament === "" ? null : tournament,
           private: videoData.private,
-          exclusive_to: videoData.private
-            ? user.currentAffiliation?.team.id
-            : null,
-          author_id: `${user.userId}`,
+          exclusive_to: videoData.private ? videoData.exclusive_to : null,
+          author_id: user.userId,
+          keywords: `${title} ${season} ${
+            week === "" ? null : `Week ${week}`
+          } ${tournament === "" ? null : tournament} ${division}`,
+          duplicate_check: videoData.private ? `${videoData.exclusive_to}` : "",
         })
         .select()
         .single();
       if (data) {
-        teamMentions.forEach((mention) => {
-          const team = teams?.find((t) => t.full_name === mention);
-          if (team) {
-            void handleTeamMention(team.id, data.id);
-          }
+        teamMentions?.forEach((mention) => {
+          void handleTeamMention(mention.id, data.id);
         });
         void reset();
       }
+      if (error)
+        if (error.code === "23505") {
+          setMessage({
+            text: `A ${
+              videoData.private ? "private" : "public"
+            } video with this link has already been published.`,
+            status: "error",
+          });
+        } else {
+          setMessage({
+            text: `There was a problem publishing this video: ${error.message}`,
+            status: "error",
+          });
+        }
     }
   };
 
@@ -280,7 +273,7 @@ const AddVideo = () => {
               name="week"
               autoComplete="week"
               id="week"
-              label="Week  (if applicable)"
+              label="Week #  (if applicable)"
               onChange={handleInput}
               value={videoData.week}
             />
@@ -300,23 +293,53 @@ const AddVideo = () => {
             setMentions={setTeamMentions}
             teams={teams}
           />
-          {user.currentAffiliation?.team.id && (
-            <div className="flex items-center justify-center">
-              <div className="text-xl font-bold tracking-tight">
-                Keep this video private to{" "}
-                {`${user.currentAffiliation?.team.full_name} `}
-              </div>
-              <Checkbox
-                checked={videoData.private}
-                onChange={() => {
-                  setVideoData({ ...videoData, private: !videoData.private });
+          <FormControl
+            className="w-full text-start"
+            sx={{ display: "flex", gap: "8px" }}
+          >
+            <InputLabel htmlFor="privacy-status">Privacy Status</InputLabel>
+            <div className="flex w-full items-center justify-center gap-2">
+              <Select
+                value={videoData.exclusive_to}
+                onChange={handlePrivacyStatus}
+                label="Privacy Status"
+                name="privacy"
+                id="privacy-status"
+                className="w-full"
+              >
+                <MenuItem value="public">Public</MenuItem>
+                {affiliations?.map((div) => (
+                  <MenuItem key={div.team.id} value={div.team.id}>
+                    <div className="flex gap-2">
+                      <div>
+                        Private to: <strong>{div.team.full_name}</strong>
+                      </div>
+                      {div.team.logo && <TeamLogo tm={div.team} size={25} />}
+                    </div>
+                  </MenuItem>
+                ))}
+              </Select>
+              <Tooltip
+                title="Private videos are only viewable by teammates and coaches (regardless of if an opponent team is tagged above). Public videos are viewable by all users."
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, -14],
+                        },
+                      },
+                    ],
+                  },
                 }}
-                size="medium"
-                name="private-only"
-                id="private-only"
-              />
+              >
+                <IconButton size="small">
+                  <InfoOutlinedIcon />
+                </IconButton>
+              </Tooltip>
             </div>
-          )}
+          </FormControl>
           <FormMessage message={message} />
           <div className="flex gap-2">
             <Button

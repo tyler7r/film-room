@@ -22,7 +22,7 @@ const PageTitle = ({ title, size, purple }: PageTitleProps) => {
 
   return (
     <div
-      className={`text-center font-serif italic tracking-tighter ${textSize} ${
+      className={`w-full text-center font-serif italic tracking-tighter ${textSize} ${
         purple && isDark
           ? "text-purple-400"
           : purple

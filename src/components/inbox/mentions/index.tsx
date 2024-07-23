@@ -9,7 +9,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import TeamLogo from "~/components/team-logo";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
@@ -22,8 +21,7 @@ type InboxMentionsProps = {
 };
 
 const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
-  const { user, setUser } = useAuthContext();
-  const { affiliations } = useAffiliatedContext();
+  const { user } = useAuthContext();
   const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
   const { backgroundStyle, isDark, hoverBorder, hoverText } =
     useIsDarkContext();
@@ -78,14 +76,16 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
   };
 
   const updateLastWatched = async (video: string, time: number) => {
-    await supabase
-      .from("profiles")
-      .update({
-        last_watched: video,
-        last_watched_time: time,
-      })
-      .eq("id", `${user.userId}`)
-      .select();
+    if (user.userId) {
+      await supabase
+        .from("profiles")
+        .update({
+          last_watched: video,
+          last_watched_time: time,
+        })
+        .eq("id", user.userId)
+        .select();
+    }
   };
 
   const updateMention = async (mentionId: string) => {
@@ -95,30 +95,17 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
       .eq("id", mentionId);
   };
 
-  const updateUserAffiliation = (teamId: string) => {
-    const team = affiliations?.find((aff) => aff.team.id === teamId);
-    if (user.currentAffiliation?.team.id === teamId) return;
-    else {
-      setUser({
-        ...user,
-        currentAffiliation: team ? team : user.currentAffiliation,
-      });
-    }
-  };
-
   const handleClick = async (
     videoId: string,
     playId: string,
     start: number,
     mentionId: string,
-    teamId: string | null,
     viewed: boolean,
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set("play", playId);
     params.set("start", `${start}`);
     if (!viewed) void updateMention(mentionId);
-    if (teamId) void updateUserAffiliation(teamId);
     void updateLastWatched(videoId, start);
     void router.push(`/film-room/${videoId}?${params.toString()}`);
     setIsOpen(false);
@@ -214,7 +201,6 @@ const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
                       notification.play.id,
                       notification.play.start_time,
                       notification.mention.id,
-                      notification.team ? notification.team.id : null,
                       notification.mention.viewed,
                     )
                   }

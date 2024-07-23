@@ -1,7 +1,7 @@
-import DeleteIcon from "@mui/icons-material/Delete";
-import { Button, Divider, Pagination } from "@mui/material";
+import { Divider, Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import AddVideo from "~/components/add-video";
+import EmptyMessage from "~/components/empty-msg";
 import PageTitle from "~/components/page-title";
 import Video from "~/components/video";
 import VideoSearchFilters from "~/components/video-search-filters";
@@ -12,26 +12,20 @@ import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
 
 export type SearchOptions = {
-  title?: string;
-  season?: string;
-  currentAffiliation?: string;
-  division?: string;
-  privateOnly?: boolean;
+  privateOnly?: string;
+  topic?: string;
 };
 
 const FilmRoomHome = () => {
-  const { user } = useAuthContext();
+  const { affIds } = useAuthContext();
   const { isMobile } = useMobileContext();
 
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [videoCount, setVideoCount] = useState<number | null>(null);
   const [searchOptions, setSearchOptions] = useState<SearchOptions>({
-    title: "",
-    season: "",
-    currentAffiliation: user.currentAffiliation?.team.id,
-    division: "",
-    privateOnly: false,
+    privateOnly: "all",
+    topic: "",
   });
 
   const itemsPerPage = isMobile ? 10 : 20;
@@ -43,44 +37,31 @@ const FilmRoomHome = () => {
       .select("*", { count: "exact" })
       .order("uploaded_at", { ascending: false })
       .range(from, to);
-    if (options?.currentAffiliation) {
-      void videos.or(
-        `private.eq.false, exclusive_to.eq.${options.currentAffiliation}`,
-      );
+    if (affIds) {
+      if (options?.privateOnly === "all") {
+        void videos.or(`private.eq.false, exclusive_to.in.(${affIds})`);
+      } else if (options?.privateOnly && options.privateOnly !== "all") {
+        void videos.eq("exclusive_to", options.privateOnly);
+      }
     } else {
       void videos.eq("private", false);
     }
-    if (options?.title) {
-      void videos.ilike("title", `%${options.title}%`);
-    }
-    if (options?.division) {
-      void videos.ilike("division", `%${options.division}%`);
-    }
-    if (options?.season) {
-      void videos.ilike("season", `%${options.season}%`);
-    }
-    if (options?.privateOnly) {
-      void videos.eq("private", true);
+    if (options?.topic && options.topic !== "") {
+      void videos.or(
+        `title.ilike.%${options.topic}%, tournament.ilike.%${options.topic}%, division.ilike.%${options.topic}%, week.ilike.%${options.topic}%, season.ilike.%${options.topic}%, keywords.ilike.%${options.topic}%`,
+      );
     }
 
     const { data, count } = await videos;
-    if (data) setVideos(data);
+    if (data && data.length > 0) setVideos(data);
+    else setVideos(null);
     if (count) setVideoCount(count);
+    else setVideoCount(null);
   };
 
   const handleChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
     setPage(value);
-  };
-
-  const clearSearchOptions = () => {
-    setSearchOptions({
-      ...searchOptions,
-      division: "",
-      season: "",
-      title: "",
-      privateOnly: false,
-    });
   };
 
   useEffect(() => {
@@ -90,7 +71,7 @@ const FilmRoomHome = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "videos" },
         () => {
-          void fetchVideos();
+          void fetchVideos(searchOptions);
         },
       )
       .subscribe();
@@ -99,13 +80,6 @@ const FilmRoomHome = () => {
       void supabase.removeChannel(channel);
     };
   }, []);
-
-  useEffect(() => {
-    setSearchOptions({
-      ...searchOptions,
-      currentAffiliation: user.currentAffiliation?.team.id,
-    });
-  }, [user]);
 
   useEffect(() => {
     if (page === 1) void fetchVideos(searchOptions);
@@ -117,7 +91,7 @@ const FilmRoomHome = () => {
   }, [page]);
 
   return (
-    <div className="mb-4 flex w-full flex-col items-center justify-center p-4">
+    <div className="flex w-full flex-col items-center justify-center p-4">
       <PageTitle title="The Film Room" size="x-large" />
       <AddVideo />
       <Divider
@@ -128,30 +102,17 @@ const FilmRoomHome = () => {
       <VideoSearchFilters
         searchOptions={searchOptions}
         setSearchOptions={setSearchOptions}
-        setPage={setPage}
       />
-      <Button endIcon={<DeleteIcon />} onClick={clearSearchOptions}>
-        Clear Filters
-      </Button>
       <div className="mt-6 flex w-4/5 flex-col items-center justify-center gap-6">
-        {(!videos || videos.length === 0) && (
-          <div className="flex flex-col items-center justify-center gap-1 text-center">
-            <div className="text-2xl font-bold tracking-tight">
-              No videos in the Film Room!
-            </div>
-            <div className="text-xl font-bold tracking-wide">
-              Try a new search.
-            </div>
-          </div>
-        )}
         {videos?.map((v) => <Video video={v} key={v.id} />)}
+        {!videos && <EmptyMessage message="videos" size="large" />}
       </div>
       {videos && videoCount && (
         <Pagination
           showFirstButton
           showLastButton
           sx={{ marginTop: "24px" }}
-          size="large"
+          size="medium"
           variant="text"
           shape="rounded"
           count={getNumberOfPages(itemsPerPage, videoCount)}

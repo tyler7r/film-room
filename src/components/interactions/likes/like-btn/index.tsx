@@ -4,28 +4,19 @@ import { IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
-import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
-import type { LikeListType, PlayType } from "~/utils/types";
+import type { LikeListType } from "~/utils/types";
 import LikePopover from "../like-popover";
 
 type LikeBtnProps = {
   includePopover?: boolean;
   playId: string;
-  activePlay?: PlayType | null | undefined;
   commentLike?: boolean;
   small?: boolean;
 };
 
-const LikeBtn = ({
-  includePopover,
-  playId,
-  activePlay,
-  commentLike,
-  small,
-}: LikeBtnProps) => {
+const LikeBtn = ({ includePopover, playId, commentLike }: LikeBtnProps) => {
   const { user } = useAuthContext();
-  const { isMobile } = useMobileContext();
   const router = useRouter();
 
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -68,57 +59,58 @@ const LikeBtn = ({
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!user.isLoggedIn) {
+    if (user.userId) {
+      const plays = supabase
+        .from("play_likes")
+        .insert({
+          play_id: playId,
+          user_id: user.userId,
+          user_name: `${user.name}`,
+        })
+        .select();
+      const comments = supabase
+        .from("comment_likes")
+        .insert({
+          comment_id: playId,
+          user_id: user.userId,
+          user_name: `${user.name}`,
+        })
+        .select();
+      const { data } = commentLike ? await comments : await plays;
+      if (data) {
+        void fetchLikeCount();
+        void fetchIfUserLiked();
+      }
+    } else {
       void router.push("/login");
       return;
-    }
-    const plays = supabase
-      .from("play_likes")
-      .insert({
-        play_id: playId,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    const comments = supabase
-      .from("comment_likes")
-      .insert({
-        comment_id: playId,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    const { data } = commentLike ? await comments : await plays;
-    if (data) {
-      void fetchLikeCount();
-      void fetchIfUserLiked();
     }
   };
 
   const handleUnlike = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const plays = supabase
-      .from("play_likes")
-      .delete()
-      .match({
-        play_id: playId,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    const comments = supabase
-      .from("comment_likes")
-      .delete()
-      .match({
-        comment_id: playId,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    const { data } = commentLike ? await comments : await plays;
-    if (data) {
-      void fetchLikeCount();
-      void fetchIfUserLiked();
+    if (user.userId) {
+      const plays = supabase
+        .from("play_likes")
+        .delete()
+        .match({
+          play_id: playId,
+          user_id: user.userId,
+        })
+        .select();
+      const comments = supabase
+        .from("comment_likes")
+        .delete()
+        .match({
+          comment_id: playId,
+          user_id: user.userId,
+        })
+        .select();
+      const { data } = commentLike ? await comments : await plays;
+      if (data) {
+        void fetchLikeCount();
+        void fetchIfUserLiked();
+      }
     }
   };
 
@@ -141,8 +133,8 @@ const LikeBtn = ({
 
   useEffect(() => {
     void fetchLikeCount();
-    if (user.isLoggedIn) void fetchIfUserLiked();
-  }, [activePlay]);
+    if (user.userId) void fetchIfUserLiked();
+  }, [playId]);
 
   return (
     <div>
@@ -154,10 +146,7 @@ const LikeBtn = ({
             onMouseLeave={handlePopoverClose}
             onClick={(e) => void handleUnlike(e)}
           >
-            <FavoriteIcon
-              color="primary"
-              fontSize={small ? "small" : isMobile ? "medium" : "large"}
-            />
+            <FavoriteIcon color="primary" fontSize="medium" />
           </IconButton>
         ) : (
           <IconButton
@@ -166,17 +155,10 @@ const LikeBtn = ({
             onMouseLeave={handlePopoverClose}
             onClick={(e) => void handleLike(e)}
           >
-            <FavoriteBorderIcon
-              color="primary"
-              fontSize={small ? "small" : isMobile ? "medium" : "large"}
-            />
+            <FavoriteBorderIcon color="primary" fontSize="medium" />
           </IconButton>
         )}
-        <div
-          className={`font-bold ${small ? `text-lg` : `text-lg md:text-2xl`}`}
-        >
-          {likeCount}
-        </div>
+        <div className="text-lg font-bold">{likeCount}</div>
       </div>
       {likeList && (
         <LikePopover

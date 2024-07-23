@@ -1,7 +1,6 @@
 import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import { IconButton } from "@mui/material";
 import React, { useEffect } from "react";
-import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
 import type { PlayType } from "~/utils/types";
 
@@ -20,36 +19,48 @@ const CommentBtn = ({
   setIsOpen,
   commentCount,
   setCommentCount,
-  activePlay,
 }: CommentBtnProps) => {
-  const { isMobile } = useMobileContext();
-
   const handleCommentClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsOpen(!isOpen);
   };
 
-  const fetchInitialCommentNumber = async () => {
+  const fetchCommentNumber = async () => {
     const { count } = await supabase
       .from("comments")
       .select("*", { count: "exact" })
       .eq("play_id", playId);
     if (count) setCommentCount(count);
+    else setCommentCount(0);
   };
 
   useEffect(() => {
-    void fetchInitialCommentNumber();
-  }, [activePlay]);
+    const channel = supabase
+      .channel("comment_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "comments" },
+        () => {
+          void fetchCommentNumber();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    void fetchCommentNumber();
+  }, [playId]);
 
   return (
     <div className="flex items-center">
       <IconButton size="small" onClick={handleCommentClick}>
-        <ModeCommentIcon
-          color="primary"
-          fontSize={isMobile ? "small" : "large"}
-        />
+        <ModeCommentIcon color="primary" fontSize="medium" />
       </IconButton>
-      <div className="text-lg font-bold md:text-2xl">{commentCount}</div>
+      <div className="text-lg font-bold">{commentCount}</div>
     </div>
   );
 };

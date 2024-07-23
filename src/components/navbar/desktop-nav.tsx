@@ -11,7 +11,6 @@ import Inbox from "../inbox";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
 import NavbarSearch from "../navbar-search";
-import TeamLogo from "../team-logo";
 import { type ChildrenNavProps } from "./navbar";
 
 const DesktopNav = ({ logout }: ChildrenNavProps) => {
@@ -39,9 +38,6 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                   >
                     <SearchIcon fontSize="large" />
                   </IconButton>
-                  {user.currentAffiliation && (
-                    <TeamLogo tm={user.currentAffiliation.team} size={45} />
-                  )}
                   <Button
                     variant="contained"
                     size="medium"

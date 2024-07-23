@@ -23,22 +23,21 @@ const AddComment = ({ playId }: CommentProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user.isLoggedIn || !user.userId) {
+    if (!user.userId) {
       void router.push("/login");
-      return;
-    }
-    const { data } = await supabase
-      .from("comments")
-      .insert({
-        play_id: playId,
-        comment,
-        author_name: `${user.name}`,
-        comment_author: user.userId,
-        team_id: user.currentAffiliation?.team.id ?? null,
-      })
-      .select();
-    if (data) {
-      setComment("");
+    } else {
+      const { data } = await supabase
+        .from("comments")
+        .insert({
+          play_id: playId,
+          comment,
+          author_name: `${user.name}`,
+          comment_author: user.userId,
+        })
+        .select();
+      if (data) {
+        setComment("");
+      }
     }
   };
 

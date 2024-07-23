@@ -12,21 +12,21 @@ const FormMessage = ({ message }: FormMessageType) => {
   const { isDark } = useIsDarkContext();
 
   const errorStyle = {
-    border: `1px solid ${
+    border: `2px solid ${
       isDark ? theme.palette.error.dark : theme.palette.error.light
     }`,
     color: `${theme.palette.error.main}`,
   };
 
   const successStyle = {
-    border: `1px solid ${colors.green[700]}`,
+    border: `2px solid ${colors.green[700]}`,
     color: colors.green[700],
   };
 
   return (
     text && (
       <div
-        className="text-md rounded-md p-2 px-3"
+        className="rounded-md p-2 text-center font-bold"
         style={status === "error" ? errorStyle : successStyle}
       >
         {text}

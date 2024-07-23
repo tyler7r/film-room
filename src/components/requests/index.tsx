@@ -2,7 +2,8 @@ import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { RequestType, TeamType } from "~/utils/types";
+import type { PlayerType, TeamType } from "~/utils/types";
+import EmptyMessage from "../empty-msg";
 
 type RequestsProps = {
   team: TeamType;
@@ -12,13 +13,13 @@ type RequestsProps = {
 
 const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
   const { backgroundStyle } = useIsDarkContext();
-  const [requests, setRequests] = useState<RequestType | null>(null);
+  const [requests, setRequests] = useState<PlayerType[] | null>(null);
 
   const fetchRequests = async () => {
     const { data, count } = await supabase
       .from("user_view")
       .select("*", { count: "exact" })
-      .match({ team_id: team.id, verified: false });
+      .match({ "team->>id": team.id, "affiliation->>verified": false });
     if (data && data.length > 0) {
       setRequests(data);
     } else setRequests(null);
@@ -50,31 +51,31 @@ const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
 
   return isOpen ? (
     <div className="mt-4 flex flex-col gap-2 text-center">
-      {!requests && <div className="text-lg font-bold">No Join Requests</div>}
+      {!requests && <EmptyMessage message="requests" size="medium" />}
       {requests?.map((req) => (
         <div
-          key={req.id}
+          key={req.affiliation.id}
           style={backgroundStyle}
           className="flex items-center justify-center gap-2 rounded-lg px-4 py-1"
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col">
-              <div className="text-lg font-bold">{req.name}</div>
-              <div className="text-xs">{req.email}</div>
+              <div className="text-lg font-bold">{req.profile.name}</div>
+              <div className="text-xs">{req.profile.email}</div>
             </div>
-            <div className="text-sm">({req.role})</div>
+            <div className="text-sm">({req.affiliation.role})</div>
           </div>
           <Button
             type="button"
             color="success"
-            onClick={() => handleAccept(req.id)}
+            onClick={() => handleAccept(req.affiliation.id)}
           >
             Accept
           </Button>
           <Button
             type="button"
             color="error"
-            onClick={() => handleReject(req.id)}
+            onClick={() => handleReject(req.affiliation.id)}
           >
             Reject
           </Button>

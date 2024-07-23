@@ -19,11 +19,11 @@ const Roster = ({ team, role }: RosterProps) => {
       .from("user_view")
       .select("*")
       .match({
-        team_id: team.id,
-        role: "player",
-        verified: true,
+        "team->>id": team.id,
+        "affiliation->>role": "player",
+        "affiliation->>verified": true,
       })
-      .order("number");
+      .order("affiliation->>number");
     if (data && data.length > 0) {
       setRoster(data);
     } else {
@@ -60,9 +60,9 @@ const Roster = ({ team, role }: RosterProps) => {
       )}
       <div className="flex flex-wrap items-center justify-center gap-4">
         {(role === "player" || role === "guest") &&
-          roster?.map((p) => <Player key={p.id} player={p} />)}
+          roster?.map((p) => <Player key={p.affiliation.id} player={p} />)}
         {(role === "coach" || role === "owner") &&
-          roster?.map((p) => <PlayerEdit key={p.id} player={p} />)}
+          roster?.map((p) => <PlayerEdit key={p.affiliation.id} player={p} />)}
       </div>
     </div>
   );

@@ -2,7 +2,6 @@ import PublicIcon from "@mui/icons-material/Public";
 import { colors } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -19,8 +18,7 @@ type VideoProps = {
 
 const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
   const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
-  const { affiliations } = useAffiliatedContext();
-  const { user } = useAuthContext();
+  const { user, affiliations } = useAuthContext();
   const router = useRouter();
 
   const [exclusiveTeam, setExclusiveTeam] = useState<
@@ -37,13 +35,15 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
 
   const handleClick = async (id: string) => {
     if (!startTime) {
-      await supabase
-        .from("profiles")
-        .update({
-          last_watched: id,
-          last_watched_time: 0,
-        })
-        .eq("id", `${user.userId}`);
+      if (user.userId) {
+        await supabase
+          .from("profiles")
+          .update({
+            last_watched: id,
+            last_watched_time: 0,
+          })
+          .eq("id", user.userId);
+      }
       void router.push(`/film-room/${id}`);
     } else {
       void router.push(`/film-room/${id}?start=${startTime}`);
@@ -107,12 +107,13 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
               isDark ? "text-purple-400" : "text-purple-A400"
             }`}
           >
-            {video.season} -{" "}
+            {video.season}
             {video.week
-              ? video.week.toLocaleUpperCase()
+              ? ` ${video.week.toLocaleUpperCase()}`
               : video.tournament
-                ? video.tournament.toLocaleUpperCase()
+                ? ` ${video.tournament.toLocaleUpperCase()}`
                 : null}
+            {` - ${video.division}`}
           </div>
           <PageTitle size="small" title={video.title} />
         </div>

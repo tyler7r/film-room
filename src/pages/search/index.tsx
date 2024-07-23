@@ -11,7 +11,7 @@ import SearchVideos from "~/components/search-sections/videos";
 import { useAuthContext } from "~/contexts/auth";
 
 export type SearchOptions = {
-  currentAffiliation: string | undefined;
+  affIds: string[] | null;
 };
 
 type ActionBarType = {
@@ -22,7 +22,7 @@ type ActionBarType = {
 };
 
 const Search = () => {
-  const { user } = useAuthContext();
+  const { affIds } = useAuthContext();
 
   const topic = useSearchParams().get("topic") ?? "";
   const searchParams = useSearchParams();
@@ -30,7 +30,7 @@ const Search = () => {
   const router = useRouter();
 
   const [options, setOptions] = useState<SearchOptions>({
-    currentAffiliation: user.currentAffiliation?.team.id,
+    affIds: affIds,
   });
   const [actionBar, setActionBar] = useState<ActionBarType>({
     videos: true,
@@ -63,9 +63,9 @@ const Search = () => {
 
   useEffect(() => {
     setOptions({
-      currentAffiliation: user.currentAffiliation?.team.id,
+      affIds: affIds,
     });
-  }, [user]);
+  }, [affIds]);
 
   return (
     <div

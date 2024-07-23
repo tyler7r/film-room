@@ -9,7 +9,6 @@ import MentionsFeed from "~/components/profile-feed/mentions";
 import ProfileStats from "~/components/profile-stats";
 import TeamAffiliation from "~/components/team-affiliation";
 import Video from "~/components/video";
-import { useAffiliatedContext } from "~/contexts/affiliations";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type {
@@ -20,7 +19,6 @@ import type {
 
 type FetchOptions = {
   profileId?: string | undefined;
-  currentAffiliation: string | undefined;
 };
 
 type ProfileType = {
@@ -30,12 +28,10 @@ type ProfileType = {
 
 const Profile = () => {
   const router = useRouter();
-  const { affiliations } = useAffiliatedContext();
-  const { user, setUser } = useAuthContext();
+  const { user } = useAuthContext();
 
   const [options, setOptions] = useState<FetchOptions>({
     profileId: router.query.user as string,
-    currentAffiliation: user.currentAffiliation?.team.id,
   });
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [profileAffiliations, setProfileAffiliations] = useState<
@@ -53,17 +49,20 @@ const Profile = () => {
     if (options?.profileId) {
       const { data } = await supabase
         .from("user_view")
-        .select("*, teams!affiliations_team_id_fkey(*)")
-        .eq("profile_id", options.profileId);
+        .select("*")
+        .eq("profile->>id", options.profileId);
       if (data?.[0]) {
-        setProfile({ name: data[0].name, join_date: data[0].join_date });
+        setProfile({
+          name: data[0].profile.name,
+          join_date: data[0].profile.join_date,
+        });
         const typedAffiliations: TeamAffiliationType[] = data
-          .filter((aff) => aff.verified)
+          .filter((aff) => aff.affiliation.verified)
           .map((aff) => ({
-            team: aff.teams!,
-            role: aff.role,
-            affId: aff.id,
-            number: aff.number,
+            team: aff.team,
+            role: aff.affiliation.role,
+            number: aff.affiliation.number,
+            affId: aff.affiliation.id,
           }));
         if (typedAffiliations && typedAffiliations.length > 0)
           setProfileAffiliations(typedAffiliations);
@@ -73,13 +72,15 @@ const Profile = () => {
   };
 
   const fetchLastWatched = async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("last_watched, last_watched_time, videos(*)")
-      .eq("id", `${user.userId}`)
-      .single();
-    if (data?.last_watched) setLastWatched(data);
-    else setLastWatched(null);
+    if (user.userId === options.profileId) {
+      const { data } = await supabase
+        .from("last_watched_view")
+        .select()
+        .eq("profile->>id", `${user.userId}`)
+        .single();
+      if (data) setLastWatched(data);
+      else setLastWatched(null);
+    }
   };
 
   const changeActionBar = (
@@ -104,19 +105,6 @@ const Profile = () => {
           });
   };
 
-  const updateUserAffiliation = (teamId: string | null | undefined) => {
-    if (teamId) {
-      const team = affiliations?.find((aff) => aff.team.id === teamId);
-      if (user.currentAffiliation?.team.id === teamId) return;
-      else {
-        setUser({
-          ...user,
-          currentAffiliation: team ? team : user.currentAffiliation,
-        });
-      }
-    } else return;
-  };
-
   useEffect(() => {
     if (user.userId) void fetchLastWatched();
   }, [user]);
@@ -125,7 +113,6 @@ const Profile = () => {
     setOptions({
       ...options,
       profileId: router.query.user as string,
-      currentAffiliation: user.currentAffiliation?.team.id,
     });
   }, [router.query.user, user]);
 
@@ -163,17 +150,10 @@ const Profile = () => {
                   <PlayArrowIcon fontSize="large" />
                   <PageTitle size="small" title="Continue Watching" />
                 </div>
-                <div
-                  className="w-full"
-                  onClick={() =>
-                    updateUserAffiliation(lastWatched.videos?.exclusive_to)
-                  }
-                >
-                  <Video
-                    video={lastWatched.videos}
-                    startTime={`${lastWatched.last_watched_time}`}
-                  />
-                </div>
+                <Video
+                  video={lastWatched.video}
+                  startTime={`${lastWatched.profile.last_watched_time}`}
+                />
               </div>
             )}
           </div>
@@ -185,22 +165,13 @@ const Profile = () => {
           />
         </div>
         {actionBarStatus.createdPlays && (
-          <CreatedFeed
-            profileId={options.profileId}
-            currentAffiliation={options.currentAffiliation}
-          />
+          <CreatedFeed profileId={options.profileId} />
         )}
         {actionBarStatus.mentions && (
-          <MentionsFeed
-            profileId={options.profileId}
-            currentAffiliation={options.currentAffiliation}
-          />
+          <MentionsFeed profileId={options.profileId} />
         )}
         {actionBarStatus.highlights && (
-          <HighlightsFeed
-            profileId={options.profileId}
-            currentAffiliation={options.currentAffiliation}
-          />
+          <HighlightsFeed profileId={options.profileId} />
         )}
       </div>
     )

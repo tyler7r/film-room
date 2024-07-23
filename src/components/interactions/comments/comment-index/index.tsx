@@ -2,6 +2,7 @@ import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import { supabase } from "~/utils/supabase";
+import type { CommentType } from "~/utils/types";
 import Comment from "../comment";
 
 type CommentIndexProps = {
@@ -9,18 +10,8 @@ type CommentIndexProps = {
   setCommentCount: (count: number) => void;
 };
 
-type CommentIndexType = {
-  author_name: string;
-  comment: string;
-  comment_author: string;
-  created_at: string;
-  id: string;
-  play_id: string;
-  team_id: string | null;
-}[];
-
 const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
-  const [index, setIndex] = useState<CommentIndexType | null>(null);
+  const [index, setIndex] = useState<CommentType[] | null>(null);
   const [page, setPage] = useState<number>(0);
   const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState<boolean>(false);
 

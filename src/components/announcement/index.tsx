@@ -1,6 +1,7 @@
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { Divider, IconButton } from "@mui/material";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
@@ -15,7 +16,9 @@ type AnnouncementProps = {
 
 const Announcement = ({ annc }: AnnouncementProps) => {
   const { user } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
+  const { backgroundStyle, hoverText } = useIsDarkContext();
+  const router = useRouter();
+
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [likeCount, setLikeCount] = useState<number>(0);
@@ -63,35 +66,40 @@ const Announcement = ({ annc }: AnnouncementProps) => {
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const { data } = await supabase
-      .from("announcement_likes")
-      .insert({
-        announcement_id: annc.id,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    if (data) {
-      void fetchLikeCount();
-      void fetchIfUserLiked();
+    if (user.userId && user.name) {
+      const { data } = await supabase
+        .from("announcement_likes")
+        .insert({
+          announcement_id: annc.id,
+          user_id: user.userId,
+          user_name: user.name,
+        })
+        .select();
+      if (data) {
+        void fetchLikeCount();
+        void fetchIfUserLiked();
+      }
+    } else {
+      void router.push("/login");
     }
   };
 
   const handleUnlike = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const { data } = await supabase
-      .from("announcement_likes")
-      .delete()
-      .match({
-        announcement_id: annc.id,
-        user_id: `${user.userId}`,
-        user_name: `${user.name}`,
-      })
-      .select();
-    if (data) {
-      void fetchLikeCount();
-      void fetchIfUserLiked();
-    }
+    if (user.userId) {
+      const { data } = await supabase
+        .from("announcement_likes")
+        .delete()
+        .match({
+          announcement_id: annc.id,
+          user_id: user.userId,
+        })
+        .select();
+      if (data) {
+        void fetchLikeCount();
+        void fetchIfUserLiked();
+      }
+    } else void router.push("/login");
   };
 
   const handleDelete = async () => {
@@ -109,7 +117,10 @@ const Announcement = ({ annc }: AnnouncementProps) => {
       className="flex w-4/5 cursor-default items-center justify-center gap-2 rounded-md p-4 text-lg"
     >
       <div>
-        <strong className="tracking-tight">{`${annc.author_name}: `}</strong>
+        <strong
+          className={hoverText}
+          onClick={() => void router.push(`/profile/${annc.author_id}`)}
+        >{`${annc.author_name}: `}</strong>
         {annc.text}
       </div>
       <Divider
@@ -140,7 +151,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
           )}
           <div className="text-lg font-bold">{likeCount}</div>
         </div>
-        {annc.author_id === user.currentAffiliation?.affId && (
+        {annc.author_id === user.userId && (
           <DeleteMenu
             isOpen={isDeleteMenuOpen}
             setIsOpen={setIsDeleteMenuOpen}

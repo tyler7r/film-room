@@ -1,60 +1,46 @@
-import {
-  Checkbox,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  type SelectChangeEvent,
-} from "@mui/material";
-import type { TeamMentionType } from "~/utils/types";
+import { Autocomplete, TextField } from "@mui/material";
+import type { SyntheticEvent } from "react";
+import type { TeamType } from "~/utils/types";
 
 type TeamVideosProps = {
-  mentions: string[];
-  setMentions: (mentions: string[]) => void;
-  teams: TeamMentionType | null;
+  mentions: TeamType[] | null;
+  setMentions: (mentions: TeamType[] | null) => void;
+  teams: TeamType[] | null;
 };
 
-const TeamMentions = ({ mentions, setMentions, teams }: TeamVideosProps) => {
-  const handleChange = (event: SelectChangeEvent<typeof mentions>) => {
-    const {
-      target: { value },
-    } = event;
-    setMentions(typeof value === "string" ? value.split(",") : value);
+const TeamMentions = ({ setMentions, teams }: TeamVideosProps) => {
+  const handleChange = (
+    event: SyntheticEvent<Element, Event>,
+    newValue: TeamType[],
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMentions(newValue);
+    if (newValue.length === 0) {
+      setMentions(null);
+    }
   };
 
   return (
-    mentions && (
-      <div className="w-full">
-        <FormControl className="w-full text-start">
-          <InputLabel htmlFor="team-mentions">Team Mentions</InputLabel>
-          <Select
-            id="team-mentions"
-            name="team-mentions"
-            multiple
-            value={mentions}
-            onChange={handleChange}
-            input={<OutlinedInput label="Player Mentions" />}
-            renderValue={(selected) => selected.join(", ")}
-            multiline={true}
-          >
-            {teams?.map(
-              (team) =>
-                team.full_name && (
-                  <MenuItem key={team.id} value={team.full_name}>
-                    <Checkbox
-                      checked={mentions.indexOf(team.full_name) > -1}
-                      id="include-team"
-                      name="include-team"
-                    />
-                    <ListItemText primary={team.full_name} />
-                  </MenuItem>
-                ),
-            )}
-          </Select>
-        </FormControl>
-      </div>
+    teams && (
+      <Autocomplete
+        className="w-full"
+        id="teams-mentions"
+        onChange={(event, newValue) => handleChange(event, newValue)}
+        options={teams}
+        getOptionLabel={(option) => `${option.full_name} (${option.division})`}
+        filterSelectedOptions
+        multiple
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Team Mentions"
+            id="teams"
+            name="teams"
+          />
+        )}
+        limitTags={3}
+      />
     )
   );
 };
