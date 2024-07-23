@@ -217,29 +217,9 @@ export type CommentType = {
   comment: string;
   comment_author: string;
   author_name: string;
-  team_id: string | null;
   play_id: string;
   viewed: boolean;
 };
-
-export type RealCommentType = {
-  comment: string;
-  comment_author_name: string;
-  comment_id: string;
-  created_at: string;
-  highlight: boolean;
-  note: string;
-  play_id: string;
-  play_title: string;
-  private: boolean;
-  start_time: number;
-  team_id: string;
-  play_author_id: string;
-  video_id: string;
-  video_title: string;
-  viewed: boolean;
-  team: TeamType | null;
-}[];
 
 export type TeamActionBarType = {
   settings: boolean;
