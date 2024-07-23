@@ -30,9 +30,12 @@ const TeamAffiliation = ({ aff, handleClose }: TeamAffiliationProps) => {
     >
       <TeamLogo tm={aff.team} size={35} />
       <Divider flexItem orientation="vertical" variant="middle" />
-      <div className="flex items-center justify-center gap-2">
-        <div className="text-lg font-bold">{aff.team.full_name}</div>
-        {aff.number && <div className="leading-3">#{aff.number}</div>}
+      <div className="flex flex-col items-center justify-center">
+        <div className="flex items-center justify-center gap-2">
+          <div className="text-lg font-bold">{aff.team.full_name}</div>
+          {aff.number && <div className="leading-3">#{aff.number}</div>}
+        </div>
+        <div className="text-sm italic leading-3">{aff.role}</div>
       </div>
     </div>
   );
