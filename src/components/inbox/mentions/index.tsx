@@ -21,7 +21,7 @@ type InboxMentionsProps = {
 };
 
 const InboxMentions = ({ hide, setHide }: InboxMentionsProps) => {
-  const { user, setUser, affiliations } = useAuthContext();
+  const { user } = useAuthContext();
   const { setIsOpen, page, setPage, setMentionCount } = useInboxContext();
   const { backgroundStyle, isDark, hoverBorder, hoverText } =
     useIsDarkContext();

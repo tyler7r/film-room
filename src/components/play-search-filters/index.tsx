@@ -13,11 +13,11 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   TextField,
+  type SelectChangeEvent,
 } from "@mui/material";
 import { useState } from "react";
-import { YouTubePlayer } from "react-youtube";
+import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import type { PlaySearchOptions } from "../play-index";
 import StandardPopover from "../standard-popover";
@@ -103,7 +103,7 @@ const PlaySearchFilters = ({
     }
     if (player) {
       const time = (await player.getCurrentTime()) - 1;
-      const roundedTime = Math.round(time!);
+      const roundedTime = Math.round(time);
       setSearchOptions({ ...searchOptions, timestamp: roundedTime });
     }
   };

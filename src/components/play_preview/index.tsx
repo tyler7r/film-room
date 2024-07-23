@@ -26,7 +26,7 @@ type PlayPreviewProps = {
 const PlayPreview = ({ preview }: PlayPreviewProps) => {
   const { isMobile } = useMobileContext();
   const { hoverText } = useIsDarkContext();
-  const { user, setUser, affiliations, affIds } = useAuthContext();
+  const { user, affIds } = useAuthContext();
   const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);

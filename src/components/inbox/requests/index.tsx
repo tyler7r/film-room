@@ -1,10 +1,8 @@
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { Divider, IconButton } from "@mui/material";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
-import { useInboxContext } from "~/contexts/inbox";
 import { supabase } from "~/utils/supabase";
 import type { UserTeamType } from "~/utils/types";
 import PendingRequest from "./request";
@@ -16,8 +14,6 @@ type PendingTeamRequestsProps = {
 
 const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
   const { user } = useAuthContext();
-  const { setIsOpen } = useInboxContext();
-  const router = useRouter();
 
   const [pendingRequests, setPendingRequests] = useState<UserTeamType[] | null>(
     null,
@@ -33,15 +29,6 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
       if (data && data.length > 0) setPendingRequests(data);
       else setPendingRequests(null);
     } else setPendingRequests(null);
-  };
-
-  const handleClose = () => {
-    setIsOpen(false);
-    if (user.isLoggedIn) {
-      void router.push("/team-select");
-    } else {
-      void router.push("/login");
-    }
   };
 
   useEffect(() => {

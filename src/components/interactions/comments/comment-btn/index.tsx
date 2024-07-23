@@ -19,7 +19,6 @@ const CommentBtn = ({
   setIsOpen,
   commentCount,
   setCommentCount,
-  activePlay,
 }: CommentBtnProps) => {
   const handleCommentClick = async (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -25,17 +25,17 @@ const PlayMentions = ({ setMentions, players }: PlayMentionsProps) => {
           id="mentions"
           onChange={(event, newValue) => handleChange(event, newValue)}
           options={players}
-          getOptionLabel={(option) => `${option.name}`}
+          getOptionLabel={(option) => `${option.profile.name}`}
           renderOption={(props, option) => (
-            <li {...props} key={option.profile_id}>
+            <li {...props} key={option.profile.name}>
               <User
                 user={{
-                  email: option.email,
-                  id: option.profile_id,
+                  email: option.profile.email,
+                  id: option.profile.id,
                   last_watched: null,
                   last_watched_time: null,
-                  name: option.name,
-                  join_date: option.join_date,
+                  name: option.profile.name,
+                  join_date: option.profile.join_date,
                 }}
                 goToProfile={false}
                 small={true}

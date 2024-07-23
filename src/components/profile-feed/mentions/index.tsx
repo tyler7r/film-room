@@ -7,7 +7,7 @@ import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
-import { FeedProps } from "../created";
+import type { FeedProps } from "../created";
 
 const MentionsFeed = ({ profileId }: FeedProps) => {
   const { isMobile } = useMobileContext();

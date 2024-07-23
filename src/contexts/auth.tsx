@@ -123,10 +123,6 @@ export const IsAuth = ({ children }: AuthProps) => {
     };
   }, [user.userId]);
 
-  useEffect(() => {
-    console.log(affIds);
-  }, [affIds]);
-
   return (
     <isAuthContext.Provider
       value={{

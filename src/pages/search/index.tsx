@@ -22,7 +22,7 @@ type ActionBarType = {
 };
 
 const Search = () => {
-  const { user, affIds } = useAuthContext();
+  const { affIds } = useAuthContext();
 
   const topic = useSearchParams().get("topic") ?? "";
   const searchParams = useSearchParams();

@@ -6,7 +6,7 @@ import CommentIndex from "~/components/interactions/comments/comment-index";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { PlayPreviewType, TagType } from "~/utils/types";
+import type { PlayPreviewType, TagType } from "~/utils/types";
 
 type ExpandedPlayProps = {
   play: PlayPreviewType;

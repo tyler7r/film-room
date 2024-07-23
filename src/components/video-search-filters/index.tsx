@@ -7,8 +7,8 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   TextField,
+  type SelectChangeEvent,
 } from "@mui/material";
 import { useAuthContext } from "~/contexts/auth";
 import type { SearchOptions } from "~/pages/film-room";

@@ -14,7 +14,7 @@ type SearchPlayTagsProps = {
 
 const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
   const { isMobile } = useMobileContext();
-  const { user, affIds } = useAuthContext();
+  const { affIds } = useAuthContext();
 
   const [playTags, setPlayTags] = useState<PlayPreviewType[] | null>(null);
   const [playCount, setPlayCount] = useState<number | null>(null);
