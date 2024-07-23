@@ -16,8 +16,8 @@ import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType, TeamType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
-import ExpandedPlay from "./expanded";
-import Mentions from "./mentions";
+import ExpandedPlay from "../../expanded-play";
+import Mentions from "../../mentions";
 
 type PlayProps = {
   player: YouTubePlayer | null;
@@ -218,7 +218,7 @@ const IndexPlay = ({
           </div>
           <div className="flex flex-wrap items-center justify-center gap-2 text-center">
             <div
-              className={`tracking text-center text-xl font-bold ${hoverText} `}
+              className={`font-serif text-xl font-bold italic tracking-tighter ${hoverText}`}
               onClick={() =>
                 void router.push(`/profile/${play.play.author_id}`)
               }
@@ -228,11 +228,13 @@ const IndexPlay = ({
             <Divider flexItem orientation="vertical" variant="middle" />
             <div>{play.play.title}</div>
           </div>
-          <Mentions
-            activePlay={activePlay}
-            play={play}
-            handleMentionAndTagClick={handleMentionAndTagClick}
-          />
+          <div className="flex justify-center">
+            <Mentions
+              activePlay={activePlay}
+              play={play}
+              handleMentionAndTagClick={handleMentionAndTagClick}
+            />
+          </div>
         </div>
         <div className="flex items-center justify-center gap-2">
           <LikeBtn playId={play.play.id} />

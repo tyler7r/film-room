@@ -44,7 +44,7 @@ const TeamLogo = ({ tm, size, inactive }: TeamLogoProps) => {
     >{`${tm.city.slice(0, 1)}${tm.name.slice(0, 1)}`}</div>
   ) : (
     <div
-      className="cursor-pointer rounded-full p-2 text-lg font-bold text-white"
+      className="cursor-pointer rounded-full p-2 text-base font-bold text-white"
       style={colorBackground}
       onClick={() => handleClick()}
     >{`${tm.city.slice(0, 1)}${tm.name.slice(0, 1)}`}</div>

@@ -77,7 +77,7 @@ const TeamHub = () => {
   }, [router.query.team, role]);
 
   return loading ? (
-    <Typography variant="h1" fontSize={72}>
+    <Typography sx={{ textAlign: "center" }} variant="h1" fontSize={72}>
       Loading...
     </Typography>
   ) : (

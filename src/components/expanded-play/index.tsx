@@ -12,7 +12,7 @@ type ExpandedPlayProps = {
   play: PlayPreviewType;
   activePlay?: PlayPreviewType;
   setCommentCount: (count: number) => void;
-  handleMentionAndTagClick: (e: React.MouseEvent, topic: string) => void;
+  handleMentionAndTagClick?: (e: React.MouseEvent, topic: string) => void;
 };
 
 const ExpandedPlay = ({
@@ -44,6 +44,11 @@ const ExpandedPlay = ({
     } else setTags(null);
   };
 
+  const handleClick = (e: React.MouseEvent, tag: string) => {
+    if (handleMentionAndTagClick) handleMentionAndTagClick(e, tag);
+    else void router.push(`/search/?topic=${tag}`);
+  };
+
   useEffect(() => {
     void fetchTags();
   }, [activePlay]);
@@ -66,7 +71,7 @@ const ExpandedPlay = ({
           <Button
             key={tag.title + tag.id}
             size="small"
-            onClick={(e) => handleMentionAndTagClick(e, tag.title)}
+            onClick={(e) => handleClick(e, tag.title)}
           >
             #{tag.title}
           </Button>

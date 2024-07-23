@@ -128,7 +128,7 @@ const Home = () => {
         </div>
         <KeyboardDoubleArrowDownIcon fontSize="large" color="primary" />
       </div>
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 items-center justify-center gap-6">
         {plays?.map((play) => (
           <PlayPreview preview={play} key={play.play.id} />
         ))}
