@@ -5,7 +5,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { CommentNotificationType } from "~/utils/types";
+import type { CommentNotificationType } from "~/utils/types";
 
 type InboxCommentProps = {
   comment: CommentNotificationType;

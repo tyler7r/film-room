@@ -7,7 +7,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { MentionNotificationType } from "~/utils/types";
+import type { MentionNotificationType } from "~/utils/types";
 
 type InboxMentionProps = {
   mention: MentionNotificationType;

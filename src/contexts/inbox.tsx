@@ -7,7 +7,7 @@ import {
 } from "react";
 import { getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { NotificationType } from "~/utils/types";
+import type { NotificationType } from "~/utils/types";
 import { useAuthContext } from "./auth";
 import { useMobileContext } from "./mobile";
 
@@ -84,7 +84,7 @@ export const TheInbox = ({ children }: InboxProps) => {
       const comments = await cmts;
       const mentions = await mntns;
       let notifs: NotificationType[] | null = null;
-      let unread: number = 0;
+      let unread = 0;
       if (comments.data) {
         notifs = comments.data;
         const unreadComments = comments.data.filter(
