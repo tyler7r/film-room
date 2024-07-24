@@ -64,7 +64,10 @@ const MentionsFeed = ({ profileId }: FeedProps) => {
 
   return plays ? (
     <div className="flex flex-col items-center justify-center">
-      <div className="grid grid-cols-1 gap-6" ref={topRef}>
+      <div
+        className="grid grid-cols-1 items-center justify-center gap-6"
+        ref={topRef}
+      >
         {plays.map((play) => (
           <PlayPreview key={play.play.id} preview={play} />
         ))}

@@ -82,14 +82,12 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <CssBaseline />
         <IsAuth>
           <IsMobile>
-            {/* <IsAffiliated> */}
             <TheInbox>
               <GlobalSearch>
                 <Navbar />
                 <Component {...pageProps} />
               </GlobalSearch>
             </TheInbox>
-            {/* </IsAffiliated> */}
           </IsMobile>
         </IsAuth>
       </IsDarkContext.Provider>

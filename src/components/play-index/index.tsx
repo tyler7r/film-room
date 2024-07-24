@@ -139,7 +139,6 @@ const PlayIndex = ({
       }
       const getTags = await playsByTag;
       const getMentions = await playsByMention;
-      console.log({ getTags, getMentions });
       let ps: PlayPreviewType[] | null = null;
       if (getTags.data) {
         ps = getTags.data;

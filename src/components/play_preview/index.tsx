@@ -9,6 +9,7 @@ import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
+import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
 import DeleteMenu from "../delete-menu";
@@ -85,14 +86,6 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
   const restartPreview = () => {
     void player?.seekTo(preview.play.start_time, true);
     void player?.pauseVideo();
-  };
-
-  const convertTimestamp = (date: string) => {
-    const month =
-      date.slice(5, 6) === "0" ? date.slice(6, 7) : date.substring(5, 7);
-    const day =
-      date.slice(8, 9) === "0" ? date.slice(9, 10) : date.substring(8, 10);
-    return `${month}/${day}`;
   };
 
   const updateLastWatched = async (video: string, time: number) => {

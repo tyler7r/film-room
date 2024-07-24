@@ -13,6 +13,7 @@ import StandardPopover from "~/components/standard-popover";
 import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType, TeamType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
@@ -130,14 +131,6 @@ const IndexPlay = ({
       ...searchOptions,
       private_only: exclusiveTeam?.id ? exclusiveTeam.id : "all",
     });
-  };
-
-  const convertTimestamp = (date: string) => {
-    const month =
-      date.slice(5, 6) === "0" ? date.slice(6, 7) : date.substring(5, 7);
-    const day =
-      date.slice(8, 9) === "0" ? date.slice(9, 10) : date.substring(8, 10);
-    return `${month}/${day}`;
   };
 
   const handleDelete = async (e?: React.MouseEvent) => {

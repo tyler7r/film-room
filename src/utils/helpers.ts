@@ -65,3 +65,11 @@ export const getNumberOfPages = (itemPerPage: number, count: number) => {
   if (count % itemPerPage !== 0) return Math.floor(count / itemPerPage) + 1;
   else return count / itemPerPage;
 };
+
+export const convertTimestamp = (date: string) => {
+  const month =
+    date.slice(5, 6) === "0" ? date.slice(6, 7) : date.substring(5, 7);
+  const day =
+    date.slice(8, 9) === "0" ? date.slice(9, 10) : date.substring(8, 10);
+  return `${month}/${day}`;
+};
