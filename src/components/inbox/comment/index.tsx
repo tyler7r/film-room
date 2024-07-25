@@ -1,9 +1,13 @@
-import { colors, Divider } from "@mui/material";
+import MarkAsUnreadIcon from "@mui/icons-material/MarkAsUnread";
+import { colors, Divider, IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import StandardPopover from "~/components/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
+import { getTimeSinceNotified } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { CommentNotificationType } from "~/utils/types";
 
@@ -16,7 +20,21 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
     useIsDarkContext();
   const { setIsOpen } = useInboxContext();
   const { user } = useAuthContext();
+
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [isUnread, setIsUnread] = useState<boolean>(true);
+
+  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
 
   const updateLastWatched = async (video: string, time: number) => {
     if (user.userId) {
@@ -31,11 +49,33 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
     }
   };
 
+  const fetchIfUnread = async () => {
+    const { data } = await supabase
+      .from("comments")
+      .select("viewed")
+      .eq("id", comment.comment.id)
+      .single();
+    if (data) {
+      setIsUnread(data.viewed ? false : true);
+    }
+  };
+
   const updateComment = async () => {
     await supabase
       .from("comments")
       .update({ viewed: true })
       .eq("id", comment.comment.id);
+    void fetchIfUnread();
+  };
+
+  const markUnread = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handlePopoverClose();
+    await supabase
+      .from("comments")
+      .update({ viewed: false })
+      .eq("id", comment.comment.id);
+    void fetchIfUnread();
   };
 
   const handleClick = async () => {
@@ -50,37 +90,62 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
     setIsOpen(false);
   };
 
-  const router = useRouter();
+  useEffect(() => {
+    void fetchIfUnread();
+  }, []);
+
   return (
-    <div key={comment.play.id + comment.comment.created_at}>
-      <div>
-        <strong
-          className={hoverText}
-          onClick={() => {
-            setIsOpen(false);
-            void router.push(`/profile/${comment.play.author_id}`);
-          }}
-        >
-          {comment.comment.author_name}
-        </strong>{" "}
-        commented on:
+    <div key={comment.play.id + comment.comment.created_at} className="">
+      <div className="flex items-center justify-end gap-1 text-right text-xs font-bold italic leading-3">
+        {!isUnread && (
+          <IconButton
+            onMouseEnter={handlePopoverOpen}
+            onMouseLeave={handlePopoverClose}
+            onClick={(e) => markUnread(e)}
+            size="small"
+          >
+            <MarkAsUnreadIcon fontSize="small" />
+          </IconButton>
+        )}
+        {getTimeSinceNotified(comment.comment.created_at)} ago
+        <StandardPopover
+          content="Mark as unread"
+          open={open}
+          anchorEl={anchorEl}
+          handlePopoverClose={handlePopoverClose}
+        />
       </div>
       <div
         onClick={() => handleClick()}
-        className={`flex w-full flex-col gap-2 ${hoverBorder}`}
+        className={`flex w-full flex-col gap-1 ${hoverBorder}`}
         style={
-          !comment.comment.viewed
+          isUnread
             ? isDark
               ? { backgroundColor: `${colors.purple[200]}` }
               : { backgroundColor: `${colors.purple[50]}` }
             : backgroundStyle
         }
       >
-        <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
+        <div className="text-center font-bold tracking-tight">
           {comment.video.title}
         </div>
-        <Divider sx={{ marginLeft: "12px", marginRight: "12px" }}></Divider>
-        <div className="ml-1 text-center">{comment.play.title}</div>
+        <Divider variant="middle" flexItem></Divider>
+        <div className="text-sm">
+          <strong
+            className={hoverText}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(false);
+              void router.push(`/profile/${comment.play.author_id}`);
+            }}
+          >
+            {comment.comment.author_name}
+          </strong>{" "}
+          commented:{" "}
+          {comment.comment.comment.length > 50
+            ? `${comment.comment.comment.slice(0, 50)}...`
+            : comment.comment.comment}
+        </div>
       </div>
     </div>
   );

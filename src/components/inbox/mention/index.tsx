@@ -1,11 +1,15 @@
+import MarkAsUnreadIcon from "@mui/icons-material/MarkAsUnread";
 import PublicIcon from "@mui/icons-material/Public";
-import { colors, Divider } from "@mui/material";
+import { colors, Divider, IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import StandardPopover from "~/components/standard-popover";
 import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
+import { getTimeSinceNotified } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { MentionNotificationType } from "~/utils/types";
 
@@ -21,6 +25,18 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [isUnread, setIsUnread] = useState<boolean>(false);
+
+  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
 
   const updateLastWatched = async (video: string, time: number) => {
     if (user.userId) {
@@ -35,11 +51,33 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
     }
   };
 
+  const fetchIfUnread = async () => {
+    const { data } = await supabase
+      .from("play_mentions")
+      .select("viewed")
+      .eq("id", mention.mention.id)
+      .single();
+    if (data) {
+      setIsUnread(data.viewed ? false : true);
+    }
+  };
+
   const updateMention = async () => {
     await supabase
       .from("play_mentions")
       .update({ viewed: true })
       .eq("id", mention.mention.id);
+    void fetchIfUnread();
+  };
+
+  const markUnread = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handlePopoverClose();
+    await supabase
+      .from("play_mentions")
+      .update({ viewed: false })
+      .eq("id", mention.mention.id);
+    void fetchIfUnread();
   };
 
   const handleClick = async () => {
@@ -54,47 +92,72 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
     setIsOpen(false);
   };
 
+  useEffect(() => {
+    void fetchIfUnread();
+  }, []);
+
   return (
     <div key={mention.mention.id}>
-      <div className="flex items-center gap-2">
-        {mention.team && <TeamLogo tm={mention.team} size={20} />}
-        {!mention.team && <PublicIcon fontSize="small" />}
-        <div>
-          <strong
-            className={hoverText}
-            onClick={() => {
-              setIsOpen(false);
-              void router.push(`/profile/${mention.play.author_id}`);
-            }}
+      <div className="flex items-center justify-end gap-1 text-right text-xs font-bold italic leading-3">
+        {!isUnread && (
+          <IconButton
+            onMouseEnter={handlePopoverOpen}
+            onMouseLeave={handlePopoverClose}
+            onClick={(e) => markUnread(e)}
+            size="small"
           >
-            {mention.play.author_name}
-          </strong>{" "}
-          mentioned you on:
-        </div>
+            <MarkAsUnreadIcon fontSize="small" />
+          </IconButton>
+        )}
+        {getTimeSinceNotified(mention.play.created_at)} ago
+        <StandardPopover
+          content="Mark as unread"
+          open={open}
+          anchorEl={anchorEl}
+          handlePopoverClose={handlePopoverClose}
+        />
       </div>
       <div
         onClick={handleClick}
-        className={`flex w-full flex-col gap-2 ${
-          !mention.mention.viewed ? "bg-purple-100" : ""
-        } ${hoverBorder}`}
+        className={`flex w-full flex-col gap-1 ${hoverBorder}`}
         style={
-          !mention.mention.viewed
+          isUnread
             ? isDark
               ? { backgroundColor: `${colors.purple[200]}` }
               : { backgroundColor: `${colors.purple[50]}` }
             : backgroundStyle
         }
       >
-        <div className="text-center text-lg font-bold tracking-tight lg:text-xl">
-          {mention.video.title}
+        <div className="flex w-full flex-col">
+          <div className="text-center font-bold tracking-tight lg:text-xl">
+            {mention.video.title}
+          </div>
         </div>
-        <Divider
-          sx={{
-            marginLeft: "12px",
-            marginRight: "12px",
-          }}
-        ></Divider>
-        <div className="mx-4 text-center">{mention.play.title}</div>
+        <Divider flexItem variant="middle"></Divider>
+        <div className="flex items-center gap-1 text-sm">
+          {mention.team && (
+            <IconButton size="small">
+              <TeamLogo tm={mention.team} size={20} inactive={true} />
+            </IconButton>
+          )}
+          {!mention.team && <PublicIcon fontSize="small" />}
+          <div>
+            <strong
+              className={hoverText}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(false);
+                void router.push(`/profile/${mention.play.author_id}`);
+              }}
+            >
+              {mention.play.author_name}
+            </strong>{" "}
+            mentioned you on:{" "}
+            {mention.play.title.length > 50
+              ? `${mention.play.title.slice(0, 50)}...`
+              : mention.play.title}
+          </div>
+        </div>
       </div>
     </div>
   );

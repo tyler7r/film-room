@@ -73,3 +73,30 @@ export const convertTimestamp = (date: string) => {
     date.slice(8, 9) === "0" ? date.slice(9, 10) : date.substring(8, 10);
   return `${month}/${day}`;
 };
+
+export const getTimeSinceNotified = (date: string) => {
+  const present = new Date();
+  const created = new Date(date);
+  // console.log(present.get() - created.getUTCSeconds());
+  let utc1 = Date.UTC(
+    present.getFullYear(),
+    present.getMonth(),
+    present.getDate(),
+  );
+  let utc2 = Date.UTC(
+    created.getFullYear(),
+    created.getMonth(),
+    created.getDate(),
+  );
+
+  // Calculate the time difference in milliseconds
+  let timeDiff = Math.abs(utc2 - utc1);
+
+  // Convert milliseconds to days
+  let daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+  if (daysDiff < 1) return "today";
+  if (1 <= daysDiff && daysDiff <= 13) return `${daysDiff}d`;
+  if (14 <= daysDiff && daysDiff <= 56) return `${Math.round(daysDiff / 7)}w`;
+  if (57 <= daysDiff && daysDiff <= 365) return `${Math.round(daysDiff / 30)}m`;
+  if (daysDiff >= 366) return `${Math.round(daysDiff / 365)}y`;
+};

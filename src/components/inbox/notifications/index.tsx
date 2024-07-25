@@ -1,29 +1,21 @@
+import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import MailIcon from "@mui/icons-material/Mail";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import { IconButton, Pagination } from "@mui/material";
-import { useRef, useState } from "react";
+import { Button, IconButton } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
+import PageTitle from "~/components/page-title";
 import StandardPopover from "~/components/standard-popover";
 import { useInboxContext } from "~/contexts/inbox";
-import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages } from "~/utils/helpers";
 import InboxComment from "../comment";
 import InboxMention from "../mention";
 
 const InboxNotification = () => {
-  const {
-    unreadOnly,
-    setUnreadOnly,
-    notifications,
-    notificationCount,
-    page,
-    setPage,
-  } = useInboxContext();
-  const { isMobile } = useMobileContext();
+  const { unreadOnly, setUnreadOnly, notifications } = useInboxContext();
 
-  const itemsPerPage = isMobile ? 5 : 10;
   const topRef = useRef<HTMLDivElement | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
@@ -39,11 +31,14 @@ const InboxNotification = () => {
     if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
-    e.preventDefault();
-    setPage(value);
-    scrollToTop();
-  };
+  useEffect(() => {
+    if (notifications && notifications.length > 0) setLoading(false);
+    else {
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    }
+  }, [notifications]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -75,7 +70,8 @@ const InboxNotification = () => {
           </IconButton>
         </div>
       </div>
-      <div className="flex flex-col gap-5 md:px-2 lg:px-4">
+      <div className="flex flex-col gap-2 md:px-2 lg:px-4">
+        {loading && <PageTitle size="small" title="Loading..." />}
         {notifications?.map((notification) => (
           <div
             key={
@@ -107,21 +103,22 @@ const InboxNotification = () => {
             )}
           </div>
         ))}
+        {notifications && (
+          <div className="mt-2 flex w-full items-center justify-center">
+            <Button
+              startIcon={<KeyboardDoubleArrowUpIcon />}
+              endIcon={<KeyboardDoubleArrowUpIcon />}
+              variant="outlined"
+              size="small"
+              onClick={scrollToTop}
+            >
+              Jump to Top
+            </Button>
+          </div>
+        )}
       </div>
       <div className="flex flex-col items-center justify-center">
-        {notifications && notifications.length > 0 ? (
-          <Pagination
-            showFirstButton
-            showLastButton
-            sx={{ marginTop: "16px", marginBottom: "8px" }}
-            size="medium"
-            variant="text"
-            shape="rounded"
-            count={getNumberOfPages(itemsPerPage, notificationCount)}
-            page={page}
-            onChange={handlePageChange}
-          />
-        ) : (
+        {!notifications && !loading && (
           <EmptyMessage message="notifications" size="small" />
         )}
       </div>
