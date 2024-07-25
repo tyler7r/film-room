@@ -126,7 +126,7 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
             : backgroundStyle
         }
       >
-        <div className="text-center font-bold tracking-tight">
+        <div className="text-center font-serif font-bold italic tracking-tight">
           {comment.video.title}
         </div>
         <Divider variant="middle" flexItem></Divider>

@@ -1,3 +1,4 @@
+import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import DeleteMenu from "~/components/delete-menu";
@@ -44,10 +45,14 @@ const PendingRequest = ({
     >
       <TeamLogo tm={request.team} size={30} />
       <div
-        className={`${hoverText} text-center text-lg font-bold`}
+        className={`flex items-center justify-center gap-1 text-center`}
         onClick={handleTeamClick}
       >
-        {request.team.full_name}
+        <div className={`${hoverText} font-serif font-bold italic`}>
+          {request.team.full_name}
+        </div>
+        <ArrowRightAltIcon color="primary" fontSize="small" />{" "}
+        <div className="text-sm">{request.affiliations.role}</div>
       </div>
       <DeleteMenu
         handleDelete={handleDelete}

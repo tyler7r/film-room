@@ -50,7 +50,7 @@ const Home = () => {
   };
 
   const scrollToTop = () => {
-    if (topRef) topRef.current?.scrollIntoView({ behavior: "instant" });
+    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {

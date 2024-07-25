@@ -17,7 +17,12 @@ const TeamHeader = () => {
   return affiliations ? (
     <div className="flex flex-wrap items-center justify-center gap-2">
       {affiliations.map((aff) => (
-        <TeamAffiliation aff={aff} key={aff.affId} handleClose={handleClose} />
+        <TeamAffiliation
+          aff={aff}
+          key={aff.affId}
+          handleClose={handleClose}
+          small={true}
+        />
       ))}
     </div>
   ) : (

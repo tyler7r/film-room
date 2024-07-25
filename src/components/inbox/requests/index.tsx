@@ -2,6 +2,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { Divider, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
+import PageTitle from "~/components/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type { UserTeamType } from "~/utils/types";
@@ -20,10 +21,10 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
   );
   const [reload, setReload] = useState<boolean>(false);
 
-  const fetchPendingRequests = async (profileId?: string) => {
-    if (profileId) {
+  const fetchPendingRequests = async () => {
+    if (user.userId) {
       const { data } = await supabase.from("user_teams").select().match({
-        "affiliations->>user_id": profileId,
+        "affiliations->>user_id": user.userId,
         "affiliations->>verified": false,
       });
       if (data && data.length > 0) setPendingRequests(data);
@@ -38,7 +39,7 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
         "postgres_changes",
         { event: "DELETE", schema: "public", table: "affiliations" },
         () => {
-          void fetchPendingRequests(user.userId);
+          void fetchPendingRequests();
         },
       )
       .subscribe();
@@ -49,16 +50,16 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
   }, []);
 
   useEffect(() => {
-    void fetchPendingRequests(user.userId);
+    void fetchPendingRequests();
   }, [reload]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       {pendingRequests && (
         <>
-          <div className="flex items-center justify-between">
-            <div className="text-lg font-bold lg:mb-2 lg:text-xl">
-              Pending Join Requests
+          <div className="flex items-center justify-center gap-4">
+            <div>
+              <PageTitle title="Pending Requests" size="x-small" />
             </div>
             {hide && (
               <IconButton size="small" onClick={() => setHide(false)}>
@@ -74,7 +75,7 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
             )}
           </div>
           {!hide && (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 px-4">
               {pendingRequests.map((req) => (
                 <PendingRequest
                   key={req.affiliations.id}

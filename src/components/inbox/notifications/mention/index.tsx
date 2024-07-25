@@ -129,7 +129,7 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
         }
       >
         <div className="flex w-full flex-col">
-          <div className="text-center font-bold tracking-tight lg:text-xl">
+          <div className="text-center font-serif font-bold italic tracking-tight">
             {mention.video.title}
           </div>
         </div>
@@ -152,7 +152,7 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
             >
               {mention.play.author_name}
             </strong>{" "}
-            mentioned you on:{" "}
+            mentioned you:{" "}
             {mention.play.title.length > 50
               ? `${mention.play.title.slice(0, 50)}...`
               : mention.play.title}

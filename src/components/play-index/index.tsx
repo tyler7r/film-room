@@ -1,5 +1,5 @@
 import { Divider, Pagination } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
@@ -48,7 +48,8 @@ const PlayIndex = ({
     topic: "",
     timestamp: 0,
   });
-  const itemsPerPage = isMobile ? 10 : 20;
+  const itemsPerPage = isMobile ? 5 : 5;
+  const topRef = useRef<HTMLDivElement | null>(null);
 
   const fetchPlays = async (options?: PlaySearchOptions) => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
@@ -152,9 +153,14 @@ const PlayIndex = ({
     }
   };
 
+  const scrollToTop = () => {
+    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
     setPage(value);
+    scrollToTop();
   };
 
   useEffect(() => {
@@ -208,7 +214,10 @@ const PlayIndex = ({
           ></Divider>
         </div>
       )}
-      <div className="flex w-full flex-col items-center justify-center gap-4">
+      <div
+        ref={topRef}
+        className="flex w-full flex-col items-center justify-center gap-4"
+      >
         <PlaySearchFilters
           searchOptions={searchOptions}
           setSearchOptions={setSearchOptions}

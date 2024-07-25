@@ -42,33 +42,30 @@ const InboxNotification = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div
-        ref={topRef}
-        className="flex items-center justify-between text-2xl font-bold lg:mb-2 lg:text-3xl"
-      >
-        <div>Notifications</div>
-        <div className="flex gap-2">
-          <IconButton
-            size="small"
-            onClick={() => setUnreadOnly(!unreadOnly)}
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-          >
-            {unreadOnly ? (
-              <MailIcon color="primary" />
-            ) : (
-              <MailOutlineIcon color="primary" />
-            )}
-            <StandardPopover
-              content={`${
-                unreadOnly ? "All Notifications" : "Unread Notifications"
-              }`}
-              open={open}
-              anchorEl={anchorEl}
-              handlePopoverClose={handlePopoverClose}
-            />
-          </IconButton>
+      <div ref={topRef} className="flex items-center justify-center gap-4">
+        <div>
+          <PageTitle title="Notifications" size="small" />
         </div>
+        <IconButton
+          size="small"
+          onClick={() => setUnreadOnly(!unreadOnly)}
+          onMouseEnter={handlePopoverOpen}
+          onMouseLeave={handlePopoverClose}
+        >
+          {unreadOnly ? (
+            <MailIcon color="primary" />
+          ) : (
+            <MailOutlineIcon color="primary" />
+          )}
+          <StandardPopover
+            content={`${
+              unreadOnly ? "All Notifications" : "Unread Notifications"
+            }`}
+            open={open}
+            anchorEl={anchorEl}
+            handlePopoverClose={handlePopoverClose}
+          />
+        </IconButton>
       </div>
       <div className="flex flex-col gap-2 md:px-2 lg:px-4">
         {loading && <PageTitle size="small" title="Loading..." />}
