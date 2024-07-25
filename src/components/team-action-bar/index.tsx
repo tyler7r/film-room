@@ -1,6 +1,7 @@
 import { Badge, Button } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { useIsDarkContext } from "~/pages/_app";
 import type { TeamActionBarType, TeamType } from "~/utils/types";
 import AnnouncementModal from "../announcement-modal";
 import Requests from "../requests";
@@ -20,6 +21,7 @@ const TeamActionBar = ({
   team,
 }: TeamActionBarProps) => {
   const router = useRouter();
+  const { isDark } = useIsDarkContext();
   const [requestCount, setRequestCount] = useState<number>(0);
 
   const handleModalToggle = (modal: string, open: boolean) => {
@@ -55,7 +57,7 @@ const TeamActionBar = ({
   };
 
   return (
-    <div className="w-full">
+    <div className={`w-full`}>
       {role === "owner" ? (
         <div className="flex w-full justify-center gap-4">
           <Button

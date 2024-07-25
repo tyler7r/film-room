@@ -95,7 +95,7 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
   }, []);
 
   return (
-    <div key={comment.play.id + comment.comment.created_at} className="">
+    <div key={comment.play.id + comment.comment.created_at}>
       <div className="flex items-center justify-end gap-1 text-right text-xs font-bold italic leading-3">
         {!isUnread && (
           <IconButton
@@ -121,8 +121,8 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
         style={
           isUnread
             ? isDark
-              ? { backgroundColor: `${colors.purple[200]}` }
-              : { backgroundColor: `${colors.purple[50]}` }
+              ? { backgroundColor: `${colors.purple[400]}` }
+              : { backgroundColor: `${colors.purple.A100}` }
             : backgroundStyle
         }
       >

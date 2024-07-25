@@ -48,7 +48,7 @@ const PlayIndex = ({
     topic: "",
     timestamp: 0,
   });
-  const itemsPerPage = isMobile ? 5 : 5;
+  const itemsPerPage = isMobile ? 5 : 10;
   const topRef = useRef<HTMLDivElement | null>(null);
 
   const fetchPlays = async (options?: PlaySearchOptions) => {

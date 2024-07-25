@@ -123,8 +123,8 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
         style={
           isUnread
             ? isDark
-              ? { backgroundColor: `${colors.purple[200]}` }
-              : { backgroundColor: `${colors.purple[50]}` }
+              ? { backgroundColor: `${colors.purple[400]}` }
+              : { backgroundColor: `${colors.purple.A100}` }
             : backgroundStyle
         }
       >

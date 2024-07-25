@@ -15,9 +15,10 @@ const TeamMentions = ({ setMentions, teams }: TeamVideosProps) => {
   ) => {
     event.preventDefault();
     event.stopPropagation();
-    setMentions(newValue);
     if (newValue.length === 0) {
       setMentions(null);
+    } else {
+      setMentions(newValue);
     }
   };
 
