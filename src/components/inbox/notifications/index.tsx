@@ -7,8 +7,8 @@ import EmptyMessage from "~/components/empty-msg";
 import PageTitle from "~/components/page-title";
 import StandardPopover from "~/components/standard-popover";
 import { useInboxContext } from "~/contexts/inbox";
-import InboxComment from "../comment";
-import InboxMention from "../mention";
+import InboxComment from "./comment";
+import InboxMention from "./mention";
 
 const InboxNotification = () => {
   const { unreadOnly, setUnreadOnly, notifications } = useInboxContext();
