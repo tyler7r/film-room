@@ -8,6 +8,7 @@ import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { AffiliationType, UserType } from "~/utils/types";
 import DeleteMenu from "../delete-menu";
+import PageTitle from "../page-title";
 import User from "../user";
 
 type UserEditProps = {
@@ -15,9 +16,16 @@ type UserEditProps = {
   goToProfile: boolean;
   affiliation: AffiliationType;
   small?: boolean;
+  setRosterReload: (rosterReload: boolean) => void;
 };
 
-const UserEdit = ({ user, goToProfile, small, affiliation }: UserEditProps) => {
+const UserEdit = ({
+  user,
+  goToProfile,
+  small,
+  affiliation,
+  setRosterReload,
+}: UserEditProps) => {
   const { backgroundStyle } = useIsDarkContext();
   const { setAffReload } = useAuthContext();
 
@@ -64,7 +72,10 @@ const UserEdit = ({ user, goToProfile, small, affiliation }: UserEditProps) => {
       .from("affiliations")
       .delete()
       .eq("id", affiliation.id);
-    if (!error) setAffReload(true);
+    if (!error) {
+      setAffReload(true);
+      setRosterReload(true);
+    }
   };
 
   useEffect(() => {
@@ -78,7 +89,7 @@ const UserEdit = ({ user, goToProfile, small, affiliation }: UserEditProps) => {
   return !isOpen ? (
     <div
       style={backgroundStyle}
-      className="flex items-center justify-center gap-1 rounded-lg px-2"
+      className="flex items-center justify-center gap-1 px-2"
     >
       <User
         user={user}
@@ -98,10 +109,12 @@ const UserEdit = ({ user, goToProfile, small, affiliation }: UserEditProps) => {
     </div>
   ) : (
     <div
-      className="flex items-center justify-center gap-4 rounded-lg p-2"
+      className="flex items-center justify-center gap-4 rounded-md p-2"
       style={backgroundStyle}
     >
-      <div className={`font-bold`}>{user.name}</div>
+      <div>
+        <PageTitle size="x-small" title={user.name} />
+      </div>
       <form
         onSubmit={handleSubmit}
         className="flex items-center justify-center gap-1"

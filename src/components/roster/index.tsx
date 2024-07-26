@@ -13,6 +13,7 @@ type RosterProps = {
 
 const Roster = ({ team, role }: RosterProps) => {
   const [roster, setRoster] = useState<PlayerType[] | null>(null);
+  const [rosterReload, setRosterReload] = useState<boolean>(false);
 
   const fetchRoster = async () => {
     const { data } = await supabase
@@ -49,6 +50,11 @@ const Roster = ({ team, role }: RosterProps) => {
   }, []);
 
   useEffect(() => {
+    if (rosterReload) void fetchRoster();
+    else setRosterReload(false);
+  }, [rosterReload]);
+
+  useEffect(() => {
     void fetchRoster();
   }, [team.id]);
 
@@ -78,6 +84,7 @@ const Roster = ({ team, role }: RosterProps) => {
                 goToProfile={true}
                 affiliation={p.affiliation}
                 small={true}
+                setRosterReload={setRosterReload}
               />
             </div>
           ))}

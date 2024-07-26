@@ -15,15 +15,11 @@ import type {
   LastWatchedType,
   ProfileActionBarType,
   TeamAffiliationType,
+  UserType,
 } from "~/utils/types";
 
 type FetchOptions = {
   profileId?: string | undefined;
-};
-
-type ProfileType = {
-  name: string;
-  join_date: string;
 };
 
 const Profile = () => {
@@ -33,7 +29,7 @@ const Profile = () => {
   const [options, setOptions] = useState<FetchOptions>({
     profileId: router.query.user as string,
   });
-  const [profile, setProfile] = useState<ProfileType | null>(null);
+  const [profile, setProfile] = useState<UserType | null>(null);
   const [profileAffiliations, setProfileAffiliations] = useState<
     TeamAffiliationType[] | null
   >(null);
@@ -47,26 +43,30 @@ const Profile = () => {
 
   const fetchProfile = async (options?: FetchOptions) => {
     if (options?.profileId) {
-      const { data } = await supabase
-        .from("user_view")
+      const profile = await supabase
+        .from("profiles")
         .select("*")
-        .eq("profile->>id", options.profileId);
-      if (data?.[0]) {
-        setProfile({
-          name: data[0].profile.name,
-          join_date: data[0].profile.join_date,
-        });
-        const typedAffiliations: TeamAffiliationType[] = data
-          .filter((aff) => aff.affiliation.verified)
-          .map((aff) => ({
-            team: aff.team,
-            role: aff.affiliation.role,
-            number: aff.affiliation.number,
-            affId: aff.affiliation.id,
-          }));
-        if (typedAffiliations && typedAffiliations.length > 0)
-          setProfileAffiliations(typedAffiliations);
-        else setProfileAffiliations(null);
+        .eq("id", options.profileId)
+        .single();
+      if (profile.data) {
+        setProfile(profile.data);
+        const { data } = await supabase
+          .from("user_view")
+          .select("*")
+          .eq("profile->>id", options.profileId);
+        if (data) {
+          const typedAffiliations: TeamAffiliationType[] = data
+            .filter((aff) => aff.affiliation.verified)
+            .map((aff) => ({
+              team: aff.team,
+              role: aff.affiliation.role,
+              number: aff.affiliation.number,
+              affId: aff.affiliation.id,
+            }));
+          if (typedAffiliations && typedAffiliations.length > 0)
+            setProfileAffiliations(typedAffiliations);
+          else setProfileAffiliations(null);
+        } else setProfileAffiliations(null);
       }
     }
   };
