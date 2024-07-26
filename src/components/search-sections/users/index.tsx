@@ -50,7 +50,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
   return (
     <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
       {!users && <EmptyMessage size="large" message="users" />}
-      <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="flex w-full flex-wrap justify-center gap-6">
         {users?.map((u) => <User user={u} key={u.id} goToProfile={true} />)}
       </div>
       {users && userCount && (

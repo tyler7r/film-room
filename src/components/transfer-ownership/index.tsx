@@ -20,12 +20,14 @@ type ChangeOwnershipProps = {
   team: TeamType;
   isOpen: boolean;
   toggleOpen: (modal: string, open: boolean) => void;
+  setRole: (role: string) => void;
 };
 
 const TransferOwnershipModal = ({
   team,
   isOpen,
   toggleOpen,
+  setRole,
 }: ChangeOwnershipProps) => {
   const { backgroundStyle, colorText } = useIsDarkContext();
   const { user } = useAuthContext();
@@ -81,7 +83,10 @@ const TransferOwnershipModal = ({
       .update({ owner: newOwner })
       .eq("id", team.id)
       .select();
-    if (data) handleClose();
+    if (data) {
+      handleClose();
+      setRole(newRole ? newRole : "guest");
+    }
     if (error)
       setMessage({
         text: `There was an error: ${error.message}.`,
@@ -123,9 +128,16 @@ const TransferOwnershipModal = ({
             X
           </Button>
           <PageTitle size="medium" title="Transfer Team Ownership" />
-          <div className={`text-sm font-bold ${colorText}`}>
-            * You will still be a {newRole} with {team.full_name} *
-          </div>
+          {newRole ? (
+            <div className={`text-sm font-bold ${colorText}`}>
+              * You will still be a {newRole} with {team.full_name} *
+            </div>
+          ) : (
+            <div className={`text-sm font-bold ${colorText}`}>
+              * You will no longer be a member of {team.full_name}, as you are
+              not a registered player or coach *
+            </div>
+          )}
           <form
             className="flex w-4/5 flex-col items-center justify-center gap-4"
             onSubmit={handleSubmit}

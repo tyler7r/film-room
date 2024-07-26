@@ -1,22 +1,30 @@
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import { IconButton, TextField } from "@mui/material";
+import { Divider, IconButton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { PlayerType } from "~/utils/types";
+import type { AffiliationType, UserType } from "~/utils/types";
 import DeleteMenu from "../delete-menu";
-import Player from "../player";
+import User from "../user";
 
-type PlayerEditProps = {
-  player: PlayerType;
+type UserEditProps = {
+  user: UserType;
+  goToProfile: boolean;
+  affiliation: AffiliationType;
+  small?: boolean;
 };
 
-const PlayerEdit = ({ player }: PlayerEditProps) => {
+const UserEdit = ({ user, goToProfile, small, affiliation }: UserEditProps) => {
   const { backgroundStyle } = useIsDarkContext();
+  const { setAffReload } = useAuthContext();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [edit, setEdit] = useState<number | null>(player.affiliation.number);
+  const [edit, setEdit] = useState<number | null | undefined>(
+    affiliation.number,
+  );
   const [isValidNumber, setIsValidNumber] = useState<boolean>(false);
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
@@ -34,27 +42,29 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
       .update({
         number: edit,
       })
-      .eq("id", player.affiliation.id)
+      .eq("id", affiliation?.id)
       .select();
     if (data) {
       setTimeout(() => {
         setIsOpen(false);
       }, 300);
+      setAffReload(true);
     }
   };
 
   const closeEdit = () => {
-    setEdit(player.affiliation.number);
+    setEdit(affiliation.number);
     setIsOpen(false);
   };
 
   const handleDelete = async () => {
     setIsOpen(false);
     setIsDeleteMenuOpen(false);
-    await supabase
+    const { error } = await supabase
       .from("affiliations")
       .delete()
-      .eq("id", player.affiliation.id);
+      .eq("id", affiliation.id);
+    if (!error) setAffReload(true);
   };
 
   useEffect(() => {
@@ -70,7 +80,13 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
       style={backgroundStyle}
       className="flex items-center justify-center gap-1 rounded-lg px-2"
     >
-      <Player player={player} />
+      <User
+        user={user}
+        goToProfile={goToProfile}
+        small={small}
+        number={affiliation.number}
+      />
+      <Divider flexItem orientation="vertical" variant="middle" />
       <IconButton size="small" onClick={() => setIsOpen(true)}>
         <EditIcon color="primary" />
       </IconButton>
@@ -85,7 +101,7 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
       className="flex items-center justify-center gap-4 rounded-lg p-2"
       style={backgroundStyle}
     >
-      <div className={`font-bold`}>{player.profile.name}</div>
+      <div className={`font-bold`}>{user.name}</div>
       <form
         onSubmit={handleSubmit}
         className="flex items-center justify-center gap-1"
@@ -113,4 +129,4 @@ const PlayerEdit = ({ player }: PlayerEditProps) => {
   );
 };
 
-export default PlayerEdit;
+export default UserEdit;

@@ -3,8 +3,8 @@ import { supabase } from "~/utils/supabase";
 import type { PlayerType, TeamType } from "~/utils/types";
 import EmptyMessage from "../empty-msg";
 import PageTitle from "../page-title";
-import Player from "../player";
-import PlayerEdit from "../player-edit";
+import User from "../user";
+import UserEdit from "../user-edit";
 
 type RosterProps = {
   team: TeamType;
@@ -53,16 +53,34 @@ const Roster = ({ team, role }: RosterProps) => {
   }, [team.id]);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-4">
+    <div className="flex w-full flex-col items-center justify-center gap-4 p-2">
       <PageTitle size="medium" title="Roster" />
       {!roster && (
         <EmptyMessage message="active player accounts" size="small" />
       )}
       <div className="flex flex-wrap items-center justify-center gap-4">
         {(role === "player" || role === "guest") &&
-          roster?.map((p) => <Player key={p.affiliation.id} player={p} />)}
+          roster?.map((p) => (
+            <div key={p.affiliation.id}>
+              <User
+                user={p.profile}
+                goToProfile={true}
+                number={p.affiliation.number}
+                small={true}
+              />
+            </div>
+          ))}
         {(role === "coach" || role === "owner") &&
-          roster?.map((p) => <PlayerEdit key={p.affiliation.id} player={p} />)}
+          roster?.map((p) => (
+            <div key={p.affiliation.id}>
+              <UserEdit
+                user={p.profile}
+                goToProfile={true}
+                affiliation={p.affiliation}
+                small={true}
+              />
+            </div>
+          ))}
       </div>
     </div>
   );

@@ -3,10 +3,12 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Announcements from "~/components/announcements";
 import PageTitle from "~/components/page-title";
+import Requests from "~/components/requests";
 import Roster from "~/components/roster";
 import TeamActionBar from "~/components/team-action-bar";
 import TeamLogo from "~/components/team-logo";
 import TeamVideos from "~/components/team-videos";
+import TransferOwnershipModal from "~/components/transfer-ownership";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -18,12 +20,11 @@ const TeamHub = () => {
   const { isDark } = useIsDarkContext();
 
   const [team, setTeam] = useState<TeamType | null>(null);
+  const [requestCount, setRequestCount] = useState<number>(0);
 
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [actionBarStatus, setActionBarStatus] = useState<TeamActionBarType>({
-    settings: false,
-    announcement: false,
     requests: false,
     transferOwner: false,
   });
@@ -95,14 +96,33 @@ const TeamHub = () => {
               {team.division.toLocaleUpperCase()}
             </div>
           </div>
+          <TeamActionBar
+            role={role ? role : "guest"}
+            actionBarStatus={actionBarStatus}
+            setActionBarStatus={setActionBarStatus}
+            team={team}
+            requestCount={requestCount}
+          />
         </div>
-        <TeamActionBar
-          role={role ? role : "guest"}
-          actionBarStatus={actionBarStatus}
-          setActionBarStatus={setActionBarStatus}
+        <Requests
           team={team}
+          isOpen={actionBarStatus.requests}
+          setRequestCount={setRequestCount}
         />
-        {role !== "guest" && <Announcements teamId={team.id} />}
+        <TransferOwnershipModal
+          toggleOpen={() =>
+            setActionBarStatus({
+              ...actionBarStatus,
+              transferOwner: !actionBarStatus.transferOwner,
+            })
+          }
+          team={team}
+          isOpen={actionBarStatus.transferOwner}
+          setRole={setRole}
+        />
+        {role !== "guest" && (
+          <Announcements teamId={team.id} role={role ? role : "guest"} />
+        )}
         <Roster team={team} role={role ? role : "guest"} />
         <div className="my-4 flex w-full flex-col items-center justify-center gap-4">
           <PageTitle size="medium" title="Team Film" />
