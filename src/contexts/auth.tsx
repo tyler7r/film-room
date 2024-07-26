@@ -130,7 +130,7 @@ export const IsAuth = ({ children }: AuthProps) => {
 
   useEffect(() => {
     if (affReload) {
-      fetchAffiliations(user.userId);
+      void fetchAffiliations(user.userId);
       setAffReload(false);
     } else return;
   }, [affReload]);
