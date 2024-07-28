@@ -8,7 +8,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
   type SelectChangeEvent,
 } from "@mui/material";
 import {
@@ -20,6 +19,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
+import PageTitle from "~/components/page-title";
 import { divisions } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { type MessageType, type TeamType } from "~/utils/types";
@@ -129,7 +129,7 @@ const TeamSettings = ({
           division: details.division,
           full_name: `${details.city} ${details.name}`,
         })
-        .eq("id", `${details.id}`)
+        .eq("id", details.id)
         .select()
         .single();
       if (data) {
@@ -151,11 +151,9 @@ const TeamSettings = ({
   };
 
   return (
-    <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
+    <div className="flex w-full flex-col items-center justify-center gap-8 p-4 text-center">
       <div className="flex flex-col">
-        <Typography variant="h1" fontSize={64}>
-          Team Settings
-        </Typography>
+        <PageTitle title="Team Settings" size="large" />
       </div>
       <form
         className="flex w-4/5 flex-col items-center justify-center gap-4 text-center"

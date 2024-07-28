@@ -186,7 +186,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
       </div>
       <YouTube
         opts={{
-          width: `${isMobile ? 480 : fullScreen ? 800 : 640}`,
+          width: `${isMobile ? 475 : fullScreen ? 800 : 640}`,
           height: `${isMobile ? 295 : fullScreen ? 495 : 390}`,
           playerVars: {
             end: preview.play.end_time,

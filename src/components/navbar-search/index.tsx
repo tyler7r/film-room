@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useSearchContext } from "~/contexts/search";
 
 const NavbarSearch = () => {
-  const { topic, setTopic, setIsOpen } = useSearchContext();
+  const { topic, setTopic } = useSearchContext();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -26,40 +26,37 @@ const NavbarSearch = () => {
       params.delete("topic");
     }
     setTopic("");
-    setIsOpen(false);
     void router.replace(`/search?${params.toString()}`);
   };
 
   return (
-    <div className="w-full">
-      <form onSubmit={handleSubmit}>
-        <TextField
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <IconButton size="small" type="submit">
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton size="small" onClick={() => setIsOpen(false)}>
-                  <CloseIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-          className="w-full"
-          placeholder="New search..."
-          name="topic"
-          autoComplete="search"
-          id="search"
-          onChange={changeHandler}
-          value={topic}
-        />
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="w-full lg:w-2/3">
+      <TextField
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <IconButton color="primary" size="small" type="submit">
+                <SearchIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton size="small" onClick={() => setTopic("")}>
+                <CloseIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+        className="w-full"
+        placeholder="New search..."
+        name="topic"
+        autoComplete="search"
+        id="search"
+        onChange={changeHandler}
+        value={topic}
+      />
+    </form>
   );
 };
 
