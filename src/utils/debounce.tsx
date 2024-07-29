@@ -1,7 +1,10 @@
 import { debounce } from "@mui/material";
 import { useEffect, useMemo, useRef } from "react";
+import { PlaySearchOptions } from "~/components/play-index";
 
-const useDebounce = (callback: () => Promise<void>) => {
+const useDebounce = (
+  callback: (options?: PlaySearchOptions) => Promise<void>,
+) => {
   const ref = useRef<() => Promise<void>>();
 
   useEffect(() => {

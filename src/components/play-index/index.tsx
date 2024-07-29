@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
+import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
@@ -51,7 +52,7 @@ const PlayIndex = ({
   const itemsPerPage = isMobile ? 5 : 10;
   const topRef = useRef<HTMLDivElement | null>(null);
 
-  const fetchPlays = async (options?: PlaySearchOptions) => {
+  const fetchPlays = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const plays = supabase
       .from("play_preview")
@@ -61,52 +62,55 @@ const PlayIndex = ({
       .eq("video->>id", videoId)
       .order("play->>start_time")
       .range(from, to);
-    if (options?.only_highlights) {
+    if (searchOptions.only_highlights) {
       void plays.eq("play->>highlight", true);
     }
-    if (options?.author && options.author !== "") {
-      void plays.ilike("play->>author_name", `%${options.author}%`);
+    if (searchOptions?.author && searchOptions.author !== "") {
+      void plays.ilike("play->>author_name", `%${searchOptions.author}%`);
     }
     if (activePlay) {
       void plays.neq("play->>id", activePlay.play.id);
     }
     if (affIds) {
-      if (options?.private_only === "all") {
+      if (searchOptions.private_only === "all") {
         void plays.or(
           `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
         );
-      } else if (options?.private_only && options.private_only !== "all") {
-        void plays.eq("play->>exclusive_to", options.private_only);
+      } else if (
+        searchOptions.private_only &&
+        searchOptions.private_only !== "all"
+      ) {
+        void plays.eq("play->>exclusive_to", searchOptions.private_only);
       }
     } else {
       void plays.eq("play->>private", false);
     }
-    if (options?.timestamp) {
-      void plays.gte("play->>end_time", options.timestamp);
+    if (searchOptions.timestamp) {
+      void plays.gte("play->>end_time", searchOptions.timestamp);
     }
     const { data, count } = await plays;
     if (data) setPlays(data);
     if (count) setPlayCount(count);
-  };
+  });
 
-  const fetchPlaysBySearch = async (options: PlaySearchOptions) => {
+  const fetchPlaysBySearch = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
-    if (options.topic && options.topic !== "") {
+    if (searchOptions.topic && searchOptions.topic !== "") {
       const playsByMention = supabase
         .from("plays_via_user_mention")
         .select("*")
         .eq("video->>id", videoId)
-        .ilike("mention->>receiver_name", `%${options.topic}%`)
+        .ilike("mention->>receiver_name", `%${searchOptions.topic}%`)
         .order("play->>start_time")
         .range(from, to);
       const playsByTag = supabase
         .from("plays_via_tag")
         .select("*")
         .eq("video->>id", videoId)
-        .ilike("tag->>title", `%${options.topic}%`)
+        .ilike("tag->>title", `%${searchOptions.topic}%`)
         .order("play->>start_time")
         .range(from, to);
-      if (options.only_highlights) {
+      if (searchOptions.only_highlights) {
         void playsByMention.eq("play->>highlight", true);
         void playsByTag.eq("play->>highlight", true);
       }
@@ -114,29 +118,35 @@ const PlayIndex = ({
         void playsByMention.neq("play->>id", activePlay.play.id);
         void playsByTag.neq("play->>id", activePlay.play.id);
       }
-      if (options.author) {
-        void playsByMention.ilike("play->>author_name", options.author);
-        void playsByTag.ilike("play->>author_name", options.author);
+      if (searchOptions.author) {
+        void playsByMention.ilike("play->>author_name", searchOptions.author);
+        void playsByTag.ilike("play->>author_name", searchOptions.author);
       }
       if (affIds) {
-        if (options?.private_only === "all") {
+        if (searchOptions.private_only === "all") {
           void playsByMention.or(
             `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
           );
           void playsByTag.or(
             `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
           );
-        } else if (options.private_only && options.private_only !== "all") {
-          void playsByMention.eq("play->>exclusive_to", options.private_only);
-          void playsByTag.eq("play->>exclusive_to", options.private_only);
+        } else if (
+          searchOptions.private_only &&
+          searchOptions.private_only !== "all"
+        ) {
+          void playsByMention.eq(
+            "play->>exclusive_to",
+            searchOptions.private_only,
+          );
+          void playsByTag.eq("play->>exclusive_to", searchOptions.private_only);
         }
       } else {
         void playsByMention.eq("play->>private", false);
         void playsByTag.eq("play->>private", false);
       }
-      if (options.timestamp) {
-        void playsByMention.gte("play->>end_time", options.timestamp);
-        void playsByTag.gte("play->>end_time", options.timestamp);
+      if (searchOptions.timestamp) {
+        void playsByMention.gte("play->>end_time", searchOptions.timestamp);
+        void playsByTag.gte("play->>end_time", searchOptions.timestamp);
       }
       const getTags = await playsByTag;
       const getMentions = await playsByMention;
@@ -151,7 +161,7 @@ const PlayIndex = ({
       setPlays(ps ? uniquePlays : null);
       setPlayCount(uniquePlays.length > 0 ? uniquePlays.length : null);
     }
-  };
+  });
 
   const scrollToTop = () => {
     if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -182,15 +192,14 @@ const PlayIndex = ({
 
   useEffect(() => {
     if (page === 1 && searchOptions.topic !== "") {
-      void fetchPlaysBySearch(searchOptions);
-    } else if (page === 1 && searchOptions.topic === "")
-      void fetchPlays(searchOptions);
+      void fetchPlaysBySearch();
+    } else if (page === 1 && searchOptions.topic === "") void fetchPlays();
     else setPage(1);
   }, [searchOptions, isMobile]);
 
   useEffect(() => {
-    if (searchOptions.topic !== "") void fetchPlaysBySearch(searchOptions);
-    else void fetchPlays(searchOptions);
+    if (searchOptions.topic !== "") void fetchPlaysBySearch();
+    else void fetchPlays();
   }, [videoId, page, activePlay]);
 
   return (
