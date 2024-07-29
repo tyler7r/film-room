@@ -1,4 +1,5 @@
 import { Button } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AddComment from "~/components/interactions/comments/add-comment";
@@ -24,6 +25,7 @@ const ExpandedPlay = ({
   const { hoverText } = useIsDarkContext();
   const { affIds } = useAuthContext();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [tags, setTags] = useState<TagType[] | null>(null);
 
@@ -44,9 +46,19 @@ const ExpandedPlay = ({
     } else setTags(null);
   };
 
+  const handleTagClick = (term: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set("topic", term);
+    } else {
+      params.delete("topic");
+    }
+    void router.push(`/search/tags?${params.toString()}`);
+  };
+
   const handleClick = (e: React.MouseEvent, tag: string) => {
     if (handleMentionAndTagClick) handleMentionAndTagClick(e, tag);
-    else void router.push(`/search/?topic=${tag}`);
+    else handleTagClick(tag);
   };
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import EmptyMessage from "~/components/empty-msg";
 import PlayPreview from "~/components/play_preview";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
+import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
@@ -22,20 +23,24 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
   const [page, setPage] = useState<number>(1);
   const itemsPerPage = isMobile ? 10 : 20;
 
-  const fetchPlaysByTag = async () => {
+  const fetchPlaysByTag = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const plays = supabase
       .from("plays_via_tag")
       .select("*", { count: "exact" })
-      .ilike("tag->>title", topic ? `%${topic}%` : "%%")
+      .ilike("tag->>title", `%${topic}%`)
       .order("play->>created_at", { ascending: false })
       .range(from, to);
     if (affIds) {
       void plays.or(
         `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
       );
+      void plays.or(
+        `tag->>private.eq.false, tag->>exclusive_to.in.(${affIds})`,
+      );
     } else {
       void plays.eq("play->>private", false);
+      void plays.eq("tag->>private", false);
     }
     const { data, count } = await plays;
     const uniquePlays = [...new Map(data?.map((x) => [x.play.id, x])).values()];
@@ -43,7 +48,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
     if (uniquePlays.length > 0) setPlayCount(uniquePlays.length);
     else setPlayCount(null);
     if (!count) setPlayCount(null);
-  };
+  });
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();

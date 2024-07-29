@@ -3,17 +3,17 @@ import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import Video from "~/components/video";
 import { useMobileContext } from "~/contexts/mobile";
-import type { SearchOptions } from "~/pages/search";
+import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
 
 type SearchVideosProps = {
-  options: SearchOptions;
+  affIds: string[] | null;
   topic: string;
 };
 
-const SearchVideos = ({ options, topic }: SearchVideosProps) => {
+const SearchVideos = ({ affIds, topic }: SearchVideosProps) => {
   const { isMobile } = useMobileContext();
 
   const [videos, setVideos] = useState<VideoType[] | null>(null);
@@ -22,15 +22,15 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
   const [page, setPage] = useState<number>(1);
   const itemsPerPage = isMobile ? 10 : 20;
 
-  const fetchVideos = async (options?: SearchOptions) => {
+  const fetchVideos = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const videos = supabase
       .from("videos")
       .select("*", { count: "exact" })
       .ilike("title", `%${topic}%`)
       .range(from, to);
-    if (options?.affIds) {
-      void videos.or(`private.eq.false, exclusive_to.in.(${options.affIds})`);
+    if (affIds) {
+      void videos.or(`private.eq.false, exclusive_to.in.(${affIds})`);
     } else {
       void videos.eq("private", false);
     }
@@ -39,7 +39,7 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
     else setVideos(null);
     if (count) setVideoCount(count);
     else setVideoCount(null);
-  };
+  });
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
@@ -47,12 +47,12 @@ const SearchVideos = ({ options, topic }: SearchVideosProps) => {
   };
 
   useEffect(() => {
-    if (page === 1) void fetchVideos(options);
+    if (page === 1) void fetchVideos();
     else setPage(1);
-  }, [topic, isMobile, options]);
+  }, [topic, isMobile, affIds]);
 
   useEffect(() => {
-    void fetchVideos(options);
+    void fetchVideos();
   }, [page]);
 
   return (

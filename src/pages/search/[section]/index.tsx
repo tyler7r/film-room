@@ -1,71 +1,55 @@
+import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
 import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
 import SearchPlayTags from "~/components/search-sections/tags";
 import SearchTeams from "~/components/search-sections/teams";
 import SearchUsers from "~/components/search-sections/users";
 import SearchVideos from "~/components/search-sections/videos";
 import { useAuthContext } from "~/contexts/auth";
 
-export type SearchOptions = {
-  affIds: string[] | null;
-};
-
-type ActionBarType = {
-  videos: boolean;
-  users: boolean;
-  teams: boolean;
-  tags: boolean;
-};
-
-const Search = () => {
+const SearchSection = () => {
   const { affIds } = useAuthContext();
-
-  const topic = useSearchParams().get("topic") ?? "";
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
   const router = useRouter();
 
-  const [options, setOptions] = useState<SearchOptions>({
-    affIds: affIds,
-  });
-  const [actionBar, setActionBar] = useState<ActionBarType>({
-    videos: true,
-    users: false,
-    teams: false,
-    tags: false,
-  });
+  const section = router.query.section as string;
+  const topic = useSearchParams().get("topic") ?? "";
 
-  const handleSearch = useDebouncedCallback((term: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set("topic", term);
-    } else {
-      params.delete("topic");
-    }
-    void router.replace(`${pathname}?${params.toString()}`);
-  }, 300);
+  const [search, setSearch] = useState<string>(topic);
 
-  const handleActionBarClick = (topic: string) => {
-    if (topic === "videos") {
-      setActionBar({ videos: true, users: false, teams: false, tags: false });
-    } else if (topic === "users") {
-      setActionBar({ users: true, videos: false, teams: false, tags: false });
-    } else if (topic === "tags") {
-      setActionBar({ teams: false, users: false, videos: false, tags: true });
+  const handleActionBarClick = (sect: string) => {
+    if (sect === "videos") {
+      void router.push(
+        `/search/videos/${topic === "" ? topic : `?topic=${topic}`}`,
+      );
+    } else if (sect === "users") {
+      void router.push(
+        `/search/users/${topic === "" ? topic : `?topic=${topic}`}`,
+      );
+    } else if (sect === "tags") {
+      void router.push(
+        `/search/tags/${topic === "" ? topic : `?topic=${topic}`}`,
+      );
     } else {
-      setActionBar({ users: false, videos: false, teams: true, tags: false });
+      void router.push(
+        `/search/teams/${topic === "" ? topic : `?topic=${topic}`}`,
+      );
     }
   };
 
+  const onChange = (term: string) => {
+    setSearch(term);
+  };
+
+  const handleClear = () => {
+    setSearch("");
+  };
+
   useEffect(() => {
-    setOptions({
-      affIds: affIds,
-    });
-  }, [affIds]);
+    setSearch(topic);
+  }, [topic]);
 
   return (
     <div
@@ -79,8 +63,8 @@ const Search = () => {
         sx={{ marginBottom: "16px" }}
         label="Search"
         placeholder="New search..."
-        onChange={(e) => handleSearch(e.target.value)}
-        defaultValue={searchParams.get("topic")?.toString()}
+        onChange={(e) => onChange(e.target.value)}
+        value={search}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -89,12 +73,19 @@ const Search = () => {
               </IconButton>
             </InputAdornment>
           ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton color="primary" onClick={handleClear} size="small">
+                <ClearIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
         }}
       />
       <div className="flex w-full items-center justify-center gap-12 md:w-4/5">
         <Button
           onClick={() => handleActionBarClick("videos")}
-          variant={actionBar.videos ? "outlined" : "text"}
+          variant={section == "videos" ? "outlined" : "text"}
           sx={{
             fontSize: "20px",
             padding: "6px 20px 6px 20px",
@@ -106,7 +97,7 @@ const Search = () => {
         </Button>
         <Button
           onClick={() => handleActionBarClick("users")}
-          variant={actionBar.users ? "outlined" : "text"}
+          variant={section === "users" ? "outlined" : "text"}
           sx={{
             fontSize: "20px",
             padding: "6px 20px 6px 20px",
@@ -118,7 +109,7 @@ const Search = () => {
         </Button>
         <Button
           onClick={() => handleActionBarClick("teams")}
-          variant={actionBar.teams ? "outlined" : "text"}
+          variant={section == "teams" ? "outlined" : "text"}
           sx={{
             fontSize: "20px",
             padding: "6px 20px 6px 20px",
@@ -130,7 +121,7 @@ const Search = () => {
         </Button>
         <Button
           onClick={() => handleActionBarClick("tags")}
-          variant={actionBar.tags ? "outlined" : "text"}
+          variant={section === "tags" ? "outlined" : "text"}
           sx={{
             fontSize: "20px",
             padding: "6px 20px 6px 20px",
@@ -141,12 +132,12 @@ const Search = () => {
           Tags
         </Button>
       </div>
-      {actionBar.videos && <SearchVideos topic={topic} options={options} />}
-      {actionBar.users && <SearchUsers topic={topic} />}
-      {actionBar.teams && <SearchTeams topic={topic} />}
-      {actionBar.tags && <SearchPlayTags topic={topic} />}
+      {section === "videos" && <SearchVideos topic={search} affIds={affIds} />}
+      {section === "users" && <SearchUsers topic={search} />}
+      {section === "teams" && <SearchTeams topic={search} />}
+      {section === "tags" && <SearchPlayTags topic={search} />}
     </div>
   );
 };
 
-export default Search;
+export default SearchSection;

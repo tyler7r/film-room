@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import User from "~/components/user";
 import { useMobileContext } from "~/contexts/mobile";
+import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { UserType } from "~/utils/types";
@@ -20,7 +21,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
   const [page, setPage] = useState<number>(1);
   const itemsPerPage = isMobile ? 10 : 20;
 
-  const fetchUsers = async () => {
+  const fetchUsers = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const { data, count } = await supabase
       .from("profiles")
@@ -31,7 +32,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
     else setUsers(null);
     if (count) setUserCount(count);
     else setUserCount(null);
-  };
+  });
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();

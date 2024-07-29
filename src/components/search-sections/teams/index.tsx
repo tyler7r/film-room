@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import Team from "~/components/team";
 import { useMobileContext } from "~/contexts/mobile";
+import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { TeamType } from "~/utils/types";
@@ -20,7 +21,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
   const [page, setPage] = useState<number>(1);
   const itemsPerPage = isMobile ? 10 : 20;
 
-  const fetchTeams = async () => {
+  const fetchTeams = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const { data, count } = await supabase
       .from("teams")
@@ -31,7 +32,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
     else setTeams(null);
     if (count) setTeamCount(count);
     else setTeamCount(null);
-  };
+  });
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();

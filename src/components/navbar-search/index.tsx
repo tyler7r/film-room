@@ -26,7 +26,7 @@ const NavbarSearch = () => {
       params.delete("topic");
     }
     setTopic("");
-    void router.replace(`/search?${params.toString()}`);
+    void router.replace(`/search/videos?${params.toString()}`);
   };
 
   return (

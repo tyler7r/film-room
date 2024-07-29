@@ -86,7 +86,7 @@ const Home = () => {
           <Button
             variant="outlined"
             size="large"
-            onClick={() => void router.push("/search")}
+            onClick={() => void router.push("/search/videos")}
             startIcon={<SearchIcon />}
           >
             Search
