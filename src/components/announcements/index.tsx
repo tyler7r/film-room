@@ -1,24 +1,41 @@
-import { Pagination } from "@mui/material";
+import CreateIcon from "@mui/icons-material/Create";
+import { IconButton, Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { AnnouncementType } from "~/utils/types";
 import Announcement from "../announcement";
+import AnnouncementModal from "../announcement-modal";
 import EmptyMessage from "../empty-msg";
 import PageTitle from "../page-title";
+import StandardPopover from "../standard-popover";
 
 type AnnouncementsProps = {
   teamId: string;
+  role: string;
 };
 
-const Announcements = ({ teamId }: AnnouncementsProps) => {
+const Announcements = ({ teamId, role }: AnnouncementsProps) => {
   const { isMobile } = useMobileContext();
   const [anncs, setAnncs] = useState<AnnouncementType[] | null>(null);
   const [announcementCount, setAnnouncementCount] = useState<number | null>(
     null,
   );
   const [page, setPage] = useState<number>(1);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
   const itemsPerPage = isMobile ? 3 : 5;
 
   const fetchAnnouncements = async () => {
@@ -67,7 +84,26 @@ const Announcements = ({ teamId }: AnnouncementsProps) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4 p-2">
-      <PageTitle size="medium" title="Announcements" />
+      {isOpen && <AnnouncementModal setIsOpen={setIsOpen} teamId={teamId} />}
+      <div className="flex items-center justify-center gap-2">
+        <PageTitle size="medium" title="Announcements" />
+        {(role === "coach" || role === "owner") && (
+          <IconButton
+            onClick={() => setIsOpen(!isOpen)}
+            size="small"
+            onMouseEnter={handlePopoverOpen}
+            onMouseLeave={handlePopoverClose}
+          >
+            <CreateIcon fontSize="large" color="primary" />
+            <StandardPopover
+              content="Write an announcement"
+              open={open}
+              anchorEl={anchorEl}
+              handlePopoverClose={handlePopoverClose}
+            />
+          </IconButton>
+        )}
+      </div>
       {!anncs && <EmptyMessage message="team announcements" size="small" />}
       {anncs?.map((annc) => <Announcement annc={annc} key={annc.id} />)}
       {anncs && announcementCount && (

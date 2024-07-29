@@ -1,7 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
-import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
 import { supabase } from "~/utils/supabase";
 import DesktopNav from "./desktop-nav";
@@ -18,8 +17,6 @@ type FetchOptions = {
 
 export const Navbar = () => {
   const { isMobile } = useMobileContext();
-  const { setUnreadCommentCount, setUnreadMentionCount, isOpen } =
-    useInboxContext();
   const { user } = useAuthContext();
   const router = useRouter();
 
@@ -28,85 +25,14 @@ export const Navbar = () => {
     userId: user.userId,
   });
 
-  const fetchUnreadMentions = async (options?: FetchOptions) => {
-    if (options?.loggedIn && options?.userId) {
-      const { count } = await supabase
-        .from("mention_notification")
-        .select("*", { count: "exact" })
-        .match({
-          "mention->>receiver_id": `${user.userId}`,
-          "mention->>viewed": false,
-        });
-      if (count && count > 0) setUnreadMentionCount(count);
-      else setUnreadMentionCount(0);
-    } else setUnreadMentionCount(0);
-  };
-
-  const fetchUnreadComments = async (options?: FetchOptions) => {
-    if (options?.userId && options.loggedIn) {
-      const { count } = await supabase
-        .from("comment_notification")
-        .select("*", { count: "exact" })
-        .match({
-          "play->>author_id": `${user.userId}`,
-          "comment->>viewed": false,
-        });
-      if (count && count > 0) setUnreadCommentCount(count);
-      else setUnreadCommentCount(0);
-    } else setUnreadCommentCount(0);
-  };
-
-  const fetchUnreadCount = async () => {
-    void fetchUnreadMentions(options);
-    void fetchUnreadComments(options);
-  };
-
   const logout = async () => {
     await supabase.auth.signOut();
     router.push("/login");
   };
 
   useEffect(() => {
-    const channel = supabase
-      .channel("mention_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_mentions" },
-        () => {
-          void fetchUnreadMentions();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("comment_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "comments" },
-        () => {
-          void fetchUnreadComments();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
     setOptions({ ...options, loggedIn: user.isLoggedIn, userId: user.userId });
   }, [user]);
-
-  useEffect(() => {
-    void fetchUnreadCount();
-  }, [isOpen, options]);
 
   return isMobile ? (
     <MobileNav logout={logout} />

@@ -1,54 +1,72 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import StarIcon from "@mui/icons-material/Star";
-import { Button, Divider, IconButton } from "@mui/material";
+import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
+import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { MentionType, PlayPreviewType, TagType } from "~/utils/types";
+import type { PlayPreviewType } from "~/utils/types";
 import DeleteMenu from "../delete-menu";
-import AddComment from "../interactions/comments/add-comment";
+import ExpandedPlay from "../expanded-play";
 import CommentBtn from "../interactions/comments/comment-btn";
-import CommentIndex from "../interactions/comments/comment-index";
 import LikeBtn from "../interactions/likes/like-btn";
+import Mentions from "../mentions";
 import StandardPopover from "../standard-popover";
+import Tags from "../tags";
+import TeamLogo from "../team-logo";
 
 type PlayPreviewProps = {
   preview: PlayPreviewType;
 };
 
 const PlayPreview = ({ preview }: PlayPreviewProps) => {
-  const { isMobile } = useMobileContext();
+  const { isMobile, fullScreen } = useMobileContext();
   const { hoverText } = useIsDarkContext();
-  const { user, affIds } = useAuthContext();
+  const { user, affiliations } = useAuthContext();
   const router = useRouter();
 
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<{
+    anchor1: HTMLElement | null;
+    anchor2: HTMLElement | null;
+    anchor3: HTMLElement | null;
+  }>({ anchor1: null, anchor2: null, anchor3: null });
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
 
-  const [mentions, setMentions] = useState<MentionType[] | null>(null);
-  const [tags, setTags] = useState<TagType[] | null>(null);
-
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
+  const exclusiveTeam = affiliations?.find(
+    (aff) => aff.team.id === preview.play.exclusive_to,
+  )?.team;
+
+  const handlePopoverOpen = (
+    e: React.MouseEvent<HTMLElement>,
+    target: 1 | 2 | 3,
+  ) => {
+    if (target === 1) {
+      setAnchorEl({ anchor1: e.currentTarget, anchor2: null, anchor3: null });
+    } else if (target === 2) {
+      setAnchorEl({ anchor1: null, anchor2: e.currentTarget, anchor3: null });
+    } else {
+      setAnchorEl({ anchor1: null, anchor2: null, anchor3: e.currentTarget });
+    }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl(null);
+    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
   };
 
-  const open = Boolean(anchorEl);
+  const open = Boolean(anchorEl.anchor1);
+  const open2 = Boolean(anchorEl.anchor2);
+  const open3 = Boolean(anchorEl.anchor3);
 
   const videoOnReady = async (e: YouTubeEvent) => {
     const video = e.target;
@@ -71,42 +89,6 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
     void player?.pauseVideo();
   };
 
-  const convertTimestamp = (date: string) => {
-    const month =
-      date.slice(5, 6) === "0" ? date.slice(6, 7) : date.substring(5, 7);
-    const day =
-      date.slice(8, 9) === "0" ? date.slice(9, 10) : date.substring(8, 10);
-    return `${month}/${day}`;
-  };
-
-  const fetchMentions = async () => {
-    const { data } = await supabase
-      .from("plays_via_user_mention")
-      .select("*")
-      .eq("play->>id", preview.play.id);
-    if (data && data.length > 0) {
-      const mentions: MentionType[] = data.map((mention) => mention.mention);
-      setMentions(mentions);
-    } else setMentions(null);
-  };
-
-  const fetchTags = async () => {
-    const tags = supabase
-      .from("plays_via_tag")
-      .select("*")
-      .eq("play->>id", preview.play.id);
-    if (affIds) {
-      void tags.or(`tag->>private.eq.false, tag->>exclusive_to.in.(${affIds})`);
-    } else {
-      void tags.eq("tag->>private", false);
-    }
-    const { data } = await tags;
-    if (data) {
-      const tags: TagType[] = data.map((tag) => tag.tag);
-      setTags(tags);
-    } else setTags(null);
-  };
-
   const updateLastWatched = async (video: string, time: number) => {
     if (user.userId) {
       await supabase
@@ -125,20 +107,48 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
     await supabase.from("plays").delete().eq("id", preview.play.id);
   };
 
-  useEffect(() => {
-    void fetchMentions();
-    void fetchTags();
-  }, [user]);
-
   return (
-    <div className="flex flex-col rounded-md">
+    <div
+      className="flex flex-col rounded-md"
+      style={{
+        width: `${isMobile ? "480px" : fullScreen ? "800px" : "640px"}`,
+      }}
+    >
       <div className="flex items-center justify-between gap-2 p-2">
         <div className="flex items-center gap-2">
+          {preview.play.private && exclusiveTeam && (
+            <IconButton
+              size="small"
+              onClick={() => void router.push(`/team-hub/${exclusiveTeam.id}`)}
+              onMouseEnter={(e) => handlePopoverOpen(e, 2)}
+              onMouseLeave={handlePopoverClose}
+            >
+              <TeamLogo tm={exclusiveTeam} size={30} inactive={true} />
+              <StandardPopover
+                open={open2}
+                anchorEl={anchorEl.anchor2}
+                content={`Play is private to ${exclusiveTeam?.full_name}`}
+                handlePopoverClose={handlePopoverClose}
+              />
+            </IconButton>
+          )}
           {preview.play.highlight && (
-            <StarIcon color="secondary" fontSize="large" />
+            <div
+              onMouseEnter={(e) => handlePopoverOpen(e, 3)}
+              onMouseLeave={handlePopoverClose}
+              className="flex cursor-pointer items-center justify-center"
+            >
+              <StarIcon color="secondary" fontSize="large" />
+              <StandardPopover
+                open={open3}
+                anchorEl={anchorEl.anchor3}
+                content="Highlight!"
+                handlePopoverClose={handlePopoverClose}
+              />
+            </div>
           )}
           <div
-            className={`tracking text-center text-xl font-bold ${hoverText}`}
+            className={`text-center font-serif text-xl font-bold italic tracking-tighter ${hoverText}`}
             onClick={() =>
               void router.push(`/profile/${preview.play.author_id}`)
             }
@@ -149,7 +159,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
           <div className="text-sm tracking-tight text-slate-600">
             {convertTimestamp(preview.play.created_at)}
           </div>
-          <div className="p-2">{preview.play.title}</div>
+          <div className="flex-wrap p-2">{preview.play.title}</div>
         </div>
         <div className="flex items-center gap-1">
           {preview.play.author_id === user.userId && (
@@ -160,7 +170,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             />
           )}
           <IconButton
-            onMouseEnter={handlePopoverOpen}
+            onMouseEnter={(e) => handlePopoverOpen(e, 1)}
             onMouseLeave={handlePopoverClose}
             onClick={() => handleVideoClick(preview.video.id)}
             size="small"
@@ -170,15 +180,15 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
           <StandardPopover
             content="Go to Video"
             open={open}
-            anchorEl={anchorEl}
+            anchorEl={anchorEl.anchor1}
             handlePopoverClose={handlePopoverClose}
           />
         </div>
       </div>
       <YouTube
         opts={{
-          width: `${isMobile ? 480 : 640}`,
-          height: `${isMobile ? 295 : 390}`,
+          width: `${isMobile ? 475 : fullScreen ? 800 : 640}`,
+          height: `${isMobile ? 295 : fullScreen ? 495 : 390}`,
           playerVars: {
             end: preview.play.end_time,
             enablejsapi: 1,
@@ -195,24 +205,8 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
         id="player"
         videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
       />
-      {mentions && (
-        <div className="flex items-center gap-2 p-2">
-          <LocalOfferIcon />
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {mentions?.map((mention) => (
-              <div
-                onClick={() =>
-                  void router.push(`/profile/${mention.receiver_id}`)
-                }
-                className={`tracking text-center font-bold ${hoverText} text-base leading-3`}
-                key={mention.id}
-              >
-                @{mention.receiver_name}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <Mentions play={preview} />
+      <Tags play={preview} />
       <div className="flex w-full items-center gap-3 px-1">
         <div className="flex items-center justify-center gap-2">
           <LikeBtn playId={preview.play.id} />
@@ -236,32 +230,8 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
         </div>
       </div>
       {isExpanded && (
-        <div className="my-4 flex w-full flex-col items-center gap-2">
-          <div className="w-full">
-            <strong
-              onClick={() =>
-                void router.push(`/profile/${preview.play.author_id}`)
-              }
-              className={`${hoverText}`}
-            >
-              {preview.play.author_name}:{" "}
-            </strong>
-            {preview.play.note}
-          </div>
-          <div className="flex w-full gap-2">
-            {tags?.map((tag) => (
-              <Button key={tag.title + tag.id} size="small">
-                #{tag.title}
-              </Button>
-            ))}
-          </div>
-          <div className="flex w-full flex-col items-center gap-4">
-            <AddComment playId={preview.play.id} />
-            <CommentIndex
-              playId={preview.play.id}
-              setCommentCount={setCommentCount}
-            />
-          </div>
+        <div className="mt-2">
+          <ExpandedPlay play={preview} setCommentCount={setCommentCount} />
         </div>
       )}
     </div>

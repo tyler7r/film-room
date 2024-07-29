@@ -19,6 +19,8 @@ type AuthContextProps = {
   setAffiliations: (affiliations: TeamAffiliationType[] | null) => void;
   affIds: string[] | null;
   setAffIds: (affIds: string[] | null) => void;
+  affReload: boolean;
+  setAffReload: (affReload: boolean) => void;
 };
 
 export const isAuthContext = createContext<AuthContextProps>({
@@ -33,6 +35,8 @@ export const isAuthContext = createContext<AuthContextProps>({
   setAffiliations: () => null,
   affIds: null,
   setAffIds: () => null,
+  affReload: false,
+  setAffReload: () => null,
 });
 
 export const IsAuth = ({ children }: AuthProps) => {
@@ -46,6 +50,7 @@ export const IsAuth = ({ children }: AuthProps) => {
     TeamAffiliationType[] | null
   >(null);
   const [affIds, setAffIds] = useState<string[] | null>(null);
+  const [affReload, setAffReload] = useState<boolean>(false);
 
   const fetchAffiliations = async (profileId?: string) => {
     if (profileId) {
@@ -123,6 +128,13 @@ export const IsAuth = ({ children }: AuthProps) => {
     };
   }, [user.userId]);
 
+  useEffect(() => {
+    if (affReload) {
+      void fetchAffiliations(user.userId);
+      setAffReload(false);
+    } else return;
+  }, [affReload]);
+
   return (
     <isAuthContext.Provider
       value={{
@@ -132,6 +144,8 @@ export const IsAuth = ({ children }: AuthProps) => {
         setAffiliations,
         affIds,
         setAffIds,
+        affReload,
+        setAffReload,
       }}
     >
       {children}

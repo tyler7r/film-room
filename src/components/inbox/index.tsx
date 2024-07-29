@@ -5,8 +5,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
 import PageTitle from "../page-title";
-import InboxComments from "./comments";
-import InboxMentions from "./mentions";
+import InboxNotification from "./notifications";
 import PendingTeamRequests from "./requests";
 import TeamHeader from "./team-header";
 
@@ -15,8 +14,6 @@ const Inbox = () => {
   const { user } = useAuthContext();
   const { screenWidth } = useMobileContext();
   const router = useRouter();
-  const [hideMentions, setHideMentions] = useState<boolean>(false);
-  const [hideComments, setHideComments] = useState<boolean>(false);
   const [hideRequests, setHideRequests] = useState<boolean>(false);
 
   return (
@@ -57,9 +54,7 @@ const Inbox = () => {
           <TeamHeader />
           <Divider></Divider>
           <PendingTeamRequests hide={hideRequests} setHide={setHideRequests} />
-          <InboxMentions hide={hideMentions} setHide={setHideMentions} />
-          <Divider />
-          <InboxComments hide={hideComments} setHide={setHideComments} />
+          <InboxNotification />
         </div>
       </div>
     </Drawer>

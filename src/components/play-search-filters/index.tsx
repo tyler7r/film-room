@@ -204,7 +204,7 @@ const PlaySearchFilters = ({
             </FormControl>
           )}
         </div>
-        <div className="flex h-full flex-col items-center justify-center gap-2 lg:gap-0">
+        <div className="flex flex-col items-center justify-center gap-2 lg:gap-0">
           <Checkbox
             icon={
               <IconButton size="small">

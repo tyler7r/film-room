@@ -27,8 +27,9 @@ const PlayMentions = ({ setMentions, players }: PlayMentionsProps) => {
           options={players}
           getOptionLabel={(option) => `${option.profile.name}`}
           renderOption={(props, option) => (
-            <li {...props} key={option.profile.name}>
+            <li {...props} key={option.profile.id}>
               <User
+                key={option.profile.id}
                 user={{
                   email: option.profile.email,
                   id: option.profile.id,

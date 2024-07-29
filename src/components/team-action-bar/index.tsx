@@ -1,16 +1,15 @@
-import { Badge, Button } from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { Badge, IconButton, Menu, MenuItem } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import type { TeamActionBarType, TeamType } from "~/utils/types";
-import AnnouncementModal from "../announcement-modal";
-import Requests from "../requests";
-import TransferOwnershipModal from "../transfer-ownership";
 
 type TeamActionBarProps = {
   role: string;
   actionBarStatus: TeamActionBarType;
   setActionBarStatus: (status: TeamActionBarType) => void;
   team: TeamType;
+  requestCount: number;
 };
 
 const TeamActionBar = ({
@@ -18,36 +17,32 @@ const TeamActionBar = ({
   actionBarStatus,
   setActionBarStatus,
   team,
+  requestCount,
 }: TeamActionBarProps) => {
   const router = useRouter();
-  const [requestCount, setRequestCount] = useState<number>(0);
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleModalToggle = (modal: string, open: boolean) => {
     if (modal === "roster") {
       setActionBarStatus({
-        settings: open,
-        announcement: false,
-        requests: false,
-        transferOwner: false,
-      });
-    } else if (modal === "announcement") {
-      setActionBarStatus({
-        settings: false,
-        announcement: open,
         requests: false,
         transferOwner: false,
       });
     } else if (modal === "requests") {
       setActionBarStatus({
-        settings: false,
-        announcement: false,
         requests: open,
         transferOwner: false,
       });
     } else {
       setActionBarStatus({
-        settings: false,
-        announcement: false,
         requests: false,
         transferOwner: open,
       });
@@ -55,89 +50,71 @@ const TeamActionBar = ({
   };
 
   return (
-    <div className="w-full">
-      {role === "owner" ? (
-        <div className="flex w-full justify-center gap-4">
-          <Button
-            variant={actionBarStatus.announcement ? "outlined" : "text"}
-            onClick={() =>
-              handleModalToggle("announcement", !actionBarStatus.announcement)
-            }
+    <div>
+      {(role === "owner" || role === "coach") && (
+        <>
+          <IconButton
+            size="small"
+            onClick={handleClick}
+            sx={{ display: "flex" }}
           >
-            Send Announcement
-          </Button>
-          <div className="flex items-center">
-            <Button
-              variant={actionBarStatus.requests ? "outlined" : "text"}
-              onClick={() =>
-                handleModalToggle("requests", !actionBarStatus.requests)
-              }
-              sx={{ display: "flex", gap: 1 }}
-            >
-              <div>Handle Requests</div>
-              {!actionBarStatus.requests && (
-                <Badge
-                  badgeContent={requestCount}
-                  color="primary"
-                  sx={{ alignSelf: "start" }}
-                />
+            <SettingsIcon fontSize="large" color="primary" />
+            {!open && (
+              <Badge
+                badgeContent={requestCount}
+                overlap="circular"
+                sx={{
+                  alignSelf: "start",
+                  ml: "2px",
+                }}
+                color="primary"
+              />
+            )}
+          </IconButton>
+          {open && (
+            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+              <MenuItem
+                onClick={() => {
+                  handleModalToggle("requests", !actionBarStatus.requests);
+                  handleClose();
+                }}
+              >
+                <div className="flex">
+                  <div className="font-bold">JOIN REQUESTS</div>
+                  <Badge
+                    badgeContent={requestCount}
+                    color="primary"
+                    sx={{ alignSelf: "start", ml: "12px" }}
+                  />
+                </div>
+              </MenuItem>
+              {role === "owner" && (
+                <div>
+                  <MenuItem
+                    onClick={() => {
+                      handleModalToggle(
+                        "transferOwner",
+                        !actionBarStatus.transferOwner,
+                      );
+                      handleClose();
+                    }}
+                  >
+                    <div className="font-bold">TRANSFER OWNERSHIP</div>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      handleClose();
+                      void router.push(`/team-settings/${team.id}`);
+                    }}
+                  >
+                    <div className="font-bold">TEAM SETTINGS</div>
+                  </MenuItem>
+                </div>
               )}
-            </Button>
-          </div>
-          <Button
-            onClick={() =>
-              handleModalToggle("transferOwner", !actionBarStatus.transferOwner)
-            }
-          >
-            Transfer Ownership
-          </Button>
-          <Button onClick={() => void router.push(`/team-settings/${team.id}`)}>
-            Team Settings
-          </Button>
-        </div>
-      ) : role === "coach" ? (
-        <div className="flex w-full justify-center gap-4">
-          <Button
-            variant={actionBarStatus.announcement ? "outlined" : "text"}
-            onClick={() =>
-              handleModalToggle("announcement", !actionBarStatus.announcement)
-            }
-          >
-            Send Announcement
-          </Button>
-          <div className="flex items-center">
-            <Button
-              variant={actionBarStatus.requests ? "outlined" : "text"}
-              onClick={() =>
-                handleModalToggle("requests", !actionBarStatus.requests)
-              }
-              sx={{ display: "flex", gap: 1 }}
-            >
-              <div>Handle Requests</div>
-              {!actionBarStatus.requests && (
-                <Badge
-                  badgeContent={requestCount}
-                  color="primary"
-                  sx={{ alignSelf: "start" }}
-                />
-              )}
-            </Button>
-          </div>
-        </div>
-      ) : null}
-      {actionBarStatus.announcement && (
-        <AnnouncementModal team={team} toggleOpen={handleModalToggle} />
+            </Menu>
+          )}
+        </>
       )}
-      <Requests
-        team={team}
-        isOpen={actionBarStatus.requests}
-        setRequestCount={setRequestCount}
-      />
-      <TransferOwnershipModal
-        toggleOpen={handleModalToggle}
-        team={team}
-        isOpen={actionBarStatus.transferOwner}
-      />
     </div>
   );
 };

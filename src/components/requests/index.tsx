@@ -1,9 +1,11 @@
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType, TeamType } from "~/utils/types";
 import EmptyMessage from "../empty-msg";
+import PageTitle from "../page-title";
 
 type RequestsProps = {
   team: TeamType;
@@ -13,6 +15,7 @@ type RequestsProps = {
 
 const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
   const { backgroundStyle } = useIsDarkContext();
+  const { setAffReload } = useAuthContext();
   const [requests, setRequests] = useState<PlayerType[] | null>(null);
 
   const fetchRequests = async () => {
@@ -37,12 +40,16 @@ const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
       .select();
     if (data) {
       void fetchRequests();
+      setAffReload(true);
     }
   };
 
   const handleReject = async (id: string) => {
     const { error } = await supabase.from("affiliations").delete().eq("id", id);
-    if (!error) void fetchRequests();
+    if (!error) {
+      void fetchRequests();
+      setAffReload(true);
+    }
   };
 
   useEffect(() => {
@@ -50,7 +57,8 @@ const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
   }, []);
 
   return isOpen ? (
-    <div className="mt-4 flex flex-col gap-2 text-center">
+    <div className="flex flex-col gap-2 text-center">
+      <PageTitle title="Join Requests" size="small" />
       {!requests && <EmptyMessage message="requests" size="medium" />}
       {requests?.map((req) => (
         <div

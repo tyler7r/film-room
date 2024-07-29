@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/empty-msg";
 import User from "~/components/user";
 import { useMobileContext } from "~/contexts/mobile";
+import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { UserType } from "~/utils/types";
@@ -20,18 +21,19 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
   const [page, setPage] = useState<number>(1);
   const itemsPerPage = isMobile ? 10 : 20;
 
-  const fetchUsers = async () => {
+  const fetchUsers = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const { data, count } = await supabase
       .from("profiles")
       .select("*", { count: "exact" })
       .ilike("name", `%${topic}%`)
+      .order("name")
       .range(from, to);
     if (data && data.length > 0) setUsers(data);
     else setUsers(null);
     if (count) setUserCount(count);
     else setUserCount(null);
-  };
+  });
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
@@ -48,9 +50,9 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
   }, [page]);
 
   return (
-    <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
+    <div className="flex w-4/5 flex-col items-center justify-center gap-6">
       {!users && <EmptyMessage size="large" message="users" />}
-      <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="flex w-full flex-wrap justify-center gap-6">
         {users?.map((u) => <User user={u} key={u.id} goToProfile={true} />)}
       </div>
       {users && userCount && (

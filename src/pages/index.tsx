@@ -50,7 +50,7 @@ const Home = () => {
   };
 
   const scrollToTop = () => {
-    if (topRef) topRef.current?.scrollIntoView({ behavior: "instant" });
+    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -86,7 +86,7 @@ const Home = () => {
           <Button
             variant="outlined"
             size="large"
-            onClick={() => void router.push("/search")}
+            onClick={() => void router.push("/search/videos")}
             startIcon={<SearchIcon />}
           >
             Search
@@ -128,7 +128,7 @@ const Home = () => {
         </div>
         <KeyboardDoubleArrowDownIcon fontSize="large" color="primary" />
       </div>
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 items-center justify-center gap-6">
         {plays?.map((play) => (
           <PlayPreview preview={play} key={play.play.id} />
         ))}

@@ -222,8 +222,6 @@ export type CommentType = {
 };
 
 export type TeamActionBarType = {
-  settings: boolean;
-  announcement: boolean;
   requests: boolean;
   transferOwner: boolean;
 };
@@ -272,7 +270,7 @@ export type PlayPreviewType = {
 export type MentionNotificationType = {
   play: PlayType;
   video: VideoType;
-  team: TeamType;
+  team: TeamType | undefined;
   mention: MentionType;
 };
 
@@ -280,6 +278,14 @@ export type CommentNotificationType = {
   play: PlayType;
   video: VideoType;
   comment: CommentType;
+};
+
+export type NotificationType = {
+  play: PlayType;
+  video: VideoType;
+  comment?: CommentType;
+  mention?: MentionType;
+  team?: TeamType;
 };
 
 export type UserTeamType = {

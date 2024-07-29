@@ -7,6 +7,7 @@ import Video from "~/components/video";
 import VideoSearchFilters from "~/components/video-search-filters";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
+import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
@@ -30,7 +31,7 @@ const FilmRoomHome = () => {
 
   const itemsPerPage = isMobile ? 10 : 20;
 
-  const fetchVideos = async (options?: SearchOptions) => {
+  const fetchVideos = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const videos = supabase
       .from("videos")
@@ -38,17 +39,20 @@ const FilmRoomHome = () => {
       .order("uploaded_at", { ascending: false })
       .range(from, to);
     if (affIds) {
-      if (options?.privateOnly === "all") {
+      if (searchOptions.privateOnly === "all") {
         void videos.or(`private.eq.false, exclusive_to.in.(${affIds})`);
-      } else if (options?.privateOnly && options.privateOnly !== "all") {
-        void videos.eq("exclusive_to", options.privateOnly);
+      } else if (
+        searchOptions.privateOnly &&
+        searchOptions.privateOnly !== "all"
+      ) {
+        void videos.eq("exclusive_to", searchOptions.privateOnly);
       }
     } else {
       void videos.eq("private", false);
     }
-    if (options?.topic && options.topic !== "") {
+    if (searchOptions.topic && searchOptions.topic !== "") {
       void videos.or(
-        `title.ilike.%${options.topic}%, tournament.ilike.%${options.topic}%, division.ilike.%${options.topic}%, week.ilike.%${options.topic}%, season.ilike.%${options.topic}%, keywords.ilike.%${options.topic}%`,
+        `title.ilike.%${searchOptions.topic}%, tournament.ilike.%${searchOptions.topic}%, division.ilike.%${searchOptions.topic}%, week.ilike.%${searchOptions.topic}%, season.ilike.%${searchOptions.topic}%, keywords.ilike.%${searchOptions.topic}%`,
       );
     }
 
@@ -57,7 +61,7 @@ const FilmRoomHome = () => {
     else setVideos(null);
     if (count) setVideoCount(count);
     else setVideoCount(null);
-  };
+  });
 
   const handleChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
@@ -71,7 +75,7 @@ const FilmRoomHome = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "videos" },
         () => {
-          void fetchVideos(searchOptions);
+          void fetchVideos();
         },
       )
       .subscribe();
@@ -82,12 +86,12 @@ const FilmRoomHome = () => {
   }, []);
 
   useEffect(() => {
-    if (page === 1) void fetchVideos(searchOptions);
+    if (page === 1) void fetchVideos();
     else setPage(1);
   }, [searchOptions, isMobile]);
 
   useEffect(() => {
-    void fetchVideos(searchOptions);
+    void fetchVideos();
   }, [page]);
 
   return (

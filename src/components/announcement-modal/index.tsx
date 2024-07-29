@@ -3,15 +3,15 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { type MessageType, type TeamType } from "~/utils/types";
+import { type MessageType } from "~/utils/types";
 import FormMessage from "../form-message";
 
 type AnnouncementProps = {
-  team: TeamType;
-  toggleOpen: (modal: string, open: boolean) => void;
+  teamId: string;
+  setIsOpen: (isOpen: boolean) => void;
 };
 
-const AnnouncementModal = ({ toggleOpen, team }: AnnouncementProps) => {
+const AnnouncementModal = ({ setIsOpen, teamId }: AnnouncementProps) => {
   const { user } = useAuthContext();
   const router = useRouter();
 
@@ -33,7 +33,7 @@ const AnnouncementModal = ({ toggleOpen, team }: AnnouncementProps) => {
       const { data } = await supabase
         .from("announcements")
         .insert({
-          team_id: team.id,
+          team_id: teamId,
           text: announcement,
           author_name: user.name,
           author_id: user.userId,
@@ -42,7 +42,7 @@ const AnnouncementModal = ({ toggleOpen, team }: AnnouncementProps) => {
       if (data) {
         setMessage({ text: "Announcement sent!", status: "success" });
         setTimeout(() => {
-          toggleOpen("announcement", false);
+          setIsOpen(false);
           setIsValidAnnouncement(false);
           setAnnouncement("");
           setMessage({ text: undefined, status: "error" });
@@ -70,7 +70,7 @@ const AnnouncementModal = ({ toggleOpen, team }: AnnouncementProps) => {
   return (
     <form
       onSubmit={handleAnnouncement}
-      className="m-2 my-8 flex flex-col items-center justify-center gap-4 text-center"
+      className="flex w-full flex-col items-center justify-center gap-4 text-center md:w-3/5 lg:w-1/2"
     >
       <TextField
         multiline={true}
@@ -97,7 +97,7 @@ const AnnouncementModal = ({ toggleOpen, team }: AnnouncementProps) => {
         <Button
           type="button"
           onClick={() => {
-            toggleOpen("announcement", false);
+            setIsOpen(false);
             setAnnouncement("");
           }}
         >

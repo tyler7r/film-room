@@ -7,19 +7,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
-import { useSearchContext } from "~/contexts/search";
 import { useIsDarkContext } from "~/pages/_app";
 import Inbox from "../inbox";
 import { Logo } from "../logo/logo";
 import MainMenu from "../main-menu/main-menu";
-import NavbarSearch from "../navbar-search";
 import { type ChildrenNavProps } from "./navbar";
 
 const MobileNav = ({ logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
   const { isOpen } = useInboxContext();
-  const { isOpen: isSearchOpen, setIsOpen: setIsSearchOpen } =
-    useSearchContext();
   const { isDark, setIsDark } = useIsDarkContext();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -33,50 +29,40 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
         <div className="flex w-full items-center gap-1">
           {user.isLoggedIn ? (
             <div className="flex w-full items-center justify-end gap-3 px-1 py-2">
-              {isSearchOpen ? (
-                <NavbarSearch />
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  <IconButton
-                    size="small"
-                    onClick={() => setIsSearchOpen(true)}
-                  >
-                    <SearchIcon fontSize="large" />
-                  </IconButton>
-                  <Button variant="contained" size="small" onClick={logout}>
-                    Logout
-                  </Button>
-                </div>
-              )}
+              <div className="flex items-center justify-center gap-2">
+                <IconButton
+                  size="small"
+                  onClick={() => void router.push("/search?")}
+                >
+                  <SearchIcon fontSize="large" />
+                </IconButton>
+                <Button variant="contained" size="small" onClick={logout}>
+                  Logout
+                </Button>
+              </div>
             </div>
           ) : (
-            <div className="flex w-full items-center justify-end gap-2 px-1 py-4">
-              {isSearchOpen ? (
-                <NavbarSearch />
-              ) : (
-                <div className="flex items-center justify-between gap-2">
-                  <IconButton
-                    size="small"
-                    onClick={() => setIsSearchOpen(true)}
-                  >
-                    <SearchIcon fontSize="large" />
-                  </IconButton>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => router.push("/signup")}
-                  >
-                    Signup
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => router.push("/login")}
-                  >
-                    Login
-                  </Button>
-                </div>
-              )}
+            <div className="flex w-full items-center justify-end gap-2 px-1">
+              <IconButton
+                size="small"
+                onClick={() => void router.push("/search?")}
+              >
+                <SearchIcon fontSize="large" />
+              </IconButton>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => router.push("/signup")}
+              >
+                Signup
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => router.push("/login")}
+              >
+                Login
+              </Button>
             </div>
           )}
           <div className="flex flex-col items-center justify-center gap-0 p-0">

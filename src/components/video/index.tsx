@@ -1,22 +1,23 @@
 import PublicIcon from "@mui/icons-material/Public";
-import { colors } from "@mui/material";
+import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { TeamType, VideoType } from "~/utils/types";
 import DeleteMenu from "../delete-menu";
 import PageTitle from "../page-title";
+import StandardPopover from "../standard-popover";
 import TeamLogo from "../team-logo";
 
 type VideoProps = {
   video: VideoType | null;
   startTime?: string | null;
-  purpleBackground?: boolean;
 };
 
-const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
+const Video = ({ video, startTime }: VideoProps) => {
   const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
@@ -25,6 +26,31 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
     TeamType | null | undefined
   >(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<{
+    anchor1: HTMLElement | null;
+    anchor2: HTMLElement | null;
+  }>({
+    anchor1: null,
+    anchor2: null,
+  });
+
+  const handlePopoverOpen = (
+    e: React.MouseEvent<HTMLElement>,
+    target: "a" | "b",
+  ) => {
+    if (target === "a") {
+      setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
+    } else {
+      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
+    }
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl({ anchor1: null, anchor2: null });
+  };
+
+  const open1 = Boolean(anchorEl.anchor1);
+  const open2 = Boolean(anchorEl.anchor2);
 
   const fetchExclusiveToTeam = () => {
     if (video?.exclusive_to) {
@@ -63,60 +89,76 @@ const Video = ({ video, startTime, purpleBackground }: VideoProps) => {
   return (
     video && (
       <div
-        style={
-          !purpleBackground
-            ? backgroundStyle
-            : isDark
-              ? { backgroundColor: `${colors.purple[200]}` }
-              : { backgroundColor: `${colors.purple[50]}` }
-        }
+        style={backgroundStyle}
         key={video.id}
-        className={`${hoverBorder} flex w-full flex-col p-2`}
+        className={`${hoverBorder} flex w-full flex-col items-center justify-center gap-1 p-2`}
         onClick={() => handleClick(video.id)}
       >
-        <div className="flex flex-col items-center justify-center gap-2">
-          <div className="flex items-center justify-center gap-2">
-            {!video.private && (
-              <div className="flex items-center justify-center gap-1">
-                <div className="text-sm font-bold tracking-tighter lg:text-base">
-                  PUBLIC
-                </div>
-                <PublicIcon fontSize="small" />
-              </div>
-            )}
-            {video.private && exclusiveTeam && (
-              <div className="justify flex items-center justify-center gap-2">
-                <div className="text-sm font-bold tracking-tighter lg:text-base">
-                  PRIVATE TO:{" "}
-                </div>
-                <TeamLogo tm={exclusiveTeam} size={20} />
-              </div>
-            )}
-            {video.author_id === user.userId && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <DeleteMenu
-                  isOpen={isDeleteOpen}
-                  setIsOpen={setIsDeleteOpen}
-                  handleDelete={handleDelete}
-                />
-              </div>
-            )}
-          </div>
+        <div className="flex w-full items-center justify-center">
+          {!video.private && (
+            <IconButton
+              onMouseEnter={(e) => handlePopoverOpen(e, "a")}
+              onMouseLeave={handlePopoverClose}
+            >
+              <PublicIcon />
+              <StandardPopover
+                content="Public video"
+                open={open1}
+                handlePopoverClose={handlePopoverClose}
+                anchorEl={anchorEl.anchor1}
+              />
+            </IconButton>
+          )}
+          {video.private && exclusiveTeam && (
+            <IconButton
+              onMouseEnter={(e) => handlePopoverOpen(e, "b")}
+              onMouseLeave={handlePopoverClose}
+            >
+              <TeamLogo tm={exclusiveTeam} size={30} />
+              <StandardPopover
+                content={`Private to ${exclusiveTeam.full_name}`}
+                open={open2}
+                anchorEl={anchorEl.anchor2}
+                handlePopoverClose={handlePopoverClose}
+              />
+            </IconButton>
+          )}
           <div
-            className={`text-center text-base font-bold leading-5 lg:text-lg ${
-              isDark ? "text-purple-400" : "text-purple-A400"
-            }`}
+            className={`${
+              video.author_id === user.userId ? "w-11/12" : ""
+            } flex items-center justify-center gap-2`}
           >
-            {video.season}
-            {video.week
-              ? ` ${video.week.toLocaleUpperCase()}`
-              : video.tournament
-                ? ` ${video.tournament.toLocaleUpperCase()}`
-                : null}
-            {` - ${video.division}`}
+            {
+              <div className="text-sm font-light">
+                {convertTimestamp(video.uploaded_at)}
+              </div>
+            }
+            <Divider flexItem variant="middle" orientation="vertical" />
+            <div
+              className={`text-center text-base font-bold leading-5 lg:text-lg ${
+                isDark ? "text-purple-400" : "text-purple-A400"
+              }`}
+            >
+              {video.season}
+              {video.week
+                ? ` ${video.week.toLocaleUpperCase()}`
+                : video.tournament
+                  ? ` ${video.tournament.toLocaleUpperCase()}`
+                  : null}
+              {` - ${video.division}`}
+            </div>
           </div>
-          <PageTitle size="small" title={video.title} />
+          {video.author_id === user.userId && (
+            <div onClick={(e) => e.stopPropagation()}>
+              <DeleteMenu
+                isOpen={isDeleteOpen}
+                setIsOpen={setIsDeleteOpen}
+                handleDelete={handleDelete}
+              />
+            </div>
+          )}
         </div>
+        <PageTitle size="small" title={video.title} />
       </div>
     )
   );

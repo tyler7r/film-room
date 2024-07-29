@@ -1,4 +1,4 @@
-import { Divider } from "@mui/material";
+import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
@@ -11,11 +11,12 @@ import TeamLogo from "../team-logo";
 type UserProps = {
   user: UserType;
   goToProfile: boolean;
+  number?: number | null;
   small?: boolean;
 };
 
-const User = ({ user, goToProfile, small }: UserProps) => {
-  const { backgroundStyle, hoverBorder } = useIsDarkContext();
+const User = ({ user, goToProfile, small, number }: UserProps) => {
+  const { backgroundStyle, hoverText } = useIsDarkContext();
   const router = useRouter();
 
   const [userTeams, setUserTeams] = useState<TeamType[] | null>(null);
@@ -35,6 +36,11 @@ const User = ({ user, goToProfile, small }: UserProps) => {
     else setUserTeams(null);
   };
 
+  const handleTeamClick = (e: React.MouseEvent, teamId: string) => {
+    e.stopPropagation();
+    void router.push(`/team-hub/${teamId}`);
+  };
+
   useEffect(() => {
     void fetchUserTeams();
   }, []);
@@ -42,20 +48,39 @@ const User = ({ user, goToProfile, small }: UserProps) => {
   return (
     <div
       style={backgroundStyle}
-      className={`${hoverBorder} flex w-full items-center ${
+      className={`flex items-center justify-center ${
         small ? "gap-2" : "gap-4"
-      } `}
+      } rounded-sm p-1 px-2`}
       onClick={handleClick}
     >
-      <PageTitle title={`${user.name}`} size={small ? "x-small" : "small"} />
-      <Divider orientation="vertical" flexItem variant="middle" />
       <div
-        className={`flex w-full shrink items-center justify-center ${
+        className={`flex items-center justify-center ${hoverText} ${
           small ? "gap-2" : "gap-4"
         }`}
       >
+        <PageTitle title={`${user.name}`} size={small ? "x-small" : "small"} />
+        {number && <div className="text-sm font-light">#{number}</div>}
+      </div>
+      <Divider orientation="vertical" flexItem variant="middle" />
+      <div
+        className={`flex items-center justify-center ${
+          small ? "gap-1" : "gap-2"
+        }`}
+      >
         {userTeams ? (
-          userTeams.map((team) => <TeamLogo tm={team} size={small ? 35 : 45} />)
+          userTeams.map((team) => (
+            <IconButton
+              key={team.id}
+              onClick={(e) => handleTeamClick(e, team.id)}
+            >
+              <TeamLogo
+                tm={team}
+                size={small ? 35 : 44}
+                inactive={true}
+                popover={true}
+              />
+            </IconButton>
+          ))
         ) : (
           <EmptyMessage message="affiliations" size="small" />
         )}

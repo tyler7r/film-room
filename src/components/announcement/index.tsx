@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { AnnouncementType, LikeListType } from "~/utils/types";
 import DeleteMenu from "../delete-menu";
@@ -116,9 +117,12 @@ const Announcement = ({ annc }: AnnouncementProps) => {
       style={backgroundStyle}
       className="flex w-4/5 cursor-default items-center justify-center gap-2 rounded-md p-4 text-lg"
     >
+      <div className="text-sm font-light">
+        {convertTimestamp(annc.created_at)}
+      </div>
       <div>
         <strong
-          className={hoverText}
+          className={`${hoverText} font-serif italic tracking-tight`}
           onClick={() => void router.push(`/profile/${annc.author_id}`)}
         >{`${annc.author_name}: `}</strong>
         {annc.text}
