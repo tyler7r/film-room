@@ -136,7 +136,7 @@ const Profile = () => {
           />
         </div>
         {profileAffiliations && (
-          <div className="my-4 flex flex-wrap items-center justify-center gap-1">
+          <div className="my-4 flex w-4/5 flex-wrap items-center justify-center gap-1">
             {profileAffiliations.map((aff) => (
               <TeamAffiliation key={aff.affId} aff={aff} />
             ))}
