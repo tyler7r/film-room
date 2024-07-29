@@ -103,6 +103,7 @@ export const TheInbox = ({ children }: InboxProps) => {
     } else {
       setNotificationCount(0);
       setNotifications(null);
+      setUnreadCount(0);
     }
   };
 
