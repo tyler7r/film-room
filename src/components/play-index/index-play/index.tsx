@@ -10,6 +10,7 @@ import DeleteMenu from "~/components/delete-menu";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
 import LikeBtn from "~/components/interactions/likes/like-btn";
 import StandardPopover from "~/components/standard-popover";
+import Tags from "~/components/tags";
 import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
@@ -209,24 +210,33 @@ const IndexPlay = ({
               )}
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-2 text-center">
-            <div
-              className={`font-serif text-xl font-bold italic tracking-tighter ${hoverText}`}
-              onClick={() =>
-                void router.push(`/profile/${play.play.author_id}`)
-              }
-            >
-              {play.play.author_name}
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-center">
+              <div
+                className={`font-serif text-xl font-bold italic tracking-tighter ${hoverText}`}
+                onClick={() =>
+                  void router.push(`/profile/${play.play.author_id}`)
+                }
+              >
+                {play.play.author_name}
+              </div>
+              <Divider flexItem orientation="vertical" variant="middle" />
+              <div>{play.play.title}</div>
             </div>
-            <Divider flexItem orientation="vertical" variant="middle" />
-            <div>{play.play.title}</div>
-          </div>
-          <div className="flex justify-center">
-            <Mentions
-              activePlay={activePlay}
-              play={play}
-              handleMentionAndTagClick={handleMentionAndTagClick}
-            />
+            <div className="flex justify-center">
+              <Mentions
+                activePlay={activePlay}
+                play={play}
+                handleMentionAndTagClick={handleMentionAndTagClick}
+              />
+            </div>
+            <div className="flex items-center justify-center">
+              <Tags
+                activePlay={activePlay}
+                handleMentionAndTagClick={handleMentionAndTagClick}
+                play={play}
+              />
+            </div>
           </div>
         </div>
         <div className="flex items-center justify-center gap-2">

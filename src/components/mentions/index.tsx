@@ -55,7 +55,7 @@ const Mentions = ({
 
   return (
     mentions && (
-      <div className={`flex items-center gap-2`}>
+      <div className={`flex items-center`}>
         <IconButton
           size="small"
           onMouseEnter={handlePopoverOpen}
@@ -69,17 +69,19 @@ const Mentions = ({
           handlePopoverClose={handlePopoverClose}
           anchorEl={anchorEl}
         />
-        {mentions?.map((mention) => (
-          <div
-            onClick={(e) =>
-              handleClick(e, mention.receiver_name, mention.receiver_id)
-            }
-            className={`tracking text-center font-bold ${hoverText} items-center text-sm`}
-            key={mention.id}
-          >
-            @{mention.receiver_name}
-          </div>
-        ))}
+        <div className="flex items-center gap-2">
+          {mentions?.map((mention) => (
+            <div
+              onClick={(e) =>
+                handleClick(e, mention.receiver_name, mention.receiver_id)
+              }
+              className={`tracking text-center font-bold ${hoverText} items-center text-sm`}
+              key={mention.id}
+            >
+              @{mention.receiver_name}
+            </div>
+          ))}
+        </div>
       </div>
     )
   );

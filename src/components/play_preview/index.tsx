@@ -18,6 +18,7 @@ import CommentBtn from "../interactions/comments/comment-btn";
 import LikeBtn from "../interactions/likes/like-btn";
 import Mentions from "../mentions";
 import StandardPopover from "../standard-popover";
+import Tags from "../tags";
 import TeamLogo from "../team-logo";
 
 type PlayPreviewProps = {
@@ -205,6 +206,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
         videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
       />
       <Mentions play={preview} />
+      <Tags play={preview} />
       <div className="flex w-full items-center gap-3 px-1">
         <div className="flex items-center justify-center gap-2">
           <LikeBtn playId={preview.play.id} />
