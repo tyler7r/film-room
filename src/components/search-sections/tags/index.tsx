@@ -65,7 +65,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
   }, [page]);
 
   return (
-    <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
+    <div className="flex w-4/5 flex-col items-center justify-center gap-6">
       {!playTags && <EmptyMessage size="large" message="plays with that tag" />}
       {playTags?.map((play) => (
         <PlayPreview key={play.play.id} preview={play} />

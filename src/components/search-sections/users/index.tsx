@@ -27,6 +27,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
       .from("profiles")
       .select("*", { count: "exact" })
       .ilike("name", `%${topic}%`)
+      .order("name")
       .range(from, to);
     if (data && data.length > 0) setUsers(data);
     else setUsers(null);
@@ -49,7 +50,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
   }, [page]);
 
   return (
-    <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
+    <div className="flex w-4/5 flex-col items-center justify-center gap-6">
       {!users && <EmptyMessage size="large" message="users" />}
       <div className="flex w-full flex-wrap justify-center gap-6">
         {users?.map((u) => <User user={u} key={u.id} goToProfile={true} />)}

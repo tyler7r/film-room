@@ -56,7 +56,7 @@ const SearchVideos = ({ affIds, topic }: SearchVideosProps) => {
   }, [page]);
 
   return (
-    <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
+    <div className="flex w-4/5 flex-col items-center justify-center gap-6">
       {!videos && <EmptyMessage size="large" message="videos" />}
       {videos?.map((v) => <Video video={v} key={v.id} />)}
       {videos && videoCount && (

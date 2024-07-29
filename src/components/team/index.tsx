@@ -13,21 +13,18 @@ const Team = ({ team }: TeamProps) => {
   const { hoverBorder, backgroundStyle } = useIsDarkContext();
   const router = useRouter();
 
-  const handleTeamClick = (
-    e: React.MouseEvent<HTMLDivElement>,
-    teamId: string,
-  ) => {
-    void router.push(`/team-hub/${teamId}`);
+  const handleTeamClick = () => {
+    void router.push(`/team-hub/${team.id}`);
   };
 
   return (
     <div
-      className={`flex items-center justify-center gap-4 ${hoverBorder}`}
+      className={`flex items-center justify-center gap-4 ${hoverBorder} p-2`}
       key={team.id}
       style={backgroundStyle}
-      onClick={(e) => handleTeamClick(e, team.id)}
+      onClick={handleTeamClick}
     >
-      <TeamLogo tm={team} size={55} />
+      <TeamLogo tm={team} size={60} />
       <Divider variant="middle" orientation="vertical" flexItem />
       <div className="flex flex-col items-center justify-center">
         <PageTitle title={team.full_name} size="small" />

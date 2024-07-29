@@ -27,6 +27,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
       .from("teams")
       .select("*", { count: "exact" })
       .ilike("full_name", `%${topic}%`)
+      .order("full_name")
       .range(from, to);
     if (data && data.length > 0) setTeams(data);
     else setTeams(null);
@@ -49,9 +50,9 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
   }, [page]);
 
   return (
-    <div className="mt-2 flex w-11/12 flex-col items-center justify-center gap-6">
+    <div className="flex w-full flex-col items-center justify-center gap-6">
       {!teams && <EmptyMessage size="large" message="teams" />}
-      <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="flex w-4/5 flex-wrap items-center justify-center gap-6">
         {teams?.map((team) => <Team team={team} key={team.id} />)}
       </div>
       {teams && teamCount && (

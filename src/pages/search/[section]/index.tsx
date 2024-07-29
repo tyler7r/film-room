@@ -82,60 +82,64 @@ const SearchSection = () => {
           ),
         }}
       />
-      <div className="flex w-full items-center justify-center gap-12 md:w-4/5">
-        <Button
-          onClick={() => handleActionBarClick("videos")}
-          variant={section == "videos" ? "outlined" : "text"}
-          sx={{
-            fontSize: "20px",
-            padding: "6px 20px 6px 20px",
-            fontWeight: "bold",
-            letterSpacing: "0.07em",
-          }}
-        >
-          Videos
-        </Button>
-        <Button
-          onClick={() => handleActionBarClick("users")}
-          variant={section === "users" ? "outlined" : "text"}
-          sx={{
-            fontSize: "20px",
-            padding: "6px 20px 6px 20px",
-            fontWeight: "bold",
-            letterSpacing: "0.07em",
-          }}
-        >
-          Users
-        </Button>
-        <Button
-          onClick={() => handleActionBarClick("teams")}
-          variant={section == "teams" ? "outlined" : "text"}
-          sx={{
-            fontSize: "20px",
-            padding: "6px 20px 6px 20px",
-            fontWeight: "bold",
-            letterSpacing: "0.07em",
-          }}
-        >
-          Teams
-        </Button>
-        <Button
-          onClick={() => handleActionBarClick("tags")}
-          variant={section === "tags" ? "outlined" : "text"}
-          sx={{
-            fontSize: "20px",
-            padding: "6px 20px 6px 20px",
-            fontWeight: "bold",
-            letterSpacing: "0.07em",
-          }}
-        >
-          Tags
-        </Button>
+      <div className="flex w-full flex-col items-center justify-center gap-4">
+        <div className="flex w-full items-center justify-around md:w-4/5">
+          <Button
+            onClick={() => handleActionBarClick("videos")}
+            variant={section == "videos" ? "outlined" : "text"}
+            sx={{
+              fontSize: "20px",
+              padding: "6px 20px 6px 20px",
+              fontWeight: "bold",
+              letterSpacing: "0.07em",
+            }}
+          >
+            Videos
+          </Button>
+          <Button
+            onClick={() => handleActionBarClick("users")}
+            variant={section === "users" ? "outlined" : "text"}
+            sx={{
+              fontSize: "20px",
+              padding: "6px 20px 6px 20px",
+              fontWeight: "bold",
+              letterSpacing: "0.07em",
+            }}
+          >
+            Users
+          </Button>
+          <Button
+            onClick={() => handleActionBarClick("teams")}
+            variant={section == "teams" ? "outlined" : "text"}
+            sx={{
+              fontSize: "20px",
+              padding: "6px 20px 6px 20px",
+              fontWeight: "bold",
+              letterSpacing: "0.07em",
+            }}
+          >
+            Teams
+          </Button>
+          <Button
+            onClick={() => handleActionBarClick("tags")}
+            variant={section === "tags" ? "outlined" : "text"}
+            sx={{
+              fontSize: "20px",
+              padding: "6px 20px 6px 20px",
+              fontWeight: "bold",
+              letterSpacing: "0.07em",
+            }}
+          >
+            Tags
+          </Button>
+        </div>
+        {section === "videos" && (
+          <SearchVideos topic={search} affIds={affIds} />
+        )}
+        {section === "users" && <SearchUsers topic={search} />}
+        {section === "teams" && <SearchTeams topic={search} />}
+        {section === "tags" && <SearchPlayTags topic={search} />}
       </div>
-      {section === "videos" && <SearchVideos topic={search} affIds={affIds} />}
-      {section === "users" && <SearchUsers topic={search} />}
-      {section === "teams" && <SearchTeams topic={search} />}
-      {section === "tags" && <SearchPlayTags topic={search} />}
     </div>
   );
 };
