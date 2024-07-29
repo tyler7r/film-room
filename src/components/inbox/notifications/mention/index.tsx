@@ -1,6 +1,6 @@
-import MarkAsUnreadIcon from "@mui/icons-material/MarkAsUnread";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import PublicIcon from "@mui/icons-material/Public";
-import { colors, Divider, IconButton } from "@mui/material";
+import { Divider, IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -18,8 +18,7 @@ type InboxMentionProps = {
 };
 
 const InboxMention = ({ mention }: InboxMentionProps) => {
-  const { hoverText, hoverBorder, backgroundStyle, isDark } =
-    useIsDarkContext();
+  const { hoverText, hoverBorder, backgroundStyle } = useIsDarkContext();
   const { setIsOpen } = useInboxContext();
   const { user } = useAuthContext();
 
@@ -99,6 +98,10 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
   return (
     <div key={mention.mention.id}>
       <div className="flex items-center justify-end gap-1 text-right text-xs font-bold italic leading-3">
+        {getTimeSinceNotified(mention.play.created_at)} ago
+      </div>
+      <div className="flex items-center justify-center gap-1">
+        {isUnread && <FiberManualRecordIcon fontSize="small" color="primary" />}
         {!isUnread && (
           <IconButton
             onMouseEnter={handlePopoverOpen}
@@ -106,56 +109,49 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
             onClick={(e) => markUnread(e)}
             size="small"
           >
-            <MarkAsUnreadIcon fontSize="small" />
+            <FiberManualRecordIcon fontSize="small" color="action" />
+            <StandardPopover
+              content="Mark unread"
+              open={open}
+              anchorEl={anchorEl}
+              handlePopoverClose={handlePopoverClose}
+            />
           </IconButton>
         )}
-        {getTimeSinceNotified(mention.play.created_at)} ago
-        <StandardPopover
-          content="Mark as unread"
-          open={open}
-          anchorEl={anchorEl}
-          handlePopoverClose={handlePopoverClose}
-        />
-      </div>
-      <div
-        onClick={handleClick}
-        className={`flex w-full flex-col gap-1 ${hoverBorder}`}
-        style={
-          isUnread
-            ? isDark
-              ? { backgroundColor: `${colors.purple[400]}` }
-              : { backgroundColor: `${colors.purple.A100}` }
-            : backgroundStyle
-        }
-      >
-        <div className="flex w-full flex-col">
-          <div className="text-center font-serif font-bold italic tracking-tight">
-            {mention.video.title}
+        <div
+          onClick={handleClick}
+          className={`flex w-full flex-col gap-1 ${hoverBorder}`}
+          style={backgroundStyle}
+        >
+          <div className="flex w-full flex-col">
+            <div className="text-center font-serif font-bold italic tracking-tight">
+              {mention.video.title}
+            </div>
           </div>
-        </div>
-        <Divider flexItem variant="middle"></Divider>
-        <div className="flex items-center gap-1 text-sm">
-          {mention.team && (
-            <IconButton size="small">
-              <TeamLogo tm={mention.team} size={20} inactive={true} />
-            </IconButton>
-          )}
-          {!mention.team && <PublicIcon fontSize="small" />}
-          <div>
-            <strong
-              className={hoverText}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(false);
-                void router.push(`/profile/${mention.play.author_id}`);
-              }}
-            >
-              {mention.play.author_name}
-            </strong>{" "}
-            mentioned you:{" "}
-            {mention.play.title.length > 50
-              ? `${mention.play.title.slice(0, 50)}...`
-              : mention.play.title}
+          <Divider flexItem variant="middle"></Divider>
+          <div className="flex items-center gap-1 text-sm">
+            {mention.team && (
+              <IconButton size="small">
+                <TeamLogo tm={mention.team} size={20} inactive={true} />
+              </IconButton>
+            )}
+            {!mention.team && <PublicIcon fontSize="small" />}
+            <div>
+              <strong
+                className={hoverText}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen(false);
+                  void router.push(`/profile/${mention.play.author_id}`);
+                }}
+              >
+                {mention.play.author_name}
+              </strong>{" "}
+              mentioned you:{" "}
+              {mention.play.title.length > 50
+                ? `${mention.play.title.slice(0, 50)}...`
+                : mention.play.title}
+            </div>
           </div>
         </div>
       </div>

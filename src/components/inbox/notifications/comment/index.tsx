@@ -1,5 +1,5 @@
-import MarkAsUnreadIcon from "@mui/icons-material/MarkAsUnread";
-import { colors, Divider, IconButton } from "@mui/material";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import { Divider, IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -16,8 +16,7 @@ type InboxCommentProps = {
 };
 
 const InboxComment = ({ comment }: InboxCommentProps) => {
-  const { hoverText, backgroundStyle, isDark, hoverBorder } =
-    useIsDarkContext();
+  const { hoverText, backgroundStyle, hoverBorder } = useIsDarkContext();
   const { setIsOpen } = useInboxContext();
   const { user } = useAuthContext();
 
@@ -97,6 +96,10 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
   return (
     <div key={comment.play.id + comment.comment.created_at}>
       <div className="flex items-center justify-end gap-1 text-right text-xs font-bold italic leading-3">
+        {getTimeSinceNotified(comment.comment.created_at)} ago
+      </div>
+      <div className="flex items-center justify-center gap-1">
+        {isUnread && <FiberManualRecordIcon fontSize="small" color="primary" />}
         {!isUnread && (
           <IconButton
             onMouseEnter={handlePopoverOpen}
@@ -104,47 +107,40 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
             onClick={(e) => markUnread(e)}
             size="small"
           >
-            <MarkAsUnreadIcon fontSize="small" />
+            <StandardPopover
+              content="Mark unread"
+              open={open}
+              anchorEl={anchorEl}
+              handlePopoverClose={handlePopoverClose}
+            />
+            <FiberManualRecordIcon fontSize="small" color="action" />
           </IconButton>
         )}
-        {getTimeSinceNotified(comment.comment.created_at)} ago
-        <StandardPopover
-          content="Mark as unread"
-          open={open}
-          anchorEl={anchorEl}
-          handlePopoverClose={handlePopoverClose}
-        />
-      </div>
-      <div
-        onClick={() => handleClick()}
-        className={`flex w-full flex-col gap-1 ${hoverBorder}`}
-        style={
-          isUnread
-            ? isDark
-              ? { backgroundColor: `${colors.purple[400]}` }
-              : { backgroundColor: `${colors.purple.A100}` }
-            : backgroundStyle
-        }
-      >
-        <div className="text-center font-serif font-bold italic tracking-tight">
-          {comment.video.title}
-        </div>
-        <Divider variant="middle" flexItem></Divider>
-        <div className="text-sm">
-          <strong
-            className={hoverText}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsOpen(false);
-              void router.push(`/profile/${comment.play.author_id}`);
-            }}
-          >
-            {comment.comment.author_name}
-          </strong>{" "}
-          commented:{" "}
-          {comment.comment.comment.length > 50
-            ? `${comment.comment.comment.slice(0, 50)}...`
-            : comment.comment.comment}
+        <div
+          onClick={() => handleClick()}
+          className={`flex w-full flex-col gap-1 ${hoverBorder}`}
+          style={backgroundStyle}
+        >
+          <div className="text-center font-serif font-bold italic tracking-tight">
+            {comment.video.title}
+          </div>
+          <Divider variant="middle" flexItem></Divider>
+          <div className="text-sm">
+            <strong
+              className={hoverText}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(false);
+                void router.push(`/profile/${comment.play.author_id}`);
+              }}
+            >
+              {comment.comment.author_name}
+            </strong>{" "}
+            commented:{" "}
+            {comment.comment.comment.length > 50
+              ? `${comment.comment.comment.slice(0, 50)}...`
+              : comment.comment.comment}
+          </div>
         </div>
       </div>
     </div>
