@@ -82,6 +82,10 @@ export type Database = MergeDeep<
             team: TeamType;
           };
         };
+        collection_plays_view: {
+          collection: CollectionType;
+          play: PlayType;
+        };
       };
     };
   }
@@ -260,6 +264,20 @@ export type AnnouncementType = {
   text: string;
 };
 
+export type CollectionType = {
+  author_id: string;
+  created_at: string;
+  private: boolean;
+  exclusive_to: string | null;
+  title: string;
+  id: string;
+};
+
+export type CollectionPlaysType = {
+  collection: CollectionType;
+  play: PlayType;
+};
+
 export type PlayPreviewType = {
   play: PlayType;
   video: VideoType;
@@ -338,6 +356,13 @@ export type NewPlayType = {
 };
 
 export type NewTagType = {
+  title: string;
+  exclusive_to: string;
+  private: boolean;
+  inputValue?: string;
+};
+
+export type NewCollectionType = {
   title: string;
   exclusive_to: string;
   private: boolean;

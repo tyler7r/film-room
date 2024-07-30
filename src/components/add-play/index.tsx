@@ -6,7 +6,12 @@ import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { NewPlayType, PlayerType, VideoType } from "~/utils/types";
+import {
+  type NewPlayType,
+  type PlayerType,
+  type VideoType,
+} from "~/utils/types";
+import PlayCollections from "../add-collection";
 import PageTitle from "../page-title";
 import PlayMentions from "../play-mentions";
 import PlayTags from "../play-tags";
@@ -22,6 +27,13 @@ type NewPlayModalProps = {
 };
 
 export type CreateNewTagType = {
+  title: string;
+  id?: string;
+  create?: boolean;
+  label?: string;
+};
+
+export type CreateNewCollectionType = {
   title: string;
   id?: string;
   create?: boolean;
@@ -52,6 +64,13 @@ const NewPlayModal = ({
   const [players, setPlayers] = useState<PlayerType[] | null>(null);
   const [playTags, setPlayTags] = useState<CreateNewTagType[]>([]);
   const [tags, setTags] = useState<CreateNewTagType[] | null>(null);
+  const [playCollections, setPlayCollections] = useState<
+    CreateNewCollectionType[]
+  >([]);
+  const [collections, setCollections] = useState<
+    CreateNewCollectionType[] | null
+  >(null);
+
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -96,6 +115,17 @@ const NewPlayModal = ({
 
     const { data } = await tags;
     if (data) setTags(data);
+  };
+
+  const fetchCollections = async () => {
+    const collections = supabase.from("collections").select("title, id");
+    if (affIds) {
+      void collections.or(`private.eq.false, exclusive_to.in.(${affIds})`);
+    } else {
+      void collections.eq("private", false);
+    }
+    const { data } = await collections;
+    if (data) setCollections(data);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,6 +189,13 @@ const NewPlayModal = ({
     });
   };
 
+  const handleCollection = async (play: string, collection: string) => {
+    await supabase.from("collection_plays").insert({
+      play_id: play,
+      collection_id: collection,
+    });
+  };
+
   const updateLastWatched = async () => {
     if (user.userId) {
       await supabase
@@ -196,6 +233,11 @@ const NewPlayModal = ({
         if (playTags.length > 0) {
           playTags.forEach((tag) => {
             void handleTag(data.id, `${tag.id}`);
+          });
+        }
+        if (playCollections.length > 0) {
+          playCollections.forEach((col) => {
+            void handleCollection(data.id, `${col.id}`);
           });
         }
         void updateLastWatched();
@@ -249,6 +291,7 @@ const NewPlayModal = ({
   useEffect(() => {
     void fetchPlayers();
     void fetchTags();
+    void fetchCollections();
   }, [video]);
 
   return !isNewPlayOpen ? (
@@ -331,6 +374,11 @@ const NewPlayModal = ({
           </div>
           <PlayTags tags={playTags} setTags={setPlayTags} allTags={tags} />
           <PlayMentions players={players} setMentions={setMentions} />
+          <PlayCollections
+            collections={playCollections}
+            setCollections={setPlayCollections}
+            allCollections={collections}
+          />
           <PrivacyStatus
             video={video}
             newDetails={playDetails}

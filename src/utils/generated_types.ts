@@ -1,4 +1,6 @@
-export type Json =
+Need to install the following packages:
+supabase@1.187.8
+Ok to proceed? (y) export type Json =
   | string
   | number
   | boolean
@@ -123,6 +125,85 @@ export type Database = {
           {
             foreignKeyName: "announcements_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collection_plays: {
+        Row: {
+          collection_id: string
+          play_id: string
+        }
+        Insert: {
+          collection_id?: string
+          play_id?: string
+        }
+        Update: {
+          collection_id?: string
+          play_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_plays_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_plays_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "plays"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_plays_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "transition_mention_view"
+            referencedColumns: ["play_id"]
+          },
+        ]
+      }
+      collections: {
+        Row: {
+          author_id: string
+          created_at: string
+          exclusive_to: string | null
+          id: string
+          private: boolean
+          title: string
+        }
+        Insert: {
+          author_id: string
+          created_at?: string
+          exclusive_to?: string | null
+          id?: string
+          private?: boolean
+          title: string
+        }
+        Update: {
+          author_id?: string
+          created_at?: string
+          exclusive_to?: string | null
+          id?: string
+          private?: boolean
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collections_exclusive_to_fkey"
+            columns: ["exclusive_to"]
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
@@ -616,6 +697,13 @@ export type Database = {
       }
     }
     Views: {
+      collection_plays_view: {
+        Row: {
+          collection: Json | null
+          play: Json | null
+        }
+        Relationships: []
+      }
       comment_notification: {
         Row: {
           comment: Json | null
