@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import TeamLogo from "~/components/team-logo";
 import { useAuthContext } from "~/contexts/auth";
-import { NewCollectionType } from "~/utils/types";
+import type { NewCollectionType } from "~/utils/types";
 
 type PrivacyStatusProps = {
   newDetails: NewCollectionType;

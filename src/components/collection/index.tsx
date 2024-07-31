@@ -2,11 +2,10 @@ import PublicIcon from "@mui/icons-material/Public";
 import { colors, Divider } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { CollectionViewType } from "~/utils/types";
+import type { CollectionViewType } from "~/utils/types";
 import PageTitle from "../page-title";
 import TeamLogo from "../team-logo";
 
@@ -17,7 +16,6 @@ type CollectionProps = {
 };
 
 const Collection = ({ collection, small, listItem }: CollectionProps) => {
-  const { user } = useAuthContext();
   const { backgroundStyle, hoverText, hoverBorder, isDark } =
     useIsDarkContext();
   const router = useRouter();

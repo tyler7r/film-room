@@ -11,9 +11,9 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { NewCollectionType } from "~/utils/types";
-import { CreateNewCollectionType } from "../add-play";
-import PrivacyStatus from "../play-collections/privacy-status";
+import type { NewCollectionType } from "~/utils/types";
+import type { CreateNewCollectionType } from "../add-play";
+import PrivacyStatus from "./privacy-status";
 
 type AddCollectionProps = {
   collections?: CreateNewCollectionType[];
@@ -33,7 +33,7 @@ const AddCollection = ({
   setNewCollection,
 }: AddCollectionProps) => {
   const { user } = useAuthContext();
-  const { backgroundStyle, borderStyle } = useIsDarkContext();
+  const { backgroundStyle } = useIsDarkContext();
 
   const [isValidNewCollection, setIsValidNewCollection] =
     useState<boolean>(false);
@@ -80,7 +80,7 @@ const AddCollection = ({
   return (
     <Modal open={open} onClose={handleClose}>
       <Box
-        className={`${borderStyle} relative inset-1/2 flex w-3/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md p-4`}
+        className={`relative inset-1/2 flex w-3/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md p-4`}
         sx={backgroundStyle}
       >
         <form onSubmit={handleNewCollection} className="w-full">

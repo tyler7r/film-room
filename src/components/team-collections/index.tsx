@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { CollectionViewType } from "~/utils/types";
+import type { CollectionViewType } from "~/utils/types";
 import Collection from "../collection";
 import EmptyMessage from "../empty-msg";
 import PageTitle from "../page-title";

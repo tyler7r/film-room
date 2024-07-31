@@ -6,13 +6,13 @@ import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import {
+import type {
   CollectionType,
+  NewPlayType,
+  PlayerType,
   TeamType,
   UserType,
-  type NewPlayType,
-  type PlayerType,
-  type VideoType,
+  VideoType,
 } from "~/utils/types";
 import PageTitle from "../page-title";
 import PlayCollections from "../play-collections";

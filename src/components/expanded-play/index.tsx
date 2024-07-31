@@ -7,7 +7,7 @@ import CommentIndex from "~/components/interactions/comments/comment-index";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import { CollectionType, type PlayPreviewType } from "~/utils/types";
+import type { CollectionType, PlayPreviewType } from "~/utils/types";
 import StandardPopover from "../standard-popover";
 
 type ExpandedPlayProps = {

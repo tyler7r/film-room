@@ -16,13 +16,13 @@ import {
   getToAndFrom,
 } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { CollectionType, PlayPreviewType } from "~/utils/types";
+import type { CollectionType, PlayPreviewType } from "~/utils/types";
 
 const Collection = () => {
   const { affIds, affiliations, user } = useAuthContext();
   const router = useRouter();
   const { isMobile } = useMobileContext();
-  const { hoverText, colorText, isDark } = useIsDarkContext();
+  const { hoverText, isDark } = useIsDarkContext();
 
   const id = router.query.id as string;
   const itemsPerPage = isMobile ? 10 : 20;
