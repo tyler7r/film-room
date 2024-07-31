@@ -36,11 +36,14 @@ const TeamPageButton = () => {
       </Button>
       <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
         {affiliations?.map((aff) => (
-          <TeamAffiliation
-            aff={aff}
-            key={aff.affId}
-            handleClose={handleClose}
-          />
+          <MenuItem className="flex items-center justify-center">
+            <TeamAffiliation
+              aff={aff}
+              key={aff.affId}
+              handleClose={handleClose}
+              listItem={true}
+            />
+          </MenuItem>
         ))}
         <MenuItem
           className="flex items-center justify-center gap-2"

@@ -7,12 +7,15 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import {
+  CollectionType,
+  TeamType,
+  UserType,
   type NewPlayType,
   type PlayerType,
   type VideoType,
 } from "~/utils/types";
-import PlayCollections from "../add-collection";
 import PageTitle from "../page-title";
+import PlayCollections from "../play-collections";
 import PlayMentions from "../play-mentions";
 import PlayTags from "../play-tags";
 import StandardPopover from "../standard-popover";
@@ -38,6 +41,9 @@ export type CreateNewCollectionType = {
   id?: string;
   create?: boolean;
   label?: string;
+  collection?: CollectionType;
+  team?: TeamType | null;
+  profile?: UserType;
 };
 
 const NewPlayModal = ({
@@ -118,14 +124,20 @@ const NewPlayModal = ({
   };
 
   const fetchCollections = async () => {
-    const collections = supabase.from("collections").select("title, id");
-    if (affIds) {
-      void collections.or(`private.eq.false, exclusive_to.in.(${affIds})`);
-    } else {
-      void collections.eq("private", false);
+    if (user.userId) {
+      const collections = supabase
+        .from("collection_view")
+        .select("*, id:collection->>id, title:collection->>title");
+      if (affIds) {
+        void collections.or(
+          `collection->>author_id.eq.${user.userId}, collection->>exclusive_to.in.(${affIds})`,
+        );
+      } else {
+        void collections.eq("collection->>author_id", user.userId);
+      }
+      const { data } = await collections;
+      if (data) setCollections(data);
     }
-    const { data } = await collections;
-    if (data) setCollections(data);
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,6 +182,7 @@ const NewPlayModal = ({
     });
     setMentions(null);
     setPlayTags([]);
+    setPlayCollections([]);
   };
 
   const handleMention = async (player: string, name: string, play: string) => {

@@ -133,7 +133,7 @@ const Video = ({ video, startTime }: VideoProps) => {
                 {convertTimestamp(video.uploaded_at)}
               </div>
             }
-            <Divider flexItem variant="middle" orientation="vertical" />
+            <Divider flexItem orientation="vertical" />
             <div
               className={`text-center text-base font-bold leading-5 lg:text-lg ${
                 isDark ? "text-purple-400" : "text-purple-A400"

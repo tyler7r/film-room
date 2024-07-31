@@ -13,9 +13,10 @@ type UserProps = {
   goToProfile: boolean;
   number?: number | null;
   small?: boolean;
+  listItem?: boolean;
 };
 
-const User = ({ user, goToProfile, small, number }: UserProps) => {
+const User = ({ user, goToProfile, small, number, listItem }: UserProps) => {
   const { backgroundStyle, hoverText } = useIsDarkContext();
   const router = useRouter();
 
@@ -37,6 +38,7 @@ const User = ({ user, goToProfile, small, number }: UserProps) => {
   };
 
   const handleTeamClick = (e: React.MouseEvent, teamId: string) => {
+    if (listItem) return;
     e.stopPropagation();
     void router.push(`/team-hub/${teamId}`);
   };
@@ -49,14 +51,14 @@ const User = ({ user, goToProfile, small, number }: UserProps) => {
     <div
       style={backgroundStyle}
       className={`flex items-center justify-center ${
-        small ? "gap-2" : "gap-4"
+        small ? "w-full gap-2" : "gap-4"
       } rounded-sm p-1 px-2`}
       onClick={handleClick}
     >
       <div
-        className={`flex items-center justify-center ${hoverText} ${
-          small ? "gap-2" : "gap-4"
-        }`}
+        className={`flex items-center justify-center ${
+          !listItem && hoverText
+        } ${small ? "gap-2" : "gap-4"}`}
       >
         <PageTitle title={`${user.name}`} size={small ? "x-small" : "small"} />
         {number && <div className="text-sm font-light">#{number}</div>}
@@ -67,23 +69,30 @@ const User = ({ user, goToProfile, small, number }: UserProps) => {
           small ? "gap-1" : "gap-2"
         }`}
       >
-        {userTeams ? (
-          userTeams.map((team) => (
-            <IconButton
-              key={team.id}
-              onClick={(e) => handleTeamClick(e, team.id)}
-            >
-              <TeamLogo
-                tm={team}
-                size={small ? 35 : 44}
-                inactive={true}
-                popover={true}
-              />
-            </IconButton>
-          ))
-        ) : (
-          <EmptyMessage message="affiliations" size="small" />
-        )}
+        <div className="flex items-center justify-center gap-2">
+          {userTeams ? (
+            userTeams.map((team) =>
+              !listItem ? (
+                <IconButton
+                  key={team.id}
+                  onClick={(e) => handleTeamClick(e, team.id)}
+                >
+                  <TeamLogo tm={team} size={small ? 35 : 44} popover={true} />
+                </IconButton>
+              ) : (
+                <TeamLogo
+                  key={team.id}
+                  tm={team}
+                  size={small ? 35 : 44}
+                  inactive={true}
+                  popover={false}
+                />
+              ),
+            )
+          ) : (
+            <EmptyMessage message="affiliations" size="small" />
+          )}
+        </div>
       </div>
     </div>
   );

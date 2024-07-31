@@ -1,6 +1,4 @@
-Need to install the following packages:
-supabase@1.187.8
-Ok to proceed? (y) export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -701,6 +699,15 @@ export type Database = {
         Row: {
           collection: Json | null
           play: Json | null
+          video: Json | null
+        }
+        Relationships: []
+      }
+      collection_view: {
+        Row: {
+          collection: Json | null
+          profile: Json | null
+          team: Json | null
         }
         Relationships: []
       }
@@ -805,6 +812,22 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transition_plays_via_collection: {
+        Row: {
+          collection: Json | null
+          play: Json | null
+          video_id: string | null
+        }
+        Relationships: [
           {
             foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]

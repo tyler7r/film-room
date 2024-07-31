@@ -12,6 +12,7 @@ import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
+import CollectionModal from "../collection-modal";
 import DeleteMenu from "../delete-menu";
 import ExpandedPlay from "../expanded-play";
 import CommentBtn from "../interactions/comments/comment-btn";
@@ -162,6 +163,7 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
           <div className="flex-wrap p-2">{preview.play.title}</div>
         </div>
         <div className="flex items-center gap-1">
+          <CollectionModal playId={preview.play.id} />
           {preview.play.author_id === user.userId && (
             <DeleteMenu
               isOpen={isDeleteMenuOpen}

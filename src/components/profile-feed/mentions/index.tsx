@@ -28,6 +28,7 @@ const MentionsFeed = ({ profileId }: FeedProps) => {
         .from("plays_via_user_mention")
         .select("*", { count: "exact" })
         .eq("mention->>receiver_id", profileId)
+        .order("play->>created_at", { ascending: false })
         .range(from, to);
       if (affIds) {
         void plays.or(

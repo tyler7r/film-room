@@ -83,8 +83,18 @@ export type Database = MergeDeep<
           };
         };
         collection_plays_view: {
-          collection: CollectionType;
-          play: PlayType;
+          Row: {
+            collection: CollectionType;
+            play: PlayType;
+            video: VideoType;
+          };
+        };
+        collection_view: {
+          Row: {
+            collection: CollectionType;
+            profile: UserType;
+            team: TeamType | null;
+          };
         };
       };
     };
@@ -273,6 +283,12 @@ export type CollectionType = {
   id: string;
 };
 
+export type CollectionViewType = {
+  collection: CollectionType;
+  team: TeamType | null;
+  profile: UserType;
+};
+
 export type CollectionPlaysType = {
   collection: CollectionType;
   play: PlayType;
@@ -283,6 +299,7 @@ export type PlayPreviewType = {
   video: VideoType;
   mention?: MentionType;
   tag?: TagType;
+  collection?: CollectionType;
 };
 
 export type MentionNotificationType = {
