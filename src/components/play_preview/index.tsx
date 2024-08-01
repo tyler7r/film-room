@@ -12,21 +12,28 @@ import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
-import CollectionModal from "../collection-modal";
-import DeleteMenu from "../delete-menu";
 import ExpandedPlay from "../expanded-play";
 import CommentBtn from "../interactions/comments/comment-btn";
 import LikeBtn from "../interactions/likes/like-btn";
 import Mentions from "../mentions";
+import PlayActionsMenu from "../play-actions-menu";
 import StandardPopover from "../standard-popover";
 import Tags from "../tags";
 import TeamLogo from "../team-logo";
 
 type PlayPreviewProps = {
   preview: PlayPreviewType;
+  collectionId?: string;
+  setReload?: (reload: boolean) => void;
+  collectionAuthor?: string;
 };
 
-const PlayPreview = ({ preview }: PlayPreviewProps) => {
+const PlayPreview = ({
+  preview,
+  collectionId,
+  setReload,
+  collectionAuthor,
+}: PlayPreviewProps) => {
   const { isMobile, fullScreen } = useMobileContext();
   const { hoverText } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
@@ -41,8 +48,6 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
-
-  const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === preview.play.exclusive_to,
@@ -104,10 +109,6 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
     void router.push(`/film-room/${videoId}`);
   };
 
-  const handleDelete = async () => {
-    await supabase.from("plays").delete().eq("id", preview.play.id);
-  };
-
   return (
     <div
       className="flex flex-col rounded-md"
@@ -163,14 +164,19 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
           <div className="flex-wrap p-2">{preview.play.title}</div>
         </div>
         <div className="flex items-center gap-1">
-          <CollectionModal playId={preview.play.id} />
-          {preview.play.author_id === user.userId && (
+          <PlayActionsMenu
+            preview={preview}
+            collectionId={collectionId}
+            setReload={setReload}
+            collectionAuthor={collectionAuthor}
+          />
+          {/* {preview.play.author_id === user.userId && (
             <DeleteMenu
               isOpen={isDeleteMenuOpen}
               setIsOpen={setIsDeleteMenuOpen}
               handleDelete={handleDelete}
             />
-          )}
+          )} */}
           <IconButton
             onMouseEnter={(e) => handlePopoverOpen(e, 1)}
             onMouseLeave={handlePopoverClose}

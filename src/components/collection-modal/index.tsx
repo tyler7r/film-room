@@ -1,5 +1,4 @@
-import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, IconButton, Modal } from "@mui/material";
+import { Box, Button, Modal } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
@@ -10,13 +9,13 @@ import type { CreateNewCollectionType } from "../add-play";
 import FormMessage from "../form-message";
 import PageTitle from "../page-title";
 import PlayCollections from "../play-collections";
-import StandardPopover from "../standard-popover";
 
 type CollectionModalProps = {
   playId: string;
+  handleMenuClose: () => void;
 };
 
-const CollectionModal = ({ playId }: CollectionModalProps) => {
+const CollectionModal = ({ playId, handleMenuClose }: CollectionModalProps) => {
   const { affIds, user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
   const router = useRouter();
@@ -29,6 +28,7 @@ const CollectionModal = ({ playId }: CollectionModalProps) => {
     CreateNewCollectionType[] | null
   >(null);
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
+  const [collectionIds, setCollectionIds] = useState<string[] | null>(null);
 
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
@@ -51,6 +51,9 @@ const CollectionModal = ({ playId }: CollectionModalProps) => {
       const collections = supabase
         .from("collection_view")
         .select("*, id:collection->>id, title:collection->>title");
+      if (collectionIds) {
+        void collections.not("collection->>id", "in", `(${collectionIds})`);
+      }
       if (affIds) {
         void collections.or(
           `collection->>author_id.eq.${user.userId}, collection->>exclusive_to.in.(${affIds})`,
@@ -63,7 +66,18 @@ const CollectionModal = ({ playId }: CollectionModalProps) => {
     }
   };
 
-  const handleOpen = () => {
+  const fetchPlayCollections = async () => {
+    const { data } = await supabase
+      .from("collection_plays")
+      .select()
+      .eq("play_id", playId);
+    if (data && data.length > 0)
+      setCollectionIds(data.map((col) => col.collection_id));
+    else setCollectionIds(null);
+  };
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (user.userId) {
       setIsOpen(true);
     } else void router.push("/login");
@@ -74,6 +88,7 @@ const CollectionModal = ({ playId }: CollectionModalProps) => {
     setIsOpen(false);
     setPlayCollections([]);
     setMessage({ text: undefined, status: "error" });
+    handleMenuClose();
   };
 
   const handleNewCollection = async (collection: string, title: string) => {
@@ -109,26 +124,23 @@ const CollectionModal = ({ playId }: CollectionModalProps) => {
   }, [playCollections]);
 
   useEffect(() => {
-    void fetchCollections();
+    void fetchPlayCollections();
   }, []);
 
+  useEffect(() => {
+    void fetchCollections();
+  }, [collectionIds]);
+
   return !isOpen ? (
-    <IconButton
-      onClick={handleOpen}
-      size="small"
-      onMouseEnter={handlePopoverOpen}
-      onMouseLeave={handlePopoverClose}
-    >
-      <AddIcon />
-      <StandardPopover
-        content="Add play to a collection"
-        open={open}
-        anchorEl={anchorEl}
-        handlePopoverClose={handlePopoverClose}
-      />
-    </IconButton>
+    <div className="text-sm font-bold" onClick={handleOpen}>
+      ADD TO COLLECTIONS
+    </div>
   ) : (
-    <Modal open={isOpen} onClose={handleClose}>
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      onClick={(e) => e.stopPropagation()}
+    >
       <Box
         className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-4 rounded-md border-solid p-4"
         sx={backgroundStyle}

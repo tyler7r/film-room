@@ -129,6 +129,11 @@ const PlayCollections = ({
                 label="Play Collections"
                 id="play-collections"
                 name="play-collections"
+                placeholder={
+                  allCollections.length > 0
+                    ? "Add Play to Collections or Create your own Collection"
+                    : "Create a New Collection"
+                }
               />
             )}
           />

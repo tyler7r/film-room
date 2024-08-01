@@ -33,6 +33,7 @@ export type Database = MergeDeep<
           Row: {
             play: PlayType;
             video: VideoType;
+            team: TeamType | null;
           };
         };
         plays_via_tag: {
@@ -40,6 +41,7 @@ export type Database = MergeDeep<
             play: PlayType;
             tag: TagType;
             video: VideoType;
+            team: TeamType | null;
           };
         };
         plays_via_user_mention: {
@@ -47,6 +49,7 @@ export type Database = MergeDeep<
             play: PlayType;
             mention: MentionType;
             video: VideoType;
+            team: TeamType | null;
           };
         };
         comment_notification: {
@@ -300,6 +303,7 @@ export type PlayPreviewType = {
   mention?: MentionType;
   tag?: TagType;
   collection?: CollectionType;
+  team?: TeamType | null;
 };
 
 export type MentionNotificationType = {

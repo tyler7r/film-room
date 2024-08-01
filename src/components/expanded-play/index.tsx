@@ -62,6 +62,23 @@ const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("collection_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "collections" },
+        () => {
+          void fetchCollections();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     void fetchCollections();
   }, []);
 
@@ -78,26 +95,32 @@ const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
           {play.play.note}
         </div>
       )}
-      <div className="flex w-full items-center justify-start">
-        <IconButton
-          onMouseEnter={handlePopoverOpen}
-          onMouseLeave={handlePopoverClose}
-          size="small"
-        >
-          <LibraryBooksIcon color="action" />
-          <StandardPopover
-            content="Play Collections"
-            handlePopoverClose={handlePopoverClose}
-            open={open}
-            anchorEl={anchorEl}
-          />
-        </IconButton>
-        {collections?.map((col) => (
-          <Button key={col.id} size="small" onClick={() => handleClick(col.id)}>
-            /{col.title}
-          </Button>
-        ))}
-      </div>
+      {collections && (
+        <div className="flex w-full items-center justify-start">
+          <IconButton
+            onMouseEnter={handlePopoverOpen}
+            onMouseLeave={handlePopoverClose}
+            size="small"
+          >
+            <LibraryBooksIcon color="action" />
+            <StandardPopover
+              content="Play Collections"
+              handlePopoverClose={handlePopoverClose}
+              open={open}
+              anchorEl={anchorEl}
+            />
+          </IconButton>
+          {collections.map((col) => (
+            <Button
+              key={col.id}
+              size="small"
+              onClick={() => handleClick(col.id)}
+            >
+              *{col.title}*
+            </Button>
+          ))}
+        </div>
+      )}
       <div className="flex w-full flex-col items-center gap-4">
         <AddComment playId={play.play.id} />
         <CommentIndex playId={play.play.id} setCommentCount={setCommentCount} />

@@ -738,6 +738,7 @@ export type Database = {
       play_preview: {
         Row: {
           play: Json | null
+          team: Json | null
           video: Json | null
         }
         Relationships: []
@@ -746,6 +747,7 @@ export type Database = {
         Row: {
           play: Json | null
           tag: Json | null
+          team: Json | null
           video: Json | null
         }
         Relationships: []
@@ -754,6 +756,7 @@ export type Database = {
         Row: {
           mention: Json | null
           play: Json | null
+          team: Json | null
           video: Json | null
         }
         Relationships: []
@@ -841,6 +844,7 @@ export type Database = {
         Row: {
           play: Json | null
           tag: Json | null
+          team_id: string | null
           video_id: string | null
         }
         Relationships: [
@@ -849,6 +853,13 @@ export type Database = {
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]

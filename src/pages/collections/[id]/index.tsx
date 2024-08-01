@@ -1,8 +1,8 @@
-import AddIcon from "@mui/icons-material/Add";
 import PublicIcon from "@mui/icons-material/Public";
-import { colors, Divider, IconButton, Pagination } from "@mui/material";
+import { colors, Divider, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import PlaysToCollectionModal from "~/components/add-plays-to-collection";
 import EmptyMessage from "~/components/empty-msg";
 import PageTitle from "~/components/page-title";
 import PlayPreview from "~/components/play_preview";
@@ -29,8 +29,12 @@ const Collection = () => {
 
   const [collection, setCollection] = useState<CollectionType | null>(null);
   const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
+  const [playIds, setPlaysIds] = useState<string[] | null>(null);
+
   const [authorName, setAuthorName] = useState<string | null>(null);
   const [userCanEdit, setUserCanEdit] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [reload, setReload] = useState<boolean>(false);
 
   const [playCount, setPlayCount] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
@@ -59,6 +63,7 @@ const Collection = () => {
         .from("collection_plays_view")
         .select("*", { count: "exact" })
         .eq("collection->>id", id)
+        .order("play->>created_at", { ascending: false })
         .range(from, to);
       if (affIds) {
         void plays.or(
@@ -70,7 +75,11 @@ const Collection = () => {
       const { data, count } = await plays;
       if (data && data.length > 0) {
         setPlays(data);
-      } else setPlays(null);
+        setPlaysIds(data.map((play) => play.play.id));
+      } else {
+        setPlays(null);
+        setPlaysIds(null);
+      }
       if (count && count > 0) setPlayCount(count);
       else setPlayCount(0);
     }
@@ -100,7 +109,7 @@ const Collection = () => {
       .channel("collection_changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "tags" },
+        { event: "*", schema: "public", table: "collections" },
         () => {
           void fetchPlays();
           void fetchCollection();
@@ -119,6 +128,14 @@ const Collection = () => {
   }, [id]);
 
   useEffect(() => {
+    if (reload) {
+      void fetchPlays();
+      void fetchCollection();
+      setReload(false);
+    } else return;
+  }, [reload]);
+
+  useEffect(() => {
     checkIfUserCanEdit();
   }, [collection]);
 
@@ -126,15 +143,15 @@ const Collection = () => {
     collection && (
       <div className="flex flex-col items-center justify-center gap-6 p-6">
         <div className="flex items-center gap-4">
-          <div className="flex flex-col items-center justify-center gap-1">
-            <div className="flex items-center justify-center gap-2">
-              {exclusiveTeam?.logo ? (
-                <TeamLogo tm={exclusiveTeam} size={60} popover={true} />
-              ) : (
-                <PublicIcon fontSize="large" color="action" />
-              )}
-              <PageTitle title={collection.title} size="medium" />
-            </div>
+          <div className="flex items-center justify-center gap-2">
+            {exclusiveTeam?.logo ? (
+              <TeamLogo tm={exclusiveTeam} size={60} popover={true} />
+            ) : (
+              <PublicIcon fontSize="large" color="action" />
+            )}
+          </div>
+          <div className="flex flex-col gap-1">
+            <PageTitle title={collection.title} size="medium" />
             <div className="flex items-center justify-center gap-2">
               <div className="text-sm font-light">
                 {convertTimestamp(collection.created_at)}
@@ -166,14 +183,24 @@ const Collection = () => {
             </div>
           </div>
           {userCanEdit && (
-            <IconButton color="primary" size="small">
-              <AddIcon fontSize="large" />
-            </IconButton>
+            <PlaysToCollectionModal
+              collectionId={collection.id}
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+              setReload={setReload}
+              playIds={playIds}
+            />
           )}
         </div>
         <div className="flex flex-col gap-6">
           {plays?.map((play) => (
-            <PlayPreview preview={play} key={play.play.id} />
+            <PlayPreview
+              preview={play}
+              key={play.play.id}
+              setReload={setReload}
+              collectionId={collection.id}
+              collectionAuthor={collection.author_id}
+            />
           ))}
         </div>
         {playCount > 0 && (

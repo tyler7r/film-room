@@ -6,10 +6,10 @@ import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
-import CollectionModal from "~/components/collection-modal";
 import DeleteMenu from "~/components/delete-menu";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
 import LikeBtn from "~/components/interactions/likes/like-btn";
+import PlayActionsMenu from "~/components/play-actions-menu";
 import StandardPopover from "~/components/standard-popover";
 import Tags from "~/components/tags";
 import TeamLogo from "~/components/team-logo";
@@ -200,8 +200,7 @@ const IndexPlay = ({
                 </div>
               )}
             </div>
-            <div className="flex gap-2">
-              <CollectionModal playId={play.play.id} />
+            <div className="flex gap-1">
               {play.play.highlight && (
                 <div
                   className="flex items-center justify-center"
@@ -210,6 +209,9 @@ const IndexPlay = ({
                   <StarIcon color="secondary" fontSize="large" />
                 </div>
               )}
+              <div onClick={(e) => e.stopPropagation()}>
+                <PlayActionsMenu preview={play} />
+              </div>
             </div>
           </div>
           <div className="flex flex-col items-center gap-1">
