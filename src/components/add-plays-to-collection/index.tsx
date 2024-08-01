@@ -141,7 +141,7 @@ const PlaysToCollectionModal = ({
     >
       <AddIcon color="primary" fontSize="large" />
       <StandardPopover
-        content="Add play to a collection"
+        content="Add plays to the Collection"
         open={open}
         anchorEl={anchorEl}
         handlePopoverClose={handlePopoverClose}

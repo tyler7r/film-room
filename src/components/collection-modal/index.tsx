@@ -34,17 +34,6 @@ const CollectionModal = ({ playId, handleMenuClose }: CollectionModalProps) => {
     text: undefined,
     status: "error",
   });
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
 
   const fetchCollections = async () => {
     if (user.userId) {
@@ -81,7 +70,6 @@ const CollectionModal = ({ playId, handleMenuClose }: CollectionModalProps) => {
     if (user.userId) {
       setIsOpen(true);
     } else void router.push("/login");
-    handlePopoverClose();
   };
 
   const handleClose = () => {

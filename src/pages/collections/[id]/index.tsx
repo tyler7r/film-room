@@ -137,7 +137,7 @@ const Collection = () => {
 
   useEffect(() => {
     checkIfUserCanEdit();
-  }, [collection]);
+  }, [collection, user]);
 
   return (
     collection && (
@@ -192,6 +192,12 @@ const Collection = () => {
             />
           )}
         </div>
+        {collection.description && (
+          <div className="w-full text-center text-lg">
+            <strong>Description: </strong>
+            {collection.description}
+          </div>
+        )}
         <div className="flex flex-col gap-6">
           {plays?.map((play) => (
             <PlayPreview

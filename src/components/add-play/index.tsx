@@ -298,6 +298,23 @@ const NewPlayModal = ({
   }, []);
 
   useEffect(() => {
+    const channel = supabase
+      .channel("collection_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "collections" },
+        () => {
+          void fetchCollections();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     checkValidPlay();
   }, [playDetails]);
 

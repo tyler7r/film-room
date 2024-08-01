@@ -1,5 +1,5 @@
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import { Divider, IconButton } from "@mui/material";
+import { Divider } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -101,11 +101,11 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
       <div className="flex items-center justify-center gap-1">
         {isUnread && <FiberManualRecordIcon fontSize="small" color="primary" />}
         {!isUnread && (
-          <IconButton
+          <div
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
             onClick={(e) => markUnread(e)}
-            size="small"
+            className="cursor-pointer"
           >
             <StandardPopover
               content="Mark unread"
@@ -114,7 +114,7 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
               handlePopoverClose={handlePopoverClose}
             />
             <FiberManualRecordIcon fontSize="small" color="action" />
-          </IconButton>
+          </div>
         )}
         <div
           onClick={() => handleClick()}

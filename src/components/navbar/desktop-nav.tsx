@@ -28,12 +28,6 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
             <div className="flex w-full items-center justify-end gap-3">
               <NavbarSearch />
               <div className="flex items-center justify-between gap-2">
-                {/* <IconButton
-                    size="small"
-                    onClick={() => setIsSearchOpen(true)}
-                  >
-                    <SearchIcon fontSize="large" />
-                  </IconButton> */}
                 <Button
                   variant="contained"
                   size="medium"
@@ -51,12 +45,6 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
             <div className="flex w-full items-center justify-end gap-2">
               <NavbarSearch />
               <div className="flex items-center justify-between gap-2">
-                {/* <IconButton
-                    size="small"
-                    onClick={() => setIsSearchOpen(true)}
-                  >
-                    <SearchIcon fontSize="large" />
-                  </IconButton> */}
                 <Button
                   variant="contained"
                   size="medium"

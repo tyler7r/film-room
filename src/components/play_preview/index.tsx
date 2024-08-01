@@ -158,8 +158,13 @@ const PlayPreview = ({
             {preview.play.author_name}
           </div>
           <Divider flexItem orientation="vertical" variant="middle" />
-          <div className="text-sm tracking-tight text-slate-600">
-            {convertTimestamp(preview.play.created_at)}
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-sm leading-3 tracking-tight text-slate-600">
+              {convertTimestamp(preview.play.created_at)}
+            </div>
+            <div className="text-xs font-bold leading-3">
+              ({preview.play.end_time - preview.play.start_time}s)
+            </div>
           </div>
           <div className="flex-wrap p-2">{preview.play.title}</div>
         </div>
@@ -170,13 +175,6 @@ const PlayPreview = ({
             setReload={setReload}
             collectionAuthor={collectionAuthor}
           />
-          {/* {preview.play.author_id === user.userId && (
-            <DeleteMenu
-              isOpen={isDeleteMenuOpen}
-              setIsOpen={setIsDeleteMenuOpen}
-              handleDelete={handleDelete}
-            />
-          )} */}
           <IconButton
             onMouseEnter={(e) => handlePopoverOpen(e, 1)}
             onMouseLeave={handlePopoverClose}

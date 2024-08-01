@@ -170,6 +170,7 @@ export type Database = {
         Row: {
           author_id: string
           created_at: string
+          description: string | null
           exclusive_to: string | null
           id: string
           private: boolean
@@ -178,6 +179,7 @@ export type Database = {
         Insert: {
           author_id: string
           created_at?: string
+          description?: string | null
           exclusive_to?: string | null
           id?: string
           private?: boolean
@@ -186,6 +188,7 @@ export type Database = {
         Update: {
           author_id?: string
           created_at?: string
+          description?: string | null
           exclusive_to?: string | null
           id?: string
           private?: boolean

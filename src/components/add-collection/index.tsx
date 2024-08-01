@@ -3,7 +3,6 @@ import {
   Button,
   DialogActions,
   DialogContent,
-  DialogTitle,
   Modal,
   TextField,
 } from "@mui/material";
@@ -13,6 +12,7 @@ import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { NewCollectionType } from "~/utils/types";
 import type { CreateNewCollectionType } from "../add-play";
+import PageTitle from "../page-title";
 import PrivacyStatus from "./privacy-status";
 
 type AddCollectionProps = {
@@ -44,6 +44,7 @@ const AddCollection = ({
       title: "",
       private: false,
       exclusive_to: "public",
+      description: "",
     });
   };
 
@@ -63,6 +64,8 @@ const AddCollection = ({
             ? newCollection.exclusive_to
             : null,
           author_id: user.userId,
+          description:
+            newCollection.description === "" ? null : newCollection.description,
         })
         .select("title, id")
         .single();
@@ -84,9 +87,9 @@ const AddCollection = ({
         sx={backgroundStyle}
       >
         <form onSubmit={handleNewCollection} className="w-full">
-          <DialogTitle>Add a new collection</DialogTitle>
+          <PageTitle title="Add New Collection" size="small" />
           <DialogContent>
-            <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full flex-col items-center justify-center">
               <TextField
                 name="collection-title"
                 autoFocus
@@ -102,6 +105,26 @@ const AddCollection = ({
                 label="Collection Title"
                 type="text"
                 variant="standard"
+                className="w-full"
+              />
+              <TextField
+                name="collection-description"
+                className="w-full"
+                autoFocus
+                margin="dense"
+                id="description"
+                value={newCollection.description}
+                onChange={(event) =>
+                  setNewCollection({
+                    ...newCollection,
+                    description: event.target.value,
+                  })
+                }
+                label="Description"
+                type="text"
+                placeholder="Description (100 characters max.)"
+                variant="standard"
+                inputProps={{ maxLength: 100 }}
               />
               <PrivacyStatus
                 newDetails={newCollection}

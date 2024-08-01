@@ -30,6 +30,7 @@ const PlayCollections = ({
     title: "",
     private: false,
     exclusive_to: "public",
+    description: "",
   });
 
   const handleChange = (
@@ -45,6 +46,7 @@ const PlayCollections = ({
         title: details.option.title,
         private: false,
         exclusive_to: "public",
+        description: "",
       });
     } else if (reason === "createOption") {
       const t = newValue[newValue.length - 1] as string;
@@ -53,6 +55,7 @@ const PlayCollections = ({
         title: t,
         private: false,
         exclusive_to: "public",
+        description: "",
       });
     } else {
       setCollections(
@@ -90,7 +93,7 @@ const PlayCollections = ({
               if (inputValue !== "" && !isExisting) {
                 filtered.push({
                   title: inputValue,
-                  label: `Add "${inputValue}"`,
+                  label: `Create Collection "${inputValue}"`,
                   create: true,
                 });
               }

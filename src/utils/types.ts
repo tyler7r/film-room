@@ -284,6 +284,7 @@ export type CollectionType = {
   exclusive_to: string | null;
   title: string;
   id: string;
+  description: string | null;
 };
 
 export type CollectionViewType = {
@@ -388,4 +389,5 @@ export type NewCollectionType = {
   exclusive_to: string;
   private: boolean;
   inputValue?: string;
+  description: string;
 };
