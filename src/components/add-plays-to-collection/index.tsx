@@ -10,12 +10,12 @@ import {
   TextField,
 } from "@mui/material";
 import { useRouter } from "next/router";
-import { SyntheticEvent, useEffect, useState } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { PlayPreviewType, type MessageType } from "~/utils/types";
+import type { MessageType, PlayPreviewType } from "~/utils/types";
 import FormMessage from "../form-message";
 import PageTitle from "../page-title";
 import StandardPopover from "../standard-popover";
@@ -116,7 +116,7 @@ const PlaysToCollectionModal = ({
     e.preventDefault();
     e.stopPropagation();
 
-    addedPlays?.forEach((play) => handleNewPlay(play.play.id));
+    addedPlays?.forEach((play) => void handleNewPlay(play.play.id));
     setAddedPlays(null);
     setIsValidForm(false);
     handleClose();

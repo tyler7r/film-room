@@ -2,11 +2,10 @@ import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Button, IconButton, Menu, MenuItem } from "@mui/material";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import { PlayPreviewType } from "~/utils/types";
+import type { PlayPreviewType } from "~/utils/types";
 import CollectionModal from "../collection-modal";
 import DeleteMenu from "../delete-menu";
 
@@ -24,7 +23,6 @@ const PlayActionsMenu = ({
   collectionAuthor,
 }: PlayActionsMenuProps) => {
   const { user } = useAuthContext();
-  const router = useRouter();
 
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
