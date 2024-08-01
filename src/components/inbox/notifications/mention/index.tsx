@@ -103,11 +103,11 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
       <div className="flex items-center justify-center gap-1">
         {isUnread && <FiberManualRecordIcon fontSize="small" color="primary" />}
         {!isUnread && (
-          <IconButton
+          <div
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
             onClick={(e) => markUnread(e)}
-            size="small"
+            className="cursor-pointer"
           >
             <FiberManualRecordIcon fontSize="small" color="action" />
             <StandardPopover
@@ -116,7 +116,7 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
               anchorEl={anchorEl}
               handlePopoverClose={handlePopoverClose}
             />
-          </IconButton>
+          </div>
         )}
         <div
           onClick={handleClick}

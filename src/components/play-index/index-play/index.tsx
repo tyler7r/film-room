@@ -9,6 +9,7 @@ import type { YouTubePlayer } from "react-youtube";
 import DeleteMenu from "~/components/delete-menu";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
 import LikeBtn from "~/components/interactions/likes/like-btn";
+import PlayActionsMenu from "~/components/play-actions-menu";
 import StandardPopover from "~/components/standard-popover";
 import Tags from "~/components/tags";
 import TeamLogo from "~/components/team-logo";
@@ -147,14 +148,24 @@ const IndexPlay = ({
           onClick={() => handleClick(play.play.start_time, play)}
         >
           <div className="flex w-full items-center justify-center gap-4">
-            {play.play.highlight && (
-              <div
-                className="flex items-center justify-center"
-                onClick={(e) => handleHighlightClick(e)}
-              >
-                <StarIcon color="secondary" fontSize="large" />
-              </div>
-            )}
+            <div className="flex items-center justify-center gap-2">
+              {play.play.private && exclusiveTeam && (
+                <div
+                  className="flex items-center justify-center"
+                  onClick={(e) => handlePrivateClick(e)}
+                  onMouseEnter={(e) => handlePopoverOpen(e, "b")}
+                  onMouseLeave={handlePopoverClose}
+                >
+                  <TeamLogo tm={exclusiveTeam} size={30} inactive={true} />
+                  <StandardPopover
+                    open={open2}
+                    anchorEl={anchorEl.anchor2}
+                    content={`Play is private to ${exclusiveTeam?.full_name}`}
+                    handlePopoverClose={handlePopoverClose}
+                  />
+                </div>
+              )}
+            </div>
             <div className="flex w-full items-center justify-center gap-2">
               <div className="flex items-center text-sm tracking-tight text-slate-600">
                 {convertTimestamp(play.play.created_at)}
@@ -173,41 +184,34 @@ const IndexPlay = ({
                 </span>
               </div>
               {activePlay && (
-                <>
-                  <div
-                    className="flex cursor-pointer items-center"
-                    onMouseEnter={(e) => handlePopoverOpen(e, "a")}
-                    onMouseLeave={handlePopoverClose}
-                    onClick={() => handleRestartClick(play.play.start_time)}
-                  >
-                    <RestartAltIcon color="primary" fontSize="large" />
-                  </div>
+                <div
+                  className="flex cursor-pointer items-center"
+                  onMouseEnter={(e) => handlePopoverOpen(e, "a")}
+                  onMouseLeave={handlePopoverClose}
+                  onClick={() => handleRestartClick(play.play.start_time)}
+                >
+                  <RestartAltIcon color="primary" fontSize="large" />
                   <StandardPopover
                     content="Restart Play"
                     open={open1}
                     anchorEl={anchorEl.anchor1}
                     handlePopoverClose={handlePopoverClose}
                   />
-                </>
-              )}
-            </div>
-            <div className="flex items-center justify-center gap-2">
-              {play.play.private && exclusiveTeam && (
-                <div
-                  className="flex items-center justify-center"
-                  onClick={(e) => handlePrivateClick(e)}
-                  onMouseEnter={(e) => handlePopoverOpen(e, "b")}
-                  onMouseLeave={handlePopoverClose}
-                >
-                  <TeamLogo tm={exclusiveTeam} size={30} inactive={true} />
-                  <StandardPopover
-                    open={open2}
-                    anchorEl={anchorEl.anchor2}
-                    content={`Play is private to ${exclusiveTeam?.full_name}`}
-                    handlePopoverClose={handlePopoverClose}
-                  />
                 </div>
               )}
+            </div>
+            <div className="flex gap-1">
+              {play.play.highlight && (
+                <div
+                  className="flex items-center justify-center"
+                  onClick={(e) => handleHighlightClick(e)}
+                >
+                  <StarIcon color="secondary" fontSize="large" />
+                </div>
+              )}
+              <div onClick={(e) => e.stopPropagation()}>
+                <PlayActionsMenu preview={play} />
+              </div>
             </div>
           </div>
           <div className="flex flex-col items-center gap-1">

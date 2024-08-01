@@ -12,20 +12,28 @@ import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
-import DeleteMenu from "../delete-menu";
 import ExpandedPlay from "../expanded-play";
 import CommentBtn from "../interactions/comments/comment-btn";
 import LikeBtn from "../interactions/likes/like-btn";
 import Mentions from "../mentions";
+import PlayActionsMenu from "../play-actions-menu";
 import StandardPopover from "../standard-popover";
 import Tags from "../tags";
 import TeamLogo from "../team-logo";
 
 type PlayPreviewProps = {
   preview: PlayPreviewType;
+  collectionId?: string;
+  setReload?: (reload: boolean) => void;
+  collectionAuthor?: string;
 };
 
-const PlayPreview = ({ preview }: PlayPreviewProps) => {
+const PlayPreview = ({
+  preview,
+  collectionId,
+  setReload,
+  collectionAuthor,
+}: PlayPreviewProps) => {
   const { isMobile, fullScreen } = useMobileContext();
   const { hoverText } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
@@ -40,8 +48,6 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
-
-  const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === preview.play.exclusive_to,
@@ -103,10 +109,6 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
     void router.push(`/film-room/${videoId}`);
   };
 
-  const handleDelete = async () => {
-    await supabase.from("plays").delete().eq("id", preview.play.id);
-  };
-
   return (
     <div
       className="flex flex-col rounded-md"
@@ -156,19 +158,23 @@ const PlayPreview = ({ preview }: PlayPreviewProps) => {
             {preview.play.author_name}
           </div>
           <Divider flexItem orientation="vertical" variant="middle" />
-          <div className="text-sm tracking-tight text-slate-600">
-            {convertTimestamp(preview.play.created_at)}
+          <div className="flex flex-col items-center gap-2">
+            <div className="text-sm leading-3 tracking-tight text-slate-600">
+              {convertTimestamp(preview.play.created_at)}
+            </div>
+            <div className="text-xs font-bold leading-3">
+              ({preview.play.end_time - preview.play.start_time}s)
+            </div>
           </div>
           <div className="flex-wrap p-2">{preview.play.title}</div>
         </div>
         <div className="flex items-center gap-1">
-          {preview.play.author_id === user.userId && (
-            <DeleteMenu
-              isOpen={isDeleteMenuOpen}
-              setIsOpen={setIsDeleteMenuOpen}
-              handleDelete={handleDelete}
-            />
-          )}
+          <PlayActionsMenu
+            preview={preview}
+            collectionId={collectionId}
+            setReload={setReload}
+            collectionAuthor={collectionAuthor}
+          />
           <IconButton
             onMouseEnter={(e) => handlePopoverOpen(e, 1)}
             onMouseLeave={handlePopoverClose}

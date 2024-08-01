@@ -6,6 +6,7 @@ import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { TeamVideoType } from "~/utils/types";
 import EmptyMessage from "../empty-msg";
+import PageTitle from "../page-title";
 import Video from "../video";
 
 type TeamVideosProps = {
@@ -61,7 +62,8 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
   }, [page]);
 
   return (
-    <div className="flex w-11/12 flex-col items-center justify-center">
+    <div className="flex w-11/12 flex-col items-center justify-center gap-2">
+      <PageTitle size="medium" title="Team Film" />
       <div className="flex w-full flex-col gap-4">
         {videos?.map((video) => (
           <Video video={video.video} key={video.video.id} />

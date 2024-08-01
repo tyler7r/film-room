@@ -4,6 +4,7 @@ import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import SearchCollections from "~/components/search-sections/collections";
 import SearchPlayTags from "~/components/search-sections/tags";
 import SearchTeams from "~/components/search-sections/teams";
 import SearchUsers from "~/components/search-sections/users";
@@ -32,9 +33,13 @@ const SearchSection = () => {
       void router.push(
         `/search/tags/${topic === "" ? topic : `?topic=${topic}`}`,
       );
-    } else {
+    } else if (sect === "teams") {
       void router.push(
         `/search/teams/${topic === "" ? topic : `?topic=${topic}`}`,
+      );
+    } else {
+      void router.push(
+        `/search/collections/${topic === "" ? topic : `?topic=${topic}`}`,
       );
     }
   };
@@ -121,6 +126,18 @@ const SearchSection = () => {
             Teams
           </Button>
           <Button
+            onClick={() => handleActionBarClick("collections")}
+            variant={section === "collections" ? "outlined" : "text"}
+            sx={{
+              fontSize: "20px",
+              padding: "6px 20px 6px 20px",
+              fontWeight: "bold",
+              letterSpacing: "0.07em",
+            }}
+          >
+            Collections
+          </Button>
+          <Button
             onClick={() => handleActionBarClick("tags")}
             variant={section === "tags" ? "outlined" : "text"}
             sx={{
@@ -139,6 +156,7 @@ const SearchSection = () => {
         {section === "users" && <SearchUsers topic={search} />}
         {section === "teams" && <SearchTeams topic={search} />}
         {section === "tags" && <SearchPlayTags topic={search} />}
+        {section === "collections" && <SearchCollections topic={search} />}
       </div>
     </div>
   );

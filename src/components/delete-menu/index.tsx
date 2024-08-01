@@ -1,28 +1,50 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { IconButton } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 
 type DeleteMenuProps = {
   handleDelete: () => void;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  actionMenu?: boolean;
 };
 
-const DeleteMenu = ({ handleDelete, isOpen, setIsOpen }: DeleteMenuProps) => {
+const DeleteMenu = ({
+  handleDelete,
+  isOpen,
+  setIsOpen,
+  actionMenu,
+}: DeleteMenuProps) => {
   return isOpen ? (
-    <div className="ml-4 flex gap-1">
-      <IconButton size="small" onClick={() => void handleDelete()}>
-        <DeleteIcon color="primary" />
-      </IconButton>
+    <div className="flex gap-1">
+      {actionMenu ? (
+        <Button
+          endIcon={<DeleteIcon />}
+          variant="contained"
+          size="small"
+          color="primary"
+          onClick={() => void handleDelete()}
+        >
+          Delete
+        </Button>
+      ) : (
+        <IconButton size="small" onClick={() => void handleDelete()}>
+          <DeleteIcon color="primary" />
+        </IconButton>
+      )}
       <IconButton size="small" onClick={() => setIsOpen(false)}>
         <ClearIcon fontSize="small" color="action" />
       </IconButton>
     </div>
-  ) : (
+  ) : !actionMenu ? (
     <IconButton size="small" onClick={() => setIsOpen(true)}>
       <DeleteOutlineIcon color="action" />
     </IconButton>
+  ) : (
+    <div className="text-sm font-bold" onClick={() => setIsOpen(true)}>
+      DELETE PLAY
+    </div>
   );
 };
 

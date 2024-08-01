@@ -6,8 +6,16 @@ import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { NewPlayType, PlayerType, VideoType } from "~/utils/types";
+import type {
+  CollectionType,
+  NewPlayType,
+  PlayerType,
+  TeamType,
+  UserType,
+  VideoType,
+} from "~/utils/types";
 import PageTitle from "../page-title";
+import PlayCollections from "../play-collections";
 import PlayMentions from "../play-mentions";
 import PlayTags from "../play-tags";
 import StandardPopover from "../standard-popover";
@@ -26,6 +34,16 @@ export type CreateNewTagType = {
   id?: string;
   create?: boolean;
   label?: string;
+};
+
+export type CreateNewCollectionType = {
+  title: string;
+  id?: string;
+  create?: boolean;
+  label?: string;
+  collection?: CollectionType;
+  team?: TeamType | null;
+  profile?: UserType;
 };
 
 const NewPlayModal = ({
@@ -52,6 +70,13 @@ const NewPlayModal = ({
   const [players, setPlayers] = useState<PlayerType[] | null>(null);
   const [playTags, setPlayTags] = useState<CreateNewTagType[]>([]);
   const [tags, setTags] = useState<CreateNewTagType[] | null>(null);
+  const [playCollections, setPlayCollections] = useState<
+    CreateNewCollectionType[]
+  >([]);
+  const [collections, setCollections] = useState<
+    CreateNewCollectionType[] | null
+  >(null);
+
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -98,6 +123,23 @@ const NewPlayModal = ({
     if (data) setTags(data);
   };
 
+  const fetchCollections = async () => {
+    if (user.userId) {
+      const collections = supabase
+        .from("collection_view")
+        .select("*, id:collection->>id, title:collection->>title");
+      if (affIds) {
+        void collections.or(
+          `collection->>author_id.eq.${user.userId}, collection->>exclusive_to.in.(${affIds})`,
+        );
+      } else {
+        void collections.eq("collection->>author_id", user.userId);
+      }
+      const { data } = await collections;
+      if (data) setCollections(data);
+    }
+  };
+
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPlayDetails({
@@ -140,6 +182,7 @@ const NewPlayModal = ({
     });
     setMentions(null);
     setPlayTags([]);
+    setPlayCollections([]);
   };
 
   const handleMention = async (player: string, name: string, play: string) => {
@@ -156,6 +199,13 @@ const NewPlayModal = ({
     await supabase.from("play_tags").insert({
       play_id: play,
       tag_id: tag,
+    });
+  };
+
+  const handleCollection = async (play: string, collection: string) => {
+    await supabase.from("collection_plays").insert({
+      play_id: play,
+      collection_id: collection,
     });
   };
 
@@ -196,6 +246,11 @@ const NewPlayModal = ({
         if (playTags.length > 0) {
           playTags.forEach((tag) => {
             void handleTag(data.id, `${tag.id}`);
+          });
+        }
+        if (playCollections.length > 0) {
+          playCollections.forEach((col) => {
+            void handleCollection(data.id, `${col.id}`);
           });
         }
         void updateLastWatched();
@@ -243,12 +298,30 @@ const NewPlayModal = ({
   }, []);
 
   useEffect(() => {
+    const channel = supabase
+      .channel("collection_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "collections" },
+        () => {
+          void fetchCollections();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     checkValidPlay();
   }, [playDetails]);
 
   useEffect(() => {
     void fetchPlayers();
     void fetchTags();
+    void fetchCollections();
   }, [video]);
 
   return !isNewPlayOpen ? (
@@ -331,6 +404,11 @@ const NewPlayModal = ({
           </div>
           <PlayTags tags={playTags} setTags={setPlayTags} allTags={tags} />
           <PlayMentions players={players} setMentions={setMentions} />
+          <PlayCollections
+            collections={playCollections}
+            setCollections={setPlayCollections}
+            allCollections={collections}
+          />
           <PrivacyStatus
             video={video}
             newDetails={playDetails}

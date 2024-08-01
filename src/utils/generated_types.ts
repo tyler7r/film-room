@@ -129,6 +129,88 @@ export type Database = {
           },
         ]
       }
+      collection_plays: {
+        Row: {
+          collection_id: string
+          play_id: string
+        }
+        Insert: {
+          collection_id?: string
+          play_id?: string
+        }
+        Update: {
+          collection_id?: string
+          play_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_plays_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_plays_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "plays"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_plays_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "transition_mention_view"
+            referencedColumns: ["play_id"]
+          },
+        ]
+      }
+      collections: {
+        Row: {
+          author_id: string
+          created_at: string
+          description: string | null
+          exclusive_to: string | null
+          id: string
+          private: boolean
+          title: string
+        }
+        Insert: {
+          author_id: string
+          created_at?: string
+          description?: string | null
+          exclusive_to?: string | null
+          id?: string
+          private?: boolean
+          title: string
+        }
+        Update: {
+          author_id?: string
+          created_at?: string
+          description?: string | null
+          exclusive_to?: string | null
+          id?: string
+          private?: boolean
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collections_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comment_likes: {
         Row: {
           comment_id: string
@@ -616,6 +698,22 @@ export type Database = {
       }
     }
     Views: {
+      collection_plays_view: {
+        Row: {
+          collection: Json | null
+          play: Json | null
+          video: Json | null
+        }
+        Relationships: []
+      }
+      collection_view: {
+        Row: {
+          collection: Json | null
+          profile: Json | null
+          team: Json | null
+        }
+        Relationships: []
+      }
       comment_notification: {
         Row: {
           comment: Json | null
@@ -643,6 +741,7 @@ export type Database = {
       play_preview: {
         Row: {
           play: Json | null
+          team: Json | null
           video: Json | null
         }
         Relationships: []
@@ -651,6 +750,7 @@ export type Database = {
         Row: {
           play: Json | null
           tag: Json | null
+          team: Json | null
           video: Json | null
         }
         Relationships: []
@@ -659,6 +759,7 @@ export type Database = {
         Row: {
           mention: Json | null
           play: Json | null
+          team: Json | null
           video: Json | null
         }
         Relationships: []
@@ -726,10 +827,10 @@ export type Database = {
           },
         ]
       }
-      transition_plays_via_tag: {
+      transition_plays_via_collection: {
         Row: {
+          collection: Json | null
           play: Json | null
-          tag: Json | null
           video_id: string | null
         }
         Relationships: [
@@ -738,6 +839,30 @@ export type Database = {
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transition_plays_via_tag: {
+        Row: {
+          play: Json | null
+          tag: Json | null
+          team_id: string | null
+          video_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]

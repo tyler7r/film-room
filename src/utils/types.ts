@@ -33,6 +33,7 @@ export type Database = MergeDeep<
           Row: {
             play: PlayType;
             video: VideoType;
+            team: TeamType | null;
           };
         };
         plays_via_tag: {
@@ -40,6 +41,7 @@ export type Database = MergeDeep<
             play: PlayType;
             tag: TagType;
             video: VideoType;
+            team: TeamType | null;
           };
         };
         plays_via_user_mention: {
@@ -47,6 +49,7 @@ export type Database = MergeDeep<
             play: PlayType;
             mention: MentionType;
             video: VideoType;
+            team: TeamType | null;
           };
         };
         comment_notification: {
@@ -80,6 +83,20 @@ export type Database = MergeDeep<
           Row: {
             affiliations: AffiliationType;
             team: TeamType;
+          };
+        };
+        collection_plays_view: {
+          Row: {
+            collection: CollectionType;
+            play: PlayType;
+            video: VideoType;
+          };
+        };
+        collection_view: {
+          Row: {
+            collection: CollectionType;
+            profile: UserType;
+            team: TeamType | null;
           };
         };
       };
@@ -260,11 +277,34 @@ export type AnnouncementType = {
   text: string;
 };
 
+export type CollectionType = {
+  author_id: string;
+  created_at: string;
+  private: boolean;
+  exclusive_to: string | null;
+  title: string;
+  id: string;
+  description: string | null;
+};
+
+export type CollectionViewType = {
+  collection: CollectionType;
+  team: TeamType | null;
+  profile: UserType;
+};
+
+export type CollectionPlaysType = {
+  collection: CollectionType;
+  play: PlayType;
+};
+
 export type PlayPreviewType = {
   play: PlayType;
   video: VideoType;
   mention?: MentionType;
   tag?: TagType;
+  collection?: CollectionType;
+  team?: TeamType | null;
 };
 
 export type MentionNotificationType = {
@@ -342,4 +382,12 @@ export type NewTagType = {
   exclusive_to: string;
   private: boolean;
   inputValue?: string;
+};
+
+export type NewCollectionType = {
+  title: string;
+  exclusive_to: string;
+  private: boolean;
+  inputValue?: string;
+  description: string;
 };

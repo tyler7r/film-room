@@ -8,9 +8,15 @@ type TeamAffiliationProps = {
   aff: TeamAffiliationType;
   handleClose?: () => void;
   small?: boolean;
+  listItem?: boolean;
 };
 
-const TeamAffiliation = ({ aff, handleClose, small }: TeamAffiliationProps) => {
+const TeamAffiliation = ({
+  aff,
+  handleClose,
+  small,
+  listItem,
+}: TeamAffiliationProps) => {
   const { hoverBorder } = useIsDarkContext();
   const router = useRouter();
 
@@ -25,7 +31,9 @@ const TeamAffiliation = ({ aff, handleClose, small }: TeamAffiliationProps) => {
 
   return (
     <div
-      className={`flex items-center justify-center gap-2 ${hoverBorder}`}
+      className={`flex items-center justify-center gap-2 ${
+        !listItem && hoverBorder
+      }`}
       key={aff.team.id}
       onClick={(e) => handleTeamClick(e, aff.team.id)}
     >

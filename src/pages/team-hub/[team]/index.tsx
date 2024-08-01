@@ -6,6 +6,7 @@ import PageTitle from "~/components/page-title";
 import Requests from "~/components/requests";
 import Roster from "~/components/roster";
 import TeamActionBar from "~/components/team-action-bar";
+import TeamCollections from "~/components/team-collections";
 import TeamLogo from "~/components/team-logo";
 import TeamVideos from "~/components/team-videos";
 import TransferOwnershipModal from "~/components/transfer-ownership";
@@ -83,7 +84,7 @@ const TeamHub = () => {
     </Typography>
   ) : (
     team && (
-      <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
+      <div className="flex w-full flex-col items-center justify-center gap-6 p-4">
         <div className="m-2 flex items-center justify-center gap-3">
           <TeamLogo size={150} tm={team} />
           <div className="flex flex-col items-center justify-center gap-2 text-center">
@@ -121,13 +122,13 @@ const TeamHub = () => {
           setRole={setRole}
         />
         {role !== "guest" && (
-          <Announcements teamId={team.id} role={role ? role : "guest"} />
+          <div className="flex flex-col items-center justify-center gap-6">
+            <Announcements teamId={team.id} role={role ? role : "guest"} />
+            <TeamCollections teamId={team.id} />
+          </div>
         )}
         <Roster team={team} role={role ? role : "guest"} />
-        <div className="my-4 flex w-full flex-col items-center justify-center gap-4">
-          <PageTitle size="medium" title="Team Film" />
-          <TeamVideos teamId={team.id} />
-        </div>
+        <TeamVideos teamId={team.id} />
       </div>
     )
   );

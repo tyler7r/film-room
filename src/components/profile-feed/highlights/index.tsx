@@ -28,6 +28,7 @@ const HighlightsFeed = ({ profileId }: FeedProps) => {
         .from("plays_via_user_mention")
         .select("*", { count: "exact" })
         .match({ "mention->>receiver_id": profileId, "play->>highlight": true })
+        .order("play->>created_at", { ascending: false })
         .range(from, to);
       if (affIds) {
         void plays.or(

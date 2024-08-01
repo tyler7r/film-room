@@ -40,6 +40,7 @@ const PlayMentions = ({ setMentions, players }: PlayMentionsProps) => {
                 }}
                 goToProfile={false}
                 small={true}
+                listItem={true}
               />
             </li>
           )}
