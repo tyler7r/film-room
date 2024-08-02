@@ -156,7 +156,7 @@ const IndexPlay = ({
                   onMouseEnter={(e) => handlePopoverOpen(e, "b")}
                   onMouseLeave={handlePopoverClose}
                 >
-                  <TeamLogo tm={exclusiveTeam} size={30} inactive={true} />
+                  <TeamLogo tm={exclusiveTeam} size={25} inactive={true} />
                   <StandardPopover
                     open={open2}
                     anchorEl={anchorEl.anchor2}

@@ -159,7 +159,7 @@ const TeamSelect = () => {
                 style={backgroundStyle}
               >
                 <div className="flex items-center justify-center gap-4">
-                  <TeamLogo tm={team.team} size={40} />
+                  <TeamLogo tm={team.team} size={35} />
                   <PageTitle size="x-small" title={team.team.full_name} />
                   <div className="flex flex-col items-center justify-center">
                     <div className="-mb-2 text-sm font-bold">COACH?</div>

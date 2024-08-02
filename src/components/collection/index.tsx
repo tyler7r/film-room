@@ -64,7 +64,7 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
         {collection.team?.logo ? (
           <TeamLogo
             tm={collection.team}
-            size={small ? 30 : 45}
+            size={small ? 25 : 60}
             inactive={true}
             popover={listItem ? false : true}
           />

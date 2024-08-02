@@ -125,7 +125,7 @@ const PlayPreview = ({
               onMouseEnter={(e) => handlePopoverOpen(e, 2)}
               onMouseLeave={handlePopoverClose}
             >
-              <TeamLogo tm={exclusiveTeam} size={30} inactive={true} />
+              <TeamLogo tm={exclusiveTeam} size={35} inactive={true} />
               <StandardPopover
                 open={open2}
                 anchorEl={anchorEl.anchor2}

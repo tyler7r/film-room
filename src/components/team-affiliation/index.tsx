@@ -37,7 +37,7 @@ const TeamAffiliation = ({
       key={aff.team.id}
       onClick={(e) => handleTeamClick(e, aff.team.id)}
     >
-      <TeamLogo tm={aff.team} size={small ? 25 : 35} />
+      <TeamLogo tm={aff.team} size={25} />
       <Divider flexItem orientation="vertical" variant="middle" />
       <div className="flex flex-col items-center justify-center">
         <div className="flex items-center justify-center gap-1">

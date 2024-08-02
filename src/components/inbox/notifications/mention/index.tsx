@@ -132,7 +132,7 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
           <div className="flex items-center gap-1 text-sm">
             {mention.team && (
               <IconButton size="small">
-                <TeamLogo tm={mention.team} size={20} inactive={true} />
+                <TeamLogo tm={mention.team} size={25} />
               </IconButton>
             )}
             {!mention.team && <PublicIcon fontSize="small" />}

@@ -43,7 +43,7 @@ const PendingRequest = ({
       style={backgroundStyle}
       className="flex items-center justify-between gap-2 rounded-md p-2"
     >
-      <TeamLogo tm={request.team} size={30} />
+      <TeamLogo tm={request.team} size={25} />
       <div
         className={`flex items-center justify-center gap-1 text-center`}
         onClick={handleTeamClick}

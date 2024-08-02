@@ -114,7 +114,7 @@ const Video = ({ video, startTime }: VideoProps) => {
               onMouseEnter={(e) => handlePopoverOpen(e, "b")}
               onMouseLeave={handlePopoverClose}
             >
-              <TeamLogo tm={exclusiveTeam} size={30} />
+              <TeamLogo tm={exclusiveTeam} size={25} />
               <StandardPopover
                 content={`Private to ${exclusiveTeam.full_name}`}
                 open={open2}

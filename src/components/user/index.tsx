@@ -77,13 +77,13 @@ const User = ({ user, goToProfile, small, number, listItem }: UserProps) => {
                   key={team.id}
                   onClick={(e) => handleTeamClick(e, team.id)}
                 >
-                  <TeamLogo tm={team} size={small ? 35 : 44} popover={true} />
+                  <TeamLogo tm={team} size={35} popover={true} />
                 </IconButton>
               ) : (
                 <TeamLogo
                   key={team.id}
                   tm={team}
-                  size={small ? 35 : 44}
+                  size={35}
                   inactive={true}
                   popover={false}
                 />
