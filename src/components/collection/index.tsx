@@ -50,8 +50,8 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
 
   return (
     <div
-      className={`flex w-full flex-col items-center justify-center gap-2 p-2 px-4 ${
-        !listItem && `${hoverBorder} rounded-md`
+      className={`flex flex-col items-center justify-center gap-2 p-2 px-4 ${
+        !listItem ? `${hoverBorder} rounded-md` : "w-full"
       }`}
       style={backgroundStyle}
       onClick={handleClick}

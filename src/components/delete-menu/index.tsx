@@ -17,7 +17,7 @@ const DeleteMenu = ({
   actionMenu,
 }: DeleteMenuProps) => {
   return isOpen ? (
-    <div className="flex gap-1">
+    <div className="flex w-full justify-around">
       {actionMenu ? (
         <Button
           endIcon={<DeleteIcon />}
