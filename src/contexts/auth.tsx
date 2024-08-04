@@ -77,7 +77,6 @@ export const IsAuth = ({ children }: AuthProps) => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event: string, session) => {
-        console.log(event, session);
         if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
           setUser({
             isLoggedIn: true,
