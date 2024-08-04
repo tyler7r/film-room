@@ -75,7 +75,7 @@ const PlayActionsMenu = ({
               handleMenuClose={handleClose}
             />
           </MenuItem>
-          {collectionAuthor === user.userId && (
+          {collectionId && collectionAuthor === user.userId && (
             <MenuItem>
               {isRemoveOpen ? (
                 <div className="flex gap-1">
