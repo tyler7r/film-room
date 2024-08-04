@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import PageTitle from "~/components/page-title";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { validatePwdMatch } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";
@@ -19,6 +20,8 @@ type DetailsType = {
 
 const SignupDetails = () => {
   const { user } = useAuthContext();
+  const { colorText } = useIsDarkContext();
+
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     status: "error",
@@ -58,18 +61,20 @@ const SignupDetails = () => {
   };
 
   const updateUserName = async () => {
-    const { error } = await supabase
-      .from("profiles")
-      .update({ name: data.name })
-      .eq("id", `${user.userId}`);
-    if (error) {
-      setMessage({
-        status: "error",
-        text: `There was a problem adding your details. ${error.message}`,
-      });
-      setIsValidForm(true);
-      return "error";
-    } else return true;
+    if (user.userId) {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ name: data.name })
+        .eq("id", `${user.userId}`);
+      if (error) {
+        setMessage({
+          status: "error",
+          text: `There was a problem adding your details. ${error.message}`,
+        });
+        setIsValidForm(true);
+        return false;
+      } else return true;
+    } else return false;
   };
 
   const updatePassword = async () => {
@@ -82,7 +87,7 @@ const SignupDetails = () => {
         text: `There was an issue updating your password. ${error.message}`,
       });
       setIsValidForm(true);
-      return "error";
+      return false;
     } else return true;
   };
 
@@ -100,7 +105,7 @@ const SignupDetails = () => {
         text: "Successfully updated your profile!",
       });
       setTimeout(() => {
-        router.push("/team-select");
+        void router.push("/team-select");
       }, 1000);
     }
   };
@@ -111,10 +116,8 @@ const SignupDetails = () => {
     const pwdMatch = validatePwdMatch(password, confirmPwd);
 
     if (name === "") {
-      setMessage({ status: "error", text: "Please enter your name!" });
       setIsValidForm(false);
-    } else if (password === "") {
-      setMessage({ status: "error", text: undefined });
+    } else if (password === "" || password.length < 8) {
       setIsValidForm(false);
     } else if (!pwdMatch) {
       setMessage({
@@ -129,7 +132,7 @@ const SignupDetails = () => {
   }, [data]);
 
   return (
-    <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
+    <div className="flex w-full flex-col items-center justify-center gap-8 p-4 text-center">
       <PageTitle title="Finish Account" size="x-large" />
       <form
         onSubmit={handleSubmit}
@@ -193,6 +196,9 @@ const SignupDetails = () => {
             ),
           }}
         />
+        <div className={`${colorText} text-sm font-bold`}>
+          *Password must be at least 8 characters*
+        </div>
         <FormMessage message={message} />
         <Button
           variant="contained"

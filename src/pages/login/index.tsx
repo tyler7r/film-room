@@ -66,7 +66,7 @@ const Login = () => {
   };
 
   return (
-    <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
+    <div className="flex w-full flex-col items-center justify-center gap-8 p-4 text-center">
       <PageTitle size="x-large" title="Login" />
       <form
         onSubmit={handleSubmit}
@@ -128,6 +128,18 @@ const Login = () => {
           sx={{ fontSize: "18px", lineHeight: "28px", fontWeight: "300" }}
         >
           Signup
+        </Button>
+      </div>
+      <div className="flex items-center justify-center gap-1">
+        <div className="text-lg font-light tracking-tight">
+          Forgot your password?
+        </div>
+        <Button
+          variant="text"
+          onClick={() => void router.push("/forgot-password")}
+          size="large"
+        >
+          RESET
         </Button>
       </div>
     </div>

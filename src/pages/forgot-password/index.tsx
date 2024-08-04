@@ -1,22 +1,21 @@
 import { Button, TextField } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/form-message";
 import PageTitle from "~/components/page-title";
 import { validateEmail } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { type MessageType } from "~/utils/types";
+import type { MessageType } from "~/utils/types";
 
-const Signup = () => {
+const ForgotPassword = () => {
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
-    status: "error",
     text: undefined,
+    status: "error",
   });
   const [email, setEmail] = useState<string>("");
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
 
-  // Checks for valid email after every input and updates form message as needed
   useEffect(() => {
     const isValidEmail = validateEmail(email);
     if (!isValidEmail) {
@@ -26,42 +25,37 @@ const Signup = () => {
     }
   }, [email]);
 
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setEmail(value);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Create initial random pwd
-    const timestamp = Date.now();
-    const pwd = `${Math.floor(Math.random() * 100000)}${email}${timestamp}`;
+    setIsValidForm(false);
 
-    //Signup in supabase
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: pwd,
-      options: {
-        emailRedirectTo: "http://localhost:3000/signup/details",
-      },
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
     });
+
     if (error) {
       setMessage({
+        text: `${error.message}. Try again.`,
         status: "error",
-        text: `There was a problem creating the user. ${error.message}`,
       });
-    } else if (data.user?.identities?.length === 0) {
+      setIsValidForm(true);
+    }
+    if (data) {
       setMessage({
-        status: "error",
-        text: `User already registered with this email!`,
-      });
-    } else {
-      setMessage({
+        text: `Reset email sent to ${email}`,
         status: "success",
-        text: "Success. Please verify your email to finish your account creation.",
       });
-      setIsValidForm(false);
     }
   };
 
   return (
     <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
-      <PageTitle size="x-large" title="Signup" />
+      <PageTitle size="x-large" title="Forgot Password" />
       <form
         onSubmit={handleSubmit}
         className="flex w-4/5 flex-col items-center justify-center gap-4 text-center"
@@ -75,9 +69,7 @@ const Signup = () => {
           label="Email"
           type="email"
           autoFocus
-          onInput={(e) => {
-            setEmail((e.target as HTMLInputElement).value);
-          }}
+          onChange={handleInput}
           value={email}
         />
         <FormMessage message={message} />
@@ -86,26 +78,26 @@ const Signup = () => {
           size="large"
           type="submit"
           disabled={!isValidForm}
-          sx={{ fontSize: "20px", lineHeight: "28px" }}
+          sx={{ fontSize: "24px", lineHeight: "32px" }}
         >
-          Signup
+          Send Reset Email
         </Button>
       </form>
       <div className="mt-2 flex flex-col items-center justify-center gap-2">
         <div className="text-xl font-light tracking-tight">
-          Already have an account?
+          Need to make an account?
         </div>
         <Button
           variant="outlined"
           size="large"
-          onClick={() => router.push("/login")}
+          onClick={() => router.push("/signup")}
           sx={{ fontSize: "18px", lineHeight: "28px", fontWeight: "300" }}
         >
-          Login
+          Signup
         </Button>
       </div>
     </div>
   );
 };
 
-export default Signup;
+export default ForgotPassword;
