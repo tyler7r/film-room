@@ -1,7 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import { MenuItem, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import TeamAffiliation from "~/components/team-affiliation";
+import TeamAffiliation from "~/components/teams/team-affiliation";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 

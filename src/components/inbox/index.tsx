@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
-import PageTitle from "../page-title";
+import PageTitle from "../utils/page-title";
 import InboxNotification from "./notifications";
 import PendingTeamRequests from "./requests";
 import TeamHeader from "./team-header";

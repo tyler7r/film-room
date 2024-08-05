@@ -1,8 +1,8 @@
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import DeleteMenu from "~/components/delete-menu";
-import TeamLogo from "~/components/team-logo";
+import TeamLogo from "~/components/teams/team-logo";
+import DeleteMenu from "~/components/utils/delete-menu";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
