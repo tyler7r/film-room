@@ -4,7 +4,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Button, Divider, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import PlayPreview from "~/components/play/play_preview";
+import PlayPreview from "~/components/plays/play_preview";
 import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";

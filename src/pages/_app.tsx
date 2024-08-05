@@ -7,7 +7,7 @@ import { CssBaseline, ThemeProvider, colors } from "@mui/material";
 import { type AppType } from "next/app";
 import { createContext, useContext, useState } from "react";
 
-import { Navbar } from "~/components/navbar/navbar";
+import { Navbar } from "~/components/navbar";
 import { IsAuth } from "~/contexts/auth";
 import { TheInbox } from "~/contexts/inbox";
 import { IsMobile } from "~/contexts/mobile";
