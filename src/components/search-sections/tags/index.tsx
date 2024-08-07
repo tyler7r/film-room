@@ -1,7 +1,8 @@
 import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
-import EmptyMessage from "~/components/empty-msg";
-import PlayPreview from "~/components/play_preview";
+import PlayPreview from "~/components/plays/play_preview";
+import EmptyMessage from "~/components/utils/empty-msg";
+import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce";
@@ -17,6 +18,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
   const { isMobile } = useMobileContext();
   const { affIds } = useAuthContext();
 
+  const [loading, setLoading] = useState<boolean>(true);
   const [playTags, setPlayTags] = useState<PlayPreviewType[] | null>(null);
   const [playCount, setPlayCount] = useState<number | null>(null);
 
@@ -48,6 +50,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
     if (uniquePlays.length > 0) setPlayCount(uniquePlays.length);
     else setPlayCount(null);
     if (!count) setPlayCount(null);
+    setLoading(false);
   });
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -65,8 +68,12 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
   }, [page]);
 
   return (
-    <div className="flex w-4/5 flex-col items-center justify-center gap-6">
-      {!playTags && <EmptyMessage size="large" message="plays with that tag" />}
+    <div className="flex w-4/5 flex-col items-center justify-center gap-4">
+      {loading && <PageTitle title="Loading..." size="medium" />}
+      {playCount && <div className="font-bold">{playCount} results found</div>}
+      {!playTags && !loading && (
+        <EmptyMessage size="large" message="plays with that tag" />
+      )}
       {playTags?.map((play) => (
         <PlayPreview key={play.play.id} preview={play} />
       ))}

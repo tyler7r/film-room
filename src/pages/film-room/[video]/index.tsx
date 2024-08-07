@@ -3,14 +3,15 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
-import NewPlayModal from "~/components/add-play";
-import PageTitle from "~/components/page-title";
-import PlayIndex from "~/components/play-index";
+import CreatePlay from "~/components/plays/create-play";
+import Team from "~/components/teams/team";
+import PageTitle from "~/components/utils/page-title";
+import VideoPlayIndex from "~/components/videos/video-play-index";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { PlayPreviewType, VideoType } from "~/utils/types";
+import type { PlayPreviewType, TeamType, VideoType } from "~/utils/types";
 
 const FilmRoom = () => {
   const router = useRouter();
@@ -19,8 +20,12 @@ const FilmRoom = () => {
   const { isDark } = useIsDarkContext();
   const playParam = useSearchParams().get("play") ?? null;
   const startParam = useSearchParams().get("start") ?? null;
+  const videoId = router.query.video as string;
 
   const [video, setVideo] = useState<VideoType | null>(null);
+  const [affiliatedTeams, setAffiliatedTeams] = useState<TeamType[] | null>(
+    null,
+  );
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
@@ -32,9 +37,17 @@ const FilmRoom = () => {
     const { data } = await supabase
       .from("videos")
       .select(`*`)
-      .eq("id", router.query.video as string)
+      .eq("id", videoId)
       .single();
     if (data) setVideo(data);
+  };
+
+  const fetchAffiliatedTeams = async () => {
+    const { data } = await supabase
+      .from("team_video_view")
+      .select("team")
+      .eq("video->>id", videoId);
+    if (data) setAffiliatedTeams(data.map((tm) => tm.team));
   };
 
   const fetchActivePlay = async () => {
@@ -66,6 +79,7 @@ const FilmRoom = () => {
   useEffect(() => {
     if (router.query.video) {
       void fetchVideo();
+      void fetchAffiliatedTeams();
       void fetchActivePlay();
     }
   }, [router.query.video, playParam]);
@@ -92,9 +106,12 @@ const FilmRoom = () => {
                 : null}
           </div>
           <PageTitle title={video.title} size="large" />
+          <div className="mt-2 flex flex-wrap gap-2">
+            {affiliatedTeams?.map((tm) => <Team team={tm} small={true} />)}
+          </div>
         </div>
         <Divider flexItem variant="middle" sx={{ marginTop: "8px" }} />
-        <NewPlayModal
+        <CreatePlay
           player={player}
           video={video}
           isNewPlayOpen={isNewPlayOpen}
@@ -121,7 +138,7 @@ const FilmRoom = () => {
             />
           </div>
         )}
-        <PlayIndex
+        <VideoPlayIndex
           player={player}
           videoId={video.id}
           scrollToPlayer={scrollToPlayer}

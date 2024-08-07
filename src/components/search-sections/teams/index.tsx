@@ -1,7 +1,8 @@
 import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
-import EmptyMessage from "~/components/empty-msg";
-import Team from "~/components/team";
+import Team from "~/components/teams/team";
+import EmptyMessage from "~/components/utils/empty-msg";
+import PageTitle from "~/components/utils/page-title";
 import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
@@ -15,6 +16,7 @@ type SearchTeamsProps = {
 const SearchTeams = ({ topic }: SearchTeamsProps) => {
   const { isMobile } = useMobileContext();
 
+  const [loading, setLoading] = useState<boolean>(true);
   const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [teamCount, setTeamCount] = useState<number | null>(null);
 
@@ -33,6 +35,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
     else setTeams(null);
     if (count) setTeamCount(count);
     else setTeamCount(null);
+    setLoading(false);
   });
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -50,8 +53,10 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
   }, [page]);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-6">
-      {!teams && <EmptyMessage size="large" message="teams" />}
+    <div className="flex w-full flex-col items-center justify-center gap-4">
+      {loading && <PageTitle title="Loading..." size="medium" />}
+      {teamCount && <div className="font-bold">{teamCount} results found</div>}
+      {!teams && !loading && <EmptyMessage size="large" message="teams" />}
       <div className="flex w-4/5 flex-wrap items-center justify-center gap-6">
         {teams?.map((team) => <Team team={team} key={team.id} />)}
       </div>

@@ -3,7 +3,7 @@ import { Divider } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import StandardPopover from "~/components/standard-popover";
+import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";

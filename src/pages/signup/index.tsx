@@ -1,8 +1,8 @@
 import { Button, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import FormMessage from "~/components/form-message";
-import PageTitle from "~/components/page-title";
+import FormMessage from "~/components/utils/form-message";
+import PageTitle from "~/components/utils/page-title";
 import { validateEmail } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";

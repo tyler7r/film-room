@@ -1,15 +1,14 @@
-import { Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Announcements from "~/components/announcements";
-import PageTitle from "~/components/page-title";
+import Announcements from "~/components/announcements/all-announcements";
 import Requests from "~/components/requests";
-import Roster from "~/components/roster";
-import TeamActionBar from "~/components/team-action-bar";
-import TeamCollections from "~/components/team-collections";
-import TeamLogo from "~/components/team-logo";
-import TeamVideos from "~/components/team-videos";
-import TransferOwnershipModal from "~/components/transfer-ownership";
+import TeamActionBar from "~/components/teams/team-action-bar";
+import TeamCollections from "~/components/teams/team-collections";
+import TeamLogo from "~/components/teams/team-logo";
+import Roster from "~/components/teams/team-roster";
+import TeamVideos from "~/components/teams/team-videos";
+import TransferTeamOwnershipModal from "~/components/teams/transfer-team-ownership";
+import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -79,12 +78,10 @@ const TeamHub = () => {
   }, [router.query.team, role]);
 
   return loading ? (
-    <Typography sx={{ textAlign: "center" }} variant="h1" fontSize={72}>
-      Loading...
-    </Typography>
+    <PageTitle size="large" title="Loading..." />
   ) : (
     team && (
-      <div className="flex w-full flex-col items-center justify-center gap-6 p-4">
+      <div className="flex w-full flex-col items-center justify-center gap-8 p-4">
         <div className="m-2 flex items-center justify-center gap-3">
           <TeamLogo size={150} tm={team} />
           <div className="flex flex-col items-center justify-center gap-2 text-center">
@@ -110,7 +107,7 @@ const TeamHub = () => {
           isOpen={actionBarStatus.requests}
           setRequestCount={setRequestCount}
         />
-        <TransferOwnershipModal
+        <TransferTeamOwnershipModal
           toggleOpen={() =>
             setActionBarStatus({
               ...actionBarStatus,

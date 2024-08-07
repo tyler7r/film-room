@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
-import EmptyMessage from "~/components/empty-msg";
+import EmptyMessage from "~/components/utils/empty-msg";
 import { supabase } from "~/utils/supabase";
 import type { CommentType } from "~/utils/types";
 import Comment from "../comment";

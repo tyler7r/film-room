@@ -1,11 +1,11 @@
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
-import { Button, Divider, Pagination } from "@mui/material";
+import { Button, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import PageTitle from "~/components/page-title";
-import PlayPreview from "~/components/play_preview";
+import { Logo } from "~/components/navbar/logo/logo";
+import PlayPreview from "~/components/plays/play_preview";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
@@ -70,9 +70,10 @@ const Home = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4">
-      <Divider flexItem variant="middle">
+      {/* <Divider flexItem variant="middle">
         <PageTitle size="x-large" title="Inside Break" />
-      </Divider>
+      </Divider> */}
+      <Logo size="large" />
       {user.userId ? (
         <div className="flex gap-4">
           <Button

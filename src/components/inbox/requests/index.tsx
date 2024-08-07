@@ -2,7 +2,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { Divider, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
-import PageTitle from "~/components/page-title";
+import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type { UserTeamType } from "~/utils/types";

@@ -7,9 +7,9 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { AffiliationType, UserType } from "~/utils/types";
-import DeleteMenu from "../delete-menu";
-import PageTitle from "../page-title";
 import User from "../user";
+import DeleteMenu from "../utils/delete-menu";
+import PageTitle from "../utils/page-title";
 
 type UserEditProps = {
   user: UserType;

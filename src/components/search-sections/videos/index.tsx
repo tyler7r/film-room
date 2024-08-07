@@ -1,7 +1,9 @@
 import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
-import EmptyMessage from "~/components/empty-msg";
-import Video from "~/components/video";
+import EmptyMessage from "~/components/utils/empty-msg";
+import PageTitle from "~/components/utils/page-title";
+import CreateVideo from "~/components/videos/create-video";
+import Video from "~/components/videos/video";
 import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
@@ -16,6 +18,7 @@ type SearchVideosProps = {
 const SearchVideos = ({ affIds, topic }: SearchVideosProps) => {
   const { isMobile } = useMobileContext();
 
+  const [loading, setLoading] = useState<boolean>(true);
   const [videos, setVideos] = useState<VideoType[] | null>(null);
   const [videoCount, setVideoCount] = useState<number | null>(null);
 
@@ -39,6 +42,7 @@ const SearchVideos = ({ affIds, topic }: SearchVideosProps) => {
     else setVideos(null);
     if (count) setVideoCount(count);
     else setVideoCount(null);
+    setLoading(false);
   });
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -56,15 +60,22 @@ const SearchVideos = ({ affIds, topic }: SearchVideosProps) => {
   }, [page]);
 
   return (
-    <div className="flex w-4/5 flex-col items-center justify-center gap-6">
-      {!videos && <EmptyMessage size="large" message="videos" />}
-      {videos?.map((v) => <Video video={v} key={v.id} />)}
+    <div className="flex w-4/5 flex-col items-center justify-center gap-4">
+      {loading && <PageTitle title="Loading..." size="medium" />}
+      {!loading && <CreateVideo />}
+      {videoCount && (
+        <div className="font-bold">{videoCount} results found</div>
+      )}
+      {!videos && !loading && <EmptyMessage size="large" message="videos" />}
+      <div className="flex w-full flex-wrap justify-center gap-6">
+        {videos?.map((v) => <Video video={v} key={v.id} />)}
+      </div>
       {videos && videoCount && (
         <Pagination
           showFirstButton
           showLastButton
           sx={{ marginTop: "8px" }}
-          size="small"
+          size="medium"
           variant="text"
           shape="rounded"
           count={getNumberOfPages(itemsPerPage, videoCount)}

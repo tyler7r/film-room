@@ -1,10 +1,10 @@
 import { Divider, Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
-import AddVideo from "~/components/add-video";
-import EmptyMessage from "~/components/empty-msg";
-import PageTitle from "~/components/page-title";
-import Video from "~/components/video";
-import VideoSearchFilters from "~/components/video-search-filters";
+import VideoSearchFilters from "~/components/search-filters/video-search-filters";
+import EmptyMessage from "~/components/utils/empty-msg";
+import PageTitle from "~/components/utils/page-title";
+import CreateVideo from "~/components/videos/create-video";
+import Video from "~/components/videos/video";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce";
@@ -95,19 +95,17 @@ const FilmRoomHome = () => {
   }, [page]);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center p-4">
-      <PageTitle title="The Film Room" size="x-large" />
-      <AddVideo />
-      <Divider
-        flexItem
-        variant="middle"
-        sx={{ marginBottom: "16px" }}
-      ></Divider>
-      <VideoSearchFilters
-        searchOptions={searchOptions}
-        setSearchOptions={setSearchOptions}
-      />
-      <div className="mt-6 flex w-4/5 flex-col items-center justify-center gap-6">
+    <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
+      <div className="flex w-full flex-col items-center justify-center gap-4">
+        <PageTitle title="The Film Room" size="x-large" />
+        <CreateVideo />
+        <Divider flexItem variant="middle"></Divider>
+        <VideoSearchFilters
+          searchOptions={searchOptions}
+          setSearchOptions={setSearchOptions}
+        />
+      </div>
+      <div className="flex w-4/5 flex-col items-center justify-center gap-6">
         {videos?.map((v) => <Video video={v} key={v.id} />)}
         {!videos && <EmptyMessage message="videos" size="large" />}
       </div>
@@ -115,7 +113,7 @@ const FilmRoomHome = () => {
         <Pagination
           showFirstButton
           showLastButton
-          sx={{ marginTop: "24px" }}
+          sx={{ marginTop: "16px" }}
           size="medium"
           variant="text"
           shape="rounded"

@@ -4,8 +4,8 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType, TeamType } from "~/utils/types";
-import EmptyMessage from "../empty-msg";
-import PageTitle from "../page-title";
+import EmptyMessage from "../utils/empty-msg";
+import PageTitle from "../utils/page-title";
 
 type RequestsProps = {
   team: TeamType;

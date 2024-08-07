@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { TeamType, UserType } from "~/utils/types";
-import EmptyMessage from "../empty-msg";
-import PageTitle from "../page-title";
-import TeamLogo from "../team-logo";
+import TeamLogo from "../teams/team-logo";
+import EmptyMessage from "../utils/empty-msg";
+import PageTitle from "../utils/page-title";
 
 type UserProps = {
   user: UserType;

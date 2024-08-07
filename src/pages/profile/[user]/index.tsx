@@ -1,14 +1,14 @@
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import PageTitle from "~/components/page-title";
-import ProfileActionBar from "~/components/profile-action-bar";
-import CreatedFeed from "~/components/profile-feed/created";
-import HighlightsFeed from "~/components/profile-feed/highlights";
-import MentionsFeed from "~/components/profile-feed/mentions";
-import ProfileStats from "~/components/profile-stats";
-import TeamAffiliation from "~/components/team-affiliation";
-import Video from "~/components/video";
+import ProfileActionBar from "~/components/profiles/profile-action-bar";
+import CreatedFeed from "~/components/profiles/profile-feed/created";
+import HighlightsFeed from "~/components/profiles/profile-feed/highlights";
+import MentionsFeed from "~/components/profiles/profile-feed/mentions";
+import ProfileStats from "~/components/profiles/profile-stats";
+import TeamAffiliation from "~/components/teams/team-affiliation";
+import PageTitle from "~/components/utils/page-title";
+import Video from "~/components/videos/video";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type {

@@ -1,7 +1,8 @@
 import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
-import EmptyMessage from "~/components/empty-msg";
 import User from "~/components/user";
+import EmptyMessage from "~/components/utils/empty-msg";
+import PageTitle from "~/components/utils/page-title";
 import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
@@ -15,6 +16,7 @@ type SearchUsersProps = {
 const SearchUsers = ({ topic }: SearchUsersProps) => {
   const { isMobile } = useMobileContext();
 
+  const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<UserType[] | null>(null);
   const [userCount, setUserCount] = useState<number | null>(null);
 
@@ -33,6 +35,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
     else setUsers(null);
     if (count) setUserCount(count);
     else setUserCount(null);
+    setLoading(false);
   });
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -50,8 +53,10 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
   }, [page]);
 
   return (
-    <div className="flex w-4/5 flex-col items-center justify-center gap-6">
-      {!users && <EmptyMessage size="large" message="users" />}
+    <div className="flex w-4/5 flex-col items-center justify-center gap-4">
+      {loading && <PageTitle title="Loading..." size="medium" />}
+      {userCount && <div className="font-bold">{userCount} results found</div>}
+      {!users && !loading && <EmptyMessage size="large" message="users" />}
       <div className="flex w-full flex-wrap justify-center gap-6">
         {users?.map((u) => <User user={u} key={u.id} goToProfile={true} />)}
       </div>
@@ -60,7 +65,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
           showFirstButton
           showLastButton
           sx={{ marginTop: "8px" }}
-          size="small"
+          size="medium"
           variant="text"
           shape="rounded"
           count={getNumberOfPages(itemsPerPage, userCount)}
