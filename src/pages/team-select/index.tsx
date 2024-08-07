@@ -3,7 +3,7 @@ import SendIcon from "@mui/icons-material/Send";
 import { Autocomplete, Button, Checkbox, TextField } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState, type SyntheticEvent } from "react";
-import TeamLogo from "~/components/team-logo";
+import TeamLogo from "~/components/teams/team-logo";
 import FormMessage from "~/components/utils/form-message";
 import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
