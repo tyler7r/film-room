@@ -13,14 +13,6 @@ type LogoProps = {
 export const Logo = ({ size, ...props }: LogoProps) => {
   const router = useRouter();
   const { isDark } = useIsDarkContext();
-  // const testing = `${
-  //   SmallDarkLogoEffect
-  //     ? LargeDarkLogoEffect
-  //     : SmallLightLogoEffect && LargeLightLogoEffect
-  // }`;
-  // const testing2 = `${
-  //   SmallDarkLogo ? LargeDarkLogo : SmallLightLogo && LargeLightLogo
-  // }`;
 
   return size === "small" ? (
     <Image
