@@ -12,7 +12,7 @@ import TeamHeader from "./team-header";
 const Inbox = () => {
   const { isOpen, setIsOpen } = useInboxContext();
   const { user } = useAuthContext();
-  const { screenWidth } = useMobileContext();
+  const { screenWidth, isMobile } = useMobileContext();
   const router = useRouter();
   const [hideRequests, setHideRequests] = useState<boolean>(false);
 
@@ -20,7 +20,7 @@ const Inbox = () => {
     <Drawer open={isOpen} anchor="right" onClose={() => setIsOpen(false)}>
       <div
         className="flex flex-col gap-2 p-2"
-        style={{ width: screenWidth * 0.5 }}
+        style={{ width: isMobile ? screenWidth * 0.75 : screenWidth * 0.5 }}
       >
         <PageTitle size="large" title="Inbox" />
         {!user.isLoggedIn && (

@@ -3,11 +3,13 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Button, Menu, MenuItem, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import TeamAffiliation from "~/components/teams/team-affiliation";
 import { useAuthContext } from "~/contexts/auth";
-import TeamAffiliation from "../team-affiliation";
+import { useMobileContext } from "~/contexts/mobile";
 
 const TeamPageButton = () => {
   const { affiliations } = useAuthContext();
+  const { screenWidth } = useMobileContext();
   const router = useRouter();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -26,10 +28,14 @@ const TeamPageButton = () => {
       <Button
         variant="text"
         onClick={handleClick}
-        endIcon={<ExpandMoreIcon fontSize="large" />}
+        endIcon={
+          <ExpandMoreIcon fontSize={screenWidth < 750 ? "small" : "large"} />
+        }
         sx={{
-          fontSize: "18px",
+          fontSize: screenWidth < 750 ? "15px" : "18px",
           fontWeight: "bold",
+          fontFamily: "serif",
+          fontStyle: "italic",
         }}
       >
         Team Hub

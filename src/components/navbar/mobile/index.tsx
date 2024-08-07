@@ -1,21 +1,21 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import InboxIcon from "@mui/icons-material/Inbox";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
-import SearchIcon from "@mui/icons-material/Search";
-import { Button, IconButton, Switch } from "@mui/material";
+import { Badge, Button, IconButton, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Inbox from "~/components/inbox";
-import { Logo } from "~/components/logo/logo";
+import { Logo } from "~/components/navbar/logo/logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import type { ChildrenNavProps } from "..";
-import MainMenu from "../navbar-main-menu/main-menu";
+import MobileMainMenu from "../mobile-main-menu";
 
 const MobileNav = ({ logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
-  const { isOpen } = useInboxContext();
+  const { isOpen, setIsOpen, unreadCount } = useInboxContext();
   const { isDark, setIsDark } = useIsDarkContext();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -23,18 +23,23 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
   return (
     <div className="flex flex-col">
       <div className="flex w-full items-center">
-        <div className="flex h-max items-center justify-center p-0">
-          <Logo size="small" />
-        </div>
+        <Logo size="small" />
         <div className="flex w-full items-center gap-1">
           {user.isLoggedIn ? (
             <div className="flex w-full items-center justify-end gap-3 px-1 py-2">
               <div className="flex items-center justify-center gap-2">
                 <IconButton
+                  onClick={() => {
+                    setIsOpen(!isOpen);
+                  }}
                   size="small"
-                  onClick={() => void router.push("/search?")}
                 >
-                  <SearchIcon fontSize="large" />
+                  <InboxIcon fontSize="large" />
+                  <Badge
+                    badgeContent={unreadCount}
+                    color="primary"
+                    sx={{ alignSelf: "start" }}
+                  />
                 </IconButton>
                 <Button variant="contained" size="small" onClick={logout}>
                   Logout
@@ -43,12 +48,6 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
             </div>
           ) : (
             <div className="flex w-full items-center justify-end gap-2 px-1">
-              <IconButton
-                size="small"
-                onClick={() => void router.push("/search?")}
-              >
-                <SearchIcon fontSize="large" />
-              </IconButton>
               <Button
                 variant="contained"
                 size="small"
@@ -81,7 +80,7 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
           </div>
         </div>
       </div>
-      {menuOpen && <MainMenu size="medium" />}
+      {menuOpen && <MobileMainMenu />}
       {isOpen && <Inbox />}
     </div>
   );

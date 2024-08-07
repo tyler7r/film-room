@@ -6,13 +6,18 @@ import { useRouter } from "next/router";
 import { useSearchContext } from "~/contexts/search";
 
 const NavbarSearch = () => {
-  const { topic, setTopic } = useSearchContext();
+  const { topic, setTopic, setSearchOpen } = useSearchContext();
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setTopic(value);
+  };
+
+  const handleClose = () => {
+    setTopic("");
+    setSearchOpen(false);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,7 +35,7 @@ const NavbarSearch = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full lg:w-2/3">
+    <form onSubmit={handleSubmit} className="w-full">
       <TextField
         InputProps={{
           startAdornment: (
@@ -42,7 +47,7 @@ const NavbarSearch = () => {
           ),
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton size="small" onClick={() => setTopic("")}>
+              <IconButton size="small" onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
             </InputAdornment>
@@ -55,6 +60,7 @@ const NavbarSearch = () => {
         id="search"
         onChange={changeHandler}
         value={topic}
+        size="small"
       />
     </form>
   );

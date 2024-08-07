@@ -1,30 +1,45 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import InboxIcon from "@mui/icons-material/Inbox";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import { Button, Switch } from "@mui/material";
+import { Badge, Button, IconButton, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
+import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { type ChildrenNavProps } from "..";
 import Inbox from "../../inbox";
-import { Logo } from "../../logo/logo";
-import MainMenu from "../navbar-main-menu/main-menu";
-import NavbarSearch from "../navbar-search";
+import DesktopMainMenu from "../desktop-main-menu";
+import { Logo } from "../logo/logo";
+import MobileMainMenu from "../mobile-main-menu";
 
 const DesktopNav = ({ logout }: ChildrenNavProps) => {
   const { user } = useAuthContext();
-  const { isOpen } = useInboxContext();
+  const { screenWidth } = useMobileContext();
+  const { isOpen, setIsOpen, unreadCount } = useInboxContext();
   const { isDark, setIsDark } = useIsDarkContext();
   const router = useRouter();
 
   return (
-    <div className="flex flex-col">
-      <div className="flex w-full items-center justify-center px-3">
-        <Logo size="large" />
+    <div className="flex flex-col gap-2">
+      <div className="mt-2 flex w-full items-center justify-center p-2">
+        <Logo size="small" />
         <div className="flex w-full items-center gap-2">
           {user.isLoggedIn ? (
             <div className="flex w-full items-center justify-end gap-3">
-              <NavbarSearch />
+              <IconButton
+                onClick={() => {
+                  setIsOpen(!isOpen);
+                }}
+                size="small"
+              >
+                <InboxIcon fontSize="large" />
+                <Badge
+                  badgeContent={unreadCount}
+                  color="primary"
+                  sx={{ alignSelf: "start" }}
+                />
+              </IconButton>
               <div className="flex items-center justify-between gap-2">
                 <Button
                   variant="contained"
@@ -41,7 +56,6 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
             </div>
           ) : (
             <div className="flex w-full items-center justify-end gap-2">
-              <NavbarSearch />
               <div className="flex items-center justify-between gap-2">
                 <Button
                   variant="contained"
@@ -78,7 +92,7 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
           />
         </div>
       </div>
-      <MainMenu size="large" />
+      {screenWidth > 749 ? <DesktopMainMenu /> : <MobileMainMenu />}
       {isOpen && <Inbox />}
     </div>
   );
