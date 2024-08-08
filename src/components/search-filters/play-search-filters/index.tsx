@@ -16,7 +16,7 @@ import {
   TextField,
   type SelectChangeEvent,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import TeamLogo from "~/components/teams/team-logo";
 import { useAuthContext } from "~/contexts/auth";
@@ -35,8 +35,8 @@ const PlaySearchFilters = ({
   player,
 }: PlaySearchFilterProps) => {
   const { affiliations } = useAuthContext();
-
   const [isAuthorSearch, setIsAuthorSearch] = useState<boolean>(false);
+
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
@@ -123,8 +123,19 @@ const PlaySearchFilters = ({
     setSearchOptions({ ...searchOptions, topic: "" });
   };
 
+  const checkToSwitchMode = () => {
+    if (isAuthorSearch && searchOptions.topic !== "") {
+      setIsAuthorSearch(false);
+      setSearchOptions({ ...searchOptions, author: "" });
+    } else return;
+  };
+
+  useEffect(() => {
+    checkToSwitchMode();
+  }, [searchOptions.topic]);
+
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-2 p-2 md:w-11/12">
+    <div className="flex w-4/5 flex-col items-center justify-center gap-2 p-2 lg:w-full">
       <div className="flex w-full items-center justify-center gap-1">
         <div className="flex w-full flex-col items-center gap-4 lg:flex-row lg:gap-2">
           <label htmlFor="search" className="sr-only">

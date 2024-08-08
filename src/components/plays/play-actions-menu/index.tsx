@@ -1,6 +1,6 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
@@ -65,7 +65,7 @@ const PlayActionsMenu = ({
   return (
     <div>
       <IconButton size="small" onClick={handleClick} sx={{ display: "flex" }}>
-        <MoreVertIcon fontSize="large" color="primary" />
+        <MoreHorizIcon color="primary" />
       </IconButton>
       {open && (
         <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>

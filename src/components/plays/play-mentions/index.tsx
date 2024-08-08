@@ -1,5 +1,5 @@
 import PersonIcon from "@mui/icons-material/Person";
-import { IconButton } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import StandardPopover from "~/components/utils/standard-popover";
@@ -61,7 +61,7 @@ const PlayMentions = ({
           onMouseEnter={handlePopoverOpen}
           onMouseLeave={handlePopoverClose}
         >
-          <PersonIcon fontSize="medium" />
+          <PersonIcon fontSize="small" />
         </IconButton>
         <StandardPopover
           content="Player Mentions"
@@ -69,17 +69,19 @@ const PlayMentions = ({
           handlePopoverClose={handlePopoverClose}
           anchorEl={anchorEl}
         />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           {mentions?.map((mention) => (
-            <div
+            <Button
               onClick={(e) =>
                 handleClick(e, mention.receiver_name, mention.receiver_id)
               }
               className={`tracking text-center font-bold ${hoverText} items-center text-sm`}
               key={mention.id}
+              variant="text"
+              style={{ fontSize: "12px", padding: "2px" }}
             >
               @{mention.receiver_name}
-            </div>
+            </Button>
           ))}
         </div>
       </div>

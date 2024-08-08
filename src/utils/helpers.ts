@@ -74,6 +74,11 @@ export const convertTimestamp = (date: string) => {
   return `${month}/${day}`;
 };
 
+export const convertFullTimestamp = (date: string) => {
+  const d = new Date(date);
+  return d.toLocaleString();
+};
+
 export const getTimeSinceNotified = (date: string) => {
   const present = new Date();
   const created = new Date(date);

@@ -24,6 +24,7 @@ type isDarkContextType = {
   hoverBorder: string;
   hoverText: string;
   colorText: string;
+  backgroundStyleString: string;
 };
 
 export const IsDarkContext = createContext<isDarkContextType>({
@@ -35,6 +36,7 @@ export const IsDarkContext = createContext<isDarkContextType>({
   hoverBorder: "",
   hoverText: "",
   colorText: "",
+  backgroundStyleString: "",
 });
 
 const MyApp: AppType = ({ Component, pageProps }) => {
@@ -54,6 +56,10 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         : `2px solid ${colors.purple.A400}`
     }`,
   };
+
+  const backgroundStyleString = `${
+    isDark ? colors.grey[900] : colors.grey[100]
+  }`;
 
   const hoverBorder = `cursor-pointer rounded-sm border-2 border-solid border-transparent p-1 px-2 transition ease-in-out hover:rounded-md hover:border-solid ${
     isDark ? "hover:border-purple-400" : "hover:border-purple-A400"
@@ -77,6 +83,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           hoverBorder,
           hoverText,
           colorText,
+          backgroundStyleString,
         }}
       >
         <CssBaseline />
