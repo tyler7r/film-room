@@ -35,12 +35,7 @@ const Comment = ({ comment }: CommentProps) => {
         >{`${comment.author_name}: `}</strong>
         {comment.comment}
       </div>
-      <LikeBtn
-        playId={comment.id}
-        commentLike={true}
-        includePopover={true}
-        small={true}
-      />
+      <LikeBtn playId={comment.id} commentLike={true} small={true} />
       {comment.comment_author === user.userId && (
         <DeleteMenu
           isOpen={isDeleteMenuOpen}
