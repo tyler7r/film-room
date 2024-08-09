@@ -7,7 +7,6 @@ import CreatePlay from "~/components/plays/create-play";
 import Team from "~/components/teams/team";
 import PageTitle from "~/components/utils/page-title";
 import VideoPlayIndex from "~/components/videos/video-play-index";
-import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -16,7 +15,6 @@ import type { PlayPreviewType, TeamType, VideoType } from "~/utils/types";
 const FilmRoom = () => {
   const router = useRouter();
   const { screenWidth } = useMobileContext();
-  const { user } = useAuthContext();
   const { isDark } = useIsDarkContext();
   const playParam = useSearchParams().get("play") ?? null;
   const startParam = useSearchParams().get("start") ?? null;
@@ -95,7 +93,7 @@ const FilmRoom = () => {
           interval.current = null;
           setSeenActivePlay(true);
         } else if (currentTime !== endTime && !interval.current) {
-          interval.current = setInterval(async () => void checkTime(), 1000);
+          interval.current = setInterval(() => void checkTime(), 1000);
         } else if (currentTime == endTime && seenActivePlay) {
           void player.seekTo(activePlay.play.start_time, true);
           void player.pauseVideo();
