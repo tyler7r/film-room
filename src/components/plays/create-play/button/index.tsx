@@ -1,5 +1,6 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { Button, IconButton, Tooltip } from "@mui/material";
+import { useState } from "react";
 
 type PlayModalBtnProps = {
   isPlayStarted: boolean;
@@ -12,13 +13,23 @@ const PlayModalBtn = ({
   startPlay,
   endPlay,
 }: PlayModalBtnProps) => {
+  const [isValidBtn, setIsValidBtn] = useState<boolean>(false);
+
+  const handleStart = () => {
+    startPlay();
+    setTimeout(() => {
+      setIsValidBtn(true);
+    }, 1000);
+  };
+
+  const handleEnd = () => {
+    endPlay();
+    setIsValidBtn(false);
+  };
+
   return !isPlayStarted ? (
     <div>
-      <Button
-        sx={{ marginRight: "-8px" }}
-        onClick={() => startPlay()}
-        size="large"
-      >
+      <Button sx={{ marginRight: "-8px" }} onClick={handleStart} size="large">
         Start Recording
       </Button>
       <Tooltip
@@ -43,7 +54,7 @@ const PlayModalBtn = ({
     </div>
   ) : (
     <div>
-      <Button onClick={() => endPlay()} size="large">
+      <Button disabled={!isValidBtn} onClick={handleEnd} size="large">
         End Recording
       </Button>
       <Tooltip

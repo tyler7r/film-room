@@ -7,6 +7,11 @@ import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
+import {
+  clearIntervalAsync,
+  setIntervalAsync,
+  type SetIntervalAsyncTimer,
+} from "set-interval-async";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
 import LikeBtn from "~/components/interactions/likes/like-btn";
 import TeamLogo from "~/components/teams/team-logo";
@@ -50,9 +55,8 @@ const Play = ({
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
   const [seenActivePlay, setSeenActivePlay] = useState<boolean>(false);
-  const [reset, setReset] = useState<boolean>(false);
 
-  const interval = useRef<NodeJS.Timeout | null>(null);
+  const interval = useRef<SetIntervalAsyncTimer<[]> | null>(null);
 
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
@@ -94,42 +98,42 @@ const Play = ({
 
   const handleClick = async () => {
     scrollToPlayer();
+    setSeenActivePlay(false);
+    setActivePlay(play);
     void player?.seekTo(play.play.start_time, true);
     void player?.playVideo();
     void updateLastWatched(play.play.start_time);
-    // const duration = (play.play.end_time + 1 - play.play.start_time) * 1000;
-    // setTimeout(async () => {
-    //   void player?.pauseVideo();
-    // }, duration);
-    setActivePlay(play);
-    if (activePlay?.play.id === play.play.id) setReset(true);
   };
 
-  const handleRestartClick = () => {
-    void player?.seekTo(play.play.start_time, true);
-    void player?.playVideo();
-    void checkTime();
+  const getCurrentTime = async (player: YouTubePlayer) => {
+    return Math.round(await player.getCurrentTime());
   };
 
   const checkTime = async () => {
     if (player && activePlay) {
-      const currentTime = Math.round(await player.getCurrentTime());
-      const endTime = activePlay.play.end_time;
-      console.log({ currentTime, endTime, interval: interval.current });
-      if (currentTime == endTime && interval.current) {
-        console.log("here");
-        void player.pauseVideo();
-        clearInterval(interval.current);
-        interval.current = null;
-        setSeenActivePlay(true);
-      } else if (currentTime !== endTime && !interval.current) {
-        interval.current = setInterval(async () => void checkTime(), 1000);
-        setReset(false);
-      } else if (reset && !interval.current) {
-        void player.seekTo(activePlay.play.start_time, true);
-        void player.playVideo();
-      }
-    }
+      void getCurrentTime(player).then((currentTime) => {
+        const endTime = play.play.end_time;
+        if (currentTime == endTime && interval.current && !seenActivePlay) {
+          void player.pauseVideo();
+          void clearIntervalAsync(interval.current);
+          interval.current = null;
+          setSeenActivePlay(true);
+        } else if (currentTime !== endTime && !interval.current) {
+          interval.current = setIntervalAsync(
+            async () => void checkTime(),
+            1000,
+          );
+        } else if (currentTime == endTime && seenActivePlay) {
+          void player.seekTo(play.play.start_time, true);
+          void player.pauseVideo();
+          if (interval.current) {
+            void clearIntervalAsync(interval.current);
+            interval.current = null;
+          }
+        }
+        return;
+      });
+    } else return;
   };
 
   const handleMentionAndTagClick = (e: React.MouseEvent, topic: string) => {
@@ -154,12 +158,15 @@ const Play = ({
   };
 
   useEffect(() => {
-    if (!seenActivePlay) {
-      void checkTime();
-    } else {
-      return;
+    void checkTime();
+  }, [activePlay, seenActivePlay]);
+
+  useEffect(() => {
+    if (interval.current) {
+      void clearIntervalAsync(interval.current);
+      interval.current = null;
     }
-  }, [seenActivePlay, reset]);
+  }, []);
 
   return (
     <div
@@ -225,7 +232,7 @@ const Play = ({
           </div>
           <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
             {activePlay && (
-              <IconButton size="small" onClick={handleRestartClick}>
+              <IconButton size="small" onClick={handleClick}>
                 <RestartAltIcon color="primary" />
               </IconButton>
             )}

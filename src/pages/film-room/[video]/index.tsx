@@ -107,7 +107,9 @@ const FilmRoom = () => {
           </div>
           <PageTitle title={video.title} size="large" />
           <div className="mt-2 flex flex-wrap gap-2">
-            {affiliatedTeams?.map((tm) => <Team team={tm} small={true} />)}
+            {affiliatedTeams?.map((tm) => (
+              <Team team={tm} small={true} key={tm.id} />
+            ))}
           </div>
         </div>
         <Divider flexItem variant="middle" sx={{ marginTop: "8px" }} />
