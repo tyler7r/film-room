@@ -1,13 +1,13 @@
 import { Divider, Pagination } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
+import Play from "~/components/plays/play";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
-import IndexPlay from "../../plays/index-play";
 import PlaySearchFilters from "../../search-filters/play-search-filters";
 import PageTitle from "../../utils/page-title";
 import Plays from "./plays";
@@ -205,9 +205,9 @@ const VideoPlayIndex = ({
   return (
     <div className="flex w-full flex-col items-center">
       {activePlay && (
-        <div className="flex w-11/12 flex-col items-center justify-center gap-2 md:w-4/5">
+        <div className="flex w-11/12 flex-col items-center justify-center gap-2">
           <PageTitle title="Active Play" size="small" />
-          <IndexPlay
+          <Play
             scrollToPlayer={scrollToPlayer}
             play={activePlay}
             player={player}
@@ -215,7 +215,6 @@ const VideoPlayIndex = ({
             setActivePlay={setActivePlay}
             searchOptions={searchOptions}
             setSearchOptions={setSearchOptions}
-            videoId={videoId}
           />
           <Divider
             sx={{ marginTop: "16px", marginBottom: "16px" }}

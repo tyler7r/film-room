@@ -5,39 +5,19 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import type { LikeListType } from "~/utils/types";
-import LikePopover from "../like-popover";
 
 type LikeBtnProps = {
-  includePopover?: boolean;
   playId: string;
   commentLike?: boolean;
   small?: boolean;
 };
 
-const LikeBtn = ({ includePopover, playId, commentLike }: LikeBtnProps) => {
+const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
   const { user } = useAuthContext();
   const router = useRouter();
 
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
-
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [likeList, setLikeList] = useState<LikeListType | null>(null);
-
-  const open = Boolean(anchorEl);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    if (includePopover) {
-      setAnchorEl(e.currentTarget);
-    } else return;
-  };
-
-  const handlePopoverClose = () => {
-    if (includePopover) {
-      setAnchorEl(null);
-    } else return;
-  };
 
   const fetchLikeCount = async () => {
     const plays = supabase
@@ -48,12 +28,10 @@ const LikeBtn = ({ includePopover, playId, commentLike }: LikeBtnProps) => {
       .from("comment_likes")
       .select("user_name", { count: "exact" })
       .eq("comment_id", playId);
-    const { data, count } = commentLike ? await comments : await plays;
-    if (data && data.length > 0 && includePopover) setLikeList(data);
+    const { count } = commentLike ? await comments : await plays;
     if (count) setLikeCount(count);
     else {
       setLikeCount(0);
-      setLikeList(null);
     }
   };
 
@@ -140,34 +118,16 @@ const LikeBtn = ({ includePopover, playId, commentLike }: LikeBtnProps) => {
     <div>
       <div className="flex items-center justify-center">
         {isLiked ? (
-          <IconButton
-            size="small"
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-            onClick={(e) => void handleUnlike(e)}
-          >
+          <IconButton size="small" onClick={(e) => void handleUnlike(e)}>
             <FavoriteIcon color="primary" fontSize="medium" />
           </IconButton>
         ) : (
-          <IconButton
-            size="small"
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-            onClick={(e) => void handleLike(e)}
-          >
+          <IconButton size="small" onClick={(e) => void handleLike(e)}>
             <FavoriteBorderIcon color="primary" fontSize="medium" />
           </IconButton>
         )}
         <div className="text-lg font-bold">{likeCount}</div>
       </div>
-      {likeList && (
-        <LikePopover
-          open={open}
-          anchorEl={anchorEl}
-          handlePopoverClose={handlePopoverClose}
-          likeList={likeList}
-        />
-      )}
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import type { YouTubePlayer } from "react-youtube";
+import Play from "~/components/plays/play";
 import EmptyMessage from "~/components/utils/empty-msg";
 import type { PlayPreviewType } from "~/utils/types";
 import type { PlaySearchOptions } from "..";
-import IndexPlay from "../../../plays/index-play";
 
 type PlaysProps = {
   plays: PlayPreviewType[] | null;
@@ -21,12 +21,11 @@ const Plays = ({
   scrollToPlayer,
   searchOptions,
   setSearchOptions,
-  videoId,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
-    <div className="grid w-11/12 grid-cols-1 justify-center gap-6 md:w-4/5">
+    <div className="grid w-11/12 grid-cols-1 justify-center gap-2">
       {plays.map((play) => (
-        <IndexPlay
+        <Play
           setActivePlay={setActivePlay}
           key={play.play.id}
           scrollToPlayer={scrollToPlayer}
@@ -34,7 +33,6 @@ const Plays = ({
           player={player}
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
-          videoId={videoId}
         />
       ))}
     </div>

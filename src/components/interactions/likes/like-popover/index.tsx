@@ -37,7 +37,7 @@ const LikePopover = ({
       disableRestoreFocus
       className="max-h-40"
     >
-      <div style={backgroundStyle} className="p-2">
+      <div style={backgroundStyle} className="flex gap-1 p-2 text-xs font-bold">
         {likeList?.map((like) => (
           <div key={like.user_name}>{like.user_name}</div>
         ))}

@@ -89,12 +89,12 @@ const PlayTags = ({
           content="Play Tags"
           anchorEl={anchorEl}
         />
-        <div className="flex flex-wrap">
+        <div className="flex">
           {tags.map((tag) => (
             <Button
               key={tag.title + tag.id}
-              size="small"
               onClick={(e) => handleClick(e, tag.title)}
+              style={{ fontSize: "12px", padding: "2px" }}
             >
               #{tag.title}
             </Button>

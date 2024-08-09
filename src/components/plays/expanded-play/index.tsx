@@ -7,6 +7,7 @@ import CommentIndex from "~/components/interactions/comments/comment-index";
 import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import { convertFullTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { CollectionType, PlayPreviewType } from "~/utils/types";
 
@@ -84,6 +85,9 @@ const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
 
   return (
     <div className="flex w-full flex-col items-center gap-2 px-8">
+      <div className="flex w-full items-start text-xs">
+        <div>{convertFullTimestamp(play.play.created_at)}</div>
+      </div>
       {play.play.note && (
         <div className="w-full">
           <strong

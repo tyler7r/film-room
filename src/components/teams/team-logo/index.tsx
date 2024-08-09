@@ -37,7 +37,11 @@ const TeamLogo = ({ tm, size, inactive, popover }: TeamLogoProps) => {
   };
 
   return (
-    <div onMouseEnter={handlePopoverOpen} onMouseLeave={handlePopoverClose}>
+    <div
+      className="flex items-center"
+      onMouseEnter={handlePopoverOpen}
+      onMouseLeave={handlePopoverClose}
+    >
       {popover && (
         <StandardPopover
           content={tm.full_name}
