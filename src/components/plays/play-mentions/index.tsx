@@ -3,7 +3,6 @@ import { Button, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import StandardPopover from "~/components/utils/standard-popover";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { MentionType, PlayPreviewType } from "~/utils/types";
 
@@ -18,7 +17,6 @@ const PlayMentions = ({
   handleMentionAndTagClick,
   activePlay,
 }: PlayMentionsProps) => {
-  const { hoverText } = useIsDarkContext();
   const router = useRouter();
   const [mentions, setMentions] = useState<MentionType[] | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
