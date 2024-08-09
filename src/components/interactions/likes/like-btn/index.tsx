@@ -7,13 +7,12 @@ import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 
 type LikeBtnProps = {
-  includePopover?: boolean;
   playId: string;
   commentLike?: boolean;
   small?: boolean;
 };
 
-const LikeBtn = ({ includePopover, playId, commentLike }: LikeBtnProps) => {
+const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
   const { user } = useAuthContext();
   const router = useRouter();
 
