@@ -222,7 +222,9 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
                               <div className="flex gap-2">
                                 <div>
                                   Private to:{" "}
-                                  <strong>{aff.team.full_name}</strong>
+                                  <strong className="tracking-tight">
+                                    {aff.team.full_name}
+                                  </strong>
                                 </div>
                                 {aff.team.logo && (
                                   <TeamLogo tm={aff.team} size={25} />

@@ -19,7 +19,7 @@ const PlayModalBtn = ({
     startPlay();
     setTimeout(() => {
       setIsValidBtn(true);
-    }, 1000);
+    }, 2000);
   };
 
   const handleEnd = () => {
@@ -33,7 +33,7 @@ const PlayModalBtn = ({
         Start Recording
       </Button>
       <Tooltip
-        title="Start your play recording, once your play ends make sure to click END RECORDING to complete your note!"
+        title="Start your play recording, once your play ends make sure to click END RECORDING to complete your note! Plays must be at least 2 seconds long."
         slotProps={{
           popper: {
             modifiers: [

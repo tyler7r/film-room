@@ -75,10 +75,9 @@ const PlayMentions = ({
               onClick={(e) =>
                 handleClick(e, mention.receiver_name, mention.receiver_id)
               }
-              className={`tracking text-center font-bold ${hoverText} items-center text-sm`}
               key={mention.id}
               variant="text"
-              style={{ fontSize: "12px", padding: "2px" }}
+              style={{ fontSize: "12px", padding: "2px", fontWeight: "bold" }}
             >
               @{mention.receiver_name}
             </Button>

@@ -15,7 +15,7 @@ const TeamHeader = () => {
   };
 
   return affiliations ? (
-    <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className="flex w-full flex-wrap items-center justify-center gap-1">
       {affiliations.map((aff) => (
         <TeamAffiliation
           aff={aff}

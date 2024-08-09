@@ -232,7 +232,7 @@ const TeamSelect = () => {
             Don't see your team?{" "}
             <strong
               onClick={() => void router.push("/create-team")}
-              className={hoverText}
+              className={`${hoverText} tracking-tight`}
             >
               Create It!
             </strong>

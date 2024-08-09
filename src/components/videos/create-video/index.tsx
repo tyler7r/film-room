@@ -332,7 +332,10 @@ const CreateVideo = () => {
                   <MenuItem key={div.team.id} value={div.team.id}>
                     <div className="flex gap-2">
                       <div>
-                        Private to: <strong>{div.team.full_name}</strong>
+                        Private to:{" "}
+                        <strong className="tracking-tight">
+                          {div.team.full_name}
+                        </strong>
                       </div>
                       {div.team.logo && <TeamLogo tm={div.team} size={25} />}
                     </div>

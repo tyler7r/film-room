@@ -45,7 +45,7 @@ const VideoSearchFilters = ({
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-2">
-      <div className="flex w-full gap-2 md:w-4/5">
+      <div className="flex w-full gap-2 p-2">
         <label htmlFor="search" className="sr-only">
           Search
         </label>
@@ -86,7 +86,10 @@ const VideoSearchFilters = ({
                 <MenuItem key={div.team.id} value={div.team.id}>
                   <div className="flex gap-2">
                     <div>
-                      Videos private to: <strong>{div.team.full_name}</strong>
+                      Videos private to:{" "}
+                      <strong className="tracking-tigt">
+                        {div.team.full_name}
+                      </strong>
                     </div>
                     {div.team.logo && <TeamLogo tm={div.team} size={25} />}
                   </div>

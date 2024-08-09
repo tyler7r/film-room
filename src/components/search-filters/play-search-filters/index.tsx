@@ -205,7 +205,10 @@ const PlaySearchFilters = ({
                   <MenuItem key={div.team.id} value={div.team.id}>
                     <div className="flex gap-2">
                       <div>
-                        Plays private to: <strong>{div.team.full_name}</strong>
+                        Plays private to:{" "}
+                        <strong className="tracking-tight">
+                          {div.team.full_name}
+                        </strong>
                       </div>
                       {div.team.logo && <TeamLogo tm={div.team} size={25} />}
                     </div>

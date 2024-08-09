@@ -193,7 +193,7 @@ const Play = ({
         </div>
         <span>
           <strong
-            className={hoverText}
+            className={`${hoverText} tracking-tight`}
             onClick={() => void router.push(`/profile/${play.play.author_id}`)}
           >
             {play.play.author_name}:

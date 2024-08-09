@@ -43,7 +43,7 @@ const TeamAffiliation = ({
         <div className="flex items-center justify-center gap-1">
           <div
             className={`${
-              small ? "text-base" : "text-lg"
+              small ? "text-sm" : "text-lg"
             } font-bold leading-5 tracking-tight`}
           >
             {aff.team.full_name}
@@ -54,7 +54,9 @@ const TeamAffiliation = ({
             </div>
           )}
         </div>
-        <div className="text-sm italic leading-3">{aff.role}</div>
+        <div className={`${small ? "text-xs" : "text-sm"} italic leading-3`}>
+          {aff.role}
+        </div>
       </div>
     </div>
   );
