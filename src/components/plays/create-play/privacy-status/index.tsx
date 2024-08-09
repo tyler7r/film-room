@@ -55,7 +55,7 @@ const PrivacyStatus = ({
           >
             <MenuItem value={video.exclusive_to}>
               <div className="flex gap-2">
-                <div>
+                <div className="text-sm">
                   Private to:{" "}
                   <strong className="tracking-tight">
                     {exclusiveTeam?.full_name}
@@ -81,7 +81,7 @@ const PrivacyStatus = ({
             {affiliations?.map((div) => (
               <MenuItem key={div.team.id} value={div.team.id}>
                 <div className="flex gap-2">
-                  <div>
+                  <div className="text-sm">
                     Private to:{" "}
                     <strong className="tracking-tight">
                       {div.team.full_name}

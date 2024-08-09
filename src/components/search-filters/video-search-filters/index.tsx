@@ -85,7 +85,7 @@ const VideoSearchFilters = ({
               {affiliations?.map((div) => (
                 <MenuItem key={div.team.id} value={div.team.id}>
                   <div className="flex gap-2">
-                    <div>
+                    <div className="text-sm">
                       Videos private to:{" "}
                       <strong className="tracking-tigt">
                         {div.team.full_name}

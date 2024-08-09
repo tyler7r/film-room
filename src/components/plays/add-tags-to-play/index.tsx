@@ -220,7 +220,7 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
                           {affiliations?.map((aff) => (
                             <MenuItem key={aff.team.id} value={aff.team.id}>
                               <div className="flex gap-2">
-                                <div>
+                                <div className="text-sm">
                                   Private to:{" "}
                                   <strong className="tracking-tight">
                                     {aff.team.full_name}
