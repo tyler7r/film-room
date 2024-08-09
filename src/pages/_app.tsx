@@ -1,7 +1,13 @@
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
+// import "@fontsource/roboto/300.css";
+// import "@fontsource/roboto/400.css";
+// import "@fontsource/roboto/500.css";
+// import "@fontsource/roboto/700.css";
+import "@fontsource/lexend/300.css";
+import "@fontsource/lexend/400.css";
+import "@fontsource/lexend/500.css";
+import "@fontsource/lexend/700.css";
+import "@fontsource/lexend/800.css";
+
 import { CssBaseline, ThemeProvider, colors } from "@mui/material";
 
 import { type AppType } from "next/app";
