@@ -81,7 +81,7 @@ const VideoSearchFilters = ({
               id="privacy-status"
               className="w-full"
             >
-              <MenuItem value="all" style={{ fontSize: "12px" }}>
+              <MenuItem value="all" style={{ fontSize: "14px" }}>
                 All Videos
               </MenuItem>
               {affiliations?.map((div) => (

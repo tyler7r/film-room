@@ -216,7 +216,7 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
                           id="privacy-status"
                           className="w-full"
                         >
-                          <MenuItem value="public" style={{ fontSize: "12px" }}>
+                          <MenuItem value="public" style={{ fontSize: "14px" }}>
                             Public
                           </MenuItem>
                           {affiliations?.map((aff) => (
