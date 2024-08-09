@@ -11,7 +11,7 @@ type PlaysProps = {
   setActivePlay: (play: PlayPreviewType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
-  videoId: string;
+  setSeenActivePlay: (seenActivePlay: boolean) => void;
 };
 
 const Plays = ({
@@ -21,6 +21,7 @@ const Plays = ({
   scrollToPlayer,
   searchOptions,
   setSearchOptions,
+  setSeenActivePlay,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
     <div className="grid w-11/12 grid-cols-1 justify-center gap-2">
@@ -33,6 +34,7 @@ const Plays = ({
           player={player}
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
+          setSeenActivePlay={setSeenActivePlay}
         />
       ))}
     </div>

@@ -4,15 +4,9 @@ import PublicIcon from "@mui/icons-material/Public";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StarIcon from "@mui/icons-material/Star";
 import { Divider, IconButton } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
-import {
-  clearIntervalAsync,
-  setIntervalAsync,
-  type SetIntervalAsyncTimer,
-} from "set-interval-async";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
 import LikeBtn from "~/components/interactions/likes/like-btn";
 import TeamLogo from "~/components/teams/team-logo";
@@ -33,6 +27,7 @@ type PlayProps = {
   play: PlayPreviewType;
   scrollToPlayer: () => void;
   activePlay?: PlayPreviewType;
+  setSeenActivePlay: (seenActivePlay: boolean) => void;
   setActivePlay: (play: PlayPreviewType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
@@ -46,19 +41,16 @@ const Play = ({
   setActivePlay,
   searchOptions,
   setSearchOptions,
+  setSeenActivePlay,
 }: PlayProps) => {
   const { user } = useAuthContext();
   const { isDark, hoverText, backgroundStyle } = useIsDarkContext();
   const { isMobile } = useMobileContext();
 
   const router = useRouter();
-  const playParam = useSearchParams().get("play") ?? null;
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
-  const [seenActivePlay, setSeenActivePlay] = useState<boolean>(false);
-
-  const interval = useRef<SetIntervalAsyncTimer<[]> | null>(null);
 
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
@@ -107,38 +99,6 @@ const Play = ({
     void updateLastWatched(play.play.start_time);
   };
 
-  const getCurrentTime = async (player: YouTubePlayer) => {
-    return Math.round(await player.getCurrentTime());
-  };
-
-  const checkTime = async () => {
-    console.log("run");
-    if (player && activePlay) {
-      void getCurrentTime(player).then((currentTime) => {
-        const endTime = play.play.end_time;
-        if (currentTime == endTime && interval.current && !seenActivePlay) {
-          void player.pauseVideo();
-          void clearIntervalAsync(interval.current);
-          interval.current = null;
-          setSeenActivePlay(true);
-        } else if (currentTime !== endTime && !interval.current) {
-          interval.current = setIntervalAsync(
-            async () => void checkTime(),
-            1000,
-          );
-        } else if (currentTime == endTime && seenActivePlay) {
-          void player.seekTo(play.play.start_time, true);
-          void player.pauseVideo();
-          if (interval.current) {
-            void clearIntervalAsync(interval.current);
-            interval.current = null;
-          }
-        }
-        return;
-      });
-    } else return;
-  };
-
   const handleMentionAndTagClick = (e: React.MouseEvent, topic: string) => {
     e.stopPropagation();
     setSearchOptions({ ...searchOptions, topic: topic });
@@ -159,17 +119,6 @@ const Play = ({
       private_only: exclusiveTeam?.id ? exclusiveTeam.id : "all",
     });
   };
-
-  useEffect(() => {
-    void checkTime();
-  }, [activePlay, seenActivePlay, playParam]);
-
-  useEffect(() => {
-    if (interval.current) {
-      void clearIntervalAsync(interval.current);
-      interval.current = null;
-    }
-  }, []);
 
   return (
     <div

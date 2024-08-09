@@ -18,6 +18,7 @@ type VideoPlayIndex = {
   scrollToPlayer: () => void;
   setActivePlay: (play: PlayPreviewType) => void;
   activePlay: PlayPreviewType | null;
+  setSeenActivePlay: (seenActivePlay: boolean) => void;
 };
 
 export type PlaySearchOptions = {
@@ -34,6 +35,7 @@ const VideoPlayIndex = ({
   scrollToPlayer,
   setActivePlay,
   activePlay,
+  setSeenActivePlay,
 }: VideoPlayIndex) => {
   const { affIds } = useAuthContext();
   const { isMobile } = useMobileContext();
@@ -215,11 +217,9 @@ const VideoPlayIndex = ({
             setActivePlay={setActivePlay}
             searchOptions={searchOptions}
             setSearchOptions={setSearchOptions}
+            setSeenActivePlay={setSeenActivePlay}
           />
-          <Divider
-            sx={{ marginTop: "16px", marginBottom: "16px" }}
-            flexItem
-          ></Divider>
+          <Divider sx={{ marginTop: "16px", marginBottom: "16px" }} flexItem />
         </div>
       )}
       <div
@@ -238,7 +238,7 @@ const VideoPlayIndex = ({
           setActivePlay={setActivePlay}
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
-          videoId={videoId}
+          setSeenActivePlay={setSeenActivePlay}
         />
         {playCount && (
           <Pagination
