@@ -77,7 +77,9 @@ const PrivacyStatus = ({
             id="privacy-status"
             className="w-full"
           >
-            <MenuItem value="public">Public</MenuItem>
+            <MenuItem value="public" style={{ fontSize: "12px" }}>
+              Public
+            </MenuItem>
             {affiliations?.map((div) => (
               <MenuItem key={div.team.id} value={div.team.id}>
                 <div className="flex gap-2">

@@ -81,7 +81,9 @@ const VideoSearchFilters = ({
               id="privacy-status"
               className="w-full"
             >
-              <MenuItem value="all">All Videos</MenuItem>
+              <MenuItem value="all" style={{ fontSize: "12px" }}>
+                All Videos
+              </MenuItem>
               {affiliations?.map((div) => (
                 <MenuItem key={div.team.id} value={div.team.id}>
                   <div className="flex gap-2">

@@ -208,7 +208,7 @@ const VideoPlayIndex = ({
     <div className="flex w-full flex-col items-center">
       {activePlay && (
         <div className="flex w-11/12 flex-col items-center justify-center gap-2">
-          <PageTitle title="Active Play" size="small" />
+          <PageTitle title="Active Play" size="x-small" />
           <Play
             scrollToPlayer={scrollToPlayer}
             play={activePlay}

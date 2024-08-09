@@ -200,7 +200,9 @@ const PlaySearchFilters = ({
                 id="privacy-status"
                 className="w-full"
               >
-                <MenuItem value="all">All Plays</MenuItem>
+                <MenuItem value="all" style={{ fontSize: "12px" }}>
+                  All Plays
+                </MenuItem>
                 {affiliations?.map((div) => (
                   <MenuItem key={div.team.id} value={div.team.id}>
                     <div className="flex gap-2">
