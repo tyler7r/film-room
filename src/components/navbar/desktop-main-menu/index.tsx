@@ -33,8 +33,6 @@ const DesktopMainMenu = () => {
               sx={{
                 fontSize: "18px",
                 fontWeight: "bold",
-                fontFamily: "serif",
-                fontStyle: "italic",
               }}
               endIcon={<PersonIcon />}
             >
@@ -46,8 +44,6 @@ const DesktopMainMenu = () => {
               sx={{
                 fontSize: "18px",
                 fontWeight: "bold",
-                fontFamily: "serif",
-                fontStyle: "italic",
               }}
             >
               Film Room
@@ -64,8 +60,6 @@ const DesktopMainMenu = () => {
             sx={{
               fontSize: "18px",
               fontWeight: "bold",
-              fontFamily: "serif",
-              fontStyle: "italic",
             }}
             endIcon={<PersonIcon />}
           >
@@ -77,8 +71,6 @@ const DesktopMainMenu = () => {
             sx={{
               fontSize: searchOpen ? "14px" : "18px",
               fontWeight: "bold",
-              fontFamily: "serif",
-              fontStyle: "italic",
             }}
           >
             Film Room
@@ -89,8 +81,6 @@ const DesktopMainMenu = () => {
             sx={{
               fontSize: searchOpen ? "14px" : "18px",
               fontWeight: "bold",
-              fontFamily: "serif",
-              fontStyle: "italic",
             }}
             onClick={() => setSearchOpen(true)}
             endIcon={<SearchIcon />}

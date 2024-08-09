@@ -42,7 +42,10 @@ const DeleteMenu = ({
       <DeleteOutlineIcon color="action" />
     </IconButton>
   ) : (
-    <div className="text-sm font-bold" onClick={() => setIsOpen(true)}>
+    <div
+      className="text-sm font-bold tracking-tight"
+      onClick={() => setIsOpen(true)}
+    >
       DELETE PLAY
     </div>
   );

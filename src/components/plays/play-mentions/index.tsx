@@ -3,7 +3,6 @@ import { Button, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import StandardPopover from "~/components/utils/standard-popover";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { MentionType, PlayPreviewType } from "~/utils/types";
 
@@ -18,7 +17,6 @@ const PlayMentions = ({
   handleMentionAndTagClick,
   activePlay,
 }: PlayMentionsProps) => {
-  const { hoverText } = useIsDarkContext();
   const router = useRouter();
   const [mentions, setMentions] = useState<MentionType[] | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -75,10 +73,9 @@ const PlayMentions = ({
               onClick={(e) =>
                 handleClick(e, mention.receiver_name, mention.receiver_id)
               }
-              className={`tracking text-center font-bold ${hoverText} items-center text-sm`}
               key={mention.id}
               variant="text"
-              style={{ fontSize: "12px", padding: "2px" }}
+              style={{ fontSize: "12px", padding: "2px", fontWeight: "bold" }}
             >
               @{mention.receiver_name}
             </Button>

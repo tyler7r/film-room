@@ -55,8 +55,11 @@ const PrivacyStatus = ({
           >
             <MenuItem value={video.exclusive_to}>
               <div className="flex gap-2">
-                <div>
-                  Private to: <strong>{exclusiveTeam?.full_name}</strong>
+                <div className="text-sm">
+                  Private to:{" "}
+                  <strong className="tracking-tight">
+                    {exclusiveTeam?.full_name}
+                  </strong>
                 </div>
                 {exclusiveTeam?.logo && (
                   <TeamLogo tm={exclusiveTeam} size={25} />
@@ -74,12 +77,17 @@ const PrivacyStatus = ({
             id="privacy-status"
             className="w-full"
           >
-            <MenuItem value="public">Public</MenuItem>
+            <MenuItem value="public" style={{ fontSize: "14px" }}>
+              Public
+            </MenuItem>
             {affiliations?.map((div) => (
               <MenuItem key={div.team.id} value={div.team.id}>
                 <div className="flex gap-2">
-                  <div>
-                    Private to: <strong>{div.team.full_name}</strong>
+                  <div className="text-sm">
+                    Private to:{" "}
+                    <strong className="tracking-tight">
+                      {div.team.full_name}
+                    </strong>
                   </div>
                   {div.team.logo && <TeamLogo tm={div.team} size={25} />}
                 </div>

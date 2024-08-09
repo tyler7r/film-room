@@ -122,7 +122,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
       </div>
       <div>
         <strong
-          className={`${hoverText} font-serif italic tracking-tight`}
+          className={`${hoverText} font-bold tracking-tight`}
           onClick={() => void router.push(`/profile/${annc.author_id}`)}
         >{`${annc.author_name}: `}</strong>
         {annc.text}
@@ -153,7 +153,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
               <FavoriteBorderIcon color="primary" />
             </IconButton>
           )}
-          <div className="text-lg font-bold">{likeCount}</div>
+          <div className="text-lg font-bold tracking-tight">{likeCount}</div>
         </div>
         {annc.author_id === user.userId && (
           <DeleteMenu

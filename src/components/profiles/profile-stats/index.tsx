@@ -84,8 +84,10 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           className="flex cursor-pointer flex-col items-center justify-center"
           onClick={() => changeActionBar("createdPlays")}
         >
-          <div className="text-3xl font-bold">{stats.playCount}</div>
-          <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
+          <div className="text-3xl font-bold tracking-tight">
+            {stats.playCount}
+          </div>
+          <div className="text-base font-light italic leading-4 tracking-tighter">
             created
           </div>
         </div>
@@ -94,8 +96,10 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           className="flex cursor-pointer flex-col items-center justify-center"
           onClick={() => changeActionBar("mentions")}
         >
-          <div className="text-3xl font-bold">{stats.mentionCount}</div>
-          <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
+          <div className="text-3xl font-bold tracking-tight">
+            {stats.mentionCount}
+          </div>
+          <div className="font-light italic leading-4 tracking-tighter">
             mentions
           </div>
         </div>
@@ -104,8 +108,10 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           className="flex cursor-pointer flex-col items-center justify-center"
           onClick={() => changeActionBar("highlights")}
         >
-          <div className="text-3xl font-bold">{stats.highlightCount}</div>
-          <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
+          <div className="text-3xl font-bold tracking-tight">
+            {stats.highlightCount}
+          </div>
+          <div className="font-light italic leading-4 tracking-tighter">
             highlights
           </div>
         </div>

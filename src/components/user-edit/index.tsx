@@ -99,7 +99,7 @@ const UserEdit = ({
       />
       <Divider flexItem orientation="vertical" variant="middle" />
       <div className="flex flex-col items-center justify-center p-2">
-        <div className="text-sm font-bold leading-3">EDIT</div>
+        <div className="text-xs font-bold leading-3 tracking-tight">EDIT</div>
         <div className="flex gap-2 leading-3">
           <IconButton size="small" onClick={() => setIsOpen(true)}>
             <EditIcon color="primary" />

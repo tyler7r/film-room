@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TeamLogo from "~/components/teams/team-logo";
+import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
@@ -97,8 +98,8 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
 
   return (
     <div key={mention.mention.id}>
-      <div className="flex items-center justify-end gap-1 text-right text-xs font-bold italic leading-3">
-        {getTimeSinceNotified(mention.play.created_at)} ago
+      <div className="flex items-center justify-end gap-1 text-right text-xs font-light italic leading-4">
+        {getTimeSinceNotified(mention.play.created_at)}
       </div>
       <div className="flex items-center justify-center gap-1">
         {isUnread && <FiberManualRecordIcon fontSize="small" color="primary" />}
@@ -124,9 +125,7 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
           style={backgroundStyle}
         >
           <div className="flex w-full flex-col">
-            <div className="text-center font-serif font-bold italic tracking-tight">
-              {mention.video.title}
-            </div>
+            <PageTitle size="xx-small" title={mention.video.title} />
           </div>
           <Divider flexItem variant="middle"></Divider>
           <div className="flex items-center gap-1 text-sm">
@@ -138,7 +137,7 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
             {!mention.team && <PublicIcon fontSize="small" />}
             <div>
               <strong
-                className={hoverText}
+                className={`${hoverText} text-sm tracking-tight`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsOpen(false);

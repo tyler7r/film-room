@@ -68,7 +68,7 @@ const Login = () => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-2 p-4 text-center">
-      <Logo size="medium" />
+      <Logo size="small" />
       <div className="flex w-full flex-col items-center justify-center gap-8 text-center">
         <PageTitle size="x-large" title="Login" />
         <form

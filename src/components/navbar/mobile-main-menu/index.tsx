@@ -36,8 +36,6 @@ const MobileMainMenu = () => {
             size="large"
             sx={{
               fontWeight: "bold",
-              fontFamily: "serif",
-              fontStyle: "italic",
             }}
             endIcon={<PersonIcon fontSize="small" />}
           >
@@ -49,8 +47,6 @@ const MobileMainMenu = () => {
             size="large"
             sx={{
               fontWeight: "bold",
-              fontFamily: "serif",
-              fontStyle: "italic",
             }}
           >
             Film Room
@@ -63,8 +59,6 @@ const MobileMainMenu = () => {
             size="large"
             sx={{
               fontWeight: "bold",
-              fontFamily: "serif",
-              fontStyle: "italic",
             }}
           >
             Search

@@ -1,6 +1,6 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import InboxIcon from "@mui/icons-material/Inbox";
 import LightModeIcon from "@mui/icons-material/LightMode";
+import MailIcon from "@mui/icons-material/Mail";
 import { Badge, Button, IconButton, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "~/contexts/auth";
@@ -33,7 +33,7 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                 }}
                 size="small"
               >
-                <InboxIcon fontSize="large" />
+                <MailIcon fontSize="large" />
                 <Badge
                   badgeContent={unreadCount}
                   color="primary"

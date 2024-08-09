@@ -196,7 +196,7 @@ const SignupDetails = () => {
             ),
           }}
         />
-        <div className={`${colorText} text-sm font-bold`}>
+        <div className={`${colorText} text-sm font-bold tracking-tight`}>
           *Password must be at least 8 characters*
         </div>
         <FormMessage message={message} />

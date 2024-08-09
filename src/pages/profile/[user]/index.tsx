@@ -126,7 +126,7 @@ const Profile = () => {
         <div className="flex flex-col items-center justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
             <PageTitle size="x-large" title={profile.name} />
-            <div className="text-lg font-light leading-5 tracking-tight">
+            <div className="text-lg font-light leading-5 tracking-tighter">
               Member since {profile.join_date.substring(0, 4)}
             </div>
           </div>
@@ -136,7 +136,7 @@ const Profile = () => {
           />
         </div>
         {profileAffiliations && (
-          <div className="my-4 flex w-4/5 flex-wrap items-center justify-center gap-1">
+          <div className="my-4 flex w-full flex-wrap items-center justify-center gap-1">
             {profileAffiliations.map((aff) => (
               <TeamAffiliation key={aff.affId} aff={aff} />
             ))}
@@ -146,7 +146,7 @@ const Profile = () => {
           <div className="flex w-full items-center justify-center">
             {lastWatched && (
               <div className="flex w-11/12 flex-col items-center justify-center gap-3">
-                <div className="flex items-center gap-2 text-2xl font-bold">
+                <div className="flex items-center gap-2">
                   <PlayArrowIcon fontSize="large" />
                   <PageTitle size="small" title="Continue Watching" />
                 </div>

@@ -55,7 +55,11 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
   return (
     <div className="flex w-4/5 flex-col items-center justify-center gap-4">
       {loading && <PageTitle title="Loading..." size="medium" />}
-      {userCount && <div className="font-bold">{userCount} results found</div>}
+      {userCount && (
+        <div className="font-bold tracking-tight">
+          {userCount} results found
+        </div>
+      )}
       {!users && !loading && <EmptyMessage size="large" message="users" />}
       <div className="flex w-full flex-wrap justify-center gap-6">
         {users?.map((u) => <User user={u} key={u.id} goToProfile={true} />)}

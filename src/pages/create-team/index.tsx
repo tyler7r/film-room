@@ -167,7 +167,7 @@ const CreateTeam = () => {
     <div className="flex flex-col items-center justify-center gap-8 p-4">
       <div className="flex flex-col items-center justify-center gap-1">
         <PageTitle size="x-large" title="Create Team" />
-        <div className={`text-sm font-bold ${colorText}`}>
+        <div className={`text-sm font-bold ${colorText} tracking-tight`}>
           * You will be the team's account owner *
         </div>
       </div>

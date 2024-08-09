@@ -116,7 +116,7 @@ const Home = () => {
           The film can't analyze itself.{" "}
           <strong
             onClick={() => void router.push("/film-room")}
-            className={hoverText}
+            className={`${hoverText} tracking-tight`}
           >
             Get started!
           </strong>

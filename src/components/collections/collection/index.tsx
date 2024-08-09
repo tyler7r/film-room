@@ -92,7 +92,7 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
             <div
               className={`${
                 !listItem && hoverText
-              } w-full text-center font-serif font-bold italic`}
+              } w-full text-center font-bold tracking-tight`}
               onClick={handleProfileClick}
             >
               {collection.profile.name}
@@ -110,13 +110,15 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
           }
         >
           <div
-            className={`${small ? "text-xl" : "text-3xl"} font-bold leading-5`}
+            className={`${
+              small ? "text-xl" : "text-3xl"
+            } font-bold leading-5 tracking-tight`}
           >
             {playCount}
           </div>
           <div
-            className={`font-serif ${
-              small ? "text-base" : "text-lg"
+            className={`${
+              small ? "text-sm" : "text-base"
             } font-light italic leading-5 tracking-tight`}
           >
             plays

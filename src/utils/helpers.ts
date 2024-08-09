@@ -100,8 +100,10 @@ export const getTimeSinceNotified = (date: string) => {
   // Convert milliseconds to days
   const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
   if (daysDiff < 1) return "today";
-  if (1 <= daysDiff && daysDiff <= 13) return `${daysDiff}d`;
-  if (14 <= daysDiff && daysDiff <= 56) return `${Math.round(daysDiff / 7)}w`;
-  if (57 <= daysDiff && daysDiff <= 365) return `${Math.round(daysDiff / 30)}m`;
-  if (daysDiff >= 366) return `${Math.round(daysDiff / 365)}y`;
+  if (1 <= daysDiff && daysDiff <= 13) return `${daysDiff}d ago`;
+  if (14 <= daysDiff && daysDiff <= 56)
+    return `${Math.round(daysDiff / 7)}w ago`;
+  if (57 <= daysDiff && daysDiff <= 365)
+    return `${Math.round(daysDiff / 30)}mo ago`;
+  if (daysDiff >= 366) return `${Math.round(daysDiff / 365)}y ago`;
 };

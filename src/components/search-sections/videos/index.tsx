@@ -64,7 +64,9 @@ const SearchVideos = ({ affIds, topic }: SearchVideosProps) => {
       {loading && <PageTitle title="Loading..." size="medium" />}
       {!loading && <CreateVideo />}
       {videoCount && (
-        <div className="font-bold">{videoCount} results found</div>
+        <div className="font-bold tracking-tight">
+          {videoCount} results found
+        </div>
       )}
       {!videos && !loading && <EmptyMessage size="large" message="videos" />}
       <div className="flex w-full flex-wrap justify-center gap-6">

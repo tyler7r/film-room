@@ -150,7 +150,7 @@ const PlayPreview = ({
             </div>
           )}
           <div
-            className={`text-center font-serif text-xl font-bold italic tracking-tighter ${hoverText}`}
+            className={`text-center text-xl font-bold tracking-tighter ${hoverText}`}
             onClick={() =>
               void router.push(`/profile/${preview.play.author_id}`)
             }
@@ -162,7 +162,7 @@ const PlayPreview = ({
             <div className="text-sm leading-3 tracking-tight text-slate-600">
               {convertTimestamp(preview.play.created_at)}
             </div>
-            <div className="text-xs font-bold leading-3">
+            <div className="text-xs font-bold leading-3 tracking-tight">
               ({preview.play.end_time - preview.play.start_time}s)
             </div>
           </div>

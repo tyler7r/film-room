@@ -7,7 +7,6 @@ import CreatePlay from "~/components/plays/create-play";
 import Team from "~/components/teams/team";
 import PageTitle from "~/components/utils/page-title";
 import VideoPlayIndex from "~/components/videos/video-play-index";
-import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -16,7 +15,6 @@ import type { PlayPreviewType, TeamType, VideoType } from "~/utils/types";
 const FilmRoom = () => {
   const router = useRouter();
   const { screenWidth } = useMobileContext();
-  const { user } = useAuthContext();
   const { isDark } = useIsDarkContext();
   const playParam = useSearchParams().get("play") ?? null;
   const startParam = useSearchParams().get("start") ?? null;
@@ -30,8 +28,11 @@ const FilmRoom = () => {
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
   const [activePlay, setActivePlay] = useState<PlayPreviewType | null>(null);
+  const [seenActivePlay, setSeenActivePlay] = useState<boolean>(false);
 
   const [isNewPlayOpen, setIsNewPlayOpen] = useState<boolean>(false);
+
+  const interval = useRef<NodeJS.Timeout | null>(null);
 
   const fetchVideo = async () => {
     const { data } = await supabase
@@ -51,7 +52,7 @@ const FilmRoom = () => {
   };
 
   const fetchActivePlay = async () => {
-    if (playParam && user.isLoggedIn) {
+    if (playParam) {
       const { data } = await supabase
         .from("play_preview")
         .select(`*`, {
@@ -60,6 +61,7 @@ const FilmRoom = () => {
         .eq("play->>id", playParam)
         .single();
       if (data) setActivePlay(data);
+      else setActivePlay(null);
     }
   };
 
@@ -69,6 +71,7 @@ const FilmRoom = () => {
     const time = Number(startParam);
     if (time) {
       void video.seekTo(time, true);
+      void video.playVideo();
     }
   };
 
@@ -76,18 +79,68 @@ const FilmRoom = () => {
     if (playerRef) playerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const getCurrentTime = async (player: YouTubePlayer) => {
+    return Math.round(await player.getCurrentTime());
+  };
+
+  const checkTime = async () => {
+    if (player && activePlay) {
+      void getCurrentTime(player).then((currentTime) => {
+        const endTime = activePlay.play.end_time;
+        if (currentTime == endTime && interval.current && !seenActivePlay) {
+          void player.pauseVideo();
+          void clearInterval(interval.current);
+          interval.current = null;
+          setSeenActivePlay(true);
+        } else if (currentTime !== endTime && !interval.current) {
+          interval.current = setInterval(() => void checkTime(), 1000);
+        } else if (currentTime == endTime && seenActivePlay) {
+          void player.seekTo(activePlay.play.start_time, true);
+          void player.pauseVideo();
+          if (interval.current) {
+            void clearInterval(interval.current);
+            interval.current = null;
+          }
+        }
+        return;
+      });
+    } else return;
+  };
+
   useEffect(() => {
     if (router.query.video) {
       void fetchVideo();
       void fetchAffiliatedTeams();
-      void fetchActivePlay();
     }
-  }, [router.query.video, playParam]);
+  }, [router.query.video]);
+
+  useEffect(() => {
+    void fetchActivePlay();
+  }, [playParam, player]);
+
+  useEffect(() => {
+    if (interval.current) {
+      clearInterval(interval.current);
+      interval.current = null;
+    }
+    if (activePlay && player) {
+      void checkTime();
+    }
+  }, [activePlay, seenActivePlay]);
 
   useEffect(() => {
     const time = Number(startParam);
     if (time && player) void player.seekTo(time, true);
   }, [startParam]);
+
+  useEffect(() => {
+    return () => {
+      if (interval.current) {
+        clearInterval(interval.current);
+        interval.current = null;
+      }
+    };
+  }, []);
 
   return (
     video && (
@@ -96,7 +149,7 @@ const FilmRoom = () => {
           <div
             className={`${
               isDark ? "text-grey-400" : "text-grey-600"
-            } text-lg font-bold leading-4 lg:text-2xl`}
+            } text-lg font-bold leading-4 tracking-tight lg:text-2xl`}
           >
             {video.season} -{" "}
             {video.week
@@ -146,6 +199,7 @@ const FilmRoom = () => {
           scrollToPlayer={scrollToPlayer}
           setActivePlay={setActivePlay}
           activePlay={activePlay}
+          setSeenActivePlay={setSeenActivePlay}
         />
       </div>
     )

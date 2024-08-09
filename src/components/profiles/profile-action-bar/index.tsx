@@ -41,19 +41,19 @@ const ProfileActionBar = ({
 
   return (
     <div
-      className={`mt-2 flex ${
+      className={`mt-8 flex ${
         isMobile ? "w-full justify-center gap-4" : "w-4/5 justify-around"
       }`}
     >
       <div
         onClick={() => handleModalToggle("createdPlays")}
-        className="flex cursor-pointer flex-col items-center justify-center gap-1"
+        className={`flex cursor-pointer items-center justify-center`}
       >
         <IconButton
           size="small"
           color={actionBarStatus.createdPlays ? "primary" : "default"}
         >
-          <CreateIcon sx={{ fontSize: "42px" }} />
+          <CreateIcon fontSize="large" />
         </IconButton>
         <PageTitle
           title="created"
@@ -62,14 +62,14 @@ const ProfileActionBar = ({
         />
       </div>
       <div
-        className="flex cursor-pointer flex-col items-center justify-center gap-1"
+        className="flex cursor-pointer items-center justify-center"
         onClick={() => handleModalToggle("mentions")}
       >
         <IconButton
           size="small"
           color={actionBarStatus.mentions ? "primary" : "default"}
         >
-          <LocalOfferIcon sx={{ fontSize: "42px" }} />
+          <LocalOfferIcon fontSize="large" />
         </IconButton>
         <PageTitle
           title="mentions"
@@ -79,13 +79,13 @@ const ProfileActionBar = ({
       </div>
       <div
         onClick={() => handleModalToggle("highlights")}
-        className="flex cursor-pointer flex-col items-center justify-center gap-1"
+        className="flex cursor-pointer items-center justify-center gap-1"
       >
         <IconButton
           size="small"
           color={actionBarStatus.highlights ? "primary" : "default"}
         >
-          <StarIcon sx={{ fontSize: "42px" }} />
+          <StarIcon fontSize="large" />
         </IconButton>
         <PageTitle
           title="highlights"

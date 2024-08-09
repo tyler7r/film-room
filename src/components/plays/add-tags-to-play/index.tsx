@@ -216,13 +216,17 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
                           id="privacy-status"
                           className="w-full"
                         >
-                          <MenuItem value="public">Public</MenuItem>
+                          <MenuItem value="public" style={{ fontSize: "14px" }}>
+                            Public
+                          </MenuItem>
                           {affiliations?.map((aff) => (
                             <MenuItem key={aff.team.id} value={aff.team.id}>
                               <div className="flex gap-2">
-                                <div>
+                                <div className="text-sm">
                                   Private to:{" "}
-                                  <strong>{aff.team.full_name}</strong>
+                                  <strong className="tracking-tight">
+                                    {aff.team.full_name}
+                                  </strong>
                                 </div>
                                 {aff.team.logo && (
                                   <TeamLogo tm={aff.team} size={25} />

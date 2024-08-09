@@ -92,7 +92,7 @@ const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
         <div className="w-full">
           <strong
             onClick={() => void router.push(`/profile/${play.play.author_id}`)}
-            className={hoverText}
+            className={`${hoverText} tracking-tight`}
           >
             Note:{" "}
           </strong>
@@ -100,13 +100,13 @@ const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
         </div>
       )}
       {collections && (
-        <div className="flex w-full items-center justify-start">
+        <div className="flex w-full items-center justify-start gap-0.5">
           <IconButton
             onMouseEnter={handlePopoverOpen}
             onMouseLeave={handlePopoverClose}
             size="small"
           >
-            <LibraryBooksIcon color="action" />
+            <LibraryBooksIcon color="action" fontSize="small" />
             <StandardPopover
               content="Play Collections"
               handlePopoverClose={handlePopoverClose}
@@ -117,7 +117,7 @@ const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
           {collections.map((col) => (
             <Button
               key={col.id}
-              size="small"
+              style={{ fontWeight: "bold", padding: "2px", fontSize: "12px" }}
               onClick={() => handleClick(col.id)}
             >
               *{col.title}*

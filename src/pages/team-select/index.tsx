@@ -162,7 +162,9 @@ const TeamSelect = () => {
                   <TeamLogo tm={team.team} size={35} />
                   <PageTitle size="x-small" title={team.team.full_name} />
                   <div className="flex flex-col items-center justify-center">
-                    <div className="-mb-2 text-sm font-bold">COACH?</div>
+                    <div className="-mb-2 text-sm font-bold tracking-tight">
+                      COACH?
+                    </div>
                     <Checkbox
                       value={team.isCoach}
                       onChange={() => {
@@ -230,7 +232,7 @@ const TeamSelect = () => {
             Don't see your team?{" "}
             <strong
               onClick={() => void router.push("/create-team")}
-              className={hoverText}
+              className={`${hoverText} tracking-tight`}
             >
               Create It!
             </strong>
