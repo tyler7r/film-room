@@ -181,27 +181,6 @@ export type PlayType = {
   created_at: string;
 };
 
-export type IndexPlayType = {
-  author_id: string | null;
-  video_id: string | null;
-  highlight: boolean;
-  id: string;
-  note: string | null;
-  exclusive_to: string | null;
-  private: boolean;
-  author_name: string;
-  author_role: string;
-  start_time: number;
-  end_time: number;
-  title: string;
-  mentions: {
-    receiver_name: string;
-  }[];
-  tags: {
-    title: string;
-  }[];
-};
-
 export type PlayerType = {
   team: TeamType;
   profile: UserType;

@@ -98,14 +98,19 @@ const UserEdit = ({
         number={affiliation.number}
       />
       <Divider flexItem orientation="vertical" variant="middle" />
-      <IconButton size="small" onClick={() => setIsOpen(true)}>
-        <EditIcon color="primary" />
-      </IconButton>
-      <DeleteMenu
-        isOpen={isDeleteMenuOpen}
-        setIsOpen={setIsDeleteMenuOpen}
-        handleDelete={handleDelete}
-      />
+      <div className="flex flex-col items-center justify-center p-2">
+        <div className="text-sm font-bold leading-3">EDIT</div>
+        <div className="flex gap-2 leading-3">
+          <IconButton size="small" onClick={() => setIsOpen(true)}>
+            <EditIcon color="primary" />
+          </IconButton>
+          <DeleteMenu
+            isOpen={isDeleteMenuOpen}
+            setIsOpen={setIsDeleteMenuOpen}
+            handleDelete={handleDelete}
+          />
+        </div>
+      </div>
     </div>
   ) : (
     <div
