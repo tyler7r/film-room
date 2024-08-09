@@ -146,7 +146,7 @@ const Profile = () => {
           <div className="flex w-full items-center justify-center">
             {lastWatched && (
               <div className="flex w-11/12 flex-col items-center justify-center gap-3">
-                <div className="flex items-center gap-2 text-2xl font-bold">
+                <div className="flex items-center gap-2">
                   <PlayArrowIcon fontSize="large" />
                   <PageTitle size="small" title="Continue Watching" />
                 </div>

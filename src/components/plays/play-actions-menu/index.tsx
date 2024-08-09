@@ -96,7 +96,7 @@ const PlayActionsMenu = ({
                 </div>
               ) : (
                 <div
-                  className="text-sm font-bold"
+                  className="text-sm font-bold tracking-tight"
                   onClick={() => setIsRemoveOpen(true)}
                 >
                   REMOVE FROM COLLECTION

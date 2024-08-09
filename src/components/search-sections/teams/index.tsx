@@ -55,7 +55,11 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4">
       {loading && <PageTitle title="Loading..." size="medium" />}
-      {teamCount && <div className="font-bold">{teamCount} results found</div>}
+      {teamCount && (
+        <div className="font-bold tracking-tight">
+          {teamCount} results found
+        </div>
+      )}
       {!teams && !loading && <EmptyMessage size="large" message="teams" />}
       <div className="flex w-4/5 flex-wrap items-center justify-center gap-6">
         {teams?.map((team) => <Team team={team} key={team.id} />)}

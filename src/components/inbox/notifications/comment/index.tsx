@@ -96,7 +96,7 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
 
   return (
     <div key={comment.play.id + comment.comment.created_at}>
-      <div className="flex items-center justify-end gap-1 text-right text-xs font-bold italic leading-3">
+      <div className="flex items-center justify-end gap-1 text-right text-xs font-light italic leading-4">
         {getTimeSinceNotified(comment.comment.created_at)}
       </div>
       <div className="flex items-center justify-center gap-1">

@@ -87,7 +87,7 @@ const TeamHub = () => {
           <div className="flex flex-col items-center justify-center gap-2 text-center">
             <PageTitle size="large" title={team.full_name} />
             <div
-              className={`text-3xl font-bold ${
+              className={`text-3xl font-bold tracking-tight ${
                 isDark ? "text-purple-400" : "text-purple-A400"
               }`}
             >

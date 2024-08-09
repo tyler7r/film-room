@@ -123,7 +123,7 @@ const AddPlayToCollection = ({
   }, [collectionIds]);
 
   return !isOpen ? (
-    <div className="text-sm font-bold" onClick={handleOpen}>
+    <div className="text-sm font-bold tracking-tight" onClick={handleOpen}>
       ADD TO COLLECTIONS
     </div>
   ) : (

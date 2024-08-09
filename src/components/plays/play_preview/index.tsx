@@ -162,7 +162,7 @@ const PlayPreview = ({
             <div className="text-sm leading-3 tracking-tight text-slate-600">
               {convertTimestamp(preview.play.created_at)}
             </div>
-            <div className="text-xs font-bold leading-3">
+            <div className="text-xs font-bold leading-3 tracking-tight">
               ({preview.play.end_time - preview.play.start_time}s)
             </div>
           </div>

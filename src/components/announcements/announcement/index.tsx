@@ -153,7 +153,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
               <FavoriteBorderIcon color="primary" />
             </IconButton>
           )}
-          <div className="text-lg font-bold">{likeCount}</div>
+          <div className="text-lg font-bold tracking-tight">{likeCount}</div>
         </div>
         {annc.author_id === user.userId && (
           <DeleteMenu

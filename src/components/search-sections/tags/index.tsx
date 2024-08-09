@@ -70,7 +70,11 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
   return (
     <div className="flex w-4/5 flex-col items-center justify-center gap-4">
       {loading && <PageTitle title="Loading..." size="medium" />}
-      {playCount && <div className="font-bold">{playCount} results found</div>}
+      {playCount && (
+        <div className="font-bold tracking-tight">
+          {playCount} results found
+        </div>
+      )}
       {!playTags && !loading && (
         <EmptyMessage size="large" message="plays with that tag" />
       )}

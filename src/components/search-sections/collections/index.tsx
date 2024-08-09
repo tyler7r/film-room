@@ -60,7 +60,9 @@ const SearchCollections = ({ topic }: SearchCollectionsProps) => {
       {loading && <PageTitle title="Loading..." size="medium" />}
       {!loading && <CreateCollection />}
       {collectionCount && (
-        <div className="font-bold">{collectionCount} results found</div>
+        <div className="font-bold tracking-tight">
+          {collectionCount} results found
+        </div>
       )}
       {!collections && !loading && (
         <EmptyMessage size="large" message="collections" />

@@ -126,7 +126,7 @@ const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
             <FavoriteBorderIcon color="primary" fontSize="medium" />
           </IconButton>
         )}
-        <div className="text-lg font-bold">{likeCount}</div>
+        <div className="text-lg font-bold tracking-tight">{likeCount}</div>
       </div>
     </div>
   );

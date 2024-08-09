@@ -80,7 +80,7 @@ const TeamActionBar = ({
                 }}
               >
                 <div className="flex">
-                  <div className="font-bold">JOIN REQUESTS</div>
+                  <div className="font-bold tracking-tight">JOIN REQUESTS</div>
                   <Badge
                     badgeContent={requestCount}
                     color="primary"
@@ -99,7 +99,9 @@ const TeamActionBar = ({
                       handleClose();
                     }}
                   >
-                    <div className="font-bold">TRANSFER OWNERSHIP</div>
+                    <div className="font-bold tracking-tight">
+                      TRANSFER OWNERSHIP
+                    </div>
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
@@ -107,7 +109,9 @@ const TeamActionBar = ({
                       void router.push(`/team-settings/${team.id}`);
                     }}
                   >
-                    <div className="font-bold">TEAM SETTINGS</div>
+                    <div className="font-bold tracking-tight">
+                      TEAM SETTINGS
+                    </div>
                   </MenuItem>
                 </div>
               )}

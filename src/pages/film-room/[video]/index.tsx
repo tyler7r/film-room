@@ -149,7 +149,7 @@ const FilmRoom = () => {
           <div
             className={`${
               isDark ? "text-grey-400" : "text-grey-600"
-            } text-lg font-bold leading-4 lg:text-2xl`}
+            } text-lg font-bold leading-4 tracking-tight lg:text-2xl`}
           >
             {video.season} -{" "}
             {video.week

@@ -177,7 +177,7 @@ const Collection = () => {
                 : { backgroundColor: `${colors.purple[50]}` }
             }
           >
-            <div className="text-4xl font-bold">{playCount}</div>
+            <div className="text-4xl font-bold tracking-tight">{playCount}</div>
             <div className="text-lg font-light italic leading-4 tracking-tight">
               plays
             </div>

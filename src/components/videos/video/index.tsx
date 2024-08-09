@@ -140,7 +140,7 @@ const Video = ({ video, startTime }: VideoProps) => {
             }
             <Divider flexItem orientation="vertical" />
             <div
-              className={`text-center text-base font-bold leading-5 lg:text-lg ${
+              className={`text-center text-base font-bold leading-5 tracking-tight lg:text-lg ${
                 isDark ? "text-purple-400" : "text-purple-A400"
               }`}
             >

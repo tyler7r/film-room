@@ -98,7 +98,7 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
 
   return (
     <div key={mention.mention.id}>
-      <div className="flex items-center justify-end gap-1 text-right text-xs font-bold italic leading-3">
+      <div className="flex items-center justify-end gap-1 text-right text-xs font-light italic leading-4">
         {getTimeSinceNotified(mention.play.created_at)}
       </div>
       <div className="flex items-center justify-center gap-1">

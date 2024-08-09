@@ -60,7 +60,7 @@ const CommentBtn = ({
       <IconButton size="small" onClick={handleCommentClick}>
         <ModeCommentIcon color="primary" fontSize="medium" />
       </IconButton>
-      <div className="text-lg font-bold">{commentCount}</div>
+      <div className="text-lg font-bold tracking-tight">{commentCount}</div>
     </div>
   );
 };

@@ -26,7 +26,7 @@ const FormMessage = ({ message }: FormMessageType) => {
   return (
     text && (
       <div
-        className="rounded-md p-2 text-center font-bold"
+        className="rounded-md p-1 px-2 text-center text-sm font-bold tracking-tight"
         style={status === "error" ? errorStyle : successStyle}
       >
         {text}

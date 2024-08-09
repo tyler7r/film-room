@@ -110,7 +110,9 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
           }
         >
           <div
-            className={`${small ? "text-xl" : "text-3xl"} font-bold leading-5`}
+            className={`${
+              small ? "text-xl" : "text-3xl"
+            } font-bold leading-5 tracking-tight`}
           >
             {playCount}
           </div>

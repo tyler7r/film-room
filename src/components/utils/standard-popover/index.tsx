@@ -36,7 +36,10 @@ const StandardPopover = ({
       disableRestoreFocus
       className="max-h-40"
     >
-      <div style={backgroundStyle} className="p-2 text-sm font-bold">
+      <div
+        style={backgroundStyle}
+        className="p-2 text-sm font-bold tracking-tight"
+      >
         {content}
       </div>
     </Popover>
