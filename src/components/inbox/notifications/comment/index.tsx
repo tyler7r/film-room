@@ -3,6 +3,7 @@ import { Divider } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
@@ -96,7 +97,7 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
   return (
     <div key={comment.play.id + comment.comment.created_at}>
       <div className="flex items-center justify-end gap-1 text-right text-xs font-bold italic leading-3">
-        {getTimeSinceNotified(comment.comment.created_at)} ago
+        {getTimeSinceNotified(comment.comment.created_at)}
       </div>
       <div className="flex items-center justify-center gap-1">
         {isUnread && <FiberManualRecordIcon fontSize="small" color="primary" />}
@@ -121,13 +122,11 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
           className={`flex w-full flex-col gap-1 ${hoverBorder}`}
           style={backgroundStyle}
         >
-          <div className="text-center font-serif font-bold italic tracking-tight">
-            {comment.video.title}
-          </div>
+          <PageTitle size="xx-small" title={comment.video.title} />
           <Divider variant="middle" flexItem></Divider>
           <div className="text-sm">
             <strong
-              className={hoverText}
+              className={`${hoverText} tracking-tight`}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpen(false);

@@ -91,7 +91,7 @@ const Video = ({ video, startTime }: VideoProps) => {
       <div
         style={backgroundStyle}
         key={video.id}
-        className={`${hoverBorder} flex flex-col items-center justify-center gap-1 rounded-md p-2 px-4`}
+        className={`${hoverBorder} flex flex-col items-center justify-center rounded-md p-2 px-4`}
         onClick={() => handleClick(video.id)}
       >
         <div className="flex w-full items-center justify-center">

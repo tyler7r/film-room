@@ -4,6 +4,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StarIcon from "@mui/icons-material/Star";
 import { Divider, IconButton } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
@@ -51,6 +52,7 @@ const Play = ({
   const { isMobile } = useMobileContext();
 
   const router = useRouter();
+  const playParam = useSearchParams().get("play") ?? null;
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
@@ -110,6 +112,7 @@ const Play = ({
   };
 
   const checkTime = async () => {
+    console.log("run");
     if (player && activePlay) {
       void getCurrentTime(player).then((currentTime) => {
         const endTime = play.play.end_time;
@@ -159,7 +162,7 @@ const Play = ({
 
   useEffect(() => {
     void checkTime();
-  }, [activePlay, seenActivePlay]);
+  }, [activePlay, seenActivePlay, playParam]);
 
   useEffect(() => {
     if (interval.current) {

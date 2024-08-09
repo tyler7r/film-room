@@ -85,7 +85,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           onClick={() => changeActionBar("createdPlays")}
         >
           <div className="text-3xl font-bold">{stats.playCount}</div>
-          <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
+          <div className="text-base font-light italic leading-4 tracking-tighter">
             created
           </div>
         </div>
@@ -95,7 +95,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           onClick={() => changeActionBar("mentions")}
         >
           <div className="text-3xl font-bold">{stats.mentionCount}</div>
-          <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
+          <div className="font-light italic leading-4 tracking-tighter">
             mentions
           </div>
         </div>
@@ -105,7 +105,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           onClick={() => changeActionBar("highlights")}
         >
           <div className="text-3xl font-bold">{stats.highlightCount}</div>
-          <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
+          <div className="font-light italic leading-4 tracking-tighter">
             highlights
           </div>
         </div>

@@ -48,11 +48,11 @@ const PendingRequest = ({
         className={`flex items-center justify-center gap-1 text-center`}
         onClick={handleTeamClick}
       >
-        <div className={`${hoverText} font-serif font-bold italic`}>
+        <div className={`${hoverText} text-lg font-bold tracking-tight`}>
           {request.team.full_name}
         </div>
         <ArrowRightAltIcon color="primary" fontSize="small" />{" "}
-        <div className="text-sm">{request.affiliations.role}</div>
+        <div className="">{request.affiliations.role}</div>
       </div>
       <DeleteMenu
         handleDelete={handleDelete}

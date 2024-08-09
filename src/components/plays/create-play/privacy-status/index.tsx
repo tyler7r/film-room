@@ -56,7 +56,10 @@ const PrivacyStatus = ({
             <MenuItem value={video.exclusive_to}>
               <div className="flex gap-2">
                 <div>
-                  Private to: <strong>{exclusiveTeam?.full_name}</strong>
+                  Private to:{" "}
+                  <strong className="tracking-tight">
+                    {exclusiveTeam?.full_name}
+                  </strong>
                 </div>
                 {exclusiveTeam?.logo && (
                   <TeamLogo tm={exclusiveTeam} size={25} />

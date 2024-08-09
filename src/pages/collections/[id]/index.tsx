@@ -162,7 +162,7 @@ const Collection = () => {
                   onClick={() =>
                     void router.push(`/profile/${collection.author_id}`)
                   }
-                  className={`${hoverText} font-serif text-lg font-bold italic`}
+                  className={`${hoverText} text-lg font-bold tracking-tight`}
                 >
                   {authorName}
                 </div>
@@ -178,7 +178,7 @@ const Collection = () => {
             }
           >
             <div className="text-4xl font-bold">{playCount}</div>
-            <div className="font-serif text-lg font-light italic leading-4 tracking-tight">
+            <div className="text-lg font-light italic leading-4 tracking-tight">
               plays
             </div>
           </div>
@@ -194,7 +194,7 @@ const Collection = () => {
         </div>
         {collection.description && (
           <div className="w-full text-center text-lg">
-            <strong>Description: </strong>
+            <strong className="tracking-tight">Description: </strong>
             {collection.description}
           </div>
         )}

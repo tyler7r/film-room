@@ -122,7 +122,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
       </div>
       <div>
         <strong
-          className={`${hoverText} font-serif italic tracking-tight`}
+          className={`${hoverText} font-bold tracking-tight`}
           onClick={() => void router.push(`/profile/${annc.author_id}`)}
         >{`${annc.author_name}: `}</strong>
         {annc.text}

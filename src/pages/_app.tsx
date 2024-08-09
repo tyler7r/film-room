@@ -1,12 +1,15 @@
-// import "@fontsource/roboto/300.css";
-// import "@fontsource/roboto/400.css";
-// import "@fontsource/roboto/500.css";
-// import "@fontsource/roboto/700.css";
-import "@fontsource/lexend/300.css";
-import "@fontsource/lexend/400.css";
-import "@fontsource/lexend/500.css";
-import "@fontsource/lexend/700.css";
-import "@fontsource/lexend/800.css";
+// import "@fontsource/lexend/300.css";
+// import "@fontsource/lexend/400.css";
+// import "@fontsource/lexend/500.css";
+// import "@fontsource/lexend/700.css";
+// import "@fontsource/lexend/800.css";
+// import "@fontsource/lexend/900.css";
+import "@fontsource/outfit/300.css";
+import "@fontsource/outfit/400.css";
+import "@fontsource/outfit/500.css";
+import "@fontsource/outfit/700.css";
+import "@fontsource/outfit/800.css";
+import "@fontsource/outfit/900.css";
 
 import { CssBaseline, ThemeProvider, colors } from "@mui/material";
 

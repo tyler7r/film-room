@@ -41,7 +41,11 @@ const TeamAffiliation = ({
       <Divider flexItem orientation="vertical" variant="middle" />
       <div className="flex flex-col items-center justify-center">
         <div className="flex items-center justify-center gap-1">
-          <div className={`${small ? "text-base" : "text-lg"} font-bold`}>
+          <div
+            className={`${
+              small ? "text-base" : "text-lg"
+            } font-bold leading-5 tracking-tight`}
+          >
             {aff.team.full_name}
           </div>
           {aff.number && (

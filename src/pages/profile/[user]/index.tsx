@@ -126,7 +126,7 @@ const Profile = () => {
         <div className="flex flex-col items-center justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
             <PageTitle size="x-large" title={profile.name} />
-            <div className="text-lg font-light leading-5 tracking-tight">
+            <div className="text-lg font-light leading-5 tracking-tighter">
               Member since {profile.join_date.substring(0, 4)}
             </div>
           </div>

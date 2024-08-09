@@ -34,8 +34,6 @@ const TeamPageButton = () => {
         sx={{
           fontSize: screenWidth < 750 ? "15px" : "18px",
           fontWeight: "bold",
-          fontFamily: "serif",
-          fontStyle: "italic",
         }}
       >
         Team Hub

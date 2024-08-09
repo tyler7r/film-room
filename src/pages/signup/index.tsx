@@ -1,6 +1,7 @@
 import { Button, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Logo } from "~/components/navbar/logo/logo";
 import FormMessage from "~/components/utils/form-message";
 import PageTitle from "~/components/utils/page-title";
 import { validateEmail } from "~/utils/helpers";
@@ -60,7 +61,8 @@ const Signup = () => {
   };
 
   return (
-    <div className="mt-10 flex w-full flex-col items-center justify-center gap-8 text-center">
+    <div className="flex w-full flex-col items-center justify-center gap-6 p-4 text-center">
+      <Logo size="small" />
       <PageTitle size="x-large" title="Signup" />
       <form
         onSubmit={handleSubmit}

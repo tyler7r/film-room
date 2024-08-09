@@ -211,12 +211,10 @@ const PlaysToCollectionModal = ({
                         variant="middle"
                       />
                       <div className="flex flex-col items-center justify-center">
-                        <div className="font-serif text-lg italic">
-                          {option.video.title}
-                        </div>
+                        <PageTitle title={option.video.title} size="xx-small" />
                         <div className="flex gap-1">
                           <div className="text-center text-sm">
-                            <strong className="font-serif text-base font-bold italic">
+                            <strong className="text-sm font-bold tracking-tight">
                               {option.play.author_name}:
                             </strong>{" "}
                             {option.play.title}
