@@ -58,6 +58,7 @@ const PendingRequest = ({
         handleDelete={handleDelete}
         isOpen={isDeleteOpen}
         setIsOpen={setIsDeleteOpen}
+        deleteType="request"
       />
     </div>
   );

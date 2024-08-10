@@ -8,6 +8,7 @@ type DeleteMenuProps = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   actionMenu?: boolean;
+  deleteType: string;
 };
 
 const DeleteMenu = ({
@@ -15,6 +16,7 @@ const DeleteMenu = ({
   isOpen,
   setIsOpen,
   actionMenu,
+  deleteType,
 }: DeleteMenuProps) => {
   return isOpen ? (
     <div className="flex w-full justify-around">
@@ -46,7 +48,7 @@ const DeleteMenu = ({
       className="text-sm font-bold tracking-tight"
       onClick={() => setIsOpen(true)}
     >
-      DELETE PLAY
+      DELETE {deleteType.toLocaleUpperCase()}
     </div>
   );
 };

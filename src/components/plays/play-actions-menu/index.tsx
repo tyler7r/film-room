@@ -111,6 +111,7 @@ const PlayActionsMenu = ({
                 setIsOpen={setIsDeleteOpen}
                 handleDelete={handleDelete}
                 actionMenu={true}
+                deleteType="play"
               />
             </MenuItem>
           )}
