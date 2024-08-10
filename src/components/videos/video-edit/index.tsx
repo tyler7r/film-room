@@ -12,7 +12,6 @@ import {
   Tooltip,
   type SelectChangeEvent,
 } from "@mui/material";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TeamLogo from "~/components/teams/team-logo";
 import TeamMentions from "~/components/teams/team-mentions";
@@ -34,7 +33,6 @@ type EditVideoProps = {
 };
 
 const EditVideo = ({ video }: EditVideoProps) => {
-  const router = useRouter();
   const { user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
   const { affiliations } = useAuthContext();

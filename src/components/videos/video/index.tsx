@@ -25,7 +25,6 @@ const Video = ({ video, startTime }: VideoProps) => {
   const [exclusiveTeam, setExclusiveTeam] = useState<
     TeamType | null | undefined
   >(null);
-  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
@@ -74,12 +73,6 @@ const Video = ({ video, startTime }: VideoProps) => {
     } else {
       void router.push(`/film-room/${id}?start=${startTime}`);
     }
-  };
-
-  const handleDelete = async () => {
-    if (video) {
-      await supabase.from("videos").delete().eq("id", video.id);
-    } else return;
   };
 
   useEffect(() => {
