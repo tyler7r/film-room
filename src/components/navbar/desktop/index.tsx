@@ -1,6 +1,7 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MailIcon from "@mui/icons-material/Mail";
+import SearchIcon from "@mui/icons-material/Search";
 import { Badge, Button, IconButton, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "~/contexts/auth";
@@ -28,6 +29,12 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
           {user.isLoggedIn ? (
             <div className="flex w-full items-center justify-end gap-3">
               <IconButton
+                size="small"
+                onClick={() => void router.push("/search/users")}
+              >
+                <SearchIcon fontSize="large" />
+              </IconButton>
+              <IconButton
                 onClick={() => {
                   setIsOpen(!isOpen);
                 }}
@@ -41,30 +48,24 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                 />
               </IconButton>
               <div className="flex items-center justify-between gap-2">
-                <Button
-                  variant="contained"
-                  size="medium"
-                  onClick={logout}
-                  sx={{
-                    fontSize: { lg: "20px" },
-                    lineHeight: { lg: "28px" },
-                  }}
-                >
+                <Button variant="contained" size="medium" onClick={logout}>
                   Logout
                 </Button>
               </div>
             </div>
           ) : (
             <div className="flex w-full items-center justify-end gap-2">
+              <IconButton
+                onClick={() => void router.push("/search/users")}
+                size="small"
+              >
+                <SearchIcon fontSize="large" />
+              </IconButton>
               <div className="flex items-center justify-between gap-2">
                 <Button
                   variant="contained"
                   size="medium"
                   onClick={() => router.push("/signup")}
-                  sx={{
-                    fontSize: { lg: "20px" },
-                    lineHeight: { lg: "28px" },
-                  }}
                 >
                   Signup
                 </Button>
@@ -73,10 +74,6 @@ const DesktopNav = ({ logout }: ChildrenNavProps) => {
                   disabled={false}
                   size="medium"
                   onClick={() => router.push("/login")}
-                  sx={{
-                    fontSize: { lg: "20px" },
-                    lineHeight: { lg: "28px" },
-                  }}
                 >
                   Login
                 </Button>
