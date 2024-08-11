@@ -2,6 +2,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Team from "~/components/teams/team";
 import TeamLogo from "~/components/teams/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
@@ -21,6 +22,9 @@ const Video = ({ video, startTime }: VideoProps) => {
   const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
+  const [affiliatedTeams, setAffiliatedTeams] = useState<TeamType[] | null>(
+    null,
+  );
 
   const [exclusiveTeam, setExclusiveTeam] = useState<
     TeamType | null | undefined
@@ -58,6 +62,16 @@ const Video = ({ video, startTime }: VideoProps) => {
     } else setExclusiveTeam(null);
   };
 
+  const fetchAffiliatedTeams = async () => {
+    if (video) {
+      const { data } = await supabase
+        .from("team_video_view")
+        .select("team")
+        .eq("video->>id", video.id);
+      if (data) setAffiliatedTeams(data.map((tm) => tm.team));
+    }
+  };
+
   const handleClick = async (id: string) => {
     if (!startTime) {
       if (user.userId) {
@@ -77,7 +91,8 @@ const Video = ({ video, startTime }: VideoProps) => {
 
   useEffect(() => {
     void fetchExclusiveToTeam();
-  }, []);
+    void fetchAffiliatedTeams();
+  }, [video]);
 
   return (
     video && (
@@ -147,6 +162,11 @@ const Video = ({ video, startTime }: VideoProps) => {
           </div>
         </div>
         <PageTitle size="small" title={video.title} />
+        <div className="flex w-full flex-wrap items-center justify-center gap-1">
+          {affiliatedTeams?.map((tm) => (
+            <Team team={tm} key={tm.id} small={true} onVideo={true} />
+          ))}
+        </div>
       </div>
     )
   );

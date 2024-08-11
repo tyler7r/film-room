@@ -118,6 +118,7 @@ const EditVideo = ({ video }: EditVideoProps) => {
   const updateErrorMessage = () => {
     const { link, title, season, division } = videoData;
     const isValidLink = isValidYoutubeLink(link);
+    const isUnedited = checkForUnEdited();
     if (!isValidForm) {
       if (title === "") {
         setMessage({
@@ -141,6 +142,11 @@ const EditVideo = ({ video }: EditVideoProps) => {
           status: "error",
           text: "Please enter a valid season/year!",
         });
+      } else if (isUnedited) {
+        setMessage({
+          status: "error",
+          text: "Please make a change in order to submit the video's edit!",
+        });
       } else {
         setMessage({ status: "error", text: undefined });
         setIsValidForm(true);
@@ -162,7 +168,8 @@ const EditVideo = ({ video }: EditVideoProps) => {
       videoData.title === video.title &&
       tournament === video.tournament &&
       week === video.week &&
-      teamMentions === initialTeamMentions
+      JSON.stringify(teamMentions.map((m) => m.id)) ===
+        JSON.stringify(initialTeamMentions.map((m) => m.id))
     ) {
       return true;
     } else return false;
@@ -187,7 +194,7 @@ const EditVideo = ({ video }: EditVideoProps) => {
       setMessage({ status: "error", text: undefined });
       setIsValidForm(true);
     }
-  }, [videoData]);
+  }, [videoData, teamMentions]);
 
   const handleTeamMention = async (teamId: string, videoId: string) => {
     await supabase
