@@ -230,13 +230,15 @@ const Collection = () => {
                 : { backgroundColor: `${colors.purple[50]}` }
             }
           >
-            <div className="text-4xl font-bold tracking-tight">{playCount}</div>
-            <div className="text-lg font-light italic leading-4 tracking-tight">
+            <div className="text-4xl font-bold leading-7 tracking-tight">
+              {playCount}
+            </div>
+            <div className="text-lg font-bold leading-4 tracking-tight">
               plays
             </div>
           </div>
-          {userCanEdit && (
-            <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2">
+            {userCanEdit && (
               <PlaysToCollectionModal
                 collectionId={collection.id}
                 isOpen={isOpen}
@@ -244,13 +246,15 @@ const Collection = () => {
                 setReload={setReload}
                 playIds={playIds}
               />
+            )}
+            {user.userId === collection.author_id && (
               <EditCollection
                 collection={collection}
                 isEditOpen={isEditOpen}
                 setIsEditOpen={setIsEditOpen}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
         {collection.description && (
           <div className="w-full text-center text-lg">

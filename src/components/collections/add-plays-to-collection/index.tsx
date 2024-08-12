@@ -128,7 +128,7 @@ const PlaysToCollectionModal = ({
       .channel("play_changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "plays" },
+        { event: "*", schema: "public", table: "collection_plays" },
         () => {
           void fetchPlays();
         },

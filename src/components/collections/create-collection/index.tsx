@@ -17,7 +17,11 @@ import type { MessageType, NewCollectionType } from "~/utils/types";
 import PageTitle from "../../utils/page-title";
 import PrivacyStatus from "./privacy-status";
 
-const CreateCollection = () => {
+type CreateCollectionProps = {
+  small?: boolean;
+};
+
+const CreateCollection = ({ small }: CreateCollectionProps) => {
   const { user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
   const router = useRouter();
@@ -88,7 +92,7 @@ const CreateCollection = () => {
     <Button
       onClick={handleOpen}
       variant="contained"
-      size="large"
+      size={small ? "medium" : "large"}
       endIcon={<AddIcon />}
     >
       Create New Collection

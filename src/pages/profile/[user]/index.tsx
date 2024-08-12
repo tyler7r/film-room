@@ -2,6 +2,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ProfileActionBar from "~/components/profiles/profile-action-bar";
+import ProfileCollections from "~/components/profiles/profile-collections";
 import CreatedFeed from "~/components/profiles/profile-feed/created";
 import HighlightsFeed from "~/components/profiles/profile-feed/highlights";
 import MentionsFeed from "~/components/profiles/profile-feed/mentions";
@@ -122,7 +123,7 @@ const Profile = () => {
 
   return (
     profile && (
-      <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
+      <div className="flex w-full flex-col items-center justify-center gap-8 p-4">
         <div className="flex flex-col items-center justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
             <PageTitle size="x-large" title={profile.name} />
@@ -135,13 +136,6 @@ const Profile = () => {
             changeActionBar={changeActionBar}
           />
         </div>
-        {profileAffiliations && (
-          <div className="my-4 flex w-full flex-wrap items-center justify-center gap-1">
-            {profileAffiliations.map((aff) => (
-              <TeamAffiliation key={aff.affId} aff={aff} />
-            ))}
-          </div>
-        )}
         {router.query.user === user.userId && (
           <div className="flex w-full items-center justify-center">
             {lastWatched && (
@@ -158,6 +152,17 @@ const Profile = () => {
             )}
           </div>
         )}
+        <div className=" flex flex-col items-center justify-center">
+          <PageTitle title="Team Affiliations" size="small" />
+          {profileAffiliations && (
+            <div className="flex w-full flex-wrap items-center justify-center gap-1">
+              {profileAffiliations.map((aff) => (
+                <TeamAffiliation key={aff.affId} aff={aff} />
+              ))}
+            </div>
+          )}
+        </div>
+        <ProfileCollections profileId={profile.id} />
         <div className="flex w-full items-center justify-center">
           <ProfileActionBar
             actionBarStatus={actionBarStatus}
