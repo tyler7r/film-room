@@ -60,6 +60,23 @@ const Home = () => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (page === 1) void fetchPlays();
     else setPage(1);
   }, [isMobile, affIds]);

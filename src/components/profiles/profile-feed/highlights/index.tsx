@@ -55,6 +55,23 @@ const HighlightsFeed = ({ profileId }: FeedProps) => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchHighlightPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (page === 1) void fetchHighlightPlays();
     else setPage(1);
   }, [isMobile]);

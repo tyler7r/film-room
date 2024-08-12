@@ -123,6 +123,23 @@ const Collection = () => {
   }, []);
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     void fetchPlays();
     void fetchCollection();
   }, [id]);

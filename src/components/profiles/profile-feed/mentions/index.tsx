@@ -44,6 +44,23 @@ const MentionsFeed = ({ profileId }: FeedProps) => {
     }
   };
 
+  useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchMentionPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
   const scrollToTop = () => {
     if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
   };

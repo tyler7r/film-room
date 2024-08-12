@@ -59,6 +59,40 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("tag_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tags" },
+        () => {
+          void fetchPlaysByTag();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchPlaysByTag();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (page === 1) void fetchPlaysByTag();
     else setPage(1);
   }, [topic, isMobile, affIds]);

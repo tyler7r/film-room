@@ -59,6 +59,23 @@ const CreatedFeed = ({ profileId }: FeedProps) => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchCreatedPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (page === 1) void fetchCreatedPlays();
     else setPage(1);
   }, [isMobile]);
