@@ -48,6 +48,23 @@ const PlayMentions = ({
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("mention_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
+        () => {
+          void fetchMentions();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     void fetchMentions();
   }, [activePlay]);
 

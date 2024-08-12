@@ -228,9 +228,7 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
                                     {aff.team.full_name}
                                   </strong>
                                 </div>
-                                {aff.team.logo && (
-                                  <TeamLogo tm={aff.team} size={25} />
-                                )}
+                                <TeamLogo tm={aff.team} size={25} />
                               </div>
                             </MenuItem>
                           ))}

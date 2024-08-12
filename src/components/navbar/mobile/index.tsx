@@ -2,6 +2,7 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MailIcon from "@mui/icons-material/Mail";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import SearchIcon from "@mui/icons-material/Search";
 import { Badge, Button, IconButton, Switch } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,6 +28,12 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
         <div className="flex w-full items-center gap-1">
           {user.isLoggedIn ? (
             <div className="flex w-full items-center justify-end gap-3 px-1 py-2">
+              <IconButton
+                size="small"
+                onClick={() => void router.push("/search/users")}
+              >
+                <SearchIcon />
+              </IconButton>
               <div className="flex items-center justify-center gap-2">
                 <IconButton
                   onClick={() => {
@@ -48,6 +55,12 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
             </div>
           ) : (
             <div className="flex w-full items-center justify-end gap-2 px-1">
+              <IconButton
+                size="small"
+                onClick={() => void router.push("/search/users")}
+              >
+                <SearchIcon />
+              </IconButton>
               <Button
                 variant="contained"
                 size="small"

@@ -8,6 +8,7 @@ import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
 import AddPlayToCollection from "../../collections/add-play-to-collection";
 import DeleteMenu from "../../utils/delete-menu";
+import EditPlay from "../edit-play";
 
 type PlayActionsMenuProps = {
   preview: PlayPreviewType;
@@ -106,11 +107,17 @@ const PlayActionsMenu = ({
           )}
           {preview.play.author_id === user.userId && (
             <MenuItem>
+              <EditPlay play={preview.play} video={preview.video} />
+            </MenuItem>
+          )}
+          {preview.play.author_id === user.userId && (
+            <MenuItem>
               <DeleteMenu
                 isOpen={isDeleteOpen}
                 setIsOpen={setIsDeleteOpen}
                 handleDelete={handleDelete}
                 actionMenu={true}
+                deleteType="play"
               />
             </MenuItem>
           )}

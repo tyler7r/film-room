@@ -50,8 +50,8 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
 
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-2 p-2 px-4 ${
-        !listItem ? `${hoverBorder} rounded-md` : "w-full"
+      className={`flex items-center justify-center gap-2 p-2 px-4 ${
+        !listItem ? `${hoverBorder} flex-col rounded-md` : "w-full"
       }`}
       style={backgroundStyle}
       onClick={handleClick}
@@ -61,7 +61,7 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
           small ? "gap-4" : "gap-6"
         }`}
       >
-        {collection.team?.logo ? (
+        {collection.team ? (
           <TeamLogo
             tm={collection.team}
             size={small ? 25 : 60}
@@ -73,10 +73,10 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
         )}
         <div
           className={`flex ${
-            small ? "" : "flex-col"
-          } items-center justify-center`}
+            !small && "flex-col"
+          } w-full items-center justify-center gap-4`}
         >
-          <div className="flex w-full items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <PageTitle
               title={collection.collection.title}
               size={small ? "x-small" : "small"}
@@ -112,14 +112,14 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
           <div
             className={`${
               small ? "text-xl" : "text-3xl"
-            } font-bold leading-5 tracking-tight`}
+            } font-bold leading-7 tracking-tight`}
           >
             {playCount}
           </div>
           <div
             className={`${
               small ? "text-sm" : "text-base"
-            } font-light italic leading-5 tracking-tight`}
+            } font-bold leading-5 tracking-tight`}
           >
             plays
           </div>

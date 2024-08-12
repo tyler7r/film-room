@@ -44,6 +44,57 @@ const MentionsFeed = ({ profileId }: FeedProps) => {
     }
   };
 
+  useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchMentionPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("tag_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_tags" },
+        () => {
+          void fetchMentionPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("mention_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
+        () => {
+          void fetchMentionPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
   const scrollToTop = () => {
     if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
   };

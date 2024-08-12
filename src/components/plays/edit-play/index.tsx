@@ -1,14 +1,15 @@
 import StarIcon from "@mui/icons-material/Star";
 import { Box, Button, IconButton, Modal, TextField } from "@mui/material";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import type { YouTubePlayer } from "react-youtube";
+import FormMessage from "~/components/utils/form-message";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import {
   type CollectionType,
+  type MessageType,
   type NewPlayType,
+  type PlayType,
   type TeamType,
   type UserType,
   type VideoType,
@@ -18,14 +19,11 @@ import StandardPopover from "../../utils/standard-popover";
 import AddCollectionsToPlay from "../add-collections-to-play";
 import AddMentionsToPlayProps from "../add-mentions-to-play";
 import AddTagsToPlay from "../add-tags-to-play";
-import PlayModalBtn from "./button";
-import PrivacyStatus from "./privacy-status";
+import PrivacyStatus from "../create-play/privacy-status";
 
 type CreatePlayProps = {
-  player: YouTubePlayer | null;
   video: VideoType;
-  isNewPlayOpen: boolean;
-  setIsNewPlayOpen: (status: boolean) => void;
+  play: PlayType;
 };
 
 export type CreateNewTagType = {
@@ -45,37 +43,44 @@ export type CreateNewCollectionType = {
   profile?: UserType;
 };
 
-const CreatePlay = ({
-  player,
-  video,
-  setIsNewPlayOpen,
-  isNewPlayOpen,
-}: CreatePlayProps) => {
-  const router = useRouter();
+const EditPlay = ({ play, video }: CreatePlayProps) => {
   const { user, affIds } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
 
-  const [isPlayStarted, setIsPlayStarted] = useState(false);
   const [playDetails, setPlayDetails] = useState<NewPlayType>({
-    title: "",
-    note: "",
-    highlight: false,
-    start: null,
-    end: null,
-    private: false,
-    exclusive_to: video.exclusive_to ? video.exclusive_to : "public",
+    title: play.title,
+    note: play.note ?? "",
+    highlight: play.highlight,
+    start: play.start_time,
+    end: play.end_time,
+    private: play.private,
+    exclusive_to: play.exclusive_to ? play.exclusive_to : "public",
   });
   const [mentions, setMentions] = useState<UserType[]>([]);
+  const [initialMentions, setInitialMentions] = useState<UserType[]>([]);
   const [players, setPlayers] = useState<UserType[] | null>(null);
+
   const [playTags, setPlayTags] = useState<CreateNewTagType[]>([]);
+  const [initialPlayTags, setInitialPlayTags] = useState<CreateNewTagType[]>(
+    [],
+  );
   const [tags, setTags] = useState<CreateNewTagType[] | null>(null);
+
   const [playCollections, setPlayCollections] = useState<
+    CreateNewCollectionType[]
+  >([]);
+  const [initialPlayCollections, setInitialPlayCollections] = useState<
     CreateNewCollectionType[]
   >([]);
   const [collections, setCollections] = useState<
     CreateNewCollectionType[] | null
   >(null);
 
+  const [message, setMessage] = useState<MessageType>({
+    text: undefined,
+    status: "error",
+  });
+  const [isEditPlayOpen, setIsEditPlayOpen] = useState<boolean>(false);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -90,12 +95,27 @@ const CreatePlay = ({
 
   const open = Boolean(anchorEl);
 
+  const fetchInitialMentions = async () => {
+    if (play) {
+      const { data } = await supabase
+        .from("play_mention_view")
+        .select()
+        .eq("play->>id", play.id);
+      if (data) {
+        setInitialMentions(data.map((p) => p.receiver));
+        setMentions(data.map((p) => p.receiver));
+      } else {
+        setInitialMentions([]);
+        setMentions([]);
+      }
+    }
+  };
+
   const fetchPlayers = async () => {
     const players = supabase.from("user_view").select("profile");
     if (video.exclusive_to) {
       void players.match({
         "team->>id": video.exclusive_to,
-        "affiliation->>role": "player",
         "affiliation->>verified": true,
       });
     } else {
@@ -110,6 +130,22 @@ const CreatePlay = ({
     }
   };
 
+  const fetchInitialTags = async () => {
+    if (play) {
+      const { data } = await supabase
+        .from("play_tags")
+        .select("tags!inner(title, id)")
+        .eq("play_id", play.id);
+      if (data) {
+        setInitialPlayTags(data.map((p) => p.tags!));
+        setPlayTags(data.map((p) => p.tags!));
+      } else {
+        setInitialPlayTags([]);
+        setPlayTags([]);
+      }
+    }
+  };
+
   const fetchTags = async () => {
     const tags = supabase.from("tags").select("title, id");
     if (affIds) {
@@ -120,6 +156,22 @@ const CreatePlay = ({
 
     const { data } = await tags;
     if (data) setTags(data);
+  };
+
+  const fetchInitialCollections = async () => {
+    if (play) {
+      const { data } = await supabase
+        .from("collection_plays")
+        .select("collections!inner(title, id)")
+        .eq("play_id", play.id);
+      if (data) {
+        setInitialPlayCollections(data.map((p) => p.collections!));
+        setPlayCollections(data.map((p) => p.collections!));
+      } else {
+        setInitialPlayCollections([]);
+        setPlayCollections([]);
+      }
+    }
   };
 
   const fetchCollections = async () => {
@@ -147,37 +199,16 @@ const CreatePlay = ({
     });
   };
 
-  const startPlay = async () => {
-    if (!user.isLoggedIn) {
-      void router.push("/login");
-      return;
-    }
-    setIsPlayStarted(true);
-    const time = await player?.getCurrentTime();
-    const roundedTime = Math.round(time!);
-    setPlayDetails({ ...playDetails, start: roundedTime });
-    void player?.playVideo();
-  };
-
-  const endPlay = async () => {
-    setIsPlayStarted(false);
-    const time = await player?.getCurrentTime();
-    const roundedTime = Math.round(time!);
-    void player?.pauseVideo();
-    setPlayDetails({ ...playDetails, end: roundedTime });
-    setIsNewPlayOpen(true);
-  };
-
   const resetPlay = async () => {
-    setIsNewPlayOpen(false);
+    setIsEditPlayOpen(false);
     setPlayDetails({
-      title: "",
-      note: "",
-      highlight: false,
-      start: null,
-      end: null,
-      private: false,
-      exclusive_to: video.exclusive_to ? video.exclusive_to : "public",
+      title: play.title,
+      note: play.note ?? "",
+      highlight: play.highlight,
+      start: play.start_time,
+      end: play.end_time,
+      private: play.private,
+      exclusive_to: play.exclusive_to ? play.exclusive_to : "public",
     });
     setMentions([]);
     setPlayTags([]);
@@ -194,6 +225,22 @@ const CreatePlay = ({
     });
   };
 
+  const handleDeleteMention = async (mentionId: string) => {
+    await supabase.from("play_mentions").delete().match({
+      play_id: play.id,
+      receiver_id: mentionId,
+    });
+  };
+
+  const handleRemoveMentions = () => {
+    initialMentions.forEach((m1) => {
+      const isIncluded = mentions.find((m2) => m2.id === m1.id);
+      if (!isIncluded) {
+        void handleDeleteMention(m1.id);
+      }
+    });
+  };
+
   const handleTag = async (play: string, tag: string) => {
     await supabase.from("play_tags").insert({
       play_id: play,
@@ -201,10 +248,46 @@ const CreatePlay = ({
     });
   };
 
+  const handleDeleteTag = async (tagId: string | undefined) => {
+    if (tagId) {
+      await supabase.from("play_tags").delete().match({
+        play_id: play.id,
+        tag_id: tagId,
+      });
+    }
+  };
+
+  const handleRemoveTags = () => {
+    initialPlayTags.forEach((t1) => {
+      const isIncluded = playTags.find((t2) => t2.id === t1.id);
+      if (!isIncluded) {
+        void handleDeleteTag(t1.id);
+      }
+    });
+  };
+
   const handleCollection = async (play: string, collection: string) => {
     await supabase.from("collection_plays").insert({
       play_id: play,
       collection_id: collection,
+    });
+  };
+
+  const handleDeleteCollection = async (collectionId: string | undefined) => {
+    if (collectionId) {
+      await supabase.from("collection_plays").delete().match({
+        play_id: play.id,
+        collection_id: collectionId,
+      });
+    }
+  };
+
+  const handleRemoveCollections = () => {
+    initialPlayCollections.forEach((c1) => {
+      const isIncluded = playCollections.find((c2) => c2.id === c1.id);
+      if (!isIncluded) {
+        void handleDeleteCollection(c1.id);
+      }
     });
   };
 
@@ -220,11 +303,11 @@ const CreatePlay = ({
     }
   };
 
-  const createPlay = async (isPrivate: boolean) => {
+  const editPlay = async (isPrivate: boolean) => {
     if (user.userId) {
       const { data } = await supabase
         .from("plays")
-        .insert({
+        .update({
           exclusive_to: isPrivate ? playDetails.exclusive_to : null,
           author_id: user.userId,
           video_id: video.id,
@@ -236,20 +319,24 @@ const CreatePlay = ({
           author_name: `${user.name}`,
           private: isPrivate,
         })
+        .eq("id", play.id)
         .select()
         .single();
       if (data) {
-        mentions?.forEach((mention) => {
-          void handleMention(mention.id, mention.name, data.id);
+        handleRemoveMentions();
+        mentions.forEach((mention) => {
+          void handleMention(mention.id, mention.name, play.id);
         });
+        handleRemoveTags();
         if (playTags.length > 0) {
           playTags.forEach((tag) => {
-            void handleTag(data.id, `${tag.id}`);
+            void handleTag(play.id, `${tag.id}`);
           });
         }
+        handleRemoveCollections();
         if (playCollections.length > 0) {
           playCollections.forEach((col) => {
-            void handleCollection(data.id, `${col.id}`);
+            void handleCollection(play.id, `${col.id}`);
           });
         }
         void updateLastWatched();
@@ -258,23 +345,69 @@ const CreatePlay = ({
     }
   };
 
-  const checkValidPlay = () => {
+  const checkForUnEdited = () => {
+    const note = playDetails.note === "" ? null : playDetails.note;
+    const exclusive =
+      playDetails.exclusive_to === "public" ? null : playDetails.exclusive_to;
+    const sameMentions =
+      JSON.stringify(mentions.map((m) => m.id)) ===
+      JSON.stringify(initialMentions.map((m) => m.id));
+    const sameTags =
+      JSON.stringify(playTags.map((t) => t.id)) ===
+      JSON.stringify(initialPlayTags.map((t) => t.id));
+    const sameCollections =
+      JSON.stringify(playCollections.map((c) => c.id)) ===
+      JSON.stringify(initialPlayCollections.map((c) => c.id));
     if (
-      typeof playDetails.end !== "number" ||
-      typeof playDetails.start !== "number" ||
-      playDetails.title === ""
+      note === play.note &&
+      exclusive === play.exclusive_to &&
+      playDetails.private === play.private &&
+      playDetails.highlight === play.highlight &&
+      playDetails.title === play.title &&
+      sameMentions &&
+      sameTags &&
+      sameCollections
     ) {
+      return true;
+    } else return false;
+  };
+
+  const checkValidPlay = () => {
+    const isUnedited = checkForUnEdited();
+    if (playDetails.title === "" || isUnedited) {
       setIsValidPlay(false);
     } else {
       setIsValidPlay(true);
     }
   };
 
+  const updateErrorMessage = () => {
+    const { title } = playDetails;
+    const isUnedited = checkForUnEdited();
+    if (!isValidPlay) {
+      if (title === "") {
+        setMessage({
+          status: "error",
+          text: "Please enter a valid title!",
+        });
+        setIsValidPlay(false);
+      } else if (isUnedited) {
+        setMessage({
+          status: "error",
+          text: "Please make a change in order to submit the play's edit!",
+        });
+      } else {
+        setMessage({ status: "error", text: undefined });
+        setIsValidPlay(true);
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (video.private || playDetails.private) void createPlay(true);
+    if (video.private || playDetails.private) void editPlay(true);
     else {
-      void createPlay(false);
+      void editPlay(false);
     }
     void resetPlay();
   };
@@ -284,7 +417,7 @@ const CreatePlay = ({
       .channel("tag_changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "tags" },
+        { event: "*", schema: "public", table: "play_tags" },
         () => {
           void fetchTags();
         },
@@ -315,7 +448,7 @@ const CreatePlay = ({
 
   useEffect(() => {
     checkValidPlay();
-  }, [playDetails]);
+  }, [playDetails, mentions, playTags, playCollections]);
 
   useEffect(() => {
     void fetchPlayers();
@@ -323,14 +456,21 @@ const CreatePlay = ({
     void fetchCollections();
   }, [video]);
 
-  return !isNewPlayOpen ? (
-    <PlayModalBtn
-      isPlayStarted={isPlayStarted}
-      startPlay={startPlay}
-      endPlay={endPlay}
-    />
+  useEffect(() => {
+    void fetchInitialCollections();
+    void fetchInitialTags();
+    void fetchInitialMentions();
+  }, [isEditPlayOpen]);
+
+  return !isEditPlayOpen ? (
+    <div
+      className="text-sm font-bold tracking-tight"
+      onClick={() => setIsEditPlayOpen(true)}
+    >
+      EDIT PLAY
+    </div>
   ) : (
-    <Modal open={isNewPlayOpen} onClose={resetPlay}>
+    <Modal open={isEditPlayOpen} onClose={resetPlay}>
       <Box
         className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid p-4"
         sx={backgroundStyle}
@@ -350,7 +490,7 @@ const CreatePlay = ({
         >
           X
         </Button>
-        <PageTitle title="Create New Play" size="medium" />
+        <PageTitle title="Edit Play" size="medium" />
         <form
           onSubmit={handleSubmit}
           className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
@@ -417,15 +557,22 @@ const CreatePlay = ({
             newDetails={playDetails}
             setNewDetails={setPlayDetails}
           />
+          <FormMessage message={message} />
           <div className="flex items-center justify-center gap-2">
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!isValidPlay}
-              size="large"
-            >
-              Submit
-            </Button>
+            {isValidPlay ? (
+              <Button variant="contained" size="large" type="submit">
+                Edit Play
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                color="primary"
+                type="button"
+                onClick={() => updateErrorMessage()}
+              >
+                Edit Play
+              </Button>
+            )}
             <Button
               type="button"
               variant="text"
@@ -441,4 +588,4 @@ const CreatePlay = ({
   );
 };
 
-export default CreatePlay;
+export default EditPlay;

@@ -124,6 +124,23 @@ const PlaysToCollectionModal = ({
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "collection_plays" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     void fetchPlays();
   }, [playIds]);
 

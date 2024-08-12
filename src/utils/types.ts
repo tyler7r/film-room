@@ -99,6 +99,12 @@ export type Database = MergeDeep<
             team: TeamType | null;
           };
         };
+        play_mention_view: {
+          Row: {
+            receiver: UserType;
+            play: PlayType;
+          };
+        };
       };
     };
   }
@@ -369,4 +375,9 @@ export type NewCollectionType = {
   private: boolean;
   inputValue?: string;
   description: string;
+};
+
+export type PlayMentionViewType = {
+  receiver: UserType;
+  play: PlayType;
 };

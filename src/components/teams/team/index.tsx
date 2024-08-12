@@ -8,13 +8,15 @@ import TeamLogo from "../team-logo";
 type TeamProps = {
   team: TeamType;
   small?: boolean;
+  onVideo?: boolean;
 };
 
-const Team = ({ team, small }: TeamProps) => {
-  const { hoverBorder, backgroundStyle } = useIsDarkContext();
+const Team = ({ team, small, onVideo }: TeamProps) => {
+  const { hoverBorder, backgroundStyle, hoverText } = useIsDarkContext();
   const router = useRouter();
 
-  const handleTeamClick = () => {
+  const handleTeamClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     void router.push(`/team-hub/${team.id}`);
   };
 
@@ -22,7 +24,7 @@ const Team = ({ team, small }: TeamProps) => {
     <div
       className={`flex items-center justify-center ${
         small ? "gap-1" : "gap-4"
-      } ${hoverBorder} p-2`}
+      } ${onVideo ? hoverText : hoverBorder} p-2`}
       key={team.id}
       style={small ? {} : backgroundStyle}
       onClick={handleTeamClick}
@@ -30,7 +32,7 @@ const Team = ({ team, small }: TeamProps) => {
       <TeamLogo tm={team} size={small ? 25 : 60} />
       <Divider variant="middle" orientation="vertical" flexItem />
       <div className="flex flex-col items-center justify-center">
-        <PageTitle title={team.full_name} size={small ? "x-small" : "small"} />
+        <PageTitle title={team.full_name} size={small ? "xx-small" : "small"} />
       </div>
     </div>
   );

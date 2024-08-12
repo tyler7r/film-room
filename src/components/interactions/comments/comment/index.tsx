@@ -41,6 +41,7 @@ const Comment = ({ comment }: CommentProps) => {
           isOpen={isDeleteMenuOpen}
           setIsOpen={setIsDeleteMenuOpen}
           handleDelete={handleDelete}
+          deleteType="comment"
         />
       )}
     </div>

@@ -56,7 +56,7 @@ const PrivacyStatus = ({ newDetails, setNewDetails }: PrivacyStatusProps) => {
                     {div.team.full_name}
                   </strong>
                 </div>
-                {div.team.logo && <TeamLogo tm={div.team} size={25} />}
+                <TeamLogo tm={div.team} size={25} />
               </div>
             </MenuItem>
           ))}

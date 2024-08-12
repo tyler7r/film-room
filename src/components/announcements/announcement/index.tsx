@@ -160,6 +160,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
             isOpen={isDeleteMenuOpen}
             setIsOpen={setIsDeleteMenuOpen}
             handleDelete={handleDelete}
+            deleteType="announcement"
           />
         )}
       </div>

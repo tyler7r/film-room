@@ -108,6 +108,7 @@ const UserEdit = ({
             isOpen={isDeleteMenuOpen}
             setIsOpen={setIsDeleteMenuOpen}
             handleDelete={handleDelete}
+            deleteType="user from team"
           />
         </div>
       </div>

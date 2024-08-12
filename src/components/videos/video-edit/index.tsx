@@ -1,4 +1,3 @@
-import AddIcon from "@mui/icons-material/Add";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   Box,
@@ -13,7 +12,6 @@ import {
   Tooltip,
   type SelectChangeEvent,
 } from "@mui/material";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TeamLogo from "~/components/teams/team-logo";
 import TeamMentions from "~/components/teams/team-mentions";
@@ -23,10 +21,18 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { divisions, isValidYoutubeLink, proDivs } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { MessageType, TeamType, VideoUploadType } from "~/utils/types";
+import type {
+  MessageType,
+  TeamType,
+  VideoType,
+  VideoUploadType,
+} from "~/utils/types";
 
-const CreateVideo = () => {
-  const router = useRouter();
+type EditVideoProps = {
+  video: VideoType;
+};
+
+const EditVideo = ({ video }: EditVideoProps) => {
   const { user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
   const { affiliations } = useAuthContext();
@@ -37,24 +43,33 @@ const CreateVideo = () => {
     text: undefined,
   });
   const [videoData, setVideoData] = useState<VideoUploadType>({
-    link: "",
-    title: "",
-    private: false,
-    exclusive_to: "public",
-    week: "",
-    season: "",
-    tournament: "",
-    division: "",
+    link: video.link,
+    title: video.title,
+    private: video.private,
+    exclusive_to: video.exclusive_to ?? "public",
+    week: video.week ?? "",
+    season: video.season ?? "",
+    tournament: video.tournament ?? "",
+    division: video.division,
   });
+  const [initialTeamMentions, setInitialTeamMentions] = useState<TeamType[]>(
+    [],
+  );
   const [teamMentions, setTeamMentions] = useState<TeamType[]>([]);
   const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
 
-  const handleOpen = () => {
-    if (user.isLoggedIn) {
-      setIsOpen(true);
+  const fetchTaggedTeams = async () => {
+    const { data } = await supabase
+      .from("team_video_view")
+      .select()
+      .eq("video->>id", video.id);
+    if (data && data.length > 0) {
+      setInitialTeamMentions(data.map((d) => d.team));
+      setTeamMentions(data.map((d) => d.team));
     } else {
-      void router.push("/login");
+      setTeamMentions([]);
+      setInitialTeamMentions([]);
     }
   };
 
@@ -88,22 +103,22 @@ const CreateVideo = () => {
 
   const reset = () => {
     setVideoData({
-      link: "",
-      title: "",
-      private: false,
-      exclusive_to: "public",
-      week: "",
-      season: "",
-      tournament: "",
-      division: "",
+      link: video.link,
+      title: video.title,
+      private: video.private,
+      exclusive_to: video.exclusive_to ?? "public",
+      week: video.week ?? "",
+      season: video.season ?? "",
+      tournament: video.tournament ?? "",
+      division: video.division,
     });
-    setTeamMentions([]);
     setIsOpen(false);
   };
 
   const updateErrorMessage = () => {
     const { link, title, season, division } = videoData;
     const isValidLink = isValidYoutubeLink(link);
+    const isUnedited = checkForUnEdited();
     if (!isValidForm) {
       if (title === "") {
         setMessage({
@@ -127,6 +142,11 @@ const CreateVideo = () => {
           status: "error",
           text: "Please enter a valid season/year!",
         });
+      } else if (isUnedited) {
+        setMessage({
+          status: "error",
+          text: "Please make a change in order to submit the video's edit!",
+        });
       } else {
         setMessage({ status: "error", text: undefined });
         setIsValidForm(true);
@@ -134,29 +154,75 @@ const CreateVideo = () => {
     }
   };
 
+  const checkForUnEdited = () => {
+    const week = videoData.week === "" ? null : `Week ${videoData.week}`;
+    const tournament =
+      videoData.tournament === "" ? null : videoData.tournament;
+    const exclusive =
+      videoData.exclusive_to === "public" ? null : videoData.exclusive_to;
+    if (
+      videoData.division === video.division &&
+      exclusive === video.exclusive_to &&
+      videoData.private === video.private &&
+      videoData.season === video.season &&
+      videoData.title === video.title &&
+      tournament === video.tournament &&
+      week === video.week &&
+      JSON.stringify(teamMentions.map((m) => m.id)) ===
+        JSON.stringify(initialTeamMentions.map((m) => m.id))
+    ) {
+      return true;
+    } else return false;
+  };
+
   useEffect(() => {
     // Update form validity and form message as necessary
     const { link, title, season, division } = videoData;
     const isValidLink = isValidYoutubeLink(link);
+    const isUnedited = checkForUnEdited();
 
     if (
       title === "" ||
       season === "" ||
       link === "" ||
       !isValidLink ||
-      division === ""
+      division === "" ||
+      isUnedited
     ) {
       setIsValidForm(false);
     } else {
       setMessage({ status: "error", text: undefined });
       setIsValidForm(true);
     }
-  }, [videoData]);
+  }, [videoData, teamMentions]);
 
-  const handleTeamMention = async (teamId: string, video: string) => {
-    await supabase.from("team_videos").insert({
-      team_id: teamId,
-      video_id: video,
+  const handleTeamMention = async (teamId: string, videoId: string) => {
+    await supabase
+      .from("team_videos")
+      .insert({
+        team_id: teamId,
+        video_id: videoId,
+      })
+      .select();
+  };
+
+  const handleDeleteTeamVideo = async (teamId: string) => {
+    await supabase
+      .from("team_videos")
+      .delete()
+      .match({
+        team_id: teamId,
+        video_id: video.id,
+      })
+      .select();
+  };
+
+  const handleRemoveTeamMentions = () => {
+    initialTeamMentions.forEach((tm1) => {
+      const isIncluded = teamMentions.find((tm2) => tm2.id === tm1.id);
+      if (!isIncluded) {
+        void handleDeleteTeamVideo(tm1.id);
+      }
     });
   };
 
@@ -167,7 +233,7 @@ const CreateVideo = () => {
     if (user.userId) {
       const { data, error } = await supabase
         .from("videos")
-        .insert({
+        .update({
           title,
           link,
           season,
@@ -181,12 +247,15 @@ const CreateVideo = () => {
             week === "" ? null : `Week ${week}`
           } ${tournament === "" ? null : tournament} ${division}`,
           duplicate_check: videoData.private ? `${videoData.exclusive_to}` : "",
+          uploaded_at: video.uploaded_at,
         })
+        .eq("id", video.id)
         .select()
         .single();
       if (data) {
+        handleRemoveTeamMentions();
         teamMentions.forEach((mention) => {
-          void handleTeamMention(mention.id, data.id);
+          void handleTeamMention(mention.id, video.id);
         });
         void reset();
       }
@@ -208,6 +277,7 @@ const CreateVideo = () => {
   };
 
   useEffect(() => {
+    void fetchTaggedTeams();
     void fetchTeams();
   }, []);
 
@@ -246,16 +316,6 @@ const CreateVideo = () => {
             label="Video Title"
             onChange={handleInput}
             value={videoData.title}
-          />
-          <TextField
-            className="w-full"
-            name="link"
-            autoComplete="link"
-            required
-            id="link"
-            label="Video Link"
-            onChange={handleInput}
-            value={videoData.link}
           />
           <div className="flex w-full gap-4 text-start">
             <FormControl className="w-full" required>
@@ -369,7 +429,7 @@ const CreateVideo = () => {
           <div className="flex gap-2">
             {isValidForm ? (
               <Button variant="contained" size="large" type="submit">
-                Add Video
+                Edit Video
               </Button>
             ) : (
               <Button
@@ -378,7 +438,7 @@ const CreateVideo = () => {
                 type="button"
                 onClick={() => updateErrorMessage()}
               >
-                Add Video
+                Edit Video
               </Button>
             )}
             <Button type="button" onClick={reset} size="large">
@@ -389,16 +449,13 @@ const CreateVideo = () => {
       </Box>
     </Modal>
   ) : (
-    <Button
-      type="button"
-      size="large"
-      endIcon={<AddIcon />}
-      onClick={handleOpen}
-      variant="contained"
+    <div
+      className="text-sm font-bold tracking-tight"
+      onClick={() => setIsOpen(true)}
     >
-      Add New Video
-    </Button>
+      EDIT VIDEO
+    </div>
   );
 };
 
-export default CreateVideo;
+export default EditVideo;

@@ -59,6 +59,57 @@ const CreatedFeed = ({ profileId }: FeedProps) => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchCreatedPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("play_mentions")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
+        () => {
+          void fetchCreatedPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("tag_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_tags" },
+        () => {
+          void fetchCreatedPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (page === 1) void fetchCreatedPlays();
     else setPage(1);
   }, [isMobile]);

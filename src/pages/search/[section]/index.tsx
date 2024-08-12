@@ -9,10 +9,8 @@ import SearchPlayTags from "~/components/search-sections/tags";
 import SearchTeams from "~/components/search-sections/teams";
 import SearchUsers from "~/components/search-sections/users";
 import SearchVideos from "~/components/search-sections/videos";
-import { useAuthContext } from "~/contexts/auth";
 
 const SearchSection = () => {
-  const { affIds } = useAuthContext();
   const router = useRouter();
 
   const section = router.query.section as string;
@@ -88,27 +86,13 @@ const SearchSection = () => {
         }}
       />
       <div className="flex w-full flex-col items-center justify-center gap-4">
-        <div className="flex w-full items-center justify-around md:w-4/5">
-          <Button
-            onClick={() => handleActionBarClick("videos")}
-            variant={section == "videos" ? "outlined" : "text"}
-            sx={{
-              fontSize: "20px",
-              padding: "6px 20px 6px 20px",
-              fontWeight: "bold",
-              letterSpacing: "0.07em",
-            }}
-          >
-            Videos
-          </Button>
+        <div className="flex w-full flex-wrap items-center justify-center gap-4 lg:w-4/5 lg:justify-around">
           <Button
             onClick={() => handleActionBarClick("users")}
             variant={section === "users" ? "outlined" : "text"}
             sx={{
               fontSize: "20px",
-              padding: "6px 20px 6px 20px",
               fontWeight: "bold",
-              letterSpacing: "0.07em",
             }}
           >
             Users
@@ -118,21 +102,27 @@ const SearchSection = () => {
             variant={section == "teams" ? "outlined" : "text"}
             sx={{
               fontSize: "20px",
-              padding: "6px 20px 6px 20px",
               fontWeight: "bold",
-              letterSpacing: "0.07em",
             }}
           >
             Teams
+          </Button>
+          <Button
+            onClick={() => handleActionBarClick("videos")}
+            variant={section == "videos" ? "outlined" : "text"}
+            sx={{
+              fontSize: "20px",
+              fontWeight: "bold",
+            }}
+          >
+            Videos
           </Button>
           <Button
             onClick={() => handleActionBarClick("collections")}
             variant={section === "collections" ? "outlined" : "text"}
             sx={{
               fontSize: "20px",
-              padding: "6px 20px 6px 20px",
               fontWeight: "bold",
-              letterSpacing: "0.07em",
             }}
           >
             Collections
@@ -142,17 +132,13 @@ const SearchSection = () => {
             variant={section === "tags" ? "outlined" : "text"}
             sx={{
               fontSize: "20px",
-              padding: "6px 20px 6px 20px",
               fontWeight: "bold",
-              letterSpacing: "0.07em",
             }}
           >
             Tags
           </Button>
         </div>
-        {section === "videos" && (
-          <SearchVideos topic={search} affIds={affIds} />
-        )}
+        {section === "videos" && <SearchVideos topic={search} />}
         {section === "users" && <SearchUsers topic={search} />}
         {section === "teams" && <SearchTeams topic={search} />}
         {section === "tags" && <SearchPlayTags topic={search} />}

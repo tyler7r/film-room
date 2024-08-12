@@ -1,9 +1,10 @@
-import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
   DialogActions,
   DialogContent,
+  IconButton,
   Modal,
   TextField,
 } from "@mui/material";
@@ -13,25 +14,34 @@ import FormMessage from "~/components/utils/form-message";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { MessageType, NewCollectionType } from "~/utils/types";
+import type {
+  CollectionType,
+  MessageType,
+  NewCollectionType,
+} from "~/utils/types";
 import PageTitle from "../../utils/page-title";
-import PrivacyStatus from "./privacy-status";
+import PrivacyStatus from "../create-collection/privacy-status";
 
-type CreateCollectionProps = {
-  small?: boolean;
+type EditCollectionProps = {
+  collection: CollectionType;
+  isEditOpen: boolean;
+  setIsEditOpen: (isEditOpen: boolean) => void;
 };
 
-const CreateCollection = ({ small }: CreateCollectionProps) => {
+const EditCollection = ({
+  collection,
+  isEditOpen,
+  setIsEditOpen,
+}: EditCollectionProps) => {
   const { user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
   const router = useRouter();
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [newCollection, setNewCollection] = useState<NewCollectionType>({
-    title: "",
-    description: "",
-    exclusive_to: "public",
-    private: false,
+    title: collection.title,
+    description: collection.description ?? "",
+    exclusive_to: collection.exclusive_to ?? "public",
+    private: collection.private,
   });
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
   const [message, setMessage] = useState<MessageType>({
@@ -40,18 +50,50 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
   });
 
   const handleOpen = () => {
-    if (user.userId) setIsOpen(true);
+    if (user.userId) setIsEditOpen(true);
     else void router.push("/login");
   };
 
   const handleClose = () => {
-    setIsOpen(false);
+    setIsEditOpen(false);
     setNewCollection({
-      title: "",
-      private: false,
-      exclusive_to: "public",
-      description: "",
+      title: collection.title,
+      private: collection.private,
+      exclusive_to: collection.exclusive_to ?? "public",
+      description: collection.description ?? "",
     });
+  };
+
+  const checkForUnedited = () => {
+    const description =
+      newCollection.description === "" ? null : newCollection.description;
+    const exclusive =
+      newCollection.exclusive_to === "public"
+        ? null
+        : newCollection.exclusive_to;
+
+    if (
+      newCollection.title === collection.title &&
+      description === collection.description &&
+      exclusive === collection.exclusive_to &&
+      newCollection.private === collection.private
+    ) {
+      return true;
+    } else return false;
+  };
+
+  const updateMessage = () => {
+    const isUnedited = checkForUnedited();
+    if (newCollection.title === "") {
+      setMessage({ text: "Please enter a title!", status: "error" });
+    } else if (isUnedited) {
+      setMessage({
+        text: "Please make a change to submit collection edit.",
+        status: "error",
+      });
+    } else {
+      setMessage({ text: undefined, status: "error" });
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -60,7 +102,7 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
     if (user.userId) {
       const { data, error } = await supabase
         .from("collections")
-        .insert({
+        .update({
           title: newCollection.title,
           private: newCollection.private,
           exclusive_to: newCollection.private
@@ -70,7 +112,8 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
           description:
             newCollection.description === "" ? null : newCollection.description,
         })
-        .select("title, id")
+        .eq("id", collection.id)
+        .select()
         .single();
       if (data) {
         handleClose();
@@ -84,21 +127,17 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
   };
 
   useEffect(() => {
-    if (newCollection.title === "") setIsValidForm(false);
+    const isUnedited = checkForUnedited();
+    if (newCollection.title === "" || isUnedited) setIsValidForm(false);
     else setIsValidForm(true);
-  });
+  }, [newCollection]);
 
-  return !isOpen ? (
-    <Button
-      onClick={handleOpen}
-      variant="contained"
-      size={small ? "medium" : "large"}
-      endIcon={<AddIcon />}
-    >
-      Create New Collection
-    </Button>
+  return !isEditOpen ? (
+    <IconButton onClick={handleOpen} size="small">
+      <EditIcon color="action" />
+    </IconButton>
   ) : (
-    <Modal open={isOpen} onClose={handleClose}>
+    <Modal open={isEditOpen} onClose={handleClose}>
       <Box
         className={`relative inset-1/2 flex w-3/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md p-4`}
         sx={backgroundStyle}
@@ -164,12 +203,24 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
             <FormMessage message={message} />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} size="large">
+            <Button onClick={handleClose} size="large" variant="outlined">
               Cancel
             </Button>
-            <Button type="submit" disabled={!isValidForm} size="large">
-              Add
-            </Button>
+            {isValidForm ? (
+              <Button variant="contained" size="large" type="submit">
+                Edit Collection
+              </Button>
+            ) : (
+              <Button
+                size="large"
+                variant="outlined"
+                color="primary"
+                type="button"
+                onClick={() => updateMessage()}
+              >
+                Edit Collection
+              </Button>
+            )}
           </DialogActions>
         </form>
       </Box>
@@ -177,4 +228,4 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
   );
 };
 
-export default CreateCollection;
+export default EditCollection;

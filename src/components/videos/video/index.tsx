@@ -2,15 +2,16 @@ import PublicIcon from "@mui/icons-material/Public";
 import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Team from "~/components/teams/team";
 import TeamLogo from "~/components/teams/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { TeamType, VideoType } from "~/utils/types";
-import DeleteMenu from "../../utils/delete-menu";
 import PageTitle from "../../utils/page-title";
 import StandardPopover from "../../utils/standard-popover";
+import VideoActionsMenu from "../video-actions-menu";
 
 type VideoProps = {
   video: VideoType | null;
@@ -21,11 +22,13 @@ const Video = ({ video, startTime }: VideoProps) => {
   const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
+  const [affiliatedTeams, setAffiliatedTeams] = useState<TeamType[] | null>(
+    null,
+  );
 
   const [exclusiveTeam, setExclusiveTeam] = useState<
     TeamType | null | undefined
   >(null);
-  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
@@ -59,6 +62,16 @@ const Video = ({ video, startTime }: VideoProps) => {
     } else setExclusiveTeam(null);
   };
 
+  const fetchAffiliatedTeams = async () => {
+    if (video) {
+      const { data } = await supabase
+        .from("team_video_view")
+        .select("team")
+        .eq("video->>id", video.id);
+      if (data) setAffiliatedTeams(data.map((tm) => tm.team));
+    }
+  };
+
   const handleClick = async (id: string) => {
     if (!startTime) {
       if (user.userId) {
@@ -76,15 +89,10 @@ const Video = ({ video, startTime }: VideoProps) => {
     }
   };
 
-  const handleDelete = async () => {
-    if (video) {
-      await supabase.from("videos").delete().eq("id", video.id);
-    } else return;
-  };
-
   useEffect(() => {
     void fetchExclusiveToTeam();
-  }, []);
+    void fetchAffiliatedTeams();
+  }, [video]);
 
   return (
     video && (
@@ -94,7 +102,7 @@ const Video = ({ video, startTime }: VideoProps) => {
         className={`${hoverBorder} flex flex-col items-center justify-center rounded-md p-2 px-4`}
         onClick={() => handleClick(video.id)}
       >
-        <div className="flex w-full items-center justify-center">
+        <div className="flex w-full items-center justify-between">
           {!video.private && (
             <IconButton
               onMouseEnter={(e) => handlePopoverOpen(e, "a")}
@@ -128,11 +136,7 @@ const Video = ({ video, startTime }: VideoProps) => {
               />
             </IconButton>
           )}
-          <div
-            className={`${
-              video.author_id === user.userId ? "w-11/12" : ""
-            } flex items-center justify-center gap-2`}
-          >
+          <div className={`flex w-full items-center justify-center gap-2`}>
             {
               <div className="text-sm font-light">
                 {convertTimestamp(video.uploaded_at)}
@@ -153,17 +157,16 @@ const Video = ({ video, startTime }: VideoProps) => {
               {` - ${video.division}`}
             </div>
           </div>
-          {video.author_id === user.userId && (
-            <div onClick={(e) => e.stopPropagation()}>
-              <DeleteMenu
-                isOpen={isDeleteOpen}
-                setIsOpen={setIsDeleteOpen}
-                handleDelete={handleDelete}
-              />
-            </div>
-          )}
+          <div onClick={(e) => e.stopPropagation()}>
+            <VideoActionsMenu video={video} />
+          </div>
         </div>
         <PageTitle size="small" title={video.title} />
+        <div className="flex w-full flex-wrap items-center justify-center gap-1">
+          {affiliatedTeams?.map((tm) => (
+            <Team team={tm} key={tm.id} small={true} onVideo={true} />
+          ))}
+        </div>
       </div>
     )
   );

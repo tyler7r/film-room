@@ -4,6 +4,7 @@ import EmptyMessage from "~/components/utils/empty-msg";
 import PageTitle from "~/components/utils/page-title";
 import CreateVideo from "~/components/videos/create-video";
 import Video from "~/components/videos/video";
+import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
@@ -11,12 +12,12 @@ import { supabase } from "~/utils/supabase";
 import type { VideoType } from "~/utils/types";
 
 type SearchVideosProps = {
-  affIds: string[] | null;
   topic: string;
 };
 
-const SearchVideos = ({ affIds, topic }: SearchVideosProps) => {
+const SearchVideos = ({ topic }: SearchVideosProps) => {
   const { isMobile } = useMobileContext();
+  const { affIds } = useAuthContext();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [videos, setVideos] = useState<VideoType[] | null>(null);
@@ -49,6 +50,40 @@ const SearchVideos = ({ affIds, topic }: SearchVideosProps) => {
     e.preventDefault();
     setPage(value);
   };
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("team_video_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "team_videos" },
+        () => {
+          void fetchVideos();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("video_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "videos" },
+        () => {
+          void fetchVideos();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     if (page === 1) void fetchVideos();

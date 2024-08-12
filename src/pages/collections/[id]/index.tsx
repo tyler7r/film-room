@@ -3,6 +3,7 @@ import { colors, Divider, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import PlaysToCollectionModal from "~/components/collections/add-plays-to-collection";
+import EditCollection from "~/components/collections/edit-collection";
 import PlayPreview from "~/components/plays/play_preview";
 import TeamLogo from "~/components/teams/team-logo";
 import EmptyMessage from "~/components/utils/empty-msg";
@@ -34,6 +35,7 @@ const Collection = () => {
   const [authorName, setAuthorName] = useState<string | null>(null);
   const [userCanEdit, setUserCanEdit] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [reload, setReload] = useState<boolean>(false);
 
   const [playCount, setPlayCount] = useState<number>(0);
@@ -123,9 +125,60 @@ const Collection = () => {
   }, []);
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("mentions_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("tag_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_tags" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     void fetchPlays();
     void fetchCollection();
-  }, [id]);
+  }, [id, isEditOpen]);
 
   useEffect(() => {
     if (reload) {
@@ -177,20 +230,31 @@ const Collection = () => {
                 : { backgroundColor: `${colors.purple[50]}` }
             }
           >
-            <div className="text-4xl font-bold tracking-tight">{playCount}</div>
-            <div className="text-lg font-light italic leading-4 tracking-tight">
+            <div className="text-4xl font-bold leading-7 tracking-tight">
+              {playCount}
+            </div>
+            <div className="text-lg font-bold leading-4 tracking-tight">
               plays
             </div>
           </div>
-          {userCanEdit && (
-            <PlaysToCollectionModal
-              collectionId={collection.id}
-              isOpen={isOpen}
-              setIsOpen={setIsOpen}
-              setReload={setReload}
-              playIds={playIds}
-            />
-          )}
+          <div className="flex items-center justify-center gap-2">
+            {userCanEdit && (
+              <PlaysToCollectionModal
+                collectionId={collection.id}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                setReload={setReload}
+                playIds={playIds}
+              />
+            )}
+            {user.userId === collection.author_id && (
+              <EditCollection
+                collection={collection}
+                isEditOpen={isEditOpen}
+                setIsEditOpen={setIsEditOpen}
+              />
+            )}
+          </div>
         </div>
         {collection.description && (
           <div className="w-full text-center text-lg">

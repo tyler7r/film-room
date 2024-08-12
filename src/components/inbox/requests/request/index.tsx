@@ -41,7 +41,7 @@ const PendingRequest = ({
   return (
     <div
       style={backgroundStyle}
-      className="flex items-center justify-between gap-2 rounded-md p-2"
+      className="flex items-center justify-around gap-2 rounded-md p-2"
     >
       <TeamLogo tm={request.team} size={25} />
       <div
@@ -54,11 +54,14 @@ const PendingRequest = ({
         <ArrowRightAltIcon color="primary" fontSize="small" />{" "}
         <div className="">{request.affiliations.role}</div>
       </div>
-      <DeleteMenu
-        handleDelete={handleDelete}
-        isOpen={isDeleteOpen}
-        setIsOpen={setIsDeleteOpen}
-      />
+      <div>
+        <DeleteMenu
+          handleDelete={handleDelete}
+          isOpen={isDeleteOpen}
+          setIsOpen={setIsDeleteOpen}
+          deleteType="request"
+        />
+      </div>
     </div>
   );
 };

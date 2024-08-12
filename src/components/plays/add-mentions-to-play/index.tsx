@@ -1,24 +1,28 @@
 import { Autocomplete, TextField } from "@mui/material";
 import type { SyntheticEvent } from "react";
 import User from "~/components/user";
-import { type PlayerType } from "~/utils/types";
+import type { UserType } from "~/utils/types";
 
 type AddMentionsToPlayProps = {
-  setMentions: (mentions: PlayerType[]) => void;
-  players: PlayerType[] | null;
+  mentions: UserType[];
+  setMentions: (mentions: UserType[]) => void;
+  players: UserType[] | null;
 };
 
 const AddMentionsToPlayProps = ({
+  mentions,
   setMentions,
   players,
 }: AddMentionsToPlayProps) => {
   const handleChange = (
     event: SyntheticEvent<Element, Event>,
-    newValue: PlayerType[],
+    newValue: UserType[],
   ) => {
     event.preventDefault();
     event.stopPropagation();
-    setMentions(newValue);
+    if (newValue.length === 0) {
+      setMentions([]);
+    } else setMentions(newValue);
   };
 
   return (
@@ -28,25 +32,20 @@ const AddMentionsToPlayProps = ({
           id="mentions"
           onChange={(event, newValue) => handleChange(event, newValue)}
           options={players}
-          getOptionLabel={(option) => `${option.profile.name}`}
+          getOptionLabel={(option) => `${option.name}`}
           renderOption={(props, option) => (
-            <li {...props} key={option.profile.id}>
+            <li {...props} key={option.id}>
               <User
-                key={option.profile.id}
-                user={{
-                  email: option.profile.email,
-                  id: option.profile.id,
-                  last_watched: null,
-                  last_watched_time: null,
-                  name: option.profile.name,
-                  join_date: option.profile.join_date,
-                }}
+                key={option.id}
+                user={option}
                 goToProfile={false}
                 small={true}
                 listItem={true}
               />
             </li>
           )}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          value={mentions}
           filterSelectedOptions
           multiple
           renderInput={(params) => (

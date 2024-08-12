@@ -593,6 +593,13 @@ export type Database = {
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "team_videos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       teams: {
@@ -735,6 +742,13 @@ export type Database = {
           play: Json | null
           team: Json | null
           video: Json | null
+        }
+        Relationships: []
+      }
+      play_mention_view: {
+        Row: {
+          play: Json | null
+          receiver: Json | null
         }
         Relationships: []
       }

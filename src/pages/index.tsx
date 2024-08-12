@@ -60,6 +60,57 @@ const Home = () => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("play_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("tag_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_tags" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("mention_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (page === 1) void fetchPlays();
     else setPage(1);
   }, [isMobile, affIds]);
@@ -70,9 +121,6 @@ const Home = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4">
-      {/* <Divider flexItem variant="middle">
-        <PageTitle size="x-large" title="Inside Break" />
-      </Divider> */}
       <Logo size="large" />
       {user.userId ? (
         <div className="flex gap-4">
@@ -87,7 +135,7 @@ const Home = () => {
           <Button
             variant="outlined"
             size="large"
-            onClick={() => void router.push("/search/videos")}
+            onClick={() => void router.push("/search/users")}
             startIcon={<SearchIcon />}
           >
             Search

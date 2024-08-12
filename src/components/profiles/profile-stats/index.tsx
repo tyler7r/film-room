@@ -67,6 +67,23 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
   }, []);
 
   useEffect(() => {
+    const channel = supabase
+      .channel("mention_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "mentions" },
+        () => {
+          void fetchStats();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     void fetchStats();
   }, [profileId]);
 
@@ -76,8 +93,8 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
         className="flex w-full cursor-default items-center justify-around gap-2 rounded-md p-2 md:w-4/5"
         style={
           isDark
-            ? { backgroundColor: `${colors.purple[200]}` }
-            : { backgroundColor: `${colors.purple[50]}` }
+            ? { backgroundColor: `${colors.purple[400]}` }
+            : { backgroundColor: `${colors.purple.A200}` }
         }
       >
         <div
@@ -87,7 +104,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           <div className="text-3xl font-bold tracking-tight">
             {stats.playCount}
           </div>
-          <div className="text-base font-light italic leading-4 tracking-tighter">
+          <div className="text-base font-bold leading-4 tracking-tighter">
             created
           </div>
         </div>
@@ -99,9 +116,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           <div className="text-3xl font-bold tracking-tight">
             {stats.mentionCount}
           </div>
-          <div className="font-light italic leading-4 tracking-tighter">
-            mentions
-          </div>
+          <div className="font-bold leading-4 tracking-tighter">mentions</div>
         </div>
         <Divider flexItem orientation="vertical" />
         <div
@@ -111,9 +126,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           <div className="text-3xl font-bold tracking-tight">
             {stats.highlightCount}
           </div>
-          <div className="font-light italic leading-4 tracking-tighter">
-            highlights
-          </div>
+          <div className="font-bold leading-4 tracking-tighter">highlights</div>
         </div>
       </div>
     )
