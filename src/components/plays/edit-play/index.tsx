@@ -228,11 +228,11 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
   const handleDeleteMention = async (mentionId: string) => {
     await supabase.from("play_mentions").delete().match({
       play_id: play.id,
-      mention_id: mentionId,
+      receiver_id: mentionId,
     });
   };
 
-  const handleRemoveMentions = async () => {
+  const handleRemoveMentions = () => {
     initialMentions.forEach((m1) => {
       const isIncluded = mentions.find((m2) => m2.id === m1.id);
       if (!isIncluded) {
@@ -257,7 +257,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     }
   };
 
-  const handleRemoveTags = async () => {
+  const handleRemoveTags = () => {
     initialPlayTags.forEach((t1) => {
       const isIncluded = playTags.find((t2) => t2.id === t1.id);
       if (!isIncluded) {
@@ -282,7 +282,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     }
   };
 
-  const handleRemoveCollections = async () => {
+  const handleRemoveCollections = () => {
     initialPlayCollections.forEach((c1) => {
       const isIncluded = playCollections.find((c2) => c2.id === c1.id);
       if (!isIncluded) {
@@ -323,17 +323,17 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
         .select()
         .single();
       if (data) {
-        void handleRemoveMentions();
+        handleRemoveMentions();
         mentions.forEach((mention) => {
           void handleMention(mention.id, mention.name, play.id);
         });
-        void handleRemoveTags();
+        handleRemoveTags();
         if (playTags.length > 0) {
           playTags.forEach((tag) => {
             void handleTag(play.id, `${tag.id}`);
           });
         }
-        void handleRemoveCollections();
+        handleRemoveCollections();
         if (playCollections.length > 0) {
           playCollections.forEach((col) => {
             void handleCollection(play.id, `${col.id}`);
@@ -417,7 +417,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       .channel("tag_changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "tags" },
+        { event: "*", schema: "public", table: "play_tags" },
         () => {
           void fetchTags();
         },

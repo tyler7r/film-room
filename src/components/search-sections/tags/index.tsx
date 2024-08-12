@@ -63,7 +63,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
       .channel("tag_changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "tags" },
+        { event: "*", schema: "public", table: "play_tags" },
         () => {
           void fetchPlaysByTag();
         },
@@ -81,6 +81,23 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "plays" },
+        () => {
+          void fetchPlaysByTag();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("mention_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
         () => {
           void fetchPlaysByTag();
         },

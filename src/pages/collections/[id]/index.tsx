@@ -140,6 +140,40 @@ const Collection = () => {
   }, []);
 
   useEffect(() => {
+    const channel = supabase
+      .channel("mentions_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("tag_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_tags" },
+        () => {
+          void fetchPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     void fetchPlays();
     void fetchCollection();
   }, [id]);

@@ -67,6 +67,23 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
   }, []);
 
   useEffect(() => {
+    const channel = supabase
+      .channel("mention_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "mentions" },
+        () => {
+          void fetchStats();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     void fetchStats();
   }, [profileId]);
 

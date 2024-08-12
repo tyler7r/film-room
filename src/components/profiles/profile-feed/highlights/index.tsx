@@ -72,6 +72,40 @@ const HighlightsFeed = ({ profileId }: FeedProps) => {
   }, []);
 
   useEffect(() => {
+    const channel = supabase
+      .channel("mention_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_mentions" },
+        () => {
+          void fetchHighlightPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("tag_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "play_tags" },
+        () => {
+          void fetchHighlightPlays();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (page === 1) void fetchHighlightPlays();
     else setPage(1);
   }, [isMobile]);
