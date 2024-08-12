@@ -6,8 +6,8 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import {
-  MessageType,
   type CollectionType,
+  type MessageType,
   type NewPlayType,
   type PlayType,
   type TeamType,
@@ -323,17 +323,17 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
         .select()
         .single();
       if (data) {
-        handleRemoveMentions();
+        void handleRemoveMentions();
         mentions.forEach((mention) => {
           void handleMention(mention.id, mention.name, play.id);
         });
-        handleRemoveTags();
+        void handleRemoveTags();
         if (playTags.length > 0) {
           playTags.forEach((tag) => {
             void handleTag(play.id, `${tag.id}`);
           });
         }
-        handleRemoveCollections();
+        void handleRemoveCollections();
         if (playCollections.length > 0) {
           playCollections.forEach((col) => {
             void handleCollection(play.id, `${col.id}`);

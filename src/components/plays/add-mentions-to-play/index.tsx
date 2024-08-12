@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from "@mui/material";
 import type { SyntheticEvent } from "react";
 import User from "~/components/user";
-import { UserType } from "~/utils/types";
+import type { UserType } from "~/utils/types";
 
 type AddMentionsToPlayProps = {
   mentions: UserType[];
