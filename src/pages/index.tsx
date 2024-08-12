@@ -70,9 +70,6 @@ const Home = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4">
-      {/* <Divider flexItem variant="middle">
-        <PageTitle size="x-large" title="Inside Break" />
-      </Divider> */}
       <Logo size="large" />
       {user.userId ? (
         <div className="flex gap-4">
@@ -87,7 +84,7 @@ const Home = () => {
           <Button
             variant="outlined"
             size="large"
-            onClick={() => void router.push("/search/videos")}
+            onClick={() => void router.push("/search/users")}
             startIcon={<SearchIcon />}
           >
             Search

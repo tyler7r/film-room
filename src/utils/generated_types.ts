@@ -745,6 +745,13 @@ export type Database = {
         }
         Relationships: []
       }
+      play_mention_view: {
+        Row: {
+          play: Json | null
+          receiver: Json | null
+        }
+        Relationships: []
+      }
       play_preview: {
         Row: {
           play: Json | null

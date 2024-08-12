@@ -61,9 +61,7 @@ const PrivacyStatus = ({
                     {exclusiveTeam?.full_name}
                   </strong>
                 </div>
-                {exclusiveTeam?.logo && (
-                  <TeamLogo tm={exclusiveTeam} size={25} />
-                )}
+                {exclusiveTeam && <TeamLogo tm={exclusiveTeam} size={25} />}
               </div>
             </MenuItem>
           </Select>
@@ -89,7 +87,7 @@ const PrivacyStatus = ({
                       {div.team.full_name}
                     </strong>
                   </div>
-                  {div.team.logo && <TeamLogo tm={div.team} size={25} />}
+                  <TeamLogo tm={div.team} size={25} />
                 </div>
               </MenuItem>
             ))}
