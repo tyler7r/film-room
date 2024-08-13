@@ -56,7 +56,7 @@ const SignupDetails = () => {
         status: "error",
       });
       setIsValidForm(true);
-      return "error";
+      return false;
     } else return true;
   };
 
