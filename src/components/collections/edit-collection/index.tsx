@@ -1,10 +1,8 @@
-import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
   DialogActions,
   DialogContent,
-  IconButton,
   Modal,
   TextField,
 } from "@mui/material";
@@ -133,9 +131,9 @@ const EditCollection = ({
   }, [newCollection]);
 
   return !isEditOpen ? (
-    <IconButton onClick={handleOpen} size="small">
-      <EditIcon color="action" />
-    </IconButton>
+    <div className="text-sm font-bold tracking-tight" onClick={handleOpen}>
+      EDIT COLLECTION
+    </div>
   ) : (
     <Modal open={isEditOpen} onClose={handleClose}>
       <Box

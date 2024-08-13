@@ -1,4 +1,4 @@
-import { createServerClient, serializeCookieHeader } from "@supabase/ssr";
+import { createServerClient, serialize } from "@supabase/ssr";
 import { type GetServerSidePropsContext } from "next";
 import { type Database } from "~/utils/types";
 
@@ -18,7 +18,7 @@ export function createClient({ req, res }: GetServerSidePropsContext) {
           res.setHeader(
             "Set-Cookie",
             cookiesToSet.map(({ name, value, options }) =>
-              serializeCookieHeader(name, value, options),
+              serialize(name, value, options),
             ),
           );
         },

@@ -65,7 +65,7 @@ const SignupDetails = () => {
       const { error } = await supabase
         .from("profiles")
         .update({ name: data.name })
-        .eq("id", `${user.userId}`);
+        .eq("id", user.userId);
       if (error) {
         setMessage({
           status: "error",
@@ -130,6 +130,10 @@ const SignupDetails = () => {
       setIsValidForm(true);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (!user.userId) void router.push("/login");
+  }, [user.userId]);
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-8 p-4 text-center">

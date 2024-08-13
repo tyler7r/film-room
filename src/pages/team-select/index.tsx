@@ -116,8 +116,8 @@ const TeamSelect = () => {
   }, []);
 
   useEffect(() => {
-    if (!user.isLoggedIn) void router.push("/login");
-  }, [user.isLoggedIn]);
+    if (!user.userId) void router.push("/login");
+  }, [user.userId]);
 
   return (
     teams && (

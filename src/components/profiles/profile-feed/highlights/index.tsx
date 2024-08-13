@@ -139,9 +139,7 @@ const HighlightsFeed = ({ profileId }: FeedProps) => {
       )}
     </div>
   ) : (
-    <div className="mt-4">
-      <EmptyMessage size="medium" message="user highlights" />
-    </div>
+    <EmptyMessage size="medium" message="user highlights" />
   );
 };
 
