@@ -1,4 +1,5 @@
-import { Divider } from "@mui/material";
+import LinkIcon from "@mui/icons-material/Link";
+import { Divider, IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -6,6 +7,7 @@ import Youtube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import CreatePlay from "~/components/plays/create-play";
 import Team from "~/components/teams/team";
 import PageTitle from "~/components/utils/page-title";
+import StandardPopover from "~/components/utils/standard-popover";
 import VideoPlayIndex from "~/components/videos/video-play-index";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
@@ -31,6 +33,20 @@ const FilmRoom = () => {
   const [seenActivePlay, setSeenActivePlay] = useState<boolean>(false);
 
   const [isNewPlayOpen, setIsNewPlayOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+    setIsCopied(false);
+  };
+
+  const open = Boolean(anchorEl);
 
   const interval = useRef<NodeJS.Timeout | null>(null);
 
@@ -107,6 +123,11 @@ const FilmRoom = () => {
     } else return;
   };
 
+  const copyToClipboard = () => {
+    void navigator.clipboard.writeText(window.location.toString());
+    setIsCopied(true);
+  };
+
   useEffect(() => {
     if (router.query.video) {
       void fetchVideo();
@@ -142,21 +163,42 @@ const FilmRoom = () => {
     };
   }, []);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+  });
+
   return (
     video && (
       <div className="flex w-full flex-col items-center justify-center gap-2 p-4">
         <div className="flex flex-col items-center justify-center gap-1 text-center">
-          <div
-            className={`${
-              isDark ? "text-grey-400" : "text-grey-600"
-            } text-lg font-bold leading-4 tracking-tight lg:text-2xl`}
-          >
-            {video.season} -{" "}
-            {video.week
-              ? video.week.toLocaleUpperCase()
-              : video.tournament
-                ? video.tournament.toLocaleUpperCase()
-                : null}
+          <div className="flex items-center gap-1">
+            <div
+              className={`${
+                isDark ? "text-grey-400" : "text-grey-600"
+              } text-lg font-bold leading-4 tracking-tight lg:text-2xl`}
+            >
+              {video.season} -{" "}
+              {video.week
+                ? video.week.toLocaleUpperCase()
+                : video.tournament
+                  ? video.tournament.toLocaleUpperCase()
+                  : null}
+            </div>
+            <IconButton
+              onClick={copyToClipboard}
+              onMouseEnter={handlePopoverOpen}
+              onMouseLeave={handlePopoverClose}
+            >
+              <LinkIcon />
+              <StandardPopover
+                open={open}
+                anchorEl={anchorEl}
+                content={isCopied ? "Copied!" : `Copy link to clipboard`}
+                handlePopoverClose={handlePopoverClose}
+              />
+            </IconButton>
           </div>
           <PageTitle title={video.title} size="large" />
           <div className="mt-2 flex flex-wrap gap-2">
@@ -172,7 +214,7 @@ const FilmRoom = () => {
           isNewPlayOpen={isNewPlayOpen}
           setIsNewPlayOpen={setIsNewPlayOpen}
         />
-        {video.link && (
+        {video.link && !isLoading && (
           <div ref={playerRef}>
             <Youtube
               opts={{
@@ -193,6 +235,7 @@ const FilmRoom = () => {
             />
           </div>
         )}
+        {isLoading && <PageTitle size="large" title="Loading video..." />}
         <VideoPlayIndex
           player={player}
           videoId={video.id}

@@ -55,7 +55,7 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
   }, [reload, user.userId]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1">
       {pendingRequests && (
         <>
           <div className="flex items-center justify-center gap-4">
@@ -87,7 +87,7 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
               ))}
             </div>
           )}
-          <Divider flexItem />
+          <Divider flexItem style={{ marginTop: "8px" }} />
         </>
       )}
     </div>

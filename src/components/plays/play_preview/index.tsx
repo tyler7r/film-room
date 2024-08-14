@@ -1,8 +1,10 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import LinkIcon from "@mui/icons-material/Link";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import StarIcon from "@mui/icons-material/Star";
-import { Divider, IconButton } from "@mui/material";
+import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
@@ -38,16 +40,19 @@ const PlayPreview = ({
   const { hoverText } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
     anchor3: HTMLElement | null;
-  }>({ anchor1: null, anchor2: null, anchor3: null });
+    anchor4: HTMLElement | null;
+  }>({ anchor1: null, anchor2: null, anchor3: null, anchor4: null });
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === preview.play.exclusive_to,
@@ -55,24 +60,48 @@ const PlayPreview = ({
 
   const handlePopoverOpen = (
     e: React.MouseEvent<HTMLElement>,
-    target: 1 | 2 | 3,
+    target: 1 | 2 | 3 | 4,
   ) => {
     if (target === 1) {
-      setAnchorEl({ anchor1: e.currentTarget, anchor2: null, anchor3: null });
+      setAnchorEl({
+        anchor1: e.currentTarget,
+        anchor2: null,
+        anchor3: null,
+        anchor4: null,
+      });
     } else if (target === 2) {
-      setAnchorEl({ anchor1: null, anchor2: e.currentTarget, anchor3: null });
+      setAnchorEl({
+        anchor1: null,
+        anchor2: e.currentTarget,
+        anchor3: null,
+        anchor4: null,
+      });
+    } else if (target === 3) {
+      setAnchorEl({
+        anchor1: null,
+        anchor2: null,
+        anchor3: e.currentTarget,
+        anchor4: null,
+      });
     } else {
-      setAnchorEl({ anchor1: null, anchor2: null, anchor3: e.currentTarget });
+      setAnchorEl({
+        anchor1: null,
+        anchor2: null,
+        anchor3: null,
+        anchor4: e.currentTarget,
+      });
     }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
+    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null, anchor4: null });
+    setIsCopied(false);
   };
 
   const open = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
   const open3 = Boolean(anchorEl.anchor3);
+  const open4 = Boolean(anchorEl.anchor4);
 
   const videoOnReady = async (e: YouTubeEvent) => {
     const video = e.target;
@@ -104,9 +133,28 @@ const PlayPreview = ({
     }
   };
 
-  const handleVideoClick = async (videoId: string) => {
-    if (user.userId) void updateLastWatched(videoId, 0);
-    void router.push(`/film-room/${videoId}`);
+  const handleVideoClick = () => {
+    const videoId = preview.video.id;
+    const playId = preview.play.id;
+    const playStart = preview.play.start_time;
+
+    const params = new URLSearchParams(searchParams);
+    params.set("play", playId);
+    params.set("start", `${playStart}`);
+
+    if (user.userId) void updateLastWatched(videoId, playStart);
+    void router.push(`/film-room/${videoId}?${params.toString()}`);
+  };
+
+  const handlePlayClick = () => {
+    const playId = preview.play.id;
+    void router.push(`/play/${playId}`);
+  };
+
+  const copyToClipboard = () => {
+    const origin = window.location.origin;
+    void navigator.clipboard.writeText(`${origin}/play/${preview.play.id}`);
+    setIsCopied(true);
   };
 
   return (
@@ -176,20 +224,38 @@ const PlayPreview = ({
             collectionAuthor={collectionAuthor}
           />
           <IconButton
-            onMouseEnter={(e) => handlePopoverOpen(e, 1)}
+            onClick={copyToClipboard}
+            onMouseEnter={(e) => handlePopoverOpen(e, 4)}
             onMouseLeave={handlePopoverClose}
-            onClick={() => handleVideoClick(preview.video.id)}
-            size="small"
           >
-            <ShortcutIcon fontSize="large" color="primary" />
+            <LinkIcon />
+            <StandardPopover
+              open={open4}
+              anchorEl={anchorEl.anchor4}
+              content={isCopied ? "Copied!" : `Copy link to clipboard`}
+              handlePopoverClose={handlePopoverClose}
+            />
           </IconButton>
-          <StandardPopover
-            content="Go to Video"
+          <IconButton onClick={(e) => handlePopoverOpen(e, 1)} size="small">
+            <ShortcutIcon color="primary" />
+          </IconButton>
+        </div>
+        {open && (
+          <Menu
             open={open}
             anchorEl={anchorEl.anchor1}
-            handlePopoverClose={handlePopoverClose}
-          />
-        </div>
+            onClose={handlePopoverClose}
+          >
+            <MenuItem onClick={handlePlayClick}>
+              <div className="text-sm font-bold tracking-tight">GO TO PLAY</div>
+            </MenuItem>
+            <MenuItem onClick={handleVideoClick}>
+              <div className="text-sm font-bold tracking-tight">
+                GO TO VIDEO
+              </div>
+            </MenuItem>
+          </Menu>
+        )}
       </div>
       <YouTube
         opts={{
@@ -203,7 +269,7 @@ const PlayPreview = ({
             fs: 1,
             controls: 0,
             rel: 0,
-            origin: `http://localhost:9000`,
+            origin: `https://www.youtube.com`,
           },
         }}
         onReady={videoOnReady}

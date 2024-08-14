@@ -100,7 +100,7 @@ const InboxNotification = () => {
             )}
           </div>
         ))}
-        {notifications && (
+        {notifications && notifications.length > 0 && !loading && (
           <div className="mt-2 flex w-full items-center justify-center">
             <Button
               startIcon={<KeyboardDoubleArrowUpIcon />}
@@ -115,7 +115,7 @@ const InboxNotification = () => {
         )}
       </div>
       <div className="flex flex-col items-center justify-center">
-        {!notifications && !loading && (
+        {(!notifications || notifications.length === 0) && !loading && (
           <EmptyMessage message="notifications" size="small" />
         )}
       </div>
