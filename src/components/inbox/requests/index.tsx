@@ -23,10 +23,11 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
 
   const fetchPendingRequests = async () => {
     if (user.userId) {
-      const { data } = await supabase.from("user_teams").select().match({
-        "affiliations->>user_id": user.userId,
-        "affiliations->>verified": false,
-      });
+      const { data } = await supabase
+        .from("user_teams")
+        .select()
+        .eq("affiliations->>user_id", user.userId)
+        .eq("affiliations->>verified", false);
       if (data && data.length > 0) setPendingRequests(data);
       else setPendingRequests(null);
     } else setPendingRequests(null);
@@ -51,7 +52,7 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
 
   useEffect(() => {
     void fetchPendingRequests();
-  }, [reload]);
+  }, [reload, user.userId]);
 
   return (
     <div className="flex flex-col gap-2">
