@@ -1,11 +1,11 @@
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import StarIcon from "@mui/icons-material/Star";
 import { Divider, IconButton } from "@mui/material";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import YouTube, { type YouTubeEvent, YouTubePlayer } from "react-youtube";
+import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import { createClient } from "utils/supabase/server-props";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
 import LikeBtn from "~/components/interactions/likes/like-btn";
@@ -20,7 +20,7 @@ import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { PlayPreviewType } from "~/utils/types";
+import type { PlayPreviewType } from "~/utils/types";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const supabase = createClient(context);

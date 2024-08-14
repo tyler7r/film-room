@@ -73,7 +73,6 @@ const PlayPreview = ({
     setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
   };
 
-  const open = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
   const open3 = Boolean(anchorEl.anchor3);
 

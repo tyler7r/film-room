@@ -1,5 +1,5 @@
 import { Button, TextField } from "@mui/material";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "~/components/navbar/logo/logo";
