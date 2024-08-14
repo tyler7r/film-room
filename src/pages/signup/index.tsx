@@ -1,5 +1,4 @@
 import { Button, TextField } from "@mui/material";
-import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "~/components/navbar/logo/logo";
@@ -9,15 +8,15 @@ import { validateEmail } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  return {
-    props: {
-      host: context.req.headers.host,
-    },
-  };
-}
+// export async function getServerSideProps(context: GetServerSidePropsContext) {
+//   return {
+//     props: {
+//       host: context.req.headers.host,
+//     },
+//   };
+// }
 
-const Signup = ({ host }: { host: string }) => {
+const Signup = () => {
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     status: "error",
@@ -40,12 +39,13 @@ const Signup = ({ host }: { host: string }) => {
     e.preventDefault();
     const timestamp = Date.now();
     const pwd = `${Math.floor(Math.random() * 100000)}${email}${timestamp}`;
+    const origin = window.location.origin;
 
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: pwd,
       options: {
-        emailRedirectTo: `http://${host}/signup/details/`,
+        emailRedirectTo: `${origin}/signup/details/`,
       },
     });
     if (error) {
