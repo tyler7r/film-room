@@ -77,7 +77,7 @@ export const IsAuth = ({ children }: AuthProps) => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event: string, session) => {
-        if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) {
+        if (event !== "SIGNED_OUT" && session) {
           setUser({
             isLoggedIn: true,
             userId: session.user.id,
@@ -85,15 +85,6 @@ export const IsAuth = ({ children }: AuthProps) => {
             name: session.user.user_metadata.name as string,
           });
           void fetchAffiliations(session.user.id);
-        } else if (event === "INITIAL_SESSION" && session) {
-          setUser({
-            isLoggedIn: false,
-            userId: undefined,
-            email: undefined,
-            name: undefined,
-          });
-          setAffiliations(null);
-          setAffIds(null);
         } else {
           setUser({
             isLoggedIn: false,
@@ -126,7 +117,7 @@ export const IsAuth = ({ children }: AuthProps) => {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [user.userId]);
+  }, []);
 
   useEffect(() => {
     if (affReload) {

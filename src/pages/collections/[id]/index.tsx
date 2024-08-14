@@ -3,7 +3,7 @@ import { colors, Divider, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import PlaysToCollectionModal from "~/components/collections/add-plays-to-collection";
-import EditCollection from "~/components/collections/edit-collection";
+import CollectionActionsMenu from "~/components/collections/collection-actions-menu";
 import PlayPreview from "~/components/plays/play_preview";
 import TeamLogo from "~/components/teams/team-logo";
 import EmptyMessage from "~/components/utils/empty-msg";
@@ -35,7 +35,6 @@ const Collection = () => {
   const [authorName, setAuthorName] = useState<string | null>(null);
   const [userCanEdit, setUserCanEdit] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [reload, setReload] = useState<boolean>(false);
 
   const [playCount, setPlayCount] = useState<number>(0);
@@ -178,7 +177,7 @@ const Collection = () => {
   useEffect(() => {
     void fetchPlays();
     void fetchCollection();
-  }, [id, isEditOpen]);
+  }, [id]);
 
   useEffect(() => {
     if (reload) {
@@ -248,11 +247,7 @@ const Collection = () => {
               />
             )}
             {user.userId === collection.author_id && (
-              <EditCollection
-                collection={collection}
-                isEditOpen={isEditOpen}
-                setIsEditOpen={setIsEditOpen}
-              />
+              <CollectionActionsMenu collection={collection} />
             )}
           </div>
         </div>

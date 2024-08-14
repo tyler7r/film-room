@@ -56,7 +56,7 @@ const SignupDetails = () => {
         status: "error",
       });
       setIsValidForm(true);
-      return "error";
+      return false;
     } else return true;
   };
 
@@ -65,7 +65,7 @@ const SignupDetails = () => {
       const { error } = await supabase
         .from("profiles")
         .update({ name: data.name })
-        .eq("id", `${user.userId}`);
+        .eq("id", user.userId);
       if (error) {
         setMessage({
           status: "error",
@@ -94,6 +94,11 @@ const SignupDetails = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsValidForm(false);
+
+    if (!user.userId) {
+      void router.push("/login");
+      return;
+    }
 
     const ensureUpdate = await updateUserData();
     const checkValidName = await updateUserName();

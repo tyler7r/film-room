@@ -75,10 +75,10 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
   }, [page]);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-6">
+    <div className="mb-2 flex w-full flex-col items-center justify-center gap-2">
       <PageTitle size="small" title="User Collections" />
       {!collections && <EmptyMessage size="small" message="collections" />}
-      <div className="flex w-full flex-wrap items-center justify-center gap-6">
+      <div className="mb-4 flex w-full flex-wrap items-center justify-center gap-6">
         {collections?.map((collection) => (
           <Collection
             key={collection.collection.id}

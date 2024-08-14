@@ -9,7 +9,8 @@ import PlayPreview from "~/components/plays/play_preview";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
-import { supabase } from "~/utils/supabase";
+// import { supabase } from "~/utils/supabase";
+import { supabase } from "utils/supabase/component";
 import type { PlayPreviewType } from "~/utils/types";
 import { useIsDarkContext } from "./_app";
 

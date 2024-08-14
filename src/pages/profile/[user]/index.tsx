@@ -1,3 +1,4 @@
+import AddIcon from "@mui/icons-material/Add";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -11,6 +12,7 @@ import TeamAffiliation from "~/components/teams/team-affiliation";
 import PageTitle from "~/components/utils/page-title";
 import Video from "~/components/videos/video";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type {
   LastWatchedType,
@@ -26,6 +28,7 @@ type FetchOptions = {
 const Profile = () => {
   const router = useRouter();
   const { user } = useAuthContext();
+  const { backgroundStyle, hoverBorder } = useIsDarkContext();
 
   const [options, setOptions] = useState<FetchOptions>({
     profileId: router.query.user as string,
@@ -79,7 +82,7 @@ const Profile = () => {
         .select()
         .eq("profile->>id", `${user.userId}`)
         .single();
-      if (data) setLastWatched(data);
+      if (data?.video) setLastWatched(data);
       else setLastWatched(null);
     }
   };
@@ -136,29 +139,37 @@ const Profile = () => {
             changeActionBar={changeActionBar}
           />
         </div>
-        {router.query.user === user.userId && (
+        {router.query.user === user.userId && lastWatched && (
           <div className="flex w-full items-center justify-center">
-            {lastWatched && (
-              <div className="flex w-11/12 flex-col items-center justify-center gap-3">
-                <div className="flex items-center gap-2">
-                  <PlayArrowIcon fontSize="large" />
-                  <PageTitle size="small" title="Continue Watching" />
-                </div>
-                <Video
-                  video={lastWatched.video}
-                  startTime={`${lastWatched.profile.last_watched_time}`}
-                />
+            <div className="flex w-11/12 flex-col items-center justify-center gap-3">
+              <div className="flex items-center gap-2">
+                <PlayArrowIcon fontSize="large" />
+                <PageTitle size="small" title="Continue Watching" />
               </div>
-            )}
+              <Video
+                video={lastWatched.video}
+                startTime={`${lastWatched.profile.last_watched_time}`}
+              />
+            </div>
           </div>
         )}
-        <div className=" flex flex-col items-center justify-center">
+        <div className=" flex flex-col items-center justify-center gap-2">
           <PageTitle title="Team Affiliations" size="small" />
           {profileAffiliations && (
             <div className="flex w-full flex-wrap items-center justify-center gap-1">
               {profileAffiliations.map((aff) => (
                 <TeamAffiliation key={aff.affId} aff={aff} />
               ))}
+            </div>
+          )}
+          {!profileAffiliations && router.query.user === user.userId && (
+            <div
+              onClick={() => void router.push("/team-select")}
+              style={backgroundStyle}
+              className={`${hoverBorder} flex cursor-pointer items-center justify-center gap-1 p-2`}
+            >
+              <AddIcon fontSize="small" />
+              <div className="text-sm font-bold">JOIN A NEW TEAM!</div>
             </div>
           )}
         </div>

@@ -140,9 +140,7 @@ const CreatedFeed = ({ profileId }: FeedProps) => {
       )}
     </div>
   ) : (
-    <div className="mt-4">
-      <EmptyMessage size="medium" message="user created plays" />
-    </div>
+    <EmptyMessage size="medium" message="user created plays" />
   );
 };
 

@@ -139,9 +139,7 @@ const MentionsFeed = ({ profileId }: FeedProps) => {
       )}
     </div>
   ) : (
-    <div className="mt-4">
-      <EmptyMessage size="medium" message="user mentions" />
-    </div>
+    <EmptyMessage size="medium" message="user mentions" />
   );
 };
 
