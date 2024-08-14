@@ -8,8 +8,8 @@ type CommentBtnProps = {
   playId: string;
   commentCount: number;
   setCommentCount: (commentCount: number) => void;
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
+  isOpen?: boolean;
+  setIsOpen?: (isOpen: boolean) => void;
   activePlay: PlayType | null | undefined;
 };
 
@@ -22,7 +22,9 @@ const CommentBtn = ({
 }: CommentBtnProps) => {
   const handleCommentClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsOpen(!isOpen);
+    if (setIsOpen) {
+      setIsOpen(!isOpen);
+    }
   };
 
   const fetchCommentNumber = async () => {

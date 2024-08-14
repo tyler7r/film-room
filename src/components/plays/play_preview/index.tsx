@@ -2,7 +2,8 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import StarIcon from "@mui/icons-material/Star";
-import { Divider, IconButton } from "@mui/material";
+import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
@@ -38,6 +39,7 @@ const PlayPreview = ({
   const { hoverText } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
@@ -46,6 +48,7 @@ const PlayPreview = ({
   }>({ anchor1: null, anchor2: null, anchor3: null });
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
+  const [isNavMenuOpen, setIsNavMenuOpen] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
 
@@ -104,9 +107,27 @@ const PlayPreview = ({
     }
   };
 
-  const handleVideoClick = async (videoId: string) => {
-    if (user.userId) void updateLastWatched(videoId, 0);
-    void router.push(`/film-room/${videoId}`);
+  const handleNavMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
+    setIsNavMenuOpen(!isNavMenuOpen);
+  };
+
+  const handleVideoClick = () => {
+    const videoId = preview.video.id;
+    const playId = preview.play.id;
+    const playStart = preview.play.start_time;
+
+    const params = new URLSearchParams(searchParams);
+    params.set("play", playId);
+    params.set("start", `${playStart}`);
+
+    if (user.userId) void updateLastWatched(videoId, playStart);
+    void router.push(`/film-room/${videoId}?${params.toString()}`);
+  };
+
+  const handlePlayClick = () => {
+    const playId = preview.play.id;
+    void router.push(`/play/${playId}`);
   };
 
   return (
@@ -175,21 +196,22 @@ const PlayPreview = ({
             setReload={setReload}
             collectionAuthor={collectionAuthor}
           />
-          <IconButton
-            onMouseEnter={(e) => handlePopoverOpen(e, 1)}
-            onMouseLeave={handlePopoverClose}
-            onClick={() => handleVideoClick(preview.video.id)}
-            size="small"
-          >
+          <IconButton onClick={handleNavMenuClick} size="small">
             <ShortcutIcon fontSize="large" color="primary" />
           </IconButton>
-          <StandardPopover
-            content="Go to Video"
-            open={open}
-            anchorEl={anchorEl.anchor1}
-            handlePopoverClose={handlePopoverClose}
-          />
         </div>
+        {isNavMenuOpen && (
+          <Menu open={isNavMenuOpen} anchorEl={anchorEl.anchor1}>
+            <MenuItem onClick={handlePlayClick}>
+              <div className="text-sm font-bold tracking-tight">GO TO PLAY</div>
+            </MenuItem>
+            <MenuItem onClick={handleVideoClick}>
+              <div className="text-sm font-bold tracking-tight">
+                GO TO VIDEO
+              </div>
+            </MenuItem>
+          </Menu>
+        )}
       </div>
       <YouTube
         opts={{
@@ -203,7 +225,7 @@ const PlayPreview = ({
             fs: 1,
             controls: 0,
             rel: 0,
-            origin: `http://localhost:9000`,
+            origin: `http://www.inside-break.com`,
           },
         }}
         onReady={videoOnReady}

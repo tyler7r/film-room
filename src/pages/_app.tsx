@@ -14,6 +14,7 @@ import "@fontsource/outfit/900.css";
 import { CssBaseline, ThemeProvider, colors } from "@mui/material";
 
 import { type AppType } from "next/app";
+import Head from "next/head";
 import { createContext, useContext, useState } from "react";
 
 import { Navbar } from "~/components/navbar";
@@ -98,6 +99,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <CssBaseline />
         <IsAuth>
           <IsMobile>
+            <Head>
+              <title>Inside Break</title>
+            </Head>
             <TheInbox>
               <GlobalSearch>
                 <Navbar />
