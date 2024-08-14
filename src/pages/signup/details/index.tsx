@@ -116,7 +116,6 @@ const SignupDetails = () => {
   };
 
   useEffect(() => {
-    // Update form validity and form message as necessary
     const { name, password, confirmPwd } = data;
     const pwdMatch = validatePwdMatch(password, confirmPwd);
 

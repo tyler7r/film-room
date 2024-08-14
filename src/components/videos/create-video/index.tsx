@@ -135,7 +135,6 @@ const CreateVideo = () => {
   };
 
   useEffect(() => {
-    // Update form validity and form message as necessary
     const { link, title, season, division } = videoData;
     const isValidLink = isValidYoutubeLink(link);
 

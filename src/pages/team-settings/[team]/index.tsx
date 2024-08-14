@@ -65,11 +65,9 @@ const TeamSettings = ({
     if (files === null) return;
     const file = files[0];
     if (file && details) {
-      // Create image preview src
       const url = URL.createObjectURL(file);
       setImagePreview(url);
 
-      // Upload image to supabase storage and get image's public URL for use as team logo
       const { data, error } = await supabase.storage
         .from("team_logos")
         .upload(`logos/${details.id}.png`, file, {
@@ -118,7 +116,6 @@ const TeamSettings = ({
     e.preventDefault();
     setIsValidForm(false);
 
-    // Create team with details
     if (details) {
       const { data, error } = await supabase
         .from("teams")

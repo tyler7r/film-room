@@ -8,14 +8,6 @@ import { validateEmail } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";
 
-// export async function getServerSideProps(context: GetServerSidePropsContext) {
-//   return {
-//     props: {
-//       host: context.req.headers.host,
-//     },
-//   };
-// }
-
 const Signup = () => {
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
@@ -25,7 +17,6 @@ const Signup = () => {
   const [email, setEmail] = useState<string>("");
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
 
-  // Checks for valid email after every input and updates form message as needed
   useEffect(() => {
     const isValidEmail = validateEmail(email);
     if (!isValidEmail) {

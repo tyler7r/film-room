@@ -4,13 +4,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Button, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "utils/supabase/component";
 import { Logo } from "~/components/navbar/logo/logo";
 import PlayPreview from "~/components/plays/play_preview";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
-// import { supabase } from "~/utils/supabase";
-import { supabase } from "utils/supabase/component";
 import type { PlayPreviewType } from "~/utils/types";
 import { useIsDarkContext } from "./_app";
 

@@ -70,11 +70,9 @@ const CreateTeam = () => {
     if (files === null) return;
     const file = files[0];
     if (file) {
-      // Create image preview src
       const url = URL.createObjectURL(file);
       setImagePreview(url);
 
-      // Upload image to supabase storage and get image's public URL for use as team logo
       const { data, error } = await supabase.storage
         .from("team_logos")
         .upload(`logos/${details.id}.png`, file, {
@@ -115,7 +113,6 @@ const CreateTeam = () => {
     e.preventDefault();
     setIsValidForm(false);
 
-    // Create team with details
     const { data, error } = await supabase
       .from("teams")
       .insert({
@@ -129,10 +126,7 @@ const CreateTeam = () => {
       })
       .select()
       .single();
-
-    // When successfully created, create an owner affiliation of the team for the user
     if (data) {
-      // Set team id to newly created teams' id
       await supabase
         .from("affiliations")
         .insert({

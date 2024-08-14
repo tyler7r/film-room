@@ -47,7 +47,7 @@ const ForgotPassword = () => {
     }
     if (data) {
       setMessage({
-        text: `Reset email sent to ${email}`,
+        text: `Reset email sent to ${email}. Make sure to check spam.`,
         status: "success",
       });
     }
