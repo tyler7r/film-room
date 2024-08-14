@@ -158,7 +158,7 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.toString());
+    void navigator.clipboard.writeText(window.location.toString());
     setIsCopied(true);
   };
 

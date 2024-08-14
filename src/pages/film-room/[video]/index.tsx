@@ -124,7 +124,7 @@ const FilmRoom = () => {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.toString());
+    void navigator.clipboard.writeText(window.location.toString());
     setIsCopied(true);
   };
 
