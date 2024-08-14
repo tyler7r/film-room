@@ -1,10 +1,11 @@
+import LinkIcon from "@mui/icons-material/Link";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import StarIcon from "@mui/icons-material/Star";
 import { Divider, IconButton } from "@mui/material";
 import type { GetServerSidePropsContext } from "next";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import { createClient } from "utils/supabase/server-props";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
@@ -14,6 +15,7 @@ import PlayActionsMenu from "~/components/plays/play-actions-menu";
 import PlayMentions from "~/components/plays/play-mentions";
 import PlayTags from "~/components/plays/play-tags";
 import TeamLogo from "~/components/teams/team-logo";
+import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
@@ -51,7 +53,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const Play = ({ preview }: { preview: PlayPreviewType }) => {
   const router = useRouter();
   const { user } = useAuthContext();
-  const { isMobile, fullScreen } = useMobileContext();
+  const { isMobile, fullScreen, screenWidth } = useMobileContext();
   const { hoverText } = useIsDarkContext();
   const searchParams = useSearchParams();
 
@@ -61,30 +63,57 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
     anchor3: HTMLElement | null;
-  }>({ anchor1: null, anchor2: null, anchor3: null });
+    anchor4: HTMLElement | null;
+  }>({ anchor1: null, anchor2: null, anchor3: null, anchor4: null });
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const handlePopoverOpen = (
     e: React.MouseEvent<HTMLElement>,
-    target: 1 | 2 | 3,
+    target: 1 | 2 | 3 | 4,
   ) => {
     if (target === 1) {
-      setAnchorEl({ anchor1: e.currentTarget, anchor2: null, anchor3: null });
+      setAnchorEl({
+        anchor1: e.currentTarget,
+        anchor2: null,
+        anchor3: null,
+        anchor4: null,
+      });
     } else if (target === 2) {
-      setAnchorEl({ anchor1: null, anchor2: e.currentTarget, anchor3: null });
+      setAnchorEl({
+        anchor1: null,
+        anchor2: e.currentTarget,
+        anchor3: null,
+        anchor4: null,
+      });
+    } else if (target === 3) {
+      setAnchorEl({
+        anchor1: null,
+        anchor2: null,
+        anchor3: e.currentTarget,
+        anchor4: null,
+      });
     } else {
-      setAnchorEl({ anchor1: null, anchor2: null, anchor3: e.currentTarget });
+      setAnchorEl({
+        anchor1: null,
+        anchor2: null,
+        anchor3: null,
+        anchor4: e.currentTarget,
+      });
     }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
+    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null, anchor4: null });
+    setIsCopied(false);
   };
 
   const open = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
   const open3 = Boolean(anchorEl.anchor3);
+  const open4 = Boolean(anchorEl.anchor4);
 
-  const videoOnReady = async (e: YouTubeEvent) => {
+  const videoOnReady = (e: YouTubeEvent) => {
     const video = e.target;
     setPlayer(video);
     void video.cueVideoById({
@@ -92,6 +121,7 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
       startSeconds: preview.play.start_time,
       endSeconds: preview.play.end_time,
     });
+    setIsLoading(false);
   };
 
   const onPlayerStateChange = (e: YouTubeEvent) => {
@@ -127,15 +157,28 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
     void router.push(`/film-room/${videoId}?${params.toString()}`);
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.toString());
+    setIsCopied(true);
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+  }, []);
+
   return (
     <div className="flex items-center justify-center p-4">
       <div
-        className="flex flex-col rounded-md"
+        className="flex flex-col items-center justify-center gap-2 rounded-md"
         style={{
-          width: `${isMobile ? "480px" : fullScreen ? "800px" : "640px"}`,
+          width: `${
+            isMobile ? "480px" : fullScreen ? `${screenWidth * 0.8}px` : "640px"
+          }`,
         }}
       >
-        <div className="flex items-center justify-between gap-2 p-2">
+        <div className="flex w-full items-center justify-between gap-2 p-2">
           <div className="flex items-center gap-2">
             {preview.team && (
               <IconButton
@@ -192,6 +235,19 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
           <div className="flex items-center gap-1">
             <PlayActionsMenu preview={preview} />
             <IconButton
+              onClick={copyToClipboard}
+              onMouseEnter={(e) => handlePopoverOpen(e, 4)}
+              onMouseLeave={handlePopoverClose}
+            >
+              <LinkIcon fontSize="large" />
+              <StandardPopover
+                open={open4}
+                anchorEl={anchorEl.anchor4}
+                content={isCopied ? "Copied!" : `Copy link to clipboard`}
+                handlePopoverClose={handlePopoverClose}
+              />
+            </IconButton>
+            <IconButton
               onMouseEnter={(e) => handlePopoverOpen(e, 1)}
               onMouseLeave={handlePopoverClose}
               onClick={handleVideoClick}
@@ -207,26 +263,32 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
             />
           </div>
         </div>
-        <YouTube
-          opts={{
-            width: `${isMobile ? 475 : fullScreen ? 800 : 640}`,
-            height: `${isMobile ? 295 : fullScreen ? 495 : 390}`,
-            playerVars: {
-              end: preview.play.end_time,
-              enablejsapi: 1,
-              playsinline: 1,
-              disablekb: 1,
-              fs: 1,
-              controls: 0,
-              rel: 0,
-              origin: `http://www.inside-break.com`,
-            },
-          }}
-          onReady={videoOnReady}
-          onStateChange={onPlayerStateChange}
-          id="player"
-          videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
-        />
+        {!isLoading ? (
+          <YouTube
+            opts={{
+              width: `${isMobile ? 475 : fullScreen ? screenWidth * 0.8 : 640}`,
+              height: `${
+                isMobile ? 295 : fullScreen ? (screenWidth * 0.8) / 1.778 : 395
+              }`,
+              playerVars: {
+                end: preview.play.end_time,
+                enablejsapi: 1,
+                playsinline: 1,
+                disablekb: 1,
+                fs: 1,
+                controls: 0,
+                rel: 0,
+                origin: `https://www.youtube.com`,
+              },
+            }}
+            onReady={videoOnReady}
+            onStateChange={onPlayerStateChange}
+            id="player"
+            videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
+          />
+        ) : (
+          <PageTitle size="large" title="Loading Video..." />
+        )}
         <PlayMentions play={preview} />
         <PlayTags play={preview} />
         <div className="flex w-full items-center gap-3 px-1">
@@ -240,7 +302,7 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
             />
           </div>
         </div>
-        <div className="mt-2">
+        <div className="mt-2 w-full">
           <ExpandedPlay play={preview} setCommentCount={setCommentCount} />
         </div>
       </div>

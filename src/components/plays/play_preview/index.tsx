@@ -1,5 +1,6 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import LinkIcon from "@mui/icons-material/Link";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import StarIcon from "@mui/icons-material/Star";
 import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
@@ -45,12 +46,13 @@ const PlayPreview = ({
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
     anchor3: HTMLElement | null;
-  }>({ anchor1: null, anchor2: null, anchor3: null });
+    anchor4: HTMLElement | null;
+  }>({ anchor1: null, anchor2: null, anchor3: null, anchor4: null });
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
-  const [isNavMenuOpen, setIsNavMenuOpen] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === preview.play.exclusive_to,
@@ -58,23 +60,48 @@ const PlayPreview = ({
 
   const handlePopoverOpen = (
     e: React.MouseEvent<HTMLElement>,
-    target: 1 | 2 | 3,
+    target: 1 | 2 | 3 | 4,
   ) => {
     if (target === 1) {
-      setAnchorEl({ anchor1: e.currentTarget, anchor2: null, anchor3: null });
+      setAnchorEl({
+        anchor1: e.currentTarget,
+        anchor2: null,
+        anchor3: null,
+        anchor4: null,
+      });
     } else if (target === 2) {
-      setAnchorEl({ anchor1: null, anchor2: e.currentTarget, anchor3: null });
+      setAnchorEl({
+        anchor1: null,
+        anchor2: e.currentTarget,
+        anchor3: null,
+        anchor4: null,
+      });
+    } else if (target === 3) {
+      setAnchorEl({
+        anchor1: null,
+        anchor2: null,
+        anchor3: e.currentTarget,
+        anchor4: null,
+      });
     } else {
-      setAnchorEl({ anchor1: null, anchor2: null, anchor3: e.currentTarget });
+      setAnchorEl({
+        anchor1: null,
+        anchor2: null,
+        anchor3: null,
+        anchor4: e.currentTarget,
+      });
     }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
+    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null, anchor4: null });
+    setIsCopied(false);
   };
 
+  const open = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
   const open3 = Boolean(anchorEl.anchor3);
+  const open4 = Boolean(anchorEl.anchor4);
 
   const videoOnReady = async (e: YouTubeEvent) => {
     const video = e.target;
@@ -106,11 +133,6 @@ const PlayPreview = ({
     }
   };
 
-  const handleNavMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
-    setIsNavMenuOpen(!isNavMenuOpen);
-  };
-
   const handleVideoClick = () => {
     const videoId = preview.video.id;
     const playId = preview.play.id;
@@ -127,6 +149,12 @@ const PlayPreview = ({
   const handlePlayClick = () => {
     const playId = preview.play.id;
     void router.push(`/play/${playId}`);
+  };
+
+  const copyToClipboard = () => {
+    const origin = window.location.origin;
+    void navigator.clipboard.writeText(`${origin}/play/${preview.play.id}`);
+    setIsCopied(true);
   };
 
   return (
@@ -195,12 +223,29 @@ const PlayPreview = ({
             setReload={setReload}
             collectionAuthor={collectionAuthor}
           />
-          <IconButton onClick={handleNavMenuClick} size="small">
-            <ShortcutIcon fontSize="large" color="primary" />
+          <IconButton
+            onClick={copyToClipboard}
+            onMouseEnter={(e) => handlePopoverOpen(e, 4)}
+            onMouseLeave={handlePopoverClose}
+          >
+            <LinkIcon />
+            <StandardPopover
+              open={open4}
+              anchorEl={anchorEl.anchor4}
+              content={isCopied ? "Copied!" : `Copy link to clipboard`}
+              handlePopoverClose={handlePopoverClose}
+            />
+          </IconButton>
+          <IconButton onClick={(e) => handlePopoverOpen(e, 1)} size="small">
+            <ShortcutIcon color="primary" />
           </IconButton>
         </div>
-        {isNavMenuOpen && (
-          <Menu open={isNavMenuOpen} anchorEl={anchorEl.anchor1}>
+        {open && (
+          <Menu
+            open={open}
+            anchorEl={anchorEl.anchor1}
+            onClose={handlePopoverClose}
+          >
             <MenuItem onClick={handlePlayClick}>
               <div className="text-sm font-bold tracking-tight">GO TO PLAY</div>
             </MenuItem>
@@ -224,7 +269,7 @@ const PlayPreview = ({
             fs: 1,
             controls: 0,
             rel: 0,
-            origin: `http://www.inside-break.com`,
+            origin: `https://www.youtube.com`,
           },
         }}
         onReady={videoOnReady}

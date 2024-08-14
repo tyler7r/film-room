@@ -18,9 +18,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 const Signup = ({ host }: { host: string }) => {
-  useEffect(() => {
-    console.log(host);
-  }, []);
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     status: "error",
@@ -41,11 +38,9 @@ const Signup = ({ host }: { host: string }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Create initial random pwd
     const timestamp = Date.now();
     const pwd = `${Math.floor(Math.random() * 100000)}${email}${timestamp}`;
 
-    //Signup in supabase
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: pwd,

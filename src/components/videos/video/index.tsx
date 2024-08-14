@@ -1,3 +1,4 @@
+import LinkIcon from "@mui/icons-material/Link";
 import PublicIcon from "@mui/icons-material/Public";
 import { Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
@@ -25,35 +26,41 @@ const Video = ({ video, startTime }: VideoProps) => {
   const [affiliatedTeams, setAffiliatedTeams] = useState<TeamType[] | null>(
     null,
   );
-
   const [exclusiveTeam, setExclusiveTeam] = useState<
     TeamType | null | undefined
   >(null);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
+    anchor3: HTMLElement | null;
   }>({
     anchor1: null,
     anchor2: null,
+    anchor3: null,
   });
 
   const handlePopoverOpen = (
     e: React.MouseEvent<HTMLElement>,
-    target: "a" | "b",
+    target: 1 | 2 | 3,
   ) => {
-    if (target === "a") {
-      setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
+    if (target === 1) {
+      setAnchorEl({ anchor1: e.currentTarget, anchor2: null, anchor3: null });
+    } else if (target === 2) {
+      setAnchorEl({ anchor2: e.currentTarget, anchor1: null, anchor3: null });
     } else {
-      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
+      setAnchorEl({ anchor1: null, anchor2: null, anchor3: e.currentTarget });
     }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null });
+    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
+    setIsCopied(false);
   };
 
   const open1 = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
+  const open3 = Boolean(anchorEl.anchor3);
 
   const fetchExclusiveToTeam = () => {
     if (video?.exclusive_to) {
@@ -89,6 +96,14 @@ const Video = ({ video, startTime }: VideoProps) => {
     }
   };
 
+  const copyToClipboard = () => {
+    if (video) {
+      const origin = window.location.origin;
+      void navigator.clipboard.writeText(`${origin}/film-room/${video.id}`);
+      setIsCopied(true);
+    }
+  };
+
   useEffect(() => {
     void fetchExclusiveToTeam();
     void fetchAffiliatedTeams();
@@ -105,7 +120,7 @@ const Video = ({ video, startTime }: VideoProps) => {
         <div className="flex w-full items-center justify-between">
           {!video.private && (
             <IconButton
-              onMouseEnter={(e) => handlePopoverOpen(e, "a")}
+              onMouseEnter={(e) => handlePopoverOpen(e, 1)}
               onMouseLeave={handlePopoverClose}
             >
               <PublicIcon />
@@ -119,7 +134,7 @@ const Video = ({ video, startTime }: VideoProps) => {
           )}
           {video.private && exclusiveTeam && (
             <IconButton
-              onMouseEnter={(e) => handlePopoverOpen(e, "b")}
+              onMouseEnter={(e) => handlePopoverOpen(e, 2)}
               onMouseLeave={handlePopoverClose}
             >
               <TeamLogo
@@ -157,7 +172,23 @@ const Video = ({ video, startTime }: VideoProps) => {
               {` - ${video.division}`}
             </div>
           </div>
-          <div onClick={(e) => e.stopPropagation()}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center"
+          >
+            <IconButton
+              onClick={copyToClipboard}
+              onMouseEnter={(e) => handlePopoverOpen(e, 3)}
+              onMouseLeave={handlePopoverClose}
+            >
+              <LinkIcon />
+              <StandardPopover
+                open={open3}
+                anchorEl={anchorEl.anchor3}
+                content={isCopied ? "Copied!" : `Copy link to clipboard`}
+                handlePopoverClose={handlePopoverClose}
+              />
+            </IconButton>
             <VideoActionsMenu video={video} />
           </div>
         </div>
