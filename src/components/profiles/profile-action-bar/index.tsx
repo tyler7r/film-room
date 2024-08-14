@@ -41,8 +41,8 @@ const ProfileActionBar = ({
 
   return (
     <div
-      className={`mt-8 flex ${
-        isMobile ? "w-full justify-center gap-4" : "w-4/5 justify-around"
+      className={`flex w-full items-center justify-center ${
+        isMobile ? "gap-2" : "mt-4 gap-4"
       }`}
     >
       <div
@@ -53,11 +53,11 @@ const ProfileActionBar = ({
           size="small"
           color={actionBarStatus.createdPlays ? "primary" : "default"}
         >
-          <CreateIcon fontSize="large" />
+          <CreateIcon fontSize={isMobile ? "medium" : "large"} />
         </IconButton>
         <PageTitle
           title="created"
-          size="small"
+          size={isMobile ? "x-small" : "small"}
           purple={actionBarStatus.createdPlays ? true : false}
         />
       </div>
@@ -69,11 +69,11 @@ const ProfileActionBar = ({
           size="small"
           color={actionBarStatus.mentions ? "primary" : "default"}
         >
-          <LocalOfferIcon fontSize="large" />
+          <LocalOfferIcon fontSize={isMobile ? "medium" : "large"} />
         </IconButton>
         <PageTitle
           title="mentions"
-          size="small"
+          size={isMobile ? "x-small" : "small"}
           purple={actionBarStatus.mentions ? true : false}
         />
       </div>
@@ -85,11 +85,11 @@ const ProfileActionBar = ({
           size="small"
           color={actionBarStatus.highlights ? "primary" : "default"}
         >
-          <StarIcon fontSize="large" />
+          <StarIcon fontSize={isMobile ? "medium" : "large"} />
         </IconButton>
         <PageTitle
           title="highlights"
-          size="small"
+          size={isMobile ? "x-small" : "small"}
           purple={actionBarStatus.highlights ? true : false}
         />
       </div>

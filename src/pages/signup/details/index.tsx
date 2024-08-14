@@ -95,6 +95,11 @@ const SignupDetails = () => {
     e.preventDefault();
     setIsValidForm(false);
 
+    if (!user.userId) {
+      void router.push("/login");
+      return;
+    }
+
     const ensureUpdate = await updateUserData();
     const checkValidName = await updateUserName();
     const checkValidPassword = await updatePassword();
@@ -130,10 +135,6 @@ const SignupDetails = () => {
       setIsValidForm(true);
     }
   }, [data]);
-
-  useEffect(() => {
-    if (!user.userId) void router.push("/login");
-  }, [user.userId]);
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-8 p-4 text-center">
