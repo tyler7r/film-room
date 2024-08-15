@@ -75,6 +75,7 @@ const TeamHub = () => {
   useEffect(() => {
     setLoading(true);
     void fetchTeam();
+    setActionBarStatus({ requests: false, transferOwner: false });
   }, [router.query.team, role]);
 
   return loading ? (
