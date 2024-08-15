@@ -13,7 +13,7 @@ const useDebounce = (callback: () => Promise<void>) => {
       void ref.current?.();
     };
 
-    return debounce(func, 300);
+    return debounce(func, 200);
   }, []);
 
   return debouncedCallback;
