@@ -130,7 +130,7 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpen(false);
-                void router.push(`/profile/${comment.play.author_id}`);
+                void router.push(`/profile/${comment.comment.comment_author}`);
               }}
             >
               {comment.comment.author_name}
