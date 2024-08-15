@@ -106,9 +106,9 @@ const TeamSelect = () => {
         );
       });
     }
-    setAffReload(true);
     setTimeout(() => {
       void router.push("/");
+      setAffReload(true);
     }, 2000);
   };
 

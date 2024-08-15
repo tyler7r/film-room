@@ -89,7 +89,7 @@ const CreateCollectionFromPlay = ({
         <form onSubmit={handleNewCollection} className="w-full">
           <PageTitle title="Add New Collection" size="small" />
           <DialogContent>
-            <div className="flex w-full flex-col items-center justify-center">
+            <div className="flex w-full flex-col items-center justify-center gap-2">
               <TextField
                 name="collection-title"
                 autoFocus
@@ -104,7 +104,6 @@ const CreateCollectionFromPlay = ({
                 }
                 label="Collection Title"
                 type="text"
-                variant="standard"
                 className="w-full"
               />
               <TextField
@@ -123,7 +122,6 @@ const CreateCollectionFromPlay = ({
                 label="Description"
                 type="text"
                 placeholder="Description (100 characters max.)"
-                variant="standard"
                 inputProps={{ maxLength: 100 }}
               />
               <PrivacyStatus
