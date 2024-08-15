@@ -120,6 +120,10 @@ export const IsAuth = ({ children }: AuthProps) => {
   }, []);
 
   useEffect(() => {
+    void fetchAffiliations(user.userId);
+  }, [user.userId]);
+
+  useEffect(() => {
     if (affReload) {
       void fetchAffiliations(user.userId);
       setAffReload(false);

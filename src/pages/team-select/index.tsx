@@ -20,7 +20,7 @@ type TeamSelectType = {
 const TeamSelect = () => {
   const router = useRouter();
   const { backgroundStyle, hoverText } = useIsDarkContext();
-  const { user } = useAuthContext();
+  const { user, setAffReload } = useAuthContext();
   const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [teamSelect, setTeamSelect] = useState<TeamSelectType[] | null>(null);
   const [message, setMessage] = useState<MessageType>({
@@ -106,6 +106,7 @@ const TeamSelect = () => {
         );
       });
     }
+    setAffReload(true);
     setTimeout(() => {
       void router.push("/");
     }, 2000);
@@ -120,105 +121,119 @@ const TeamSelect = () => {
   }, [user.userId]);
 
   return (
-    teams && (
-      <form
-        onSubmit={handleSubmit}
-        className="mt-10 flex flex-col items-center justify-center gap-6 p-4"
-      >
-        <div className="flex w-full flex-col items-center justify-center gap-4">
-          <PageTitle title="Select Your Teams" size="large" />
-          <Autocomplete
-            className="w-4/5"
-            id="teams"
-            onChange={(event, newValue) => handleChange(event, newValue)}
-            options={teams}
-            getOptionLabel={(option) =>
-              `${option.full_name} (${option.division})`
-            }
-            filterSelectedOptions
-            multiple
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Teams"
-                placeholder="Teams..."
-                id="teams"
-                name="teams"
-              />
-            )}
-            limitTags={3}
-          />
-        </div>
-        {teamSelect && (
-          <div className="flex w-4/5 flex-col items-center justify-center gap-4 md:w-3/5 lg:w-1/2">
-            <PageTitle title="Adjust Your Team Roles" size="small" />
-            {teamSelect.map((team) => (
-              <div
-                key={team.team.id}
-                className="flex flex-col items-center justify-center gap-4 rounded-md p-4"
-                style={backgroundStyle}
-              >
-                <div className="flex items-center justify-center gap-4">
-                  <TeamLogo tm={team.team} size={35} />
-                  <PageTitle size="x-small" title={team.team.full_name} />
-                  <div className="flex flex-col items-center justify-center">
-                    <div className="-mb-2 text-sm font-bold tracking-tight">
-                      COACH?
+    <div className="mt-10 flex w-full flex-col items-center justify-center gap-2 p-4">
+      <PageTitle size="large" title="Team Select" />
+      {teams && (
+        <form
+          onSubmit={handleSubmit}
+          className="flex w-full flex-col items-center justify-center gap-6 p-4"
+        >
+          <div className="flex w-full flex-col items-center justify-center gap-4">
+            <Autocomplete
+              className="w-4/5"
+              id="teams"
+              onChange={(event, newValue) => handleChange(event, newValue)}
+              options={teams}
+              getOptionLabel={(option) =>
+                `${option.full_name} (${option.division})`
+              }
+              filterSelectedOptions
+              multiple
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Teams"
+                  placeholder="Teams..."
+                  id="teams"
+                  name="teams"
+                />
+              )}
+              limitTags={3}
+            />
+          </div>
+          {teamSelect && (
+            <div className="flex w-4/5 flex-col items-center justify-center gap-4 md:w-3/5 lg:w-1/2">
+              <PageTitle title="Adjust Your Team Roles" size="small" />
+              {teamSelect.map((team) => (
+                <div
+                  key={team.team.id}
+                  className="flex flex-col items-center justify-center gap-4 rounded-md p-4"
+                  style={backgroundStyle}
+                >
+                  <div className="flex items-center justify-center gap-4">
+                    <TeamLogo tm={team.team} size={35} />
+                    <PageTitle size="x-small" title={team.team.full_name} />
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="-mb-2 text-sm font-bold tracking-tight">
+                        COACH?
+                      </div>
+                      <Checkbox
+                        value={team.isCoach}
+                        onChange={() => {
+                          const copy = [...teamSelect];
+                          const find = copy.findIndex(
+                            (val) => val.team.id === team.team.id,
+                          );
+                          const tm = copy[find];
+                          if (tm) tm.isCoach = !tm.isCoach;
+                          setTeamSelect(copy);
+                        }}
+                        checked={team.isCoach}
+                        className="w-full text-start"
+                        id="user-role"
+                        name="role"
+                        size="small"
+                      />
                     </div>
-                    <Checkbox
-                      value={team.isCoach}
-                      onChange={() => {
+                  </div>
+                  {!team.isCoach && (
+                    <TextField
+                      size="small"
+                      name="num"
+                      autoComplete="num"
+                      id="num"
+                      label="Player Number"
+                      type="number"
+                      value={team.num ?? ""}
+                      onChange={(e) => {
+                        const { value } = e.target;
                         const copy = [...teamSelect];
                         const find = copy.findIndex(
                           (val) => val.team.id === team.team.id,
                         );
                         const tm = copy[find];
-                        if (tm) tm.isCoach = !tm.isCoach;
+                        if (tm) tm.num = value === "" ? null : Number(value);
                         setTeamSelect(copy);
                       }}
-                      checked={team.isCoach}
-                      className="w-full text-start"
-                      id="user-role"
-                      name="role"
-                      size="small"
                     />
-                  </div>
+                  )}
                 </div>
-                {!team.isCoach && (
-                  <TextField
-                    size="small"
-                    name="num"
-                    autoComplete="num"
-                    id="num"
-                    label="Player Number"
-                    type="number"
-                    value={team.num ?? ""}
-                    onChange={(e) => {
-                      const { value } = e.target;
-                      const copy = [...teamSelect];
-                      const find = copy.findIndex(
-                        (val) => val.team.id === team.team.id,
-                      );
-                      const tm = copy[find];
-                      if (tm) tm.num = value === "" ? null : Number(value);
-                      setTeamSelect(copy);
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-        <FormMessage message={message} />
-        {teamSelect ? (
-          <Button
-            type="submit"
-            variant="contained"
-            endIcon={<SendIcon fontSize="small" />}
-          >
-            Send Join Requests
-          </Button>
-        ) : (
+              ))}
+            </div>
+          )}
+          <FormMessage message={message} />
+          {teamSelect ? (
+            <Button
+              type="submit"
+              variant="contained"
+              endIcon={<SendIcon fontSize="small" />}
+            >
+              Send Join Requests
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              variant="contained"
+              endIcon={<KeyboardDoubleArrowRightIcon fontSize="small" />}
+            >
+              Continue w/ no affiliations
+            </Button>
+          )}
+        </form>
+      )}
+      {!teams && (
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className={`text-2xl font-bold`}>No teams in the database!</div>
           <Button
             type="submit"
             variant="contained"
@@ -226,20 +241,20 @@ const TeamSelect = () => {
           >
             Continue w/ no affiliations
           </Button>
-        )}
-        <div className="items-center justify-center text-xl">
-          <div className="text-center">
-            Don't see your team?{" "}
-            <strong
-              onClick={() => void router.push("/create-team")}
-              className={`${hoverText} tracking-tight`}
-            >
-              Create It!
-            </strong>
-          </div>
         </div>
-      </form>
-    )
+      )}
+      <div className="items-center justify-center text-xl">
+        <div className="text-center">
+          Don't see your team?{" "}
+          <strong
+            onClick={() => void router.push("/create-team")}
+            className={`${hoverText} tracking-tight`}
+          >
+            Create It!
+          </strong>
+        </div>
+      </div>
+    </div>
   );
 };
 
