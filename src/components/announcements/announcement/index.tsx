@@ -7,8 +7,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { AnnouncementType, LikeListType } from "~/utils/types";
-import LikePopover from "../../interactions/likes/like-popover";
+import type { AnnouncementType } from "~/utils/types";
 import DeleteMenu from "../../utils/delete-menu";
 
 type AnnouncementProps = {
@@ -21,32 +20,18 @@ const Announcement = ({ annc }: AnnouncementProps) => {
   const router = useRouter();
 
   const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [likeCount, setLikeCount] = useState<number>(0);
 
-  const [likeList, setLikeList] = useState<LikeListType | null>(null);
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-
   const fetchLikeCount = async () => {
-    const { data, count } = await supabase
+    const { count } = await supabase
       .from("announcement_likes")
       .select("user_name", { count: "exact" })
       .eq("announcement_id", annc.id);
-    if (data && data.length > 0) setLikeList(data);
     if (count) setLikeCount(count);
     else {
       setLikeCount(0);
-      setLikeList(null);
     }
   };
 
@@ -135,21 +120,11 @@ const Announcement = ({ annc }: AnnouncementProps) => {
       <div className="flex">
         <div className="flex items-center justify-center">
           {isLiked ? (
-            <IconButton
-              onMouseEnter={handlePopoverOpen}
-              onMouseLeave={handlePopoverClose}
-              size="small"
-              onClick={(e) => void handleUnlike(e)}
-            >
+            <IconButton size="small" onClick={(e) => void handleUnlike(e)}>
               <FavoriteIcon color="primary" />
             </IconButton>
           ) : (
-            <IconButton
-              onMouseEnter={handlePopoverOpen}
-              onMouseLeave={handlePopoverClose}
-              size="small"
-              onClick={(e) => void handleLike(e)}
-            >
+            <IconButton size="small" onClick={(e) => void handleLike(e)}>
               <FavoriteBorderIcon color="primary" />
             </IconButton>
           )}
@@ -164,14 +139,6 @@ const Announcement = ({ annc }: AnnouncementProps) => {
           />
         )}
       </div>
-      {likeList && (
-        <LikePopover
-          open={open}
-          anchorEl={anchorEl}
-          handlePopoverClose={handlePopoverClose}
-          likeList={likeList}
-        />
-      )}
     </div>
   );
 };
