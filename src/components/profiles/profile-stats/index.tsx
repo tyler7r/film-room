@@ -90,7 +90,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
   return (
     stats && (
       <div
-        className="flex w-full cursor-default items-center justify-around gap-2 rounded-md p-2 md:w-4/5"
+        className="flex w-full cursor-default items-center justify-around gap-2 rounded-md border-solid p-2 md:w-4/5"
         style={
           isDark
             ? { backgroundColor: `${colors.purple[400]}` }
