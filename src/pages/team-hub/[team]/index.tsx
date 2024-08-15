@@ -119,7 +119,7 @@ const TeamHub = () => {
           setRole={setRole}
         />
         {role !== "guest" && (
-          <div className="flex flex-col items-center justify-center gap-6">
+          <div className="flex w-full flex-col items-center justify-center gap-6">
             <Announcements teamId={team.id} role={role ? role : "guest"} />
             <TeamCollections teamId={team.id} />
           </div>
