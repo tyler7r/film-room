@@ -68,16 +68,6 @@ const CreatedFeed = ({ profileId }: FeedProps) => {
           void fetchCreatedPlays();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("play_mentions")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_mentions" },
@@ -85,16 +75,6 @@ const CreatedFeed = ({ profileId }: FeedProps) => {
           void fetchCreatedPlays();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("tag_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_tags" },

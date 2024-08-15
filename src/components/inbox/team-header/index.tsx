@@ -27,7 +27,12 @@ const TeamHeader = () => {
     </div>
   ) : (
     <MenuItem
-      className="flex items-center justify-center gap-2"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "8px",
+      }}
       onClick={() => {
         setIsOpen(false);
         void router.push(`/team-select`);

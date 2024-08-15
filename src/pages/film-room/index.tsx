@@ -78,16 +78,6 @@ const FilmRoomHome = () => {
           void fetchVideos();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("team_video_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "team_videos" },

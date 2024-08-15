@@ -238,6 +238,7 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
               onClick={copyToClipboard}
               onMouseEnter={(e) => handlePopoverOpen(e, 4)}
               onMouseLeave={handlePopoverClose}
+              size="small"
             >
               <LinkIcon fontSize="large" />
               <StandardPopover
@@ -289,8 +290,10 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
         ) : (
           <PageTitle size="large" title="Loading Video..." />
         )}
-        <PlayMentions play={preview} />
-        <PlayTags play={preview} />
+        <div className="w-full">
+          <PlayMentions play={preview} />
+          <PlayTags play={preview} />
+        </div>
         <div className="flex w-full items-center gap-3 px-1">
           <div className="flex items-center justify-center gap-2">
             <LikeBtn playId={preview.play.id} />

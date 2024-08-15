@@ -42,7 +42,9 @@ const LikePopover = ({
         className="flex gap-1 p-2 text-xs font-bold tracking-tight"
       >
         {likeList?.map((like) => (
-          <div key={like.user_name}>{like.user_name}</div>
+          <div key={like.user_name + Math.random() * 10000}>
+            {like.user_name}
+          </div>
         ))}
       </div>
     </Popover>

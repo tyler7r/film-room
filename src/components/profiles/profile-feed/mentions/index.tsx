@@ -54,16 +54,6 @@ const MentionsFeed = ({ profileId }: FeedProps) => {
           void fetchMentionPlays();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("tag_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_tags" },
@@ -71,16 +61,6 @@ const MentionsFeed = ({ profileId }: FeedProps) => {
           void fetchMentionPlays();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("mention_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_mentions" },

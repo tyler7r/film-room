@@ -73,6 +73,9 @@ const VideoPlayIndex = ({
     if (activePlay) {
       void plays.neq("play->>id", activePlay.play.id);
     }
+    if (searchOptions.timestamp) {
+      void plays.gte("play->>end_time", searchOptions.timestamp);
+    }
     if (affIds) {
       if (searchOptions.private_only === "all") {
         void plays.or(
@@ -86,9 +89,6 @@ const VideoPlayIndex = ({
       }
     } else {
       void plays.eq("play->>private", false);
-    }
-    if (searchOptions.timestamp) {
-      void plays.gte("play->>end_time", searchOptions.timestamp);
     }
     const { data, count } = await plays;
     if (data) setPlays(data);
@@ -124,6 +124,10 @@ const VideoPlayIndex = ({
         void playsByMention.ilike("play->>author_name", searchOptions.author);
         void playsByTag.ilike("play->>author_name", searchOptions.author);
       }
+      if (searchOptions.timestamp) {
+        void playsByMention.gte("play->>end_time", searchOptions.timestamp);
+        void playsByTag.gte("play->>end_time", searchOptions.timestamp);
+      }
       if (affIds) {
         if (searchOptions.private_only === "all") {
           void playsByMention.or(
@@ -145,10 +149,6 @@ const VideoPlayIndex = ({
       } else {
         void playsByMention.eq("play->>private", false);
         void playsByTag.eq("play->>private", false);
-      }
-      if (searchOptions.timestamp) {
-        void playsByMention.gte("play->>end_time", searchOptions.timestamp);
-        void playsByTag.gte("play->>end_time", searchOptions.timestamp);
       }
       const getTags = await playsByTag;
       const getMentions = await playsByMention;
@@ -185,16 +185,6 @@ const VideoPlayIndex = ({
           void fetchPlays();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("tag_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_tags" },
@@ -202,16 +192,6 @@ const VideoPlayIndex = ({
           void fetchPlays();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("mention_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_mentions" },

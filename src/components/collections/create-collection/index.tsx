@@ -121,7 +121,7 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
         <form onSubmit={handleSubmit} className="w-full">
           <PageTitle title="Add New Collection" size="small" />
           <DialogContent>
-            <div className="flex w-full flex-col items-center justify-center">
+            <div className="flex w-full flex-col items-center justify-center gap-2">
               <TextField
                 name="collection-title"
                 autoFocus

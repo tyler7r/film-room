@@ -422,16 +422,6 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
           void fetchTags();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("collection_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "collections" },

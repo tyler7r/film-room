@@ -69,36 +69,9 @@ const Home = () => {
           void fetchPlays();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("tag_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_tags" },
-        () => {
-          void fetchPlays();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("mention_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_mentions" },
         () => {
           void fetchPlays();
         },
@@ -121,7 +94,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4">
-      <Logo size="large" />
+      <Logo size={isMobile ? "medium" : "large"} />
       {user.userId ? (
         <div className="flex gap-4">
           <Button
@@ -170,7 +143,10 @@ const Home = () => {
           </strong>
         </div>
       </div>
-      <div className="flex items-center justify-center gap-4" ref={topRef}>
+      <div
+        className="flex items-center justify-center gap-4 text-center"
+        ref={topRef}
+      >
         <KeyboardDoubleArrowDownIcon fontSize="large" color="primary" />
         <div className="text-2xl font-bold tracking-tight">
           OR GET INSPIRED!

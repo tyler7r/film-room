@@ -96,15 +96,27 @@ const PlaySearchFilters = ({
     }
   };
 
+  const getCurrentTime = async (player: YouTubePlayer) => {
+    return Math.round(await player.getCurrentTime()) - 1;
+  };
+
   const setTimestamp = async () => {
     if (searchOptions.timestamp !== 0) {
       setSearchOptions({ ...searchOptions, timestamp: 0 });
       return;
     }
-    if (player) {
-      const time = (await player.getCurrentTime()) - 1;
-      const roundedTime = Math.round(time);
-      setSearchOptions({ ...searchOptions, timestamp: roundedTime });
+    if (player && searchOptions.timestamp === 0) {
+      void getCurrentTime(player).then((currentTime) => {
+        console.log(currentTime);
+        setSearchOptions({
+          ...searchOptions,
+          timestamp: currentTime,
+        });
+      });
+      // setSearchOptions({
+      //   ...searchOptions,
+      //   timestamp: roundedTime > 0 ? roundedTime : 0,
+      // });
     }
   };
 

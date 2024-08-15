@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import LargeDarkLogoEffect from "../../../../public/logos/Large Dark Icon - Effect.png";
 import LargeLightLogoEffect from "../../../../public/logos/Large Light Icon - Effect.png";
@@ -13,6 +14,7 @@ type LogoProps = {
 export const Logo = ({ size, ...props }: LogoProps) => {
   const router = useRouter();
   const { isDark } = useIsDarkContext();
+  const { fullScreen } = useMobileContext();
 
   return size === "small" ? (
     <Image
@@ -33,8 +35,8 @@ export const Logo = ({ size, ...props }: LogoProps) => {
       fill={false}
       src={isDark ? LargeDarkLogoEffect : LargeLightLogoEffect}
       alt="Site logo"
-      height={size === "medium" ? 100 : 150}
-      width={size === "medium" ? 333 : 500}
+      height={size === "medium" ? 100 : fullScreen ? 225 : 150}
+      width={size === "medium" ? 333 : fullScreen ? 750 : 500}
       priority={true}
       {...props}
     />

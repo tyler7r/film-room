@@ -116,16 +116,6 @@ const Collection = () => {
           void fetchCollection();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("play_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "plays" },
@@ -133,16 +123,6 @@ const Collection = () => {
           void fetchPlays();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("mentions_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_mentions" },
@@ -150,16 +130,6 @@ const Collection = () => {
           void fetchPlays();
         },
       )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("tag_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_tags" },

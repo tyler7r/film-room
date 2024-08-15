@@ -36,7 +36,7 @@ const PlayPreview = ({
   setReload,
   collectionAuthor,
 }: PlayPreviewProps) => {
-  const { isMobile, fullScreen } = useMobileContext();
+  const { isMobile, fullScreen, screenWidth } = useMobileContext();
   const { hoverText } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
@@ -161,7 +161,9 @@ const PlayPreview = ({
     <div
       className="flex flex-col rounded-md"
       style={{
-        width: `${isMobile ? "480px" : fullScreen ? "800px" : "640px"}`,
+        width: `${
+          isMobile ? `${screenWidth}px` : fullScreen ? "960px" : "640px"
+        }`,
       }}
     >
       <div className="flex items-center justify-between gap-2 p-2">
@@ -198,7 +200,7 @@ const PlayPreview = ({
             </div>
           )}
           <div
-            className={`text-center text-xl font-bold tracking-tighter ${hoverText}`}
+            className={`text-center font-bold tracking-tighter md:text-xl ${hoverText}`}
             onClick={() =>
               void router.push(`/profile/${preview.play.author_id}`)
             }
@@ -214,7 +216,9 @@ const PlayPreview = ({
               ({preview.play.end_time - preview.play.start_time}s)
             </div>
           </div>
-          <div className="flex-wrap p-2">{preview.play.title}</div>
+          {!isMobile && (
+            <div className="flex-wrap p-2">{preview.play.title}</div>
+          )}
         </div>
         <div className="flex items-center gap-1">
           <PlayActionsMenu
@@ -227,6 +231,7 @@ const PlayPreview = ({
             onClick={copyToClipboard}
             onMouseEnter={(e) => handlePopoverOpen(e, 4)}
             onMouseLeave={handlePopoverClose}
+            size="small"
           >
             <LinkIcon />
             <StandardPopover
@@ -259,8 +264,10 @@ const PlayPreview = ({
       </div>
       <YouTube
         opts={{
-          width: `${isMobile ? 475 : fullScreen ? 800 : 640}`,
-          height: `${isMobile ? 295 : fullScreen ? 495 : 390}`,
+          width: `${isMobile ? screenWidth - 10 : fullScreen ? 960 : 640}`,
+          height: `${
+            isMobile ? (screenWidth - 10) / 1.62 : fullScreen ? 595 : 390
+          }`,
           playerVars: {
             end: preview.play.end_time,
             enablejsapi: 1,
@@ -277,6 +284,11 @@ const PlayPreview = ({
         id="player"
         videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
       />
+      {isMobile && (
+        <div className="-my-1 flex flex-wrap p-2 text-sm md:text-base">
+          {preview.play.title}
+        </div>
+      )}
       <PlayMentions play={preview} />
       <PlayTags play={preview} />
       <div className="flex w-full items-center gap-3 px-1">

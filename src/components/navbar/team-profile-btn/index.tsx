@@ -41,7 +41,11 @@ const TeamPageButton = () => {
       <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
         {affiliations?.map((aff) => (
           <MenuItem
-            className="flex items-center justify-center"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
             key={aff.affId}
           >
             <TeamAffiliation
@@ -53,7 +57,12 @@ const TeamPageButton = () => {
           </MenuItem>
         ))}
         <MenuItem
-          className="flex items-center justify-center gap-2"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+          }}
           onClick={() => {
             handleClose();
             void router.push(`/team-select`);

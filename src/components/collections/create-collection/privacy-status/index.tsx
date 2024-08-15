@@ -31,8 +31,7 @@ const PrivacyStatus = ({ newDetails, setNewDetails }: PrivacyStatusProps) => {
 
   return (
     <FormControl
-      className="mt-8 w-full text-start"
-      sx={{ display: "flex", gap: "8px" }}
+      sx={{ display: "flex", gap: "8px", width: "100%", textAlign: "start" }}
     >
       <InputLabel htmlFor="privacy-status">Privacy Status</InputLabel>
       <div className="flex w-full items-center justify-center gap-2">
