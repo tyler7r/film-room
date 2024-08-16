@@ -185,6 +185,8 @@ export type PlayType = {
   video_id: string;
   private: boolean;
   created_at: string;
+  end_time_sort: string;
+  play_time_sort: string;
 };
 
 export type PlayerType = {

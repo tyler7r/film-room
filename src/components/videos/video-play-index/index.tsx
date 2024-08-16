@@ -26,7 +26,7 @@ export type PlaySearchOptions = {
   only_highlights?: boolean;
   topic: string;
   private_only?: string;
-  timestamp: number;
+  timestamp: string | null;
 };
 
 const VideoPlayIndex = ({
@@ -49,7 +49,7 @@ const VideoPlayIndex = ({
     author: "",
     private_only: "all",
     topic: "",
-    timestamp: 0,
+    timestamp: null,
   });
   const itemsPerPage = isMobile ? 5 : 10;
   const topRef = useRef<HTMLDivElement | null>(null);
@@ -61,8 +61,8 @@ const VideoPlayIndex = ({
       .select(`*`, {
         count: "exact",
       })
+      .order("play->>start_time_sort")
       .eq("video->>id", videoId)
-      .order("play->>start_time")
       .range(from, to);
     if (searchOptions.only_highlights) {
       void plays.eq("play->>highlight", true);
@@ -74,7 +74,7 @@ const VideoPlayIndex = ({
       void plays.neq("play->>id", activePlay.play.id);
     }
     if (searchOptions.timestamp) {
-      void plays.gte("play->>end_time", searchOptions.timestamp);
+      void plays.gte("play->>end_time_sort", searchOptions.timestamp);
     }
     if (affIds) {
       if (searchOptions.private_only === "all") {
@@ -91,7 +91,17 @@ const VideoPlayIndex = ({
       void plays.eq("play->>private", false);
     }
     const { data, count } = await plays;
-    if (data) setPlays(data);
+    if (data)
+      if (searchOptions.timestamp) {
+        setPlays(
+          data.filter(
+            (p) =>
+              p.play.end_time.toString().padStart(6, "0") >=
+              searchOptions.timestamp!,
+          ),
+        );
+      } else
+        setPlays(data.sort((a, b) => a.play.start_time - b.play.start_time));
     if (count) setPlayCount(count);
   });
 
@@ -102,15 +112,15 @@ const VideoPlayIndex = ({
         .from("plays_via_user_mention")
         .select("*")
         .eq("video->>id", videoId)
+        .order("play->>start_time_sort")
         .ilike("mention->>receiver_name", `%${searchOptions.topic}%`)
-        .order("play->>start_time")
         .range(from, to);
       const playsByTag = supabase
         .from("plays_via_tag")
         .select("*")
         .eq("video->>id", videoId)
+        .order("play->>start_time_sort")
         .ilike("tag->>title", `%${searchOptions.topic}%`)
-        .order("play->>start_time")
         .range(from, to);
       if (searchOptions.only_highlights) {
         void playsByMention.eq("play->>highlight", true);
@@ -120,13 +130,16 @@ const VideoPlayIndex = ({
         void playsByMention.neq("play->>id", activePlay.play.id);
         void playsByTag.neq("play->>id", activePlay.play.id);
       }
+      if (searchOptions.timestamp) {
+        void playsByMention.gte(
+          "play->>end_time_sort",
+          searchOptions.timestamp,
+        );
+        void playsByTag.gte("play->>end_time_sort", searchOptions.timestamp);
+      }
       if (searchOptions.author) {
         void playsByMention.ilike("play->>author_name", searchOptions.author);
         void playsByTag.ilike("play->>author_name", searchOptions.author);
-      }
-      if (searchOptions.timestamp) {
-        void playsByMention.gte("play->>end_time", searchOptions.timestamp);
-        void playsByTag.gte("play->>end_time", searchOptions.timestamp);
       }
       if (affIds) {
         if (searchOptions.private_only === "all") {
@@ -154,9 +167,26 @@ const VideoPlayIndex = ({
       const getMentions = await playsByMention;
       let ps: PlayPreviewType[] | null = null;
       if (getTags.data) {
+        // if (searchOptions.timestamp) {
+        //   ps = getTags.data.filter(
+        //     (p) =>
+        //       p.play.end_time.toString().padStart(6, "0") >=
+        //       searchOptions.timestamp!,
+        //   );
+        // } else {
+        //   ps = getTags.data;
+        // }
         ps = getTags.data;
       }
       if (getMentions.data) {
+        // if (searchOptions.timestamp) {
+        //   const ms = getMentions.data.filter(
+        //     (p) =>
+        //       p.play.end_time.toString().padStart(6, "0") >=
+        //       searchOptions.timestamp!,
+        //   );
+        //   ps = ps ? [...ps, ...ms] : ms;
+        // } else ps = ps ? [...ps, ...getMentions.data] : getMentions.data;
         ps = ps ? [...ps, ...getMentions.data] : getMentions.data;
       }
       const uniquePlays = [...new Map(ps?.map((x) => [x.play.id, x])).values()];

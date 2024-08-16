@@ -101,22 +101,18 @@ const PlaySearchFilters = ({
   };
 
   const setTimestamp = async () => {
-    if (searchOptions.timestamp !== 0) {
-      setSearchOptions({ ...searchOptions, timestamp: 0 });
+    if (searchOptions.timestamp) {
+      setSearchOptions({ ...searchOptions, timestamp: null });
       return;
     }
-    if (player && searchOptions.timestamp === 0) {
+    if (player && !searchOptions.timestamp) {
       void getCurrentTime(player).then((currentTime) => {
-        console.log(currentTime);
+        const paddedCurrentTime = currentTime.toString().padStart(6, "0");
         setSearchOptions({
           ...searchOptions,
-          timestamp: currentTime,
+          timestamp: paddedCurrentTime,
         });
       });
-      // setSearchOptions({
-      //   ...searchOptions,
-      //   timestamp: roundedTime > 0 ? roundedTime : 0,
-      // });
     }
   };
 
@@ -127,7 +123,7 @@ const PlaySearchFilters = ({
       author: "",
       topic: "",
       private_only: "all",
-      timestamp: 0,
+      timestamp: null,
     });
   };
 
@@ -271,7 +267,7 @@ const PlaySearchFilters = ({
           >
             <UpdateIcon
               fontSize="large"
-              color={searchOptions.timestamp === 0 ? "action" : "primary"}
+              color={!searchOptions.timestamp ? "action" : "primary"}
             />
           </IconButton>
           <StandardPopover
@@ -279,7 +275,7 @@ const PlaySearchFilters = ({
             anchorEl={anchorEl.anchor3}
             handlePopoverClose={handlePopoverClose}
             content={`${
-              searchOptions.timestamp === 0
+              !searchOptions.timestamp
                 ? "Plays found at this timestamp or later"
                 : "All plays"
             }`}
