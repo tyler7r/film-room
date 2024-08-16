@@ -1,5 +1,6 @@
+import LinkIcon from "@mui/icons-material/Link";
 import PublicIcon from "@mui/icons-material/Public";
-import { colors, Divider, Pagination } from "@mui/material";
+import { colors, Divider, IconButton, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import PlaysToCollectionModal from "~/components/collections/add-plays-to-collection";
@@ -8,6 +9,7 @@ import PlayPreview from "~/components/plays/play_preview";
 import TeamLogo from "~/components/teams/team-logo";
 import EmptyMessage from "~/components/utils/empty-msg";
 import PageTitle from "~/components/utils/page-title";
+import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
@@ -36,9 +38,22 @@ const Collection = () => {
   const [userCanEdit, setUserCanEdit] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [reload, setReload] = useState<boolean>(false);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const [playCount, setPlayCount] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
+
+  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+    setIsCopied(false);
+  };
+
+  const open = Boolean(anchorEl);
 
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === collection?.exclusive_to,
@@ -105,6 +120,12 @@ const Collection = () => {
     }
   };
 
+  const copyToClipboard = () => {
+    const origin = window.location.origin;
+    void navigator.clipboard.writeText(`${origin}/collections/${id}`);
+    setIsCopied(true);
+  };
+
   useEffect(() => {
     const channel = supabase
       .channel("collection_changes")
@@ -147,7 +168,7 @@ const Collection = () => {
   useEffect(() => {
     void fetchPlays();
     void fetchCollection();
-  }, [id]);
+  }, [id, affIds]);
 
   useEffect(() => {
     if (reload) {
@@ -219,6 +240,20 @@ const Collection = () => {
             {user.userId === collection.author_id && (
               <CollectionActionsMenu collection={collection} />
             )}
+            <IconButton
+              onClick={copyToClipboard}
+              onMouseEnter={handlePopoverOpen}
+              onMouseLeave={handlePopoverClose}
+              size="small"
+            >
+              <LinkIcon />
+              <StandardPopover
+                open={open}
+                anchorEl={anchorEl}
+                content={isCopied ? "Copied!" : `Copy collection link`}
+                handlePopoverClose={handlePopoverClose}
+              />
+            </IconButton>
           </div>
         </div>
         {collection.description && (

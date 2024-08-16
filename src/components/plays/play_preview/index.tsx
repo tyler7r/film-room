@@ -245,7 +245,7 @@ const PlayPreview = ({
             <StandardPopover
               open={open4}
               anchorEl={anchorEl.anchor4}
-              content={isCopied ? "Copied!" : `Copy link to clipboard`}
+              content={isCopied ? "Copied!" : `Copy play link`}
               handlePopoverClose={handlePopoverClose}
             />
           </IconButton>

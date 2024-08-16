@@ -185,7 +185,7 @@ const Video = ({ video, startTime }: VideoProps) => {
               <StandardPopover
                 open={open3}
                 anchorEl={anchorEl.anchor3}
-                content={isCopied ? "Copied!" : `Copy link to clipboard`}
+                content={isCopied ? "Copied!" : `Copy video link`}
                 handlePopoverClose={handlePopoverClose}
               />
             </IconButton>
