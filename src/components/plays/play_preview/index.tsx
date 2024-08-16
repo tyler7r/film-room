@@ -6,9 +6,10 @@ import StarIcon from "@mui/icons-material/Star";
 import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import TeamLogo from "~/components/teams/team-logo";
+import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
@@ -53,6 +54,7 @@ const PlayPreview = ({
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
   const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === preview.play.exclusive_to,
@@ -156,6 +158,12 @@ const PlayPreview = ({
     void navigator.clipboard.writeText(`${origin}/play/${preview.play.id}`);
     setIsCopied(true);
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+  });
 
   return (
     <div
@@ -262,28 +270,31 @@ const PlayPreview = ({
           </Menu>
         )}
       </div>
-      <YouTube
-        opts={{
-          width: `${isMobile ? screenWidth - 10 : fullScreen ? 960 : 640}`,
-          height: `${
-            isMobile ? (screenWidth - 10) / 1.62 : fullScreen ? 595 : 390
-          }`,
-          playerVars: {
-            end: preview.play.end_time,
-            enablejsapi: 1,
-            playsinline: 1,
-            disablekb: 1,
-            fs: 1,
-            controls: 0,
-            rel: 0,
-            origin: `https://www.youtube.com`,
-          },
-        }}
-        onReady={videoOnReady}
-        onStateChange={onPlayerStateChange}
-        id="player"
-        videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
-      />
+      {!isLoading && (
+        <YouTube
+          opts={{
+            width: `${isMobile ? screenWidth - 10 : fullScreen ? 960 : 640}`,
+            height: `${
+              isMobile ? (screenWidth - 10) / 1.62 : fullScreen ? 595 : 390
+            }`,
+            playerVars: {
+              end: preview.play.end_time,
+              enablejsapi: 1,
+              playsinline: 1,
+              disablekb: 1,
+              fs: 1,
+              controls: 0,
+              rel: 0,
+              origin: `https://www.youtube.com`,
+            },
+          }}
+          onReady={videoOnReady}
+          onStateChange={onPlayerStateChange}
+          id="player"
+          videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
+        />
+      )}
+      {isLoading && <PageTitle size="small" title="Loading..." />}
       {isMobile && (
         <div className="-my-1 flex flex-wrap p-2 text-sm md:text-base">
           {preview.play.title}

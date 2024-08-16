@@ -1,13 +1,11 @@
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import PublicIcon from "@mui/icons-material/Public";
 import { Divider, IconButton } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TeamLogo from "~/components/teams/team-logo";
 import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
-import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { getTimeSinceNotified } from "~/utils/helpers";
@@ -21,10 +19,8 @@ type InboxMentionProps = {
 const InboxMention = ({ mention }: InboxMentionProps) => {
   const { hoverText, hoverBorder, backgroundStyle } = useIsDarkContext();
   const { setIsOpen } = useInboxContext();
-  const { user } = useAuthContext();
 
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [isUnread, setIsUnread] = useState<boolean>(false);
 
@@ -37,19 +33,6 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
   };
 
   const open = Boolean(anchorEl);
-
-  const updateLastWatched = async (video: string, time: number) => {
-    if (user.userId) {
-      await supabase
-        .from("profiles")
-        .update({
-          last_watched: video,
-          last_watched_time: time,
-        })
-        .eq("id", user.userId)
-        .select();
-    }
-  };
 
   const fetchIfUnread = async () => {
     const { data } = await supabase
@@ -81,14 +64,9 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
   };
 
   const handleClick = async () => {
-    const { mention: mntn, video, play } = mention;
-
-    const params = new URLSearchParams(searchParams);
-    params.set("play", play.id);
-    params.set("start", `${play.start_time}`);
+    const { mention: mntn, play } = mention;
     if (!mntn.viewed) void updateMention();
-    void updateLastWatched(video.id, play.start_time);
-    void router.push(`/film-room/${video.id}?${params.toString()}`);
+    void router.push(`/play/${play.id}`);
     setIsOpen(false);
   };
 

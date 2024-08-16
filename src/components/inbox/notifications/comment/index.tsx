@@ -1,11 +1,9 @@
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import { Divider } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
-import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import { useIsDarkContext } from "~/pages/_app";
 import { getTimeSinceNotified } from "~/utils/helpers";
@@ -19,9 +17,7 @@ type InboxCommentProps = {
 const InboxComment = ({ comment }: InboxCommentProps) => {
   const { hoverText, backgroundStyle, hoverBorder } = useIsDarkContext();
   const { setIsOpen } = useInboxContext();
-  const { user } = useAuthContext();
 
-  const searchParams = useSearchParams();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [isUnread, setIsUnread] = useState<boolean>(true);
@@ -35,19 +31,6 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
   };
 
   const open = Boolean(anchorEl);
-
-  const updateLastWatched = async (video: string, time: number) => {
-    if (user.userId) {
-      await supabase
-        .from("profiles")
-        .update({
-          last_watched: video,
-          last_watched_time: time,
-        })
-        .eq("id", user.userId)
-        .select();
-    }
-  };
 
   const fetchIfUnread = async () => {
     const { data } = await supabase
@@ -79,14 +62,9 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
   };
 
   const handleClick = async () => {
-    const { comment: cmt, video, play } = comment;
-
-    const params = new URLSearchParams(searchParams);
-    params.set("play", play.id);
-    params.set("start", `${play.start_time}`);
+    const { comment: cmt, play } = comment;
     if (!cmt.viewed) void updateComment();
-    void updateLastWatched(video.id, play.start_time);
-    void router.push(`/film-room/${video.id}?${params.toString()}`);
+    void router.push(`/play/${play.id}`);
     setIsOpen(false);
   };
 
