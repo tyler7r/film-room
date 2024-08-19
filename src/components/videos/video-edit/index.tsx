@@ -301,7 +301,7 @@ const EditVideo = ({ video }: EditVideoProps) => {
         >
           X
         </Button>
-        <PageTitle title="Add a Video" size="medium" />
+        <PageTitle title="Edit Video" size="medium" />
         <form
           onSubmit={handleSubmit}
           className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
