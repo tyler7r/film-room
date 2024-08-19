@@ -20,7 +20,7 @@ type TeamSelectType = {
 const TeamSelect = () => {
   const router = useRouter();
   const { backgroundStyle, hoverText } = useIsDarkContext();
-  const { user, setAffReload } = useAuthContext();
+  const { user, setAffReload, affIds } = useAuthContext();
   const [teams, setTeams] = useState<TeamType[] | null>(null);
   const [teamSelect, setTeamSelect] = useState<TeamSelectType[] | null>(null);
   const [message, setMessage] = useState<MessageType>({
@@ -58,7 +58,11 @@ const TeamSelect = () => {
   };
 
   const fetchTeams = async () => {
-    const { data } = await supabase.from("teams").select();
+    const teams = supabase.from("teams").select();
+    if (affIds) {
+      void teams.not("id", "in", `(${affIds})`);
+    }
+    const { data } = await teams;
     if (data && data.length > 0) setTeams(data);
     else setTeams(null);
   };
@@ -233,13 +237,17 @@ const TeamSelect = () => {
       )}
       {!teams && (
         <div className="flex flex-col items-center justify-center gap-4">
-          <div className={`text-2xl font-bold`}>No teams in the database!</div>
+          <div className={`text-2xl font-bold`}>
+            {affIds
+              ? "You have joined all active team accounts."
+              : `No teams in the database!`}
+          </div>
           <Button
             type="submit"
             variant="contained"
             endIcon={<KeyboardDoubleArrowRightIcon fontSize="small" />}
           >
-            Continue w/ no affiliations
+            {affIds ? "Continue" : "Continue w/ no affiliations"}
           </Button>
         </div>
       )}
