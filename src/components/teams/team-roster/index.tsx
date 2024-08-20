@@ -24,7 +24,7 @@ const Roster = ({ team, role }: RosterProps) => {
         "affiliation->>role": "player",
         "affiliation->>verified": true,
       })
-      .order("affiliation->>number");
+      .order("profile->>name", { ascending: true });
     if (data && data.length > 0) {
       setRoster(data);
     } else {
