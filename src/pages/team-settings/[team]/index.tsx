@@ -135,7 +135,7 @@ const TeamSettings = ({
           status: "success",
         });
         setTimeout(() => {
-          router.push(`/team-hub/${team?.id}`);
+          void router.push(`/team-hub/${team?.id}`);
         }, 1000);
       } else {
         setMessage({
@@ -240,7 +240,7 @@ const TeamSettings = ({
           variant="outlined"
           size="medium"
           type="button"
-          onClick={() => router.push("/signup/team-select")}
+          onClick={() => void router.push("/team-select")}
           endIcon={<ClearIcon />}
         >
           Cancel
