@@ -155,7 +155,7 @@ const EditCollection = ({
         >
           X
         </Button>
-        <form onSubmit={handleSubmit} className="w-full">
+        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-2">
           <PageTitle title="Add New Collection" size="small" />
           <DialogContent>
             <div className="flex w-full flex-col items-center justify-center">
