@@ -48,53 +48,58 @@ const User = ({ user, goToProfile, small, number, listItem }: UserProps) => {
   }, []);
 
   return (
-    <div
-      style={backgroundStyle}
-      className={`flex items-center justify-center ${
-        small ? "w-full gap-2" : "gap-4"
-      } rounded-sm p-1 px-2`}
-      onClick={handleClick}
-    >
+    user.name && (
       <div
+        style={backgroundStyle}
         className={`flex items-center justify-center ${
-          !listItem && hoverText
-        } ${small ? "gap-2" : "gap-4"}`}
+          small ? "w-full gap-2" : "gap-4"
+        } rounded-sm p-1 px-2`}
+        onClick={handleClick}
       >
-        <PageTitle title={`${user.name}`} size={small ? "x-small" : "small"} />
-        {number && <div className="text-sm font-light">#{number}</div>}
-      </div>
-      <Divider orientation="vertical" flexItem variant="middle" />
-      <div
-        className={`flex items-center justify-center ${
-          small ? "gap-1" : "gap-2"
-        }`}
-      >
-        <div className="flex items-center justify-center gap-2">
-          {userTeams ? (
-            userTeams.map((team) =>
-              !listItem ? (
-                <IconButton
-                  key={team.id}
-                  onClick={(e) => handleTeamClick(e, team.id)}
-                >
-                  <TeamLogo tm={team} size={35} popover={true} />
-                </IconButton>
-              ) : (
-                <TeamLogo
-                  key={team.id}
-                  tm={team}
-                  size={35}
-                  inactive={true}
-                  popover={false}
-                />
-              ),
-            )
-          ) : (
-            <EmptyMessage message="affiliations" size="small" />
-          )}
+        <div
+          className={`flex items-center justify-center ${
+            !listItem && hoverText
+          } ${small ? "gap-2" : "gap-4"}`}
+        >
+          <PageTitle
+            title={`${user.name}`}
+            size={small ? "x-small" : "small"}
+          />
+          {number && <div className="text-sm font-light">#{number}</div>}
+        </div>
+        <Divider orientation="vertical" flexItem variant="middle" />
+        <div
+          className={`flex items-center justify-center ${
+            small ? "gap-1" : "gap-2"
+          }`}
+        >
+          <div className="flex items-center justify-center gap-2">
+            {userTeams ? (
+              userTeams.map((team) =>
+                !listItem ? (
+                  <IconButton
+                    key={team.id}
+                    onClick={(e) => handleTeamClick(e, team.id)}
+                  >
+                    <TeamLogo tm={team} size={35} popover={true} />
+                  </IconButton>
+                ) : (
+                  <TeamLogo
+                    key={team.id}
+                    tm={team}
+                    size={35}
+                    inactive={true}
+                    popover={false}
+                  />
+                ),
+              )
+            ) : (
+              <EmptyMessage message="affiliations" size="small" />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    )
   );
 };
 
