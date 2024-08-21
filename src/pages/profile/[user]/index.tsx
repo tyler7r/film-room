@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ProfileActionBar from "~/components/profiles/profile-action-bar";
 import ProfileCollections from "~/components/profiles/profile-collections";
+import ProfileEdit from "~/components/profiles/profile-edit";
 import CreatedFeed from "~/components/profiles/profile-feed/created";
 import HighlightsFeed from "~/components/profiles/profile-feed/highlights";
 import MentionsFeed from "~/components/profiles/profile-feed/mentions";
@@ -110,6 +111,23 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    const channel = supabase
+      .channel("profile_changes")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "profiles" },
+        () => {
+          void fetchProfile();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     if (user.userId) void fetchLastWatched();
   }, [user]);
 
@@ -130,8 +148,13 @@ const Profile = () => {
         <div className="flex w-4/5 flex-col items-center justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
             <PageTitle size="x-large" title={profile.name} />
-            <div className="text-lg font-light leading-5 tracking-tighter">
-              Member since {profile.join_date.substring(0, 4)}
+            <div className="flex w-full items-center justify-center gap-2">
+              <div className="text-lg font-light leading-5 tracking-tighter">
+                Member since {profile.join_date.substring(0, 4)}
+              </div>
+              {user.userId === router.query.user && (
+                <ProfileEdit profile={profile} />
+              )}
             </div>
           </div>
           <ProfileStats
