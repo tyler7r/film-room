@@ -243,7 +243,7 @@ const TeamSelect = () => {
               : `No teams in the database!`}
           </div>
           <Button
-            onClick={void router.push("/")}
+            onClick={() => void router.push("/")}
             variant="contained"
             endIcon={<KeyboardDoubleArrowRightIcon fontSize="small" />}
           >
