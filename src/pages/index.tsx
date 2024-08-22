@@ -19,7 +19,7 @@ const Home = () => {
   const { isMobile } = useMobileContext();
 
   const router = useRouter();
-  const itemsPerPage = isMobile ? 10 : 20;
+  const itemsPerPage = isMobile ? 5 : 10;
 
   const [page, setPage] = useState<number>(1);
   const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);

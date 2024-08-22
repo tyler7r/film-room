@@ -28,7 +28,7 @@ const Collection = () => {
   const { hoverText, isDark } = useIsDarkContext();
 
   const id = router.query.id as string;
-  const itemsPerPage = isMobile ? 10 : 20;
+  const itemsPerPage = isMobile ? 5 : 10;
 
   const [collection, setCollection] = useState<CollectionType | null>(null);
   const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);

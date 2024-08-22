@@ -21,7 +21,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
   const [videos, setVideos] = useState<TeamVideoType[] | null>(null);
   const [videoCount, setVideoCount] = useState<number | null>(null);
 
-  const itemsPerPage = isMobile ? 10 : 20;
+  const itemsPerPage = isMobile ? 5 : 10;
 
   const fetchVideos = async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);

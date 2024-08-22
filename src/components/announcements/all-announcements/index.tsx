@@ -114,7 +114,7 @@ const Announcements = ({ teamId, role }: AnnouncementsProps) => {
           size="small"
           variant="text"
           shape="rounded"
-          count={getNumberOfPages(isMobile ? 3 : 5, announcementCount)}
+          count={getNumberOfPages(itemsPerPage, announcementCount)}
           page={page}
           onChange={handlePageChange}
         />

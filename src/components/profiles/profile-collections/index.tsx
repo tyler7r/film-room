@@ -22,7 +22,7 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
   const [collectionCount, setCollectionCount] = useState<number | null>(null);
 
   const [page, setPage] = useState<number>(1);
-  const itemsPerPage = isMobile ? 10 : 20;
+  const itemsPerPage = isMobile ? 5 : 10;
 
   const fetchCollections = async () => {
     if (profileId) {

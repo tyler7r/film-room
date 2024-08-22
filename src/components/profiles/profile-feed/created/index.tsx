@@ -16,7 +16,7 @@ const CreatedFeed = ({ profileId }: FeedProps) => {
   const { isMobile } = useMobileContext();
   const { affIds } = useAuthContext();
 
-  const itemsPerPage = isMobile ? 10 : 20;
+  const itemsPerPage = isMobile ? 5 : 10;
 
   const [page, setPage] = useState<number>(1);
   const [playCount, setPlayCount] = useState<number | null>(null);
