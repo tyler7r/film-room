@@ -108,6 +108,8 @@ const Announcements = ({ teamId, role }: AnnouncementsProps) => {
       {anncs?.map((annc) => <Announcement annc={annc} key={annc.id} />)}
       {anncs && announcementCount && (
         <Pagination
+          siblingCount={1}
+          boundaryCount={0}
           showFirstButton
           showLastButton
           sx={{ marginTop: "8px" }}

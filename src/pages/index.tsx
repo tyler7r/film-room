@@ -161,11 +161,11 @@ const Home = () => {
       {plays && playCount && (
         <Pagination
           siblingCount={1}
-          boundaryCount={1}
+          boundaryCount={0}
           showFirstButton
           showLastButton
           sx={{ marginTop: "8px" }}
-          size="medium"
+          size={isMobile ? "small" : "medium"}
           variant="text"
           shape="rounded"
           count={getNumberOfPages(itemsPerPage, playCount)}

@@ -134,10 +134,12 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
       ))}
       {playTags && playCount && (
         <Pagination
+          siblingCount={1}
+          boundaryCount={0}
+          size={isMobile ? "small" : "medium"}
           showFirstButton
           showLastButton
           sx={{ marginTop: "8px" }}
-          size="medium"
           variant="text"
           shape="rounded"
           count={getNumberOfPages(itemsPerPage, playCount)}
