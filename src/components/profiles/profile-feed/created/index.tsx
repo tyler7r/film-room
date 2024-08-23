@@ -107,10 +107,12 @@ const CreatedFeed = ({ profileId }: FeedProps) => {
       </div>
       {playCount && (
         <Pagination
+          siblingCount={1}
+          boundaryCount={0}
+          size={isMobile ? "small" : "medium"}
           showFirstButton
           showLastButton
           sx={{ marginTop: "32px", marginBottom: "8px" }}
-          size="large"
           variant="text"
           shape="rounded"
           count={getNumberOfPages(itemsPerPage, playCount)}
