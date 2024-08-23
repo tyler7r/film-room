@@ -160,6 +160,8 @@ const Home = () => {
       </div>
       {plays && playCount && (
         <Pagination
+          siblingCount={1}
+          boundaryCount={1}
           showFirstButton
           showLastButton
           sx={{ marginTop: "8px" }}
