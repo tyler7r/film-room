@@ -14,9 +14,17 @@ type UserProps = {
   number?: number | null;
   small?: boolean;
   listItem?: boolean;
+  coach?: boolean;
 };
 
-const User = ({ user, goToProfile, small, number, listItem }: UserProps) => {
+const User = ({
+  user,
+  goToProfile,
+  small,
+  number,
+  listItem,
+  coach,
+}: UserProps) => {
   const { backgroundStyle, hoverText } = useIsDarkContext();
   const router = useRouter();
 
@@ -66,6 +74,7 @@ const User = ({ user, goToProfile, small, number, listItem }: UserProps) => {
             size={small ? "x-small" : "small"}
           />
           {number && <div className="text-sm font-light">#{number}</div>}
+          {coach && <div className="text-sm font-light">coach</div>}
         </div>
         <Divider orientation="vertical" flexItem variant="middle" />
         <div

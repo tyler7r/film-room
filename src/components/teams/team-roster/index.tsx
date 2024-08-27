@@ -21,7 +21,6 @@ const Roster = ({ team, role }: RosterProps) => {
       .select("*")
       .match({
         "team->>id": team.id,
-        "affiliation->>role": "player",
         "affiliation->>verified": true,
       })
       .order("profile->>name", { ascending: true });
@@ -73,6 +72,7 @@ const Roster = ({ team, role }: RosterProps) => {
                 goToProfile={true}
                 number={p.affiliation.number}
                 small={true}
+                coach={p.affiliation.role === "coach" ? true : false}
               />
             </div>
           ))}

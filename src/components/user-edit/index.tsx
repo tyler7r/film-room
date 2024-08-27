@@ -96,6 +96,7 @@ const UserEdit = ({
         goToProfile={goToProfile}
         small={small}
         number={affiliation.number}
+        coach={affiliation.role === "coach" ? true : false}
       />
       <Divider flexItem orientation="vertical" variant="middle" />
       <div className="flex flex-col items-center justify-center p-2">
