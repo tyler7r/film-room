@@ -4,6 +4,7 @@ import Collection from "~/components/collections/collection";
 import CreateCollection from "~/components/collections/create-collection";
 import EmptyMessage from "~/components/utils/empty-msg";
 import PageTitle from "~/components/utils/page-title";
+import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
@@ -16,6 +17,8 @@ type SearchCollectionsProps = {
 
 const SearchCollections = ({ topic }: SearchCollectionsProps) => {
   const { isMobile } = useMobileContext();
+  const { affIds } = useAuthContext();
+
   const [loading, setLoading] = useState<boolean>(true);
 
   const [collections, setCollections] = useState<CollectionViewType[] | null>(
@@ -28,12 +31,20 @@ const SearchCollections = ({ topic }: SearchCollectionsProps) => {
 
   const fetchCollections = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
-    const { data, count } = await supabase
+    const collections = supabase
       .from("collection_view")
       .select("*", { count: "exact" })
       .ilike("collection->>title", `%${topic}%`)
       .order("collection->>created_at", { ascending: false })
       .range(from, to);
+    if (affIds) {
+      void collections.or(
+        `collection->>private.eq.false, collection->>exclusive_to.in.(${affIds})`,
+      );
+    } else {
+      void collections.eq("collection->>private", false);
+    }
+    const { data, count } = await collections;
     if (data && data.length > 0) setCollections(data);
     else setCollections(null);
     if (count) setCollectionCount(count);
