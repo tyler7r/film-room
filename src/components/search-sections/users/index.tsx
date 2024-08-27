@@ -29,6 +29,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
       .from("profiles")
       .select("*", { count: "exact" })
       .ilike("name", `%${topic}%`)
+      .neq("name", "")
       .order("name")
       .range(from, to);
     if (data && data.length > 0) setUsers(data);

@@ -256,12 +256,16 @@ const CreateTeam = () => {
             name="file-upload"
             id="file_upload"
             type="file"
+            accept=".png"
             onChange={(e) => {
               void handleImage((e.target as HTMLInputElement).files);
             }}
             hidden
           />
         </Button>
+        <div className={`text-sm font-bold ${colorText} tracking-tight`}>
+          * Image must be a png file *
+        </div>
         {imagePreview !== "" && (
           <Image
             className={`rounded-full border-4 border-solid border-stone-300`}
