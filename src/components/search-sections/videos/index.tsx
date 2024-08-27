@@ -32,6 +32,7 @@ const SearchVideos = ({ topic }: SearchVideosProps) => {
       .from("videos")
       .select("*", { count: "exact" })
       .ilike("title", `%${topic}%`)
+      .order("uploaded_at", { ascending: false })
       .range(from, to);
     if (affIds) {
       void videos.or(`private.eq.false, exclusive_to.in.(${affIds})`);
