@@ -147,7 +147,10 @@ const Profile = () => {
       <div className="flex w-full flex-col items-center justify-center gap-8 p-4">
         <div className="flex w-4/5 flex-col items-center justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
-            <PageTitle size="x-large" title={profile.name} />
+            <PageTitle
+              size="x-large"
+              title={profile.name === "" ? profile.email! : profile.name}
+            />
             <div className="flex w-full items-center justify-center gap-2">
               <div className="text-lg font-light leading-5 tracking-tighter">
                 Member since {profile.join_date.substring(0, 4)}
