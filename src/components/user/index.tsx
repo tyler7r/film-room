@@ -56,7 +56,7 @@ const User = ({
   }, []);
 
   return (
-    user.name && (
+    (user.name || user.email) && (
       <div
         style={backgroundStyle}
         className={`flex items-center justify-center ${
@@ -70,7 +70,7 @@ const User = ({
           } ${small ? "gap-2" : "gap-4"}`}
         >
           <PageTitle
-            title={`${user.name}`}
+            title={user.name ? user.name : user.email!}
             size={small ? "x-small" : "small"}
           />
           {number && <div className="text-sm font-light">#{number}</div>}

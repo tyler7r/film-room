@@ -190,7 +190,7 @@ const CreatePlay = ({
       sender_id: `${user.userId}`,
       receiver_id: player,
       receiver_name: name,
-      sender_name: `${user.name}`,
+      sender_name: user.name ? user.name : `${user.email}`,
     });
   };
 

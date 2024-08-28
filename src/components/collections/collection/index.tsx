@@ -95,7 +95,9 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
               } w-full text-center font-bold tracking-tight`}
               onClick={handleProfileClick}
             >
-              {collection.profile.name}
+              {collection.profile.name !== ""
+                ? collection.profile.name
+                : collection.profile.email!}
             </div>
           </div>
         </div>

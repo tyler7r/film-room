@@ -221,7 +221,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       sender_id: `${user.userId}`,
       receiver_id: player,
       receiver_name: name,
-      sender_name: `${user.name}`,
+      sender_name: user.name ? user.name : `${user.email}`,
     });
   };
 
@@ -316,7 +316,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
           note: playDetails.note === "" ? null : playDetails.note,
           start_time: playDetails.start!,
           end_time: playDetails.end!,
-          author_name: `${user.name}`,
+          author_name: user.name ? user.name : `${user.email}`,
           private: isPrivate,
         })
         .eq("id", play.id)

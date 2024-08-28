@@ -31,7 +31,7 @@ const AddComment = ({ playId }: CommentProps) => {
         .insert({
           play_id: playId,
           comment,
-          author_name: `${user.name}`,
+          author_name: user.name ? user.name : `${user.email}`,
           comment_author: user.userId,
         })
         .select();

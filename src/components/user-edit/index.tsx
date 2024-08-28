@@ -120,7 +120,7 @@ const UserEdit = ({
       style={backgroundStyle}
     >
       <div>
-        <PageTitle size="x-small" title={user.name} />
+        <PageTitle size="x-small" title={user.name ? user.name : user.email!} />
       </div>
       <form
         onSubmit={handleSubmit}
