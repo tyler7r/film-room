@@ -2,6 +2,9 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { Badge, IconButton, Menu, MenuItem } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import DeleteMenu from "~/components/utils/delete-menu";
+import { useAuthContext } from "~/contexts/auth";
+import { supabase } from "~/utils/supabase";
 import type { TeamActionBarType, TeamType } from "~/utils/types";
 
 type TeamActionBarProps = {
@@ -20,7 +23,9 @@ const TeamActionBar = ({
   requestCount,
 }: TeamActionBarProps) => {
   const router = useRouter();
+  const { setAffReload } = useAuthContext();
 
+  const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,6 +51,19 @@ const TeamActionBar = ({
         requests: false,
         transferOwner: open,
       });
+    }
+  };
+
+  const handleDelete = async () => {
+    const { data } = await supabase
+      .from("teams")
+      .delete()
+      .eq("id", team.id)
+      .select();
+    handleClose();
+    if (data) {
+      setAffReload(true);
+      void router.push("/");
     }
   };
 
@@ -112,6 +130,15 @@ const TeamActionBar = ({
                     <div className="font-bold tracking-tight">
                       TEAM SETTINGS
                     </div>
+                  </MenuItem>
+                  <MenuItem>
+                    <DeleteMenu
+                      handleDelete={handleDelete}
+                      isOpen={deleteOpen}
+                      setIsOpen={setDeleteOpen}
+                      deleteType="team"
+                      actionMenu={true}
+                    />
                   </MenuItem>
                 </div>
               )}

@@ -32,7 +32,7 @@ type TeamDetailsType = {
 };
 
 const CreateTeam = () => {
-  const { user } = useAuthContext();
+  const { user, setAffReload } = useAuthContext();
   const { colorText } = useIsDarkContext();
 
   const router = useRouter();
@@ -141,6 +141,7 @@ const CreateTeam = () => {
       setMessage({ text: "Team successfully created!", status: "success" });
       setTimeout(() => {
         void router.push("/");
+        setAffReload(true);
       }, 500);
     } else {
       setMessage({
