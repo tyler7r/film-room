@@ -3,7 +3,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import LinkIcon from "@mui/icons-material/Link";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import StarIcon from "@mui/icons-material/Star";
-import { Divider, IconButton, Menu, MenuItem } from "@mui/material";
+import { Button, Divider, IconButton, Menu, MenuItem } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -317,6 +317,18 @@ const PlayPreview = ({
             <IconButton size="small" onClick={() => setIsExpanded(false)}>
               <KeyboardArrowUpIcon color="primary" fontSize="large" />
             </IconButton>
+          ) : preview.play.note ? (
+            <Button
+              size="small"
+              style={{ fontWeight: "bold" }}
+              variant="text"
+              onClick={() => setIsExpanded(true)}
+              endIcon={
+                <KeyboardArrowDownIcon color="primary" fontSize="large" />
+              }
+            >
+              See note
+            </Button>
           ) : (
             <IconButton size="small" onClick={() => setIsExpanded(true)}>
               <KeyboardArrowDownIcon color="primary" fontSize="large" />

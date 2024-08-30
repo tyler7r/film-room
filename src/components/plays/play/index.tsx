@@ -3,7 +3,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import PublicIcon from "@mui/icons-material/Public";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StarIcon from "@mui/icons-material/Star";
-import { Divider, IconButton } from "@mui/material";
+import { Button, Divider, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
@@ -235,9 +235,21 @@ const Play = ({
             <IconButton size="small" onClick={() => setIsExpanded(false)}>
               <KeyboardArrowUpIcon color="primary" />
             </IconButton>
+          ) : play.play.note ? (
+            <Button
+              size="small"
+              style={{ fontWeight: "bold" }}
+              variant="text"
+              onClick={() => setIsExpanded(true)}
+              endIcon={
+                <KeyboardArrowDownIcon color="primary" fontSize="large" />
+              }
+            >
+              See note
+            </Button>
           ) : (
             <IconButton size="small" onClick={() => setIsExpanded(true)}>
-              <KeyboardArrowDownIcon color="primary" />
+              <KeyboardArrowDownIcon color="primary" fontSize="large" />
             </IconButton>
           )}
         </div>

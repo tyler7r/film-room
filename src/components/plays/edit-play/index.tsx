@@ -81,7 +81,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     status: "error",
   });
   const [isEditPlayOpen, setIsEditPlayOpen] = useState<boolean>(false);
-  const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
+  const [isValidPlay, setIsValidPlay] = useState<boolean>(true);
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -372,15 +372,6 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     } else return false;
   };
 
-  const checkValidPlay = () => {
-    const isUnedited = checkForUnEdited();
-    if (playDetails.title === "" || isUnedited) {
-      setIsValidPlay(false);
-    } else {
-      setIsValidPlay(true);
-    }
-  };
-
   const updateErrorMessage = () => {
     const { title } = playDetails;
     const isUnedited = checkForUnEdited();
@@ -435,10 +426,6 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       void supabase.removeChannel(channel);
     };
   }, []);
-
-  useEffect(() => {
-    checkValidPlay();
-  }, [playDetails, mentions, playTags, playCollections]);
 
   useEffect(() => {
     void fetchPlayers();
