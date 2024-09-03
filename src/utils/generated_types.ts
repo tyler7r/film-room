@@ -522,6 +522,7 @@ export type Database = {
           last_watched: string | null;
           last_watched_time: number | null;
           name: string;
+          send_notifications: boolean;
         };
         Insert: {
           email?: string | null;
@@ -530,6 +531,7 @@ export type Database = {
           last_watched?: string | null;
           last_watched_time?: number | null;
           name?: string;
+          send_notifications?: boolean;
         };
         Update: {
           email?: string | null;
@@ -538,6 +540,7 @@ export type Database = {
           last_watched?: string | null;
           last_watched_time?: number | null;
           name?: string;
+          send_notifications?: boolean;
         };
         Relationships: [
           {

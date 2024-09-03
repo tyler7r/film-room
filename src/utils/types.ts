@@ -253,6 +253,7 @@ export type UserType = {
   last_watched_time: number | null;
   name: string;
   join_date: string;
+  send_notifications: boolean;
 };
 
 export type AnnouncementType = {
