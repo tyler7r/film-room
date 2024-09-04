@@ -182,6 +182,10 @@ const Collection = () => {
     checkIfUserCanEdit();
   }, [collection, user]);
 
+  useEffect(() => {
+    void fetchPlays();
+  }, [page]);
+
   return (
     collection && (
       <div className="flex flex-col items-center justify-center gap-6 p-6">
