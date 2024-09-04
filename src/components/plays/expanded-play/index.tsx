@@ -126,7 +126,7 @@ const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
         </div>
       )}
       <div className="flex w-full flex-col items-center gap-4">
-        <AddComment playId={play.play.id} />
+        <AddComment play={play.play} />
         <CommentIndex playId={play.play.id} setCommentCount={setCommentCount} />
       </div>
     </div>

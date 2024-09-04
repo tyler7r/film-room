@@ -4,12 +4,13 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
+import type { PlayType } from "~/utils/types";
 
 type CommentProps = {
-  playId: string;
+  play: PlayType;
 };
 
-const AddComment = ({ playId }: CommentProps) => {
+const AddComment = ({ play }: CommentProps) => {
   const { user } = useAuthContext();
   const router = useRouter();
 
@@ -29,7 +30,7 @@ const AddComment = ({ playId }: CommentProps) => {
       const { data } = await supabase
         .from("comments")
         .insert({
-          play_id: playId,
+          play_id: play.id,
           comment,
           author_name: user.name ? user.name : `${user.email}`,
           comment_author: user.userId,

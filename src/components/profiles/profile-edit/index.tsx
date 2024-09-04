@@ -1,5 +1,12 @@
-import EditIcon from "@mui/icons-material/Edit";
-import { Box, Button, IconButton, Modal, TextField } from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
+import {
+  Box,
+  Button,
+  IconButton,
+  Modal,
+  Switch,
+  TextField,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import FormMessage from "~/components/utils/form-message";
 import PageTitle from "~/components/utils/page-title";
@@ -20,11 +27,13 @@ const ProfileEdit = ({ profile }: ProfileEditProps) => {
     text: undefined,
     status: "error",
   });
-  const [name, setName] = useState<string>(profile.name ?? "");
+  const [name, setName] = useState<string>(user.name ?? "");
+  const [enabled, setEnabled] = useState<boolean>(profile.send_notifications);
   const [isValidName, setIsValidName] = useState<boolean>(false);
 
   const resetProfile = () => {
-    setName("");
+    setName(user.name ?? "");
+    setEnabled(profile.send_notifications);
     setIsProfileEditOpen(false);
   };
 
@@ -35,14 +44,15 @@ const ProfileEdit = ({ profile }: ProfileEditProps) => {
 
   const checkForUnEdited = () => {
     const nameCheck = name === "" ? null : name;
-    if (nameCheck === profile.name || nameCheck === "") {
+    const notifCheck = enabled === profile.send_notifications;
+    if (nameCheck === user.name && notifCheck) {
       return true;
     } else {
       return false;
     }
   };
 
-  const checkValidName = () => {
+  const checkValidForm = () => {
     const isUnedited = checkForUnEdited();
     if (name === "" || isUnedited) {
       setIsValidName(false);
@@ -79,20 +89,26 @@ const ProfileEdit = ({ profile }: ProfileEditProps) => {
         .from("profiles")
         .update({
           name: name,
+          send_notifications: enabled,
         })
         .eq("id", profile.id)
         .select()
         .single();
+    await supabase.auth.updateUser({
+      data: {
+        name: name,
+      },
+    });
     setIsProfileEditOpen(false);
   };
 
   useEffect(() => {
-    checkValidName();
-  }, [name]);
+    checkValidForm();
+  }, [name, enabled]);
 
   return !isProfileEditOpen ? (
     <IconButton size="small" onClick={() => setIsProfileEditOpen(true)}>
-      <EditIcon color="primary" />
+      <SettingsIcon color="primary" />
     </IconButton>
   ) : (
     <Modal open={isProfileEditOpen} onClose={resetProfile}>
@@ -115,7 +131,7 @@ const ProfileEdit = ({ profile }: ProfileEditProps) => {
         >
           X
         </Button>
-        <PageTitle title="Edit Name" size="medium" />
+        <PageTitle title="Edit Profile" size="medium" />
         <form
           onSubmit={handleSubmit}
           className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
@@ -131,6 +147,15 @@ const ProfileEdit = ({ profile }: ProfileEditProps) => {
             value={name}
             inputProps={{ maxLength: 100 }}
           />
+          <div className="flex items-center justify-center gap-2">
+            <div className="text-lg font-bold">Allow Email Notifications</div>
+            <Switch
+              checked={enabled}
+              className="items-center justify-center"
+              sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+              onChange={() => setEnabled(!enabled)}
+            />
+          </div>
           <FormMessage message={message} />
           <div className="flex items-center justify-center gap-2">
             {isValidName ? (

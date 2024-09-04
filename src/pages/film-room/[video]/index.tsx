@@ -9,6 +9,7 @@ import Team from "~/components/teams/team";
 import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
 import VideoPlayIndex from "~/components/videos/video-play-index";
+import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
@@ -16,6 +17,7 @@ import type { PlayPreviewType, TeamType, VideoType } from "~/utils/types";
 
 const FilmRoom = () => {
   const router = useRouter();
+  const { affIds } = useAuthContext();
   const { screenWidth } = useMobileContext();
   const { isDark } = useIsDarkContext();
   const playParam = useSearchParams().get("play") ?? null;
@@ -56,7 +58,13 @@ const FilmRoom = () => {
       .select(`*`)
       .eq("id", videoId)
       .single();
-    if (data) setVideo(data);
+    if (data) {
+      setVideo(data);
+      if (data.exclusive_to) {
+        const accessAllowed = affIds?.includes(data.exclusive_to);
+        if (!accessAllowed) void router.push("/");
+      }
+    }
   };
 
   const fetchAffiliatedTeams = async () => {
