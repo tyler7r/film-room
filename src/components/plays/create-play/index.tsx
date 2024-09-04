@@ -202,7 +202,9 @@ const CreatePlay = ({
       await sendEmail({
         video: video,
         play: play,
-        title: `${mention.name} mentioned you in a play!`,
+        title: `${
+          user.name ? user.name : `${user.email}`
+        } mentioned you in a play!`,
         link: `https://www.inside-break.com/play/${play.id}`,
         recipient: `${mention.email}`,
       });
