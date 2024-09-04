@@ -23,7 +23,7 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
       .match({
         play_id: playId,
       })
-      .order("created_at", { ascending: false })
+      .order("created_at")
       .range(from, to);
     setPage(page + 1);
     if (count) {
