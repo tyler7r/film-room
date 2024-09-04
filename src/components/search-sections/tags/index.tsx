@@ -30,7 +30,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
     const plays = supabase
       .from("plays_via_tag")
       .select("*", { count: "exact" })
-      .ilike("tag->>title", `%${topic}%`)
+      // .ilike("tag->>title", `%${topic}%`)
       .order("play->>created_at", { ascending: false })
       .range(from, to);
     if (affIds) {
@@ -43,6 +43,9 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
     } else {
       void plays.eq("play->>private", false);
       void plays.eq("tag->>private", false);
+    }
+    if (topic !== "") {
+      void plays.ilike("tag->>title", `%${topic}%`);
     }
     const { data, count } = await plays;
     const uniquePlays = [...new Map(data?.map((x) => [x.play.id, x])).values()];

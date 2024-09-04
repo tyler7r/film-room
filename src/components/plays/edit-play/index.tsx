@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import FormMessage from "~/components/utils/form-message";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import sendEmail from "~/utils/send-email";
 import { supabase } from "~/utils/supabase";
 import {
   type CollectionType,
@@ -112,21 +113,26 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
   };
 
   const fetchPlayers = async () => {
-    const players = supabase.from("user_view").select("profile");
+    const players = supabase.from("user_view").select("profile").match({
+      "team->>id": video.exclusive_to,
+      "affiliation->>role": "player",
+      "affiliation->>verified": true,
+    });
+    const allPlayers = supabase.from("profiles").select();
     if (video.exclusive_to) {
-      void players.match({
-        "team->>id": video.exclusive_to,
-        "affiliation->>verified": true,
-      });
+      const { data } = await players;
+      if (data) {
+        const uniquePlayers = [
+          ...new Map(data.map((x) => [x.profile.id, x])).values(),
+        ];
+        setPlayers(uniquePlayers.map((p) => p.profile));
+      }
     } else {
-      void players.eq("affiliation->>role", "player");
-    }
-    const { data } = await players;
-    if (data) {
-      const uniquePlayers = [
-        ...new Map(data.map((x) => [x.profile.id, x])).values(),
-      ];
-      setPlayers(uniquePlayers.map((p) => p.profile));
+      const { data } = await allPlayers;
+      if (data) {
+        const uniquePlayers = [...new Map(data.map((x) => [x.id, x])).values()];
+        setPlayers(uniquePlayers);
+      }
     }
   };
 
@@ -215,14 +221,23 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     setPlayCollections([]);
   };
 
-  const handleMention = async (player: string, name: string, play: string) => {
+  const handleMention = async (mention: UserType, play: PlayType) => {
     await supabase.from("play_mentions").insert({
-      play_id: play,
+      play_id: play.id,
       sender_id: `${user.userId}`,
-      receiver_id: player,
-      receiver_name: name,
+      receiver_id: mention.id,
+      receiver_name: mention.name,
       sender_name: user.name ? user.name : `${user.email}`,
     });
+    if (mention.email !== user.email && mention.send_notifications) {
+      await sendEmail({
+        video: video,
+        play: play,
+        title: `${mention.name} mentioned you in a play!`,
+        link: `https://www.inside-break.com/play/${play.id}`,
+        recipient: `${mention.email}`,
+      });
+    }
   };
 
   const handleDeleteMention = async (mentionId: string) => {
@@ -325,7 +340,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       if (data) {
         handleRemoveMentions();
         mentions.forEach((mention) => {
-          void handleMention(mention.id, mention.name, play.id);
+          void handleMention(mention, play);
         });
         handleRemoveTags();
         if (playTags.length > 0) {

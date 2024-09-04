@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import sendEmail from "~/utils/send-email";
 import { supabase } from "~/utils/supabase";
 import {
   type CollectionType,
   type NewPlayType,
+  type PlayType,
   type TeamType,
   type UserType,
   type VideoType,
@@ -91,22 +93,26 @@ const CreatePlay = ({
   const open = Boolean(anchorEl);
 
   const fetchPlayers = async () => {
-    const players = supabase.from("user_view").select("profile");
+    const players = supabase.from("user_view").select("profile").match({
+      "team->>id": video.exclusive_to,
+      "affiliation->>role": "player",
+      "affiliation->>verified": true,
+    });
+    const allPlayers = supabase.from("profiles").select();
     if (video.exclusive_to) {
-      void players.match({
-        "team->>id": video.exclusive_to,
-        "affiliation->>role": "player",
-        "affiliation->>verified": true,
-      });
+      const { data } = await players;
+      if (data) {
+        const uniquePlayers = [
+          ...new Map(data.map((x) => [x.profile.id, x])).values(),
+        ];
+        setPlayers(uniquePlayers.map((p) => p.profile));
+      }
     } else {
-      void players.eq("affiliation->>role", "player");
-    }
-    const { data } = await players;
-    if (data) {
-      const uniquePlayers = [
-        ...new Map(data.map((x) => [x.profile.id, x])).values(),
-      ];
-      setPlayers(uniquePlayers.map((p) => p.profile));
+      const { data } = await allPlayers;
+      if (data) {
+        const uniquePlayers = [...new Map(data.map((x) => [x.id, x])).values()];
+        setPlayers(uniquePlayers);
+      }
     }
   };
 
@@ -184,14 +190,23 @@ const CreatePlay = ({
     setPlayCollections([]);
   };
 
-  const handleMention = async (player: string, name: string, play: string) => {
+  const handleMention = async (mention: UserType, play: PlayType) => {
     await supabase.from("play_mentions").insert({
-      play_id: play,
+      play_id: play.id,
       sender_id: `${user.userId}`,
-      receiver_id: player,
-      receiver_name: name,
+      receiver_id: mention.id,
+      receiver_name: mention.name,
       sender_name: user.name ? user.name : `${user.email}`,
     });
+    if (mention.email !== user.email && mention.send_notifications) {
+      await sendEmail({
+        video: video,
+        play: play,
+        title: `${mention.name} mentioned you in a play!`,
+        link: `https://www.inside-break.com/play/${play.id}`,
+        recipient: `${mention.email}`,
+      });
+    }
   };
 
   const handleTag = async (play: string, tag: string) => {
@@ -242,7 +257,7 @@ const CreatePlay = ({
         .single();
       if (data) {
         mentions?.forEach((mention) => {
-          void handleMention(mention.id, mention.name, data.id);
+          void handleMention(mention, data);
         });
         if (playTags.length > 0) {
           playTags.forEach((tag) => {

@@ -186,7 +186,7 @@ export type PlayType = {
   private: boolean;
   created_at: string;
   end_time_sort: string;
-  play_time_sort: string;
+  start_time_sort: string;
 };
 
 export type PlayerType = {
@@ -382,5 +382,13 @@ export type NewCollectionType = {
 
 export type PlayMentionViewType = {
   receiver: UserType;
+  play: PlayType;
+};
+
+export type EmailNotificationType = {
+  recipient: string;
+  title: string;
+  video: VideoType;
+  link: string;
   play: PlayType;
 };
