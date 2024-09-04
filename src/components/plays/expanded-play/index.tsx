@@ -81,7 +81,7 @@ const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
 
   useEffect(() => {
     void fetchCollections();
-  }, []);
+  }, [affIds]);
 
   return (
     <div className="flex w-full flex-col items-center gap-2 px-8">
