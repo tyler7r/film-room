@@ -2,7 +2,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import PublicIcon from "@mui/icons-material/Public";
 import { colors, Divider, IconButton, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PlaysToCollectionModal from "~/components/collections/add-plays-to-collection";
 import CollectionActionsMenu from "~/components/collections/collection-actions-menu";
 import PlayPreview from "~/components/plays/play_preview";
@@ -43,6 +43,7 @@ const Collection = () => {
 
   const [playCount, setPlayCount] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
+  const topRef = useRef<HTMLDivElement | null>(null);
 
   const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
@@ -58,6 +59,10 @@ const Collection = () => {
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === collection?.exclusive_to,
   )?.team;
+
+  const scrollToTop = () => {
+    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const fetchCollection = async () => {
     if (id) {
@@ -103,6 +108,7 @@ const Collection = () => {
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
     e.preventDefault();
+    scrollToTop();
     setPage(value);
   };
 
@@ -266,7 +272,7 @@ const Collection = () => {
             {collection.description}
           </div>
         )}
-        <div className="flex flex-col gap-6">
+        <div ref={topRef} className="flex flex-col gap-6">
           {plays?.map((play) => (
             <PlayPreview
               preview={play}
