@@ -258,6 +258,7 @@ const Play = ({
         <ExpandedPlay
           play={play}
           handleMentionAndTagClick={handleMentionAndTagClick}
+          commentCount={commentCount}
           setCommentCount={setCommentCount}
         />
       )}

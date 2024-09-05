@@ -306,7 +306,11 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
           </div>
         </div>
         <div className="mt-2 w-full">
-          <ExpandedPlay play={preview} setCommentCount={setCommentCount} />
+          <ExpandedPlay
+            play={preview}
+            commentCount={commentCount}
+            setCommentCount={setCommentCount}
+          />
         </div>
       </div>
     </div>

@@ -56,6 +56,7 @@ export const TheInbox = ({ children }: InboxProps) => {
         .from("comment_notification")
         .select("*", { count: "exact" })
         .eq("play->>author_id", user.userId)
+        .neq("comment->>comment_author", user.userId)
         .order("comment->>created_at", { ascending: false });
       if (unreadOnly) {
         void cmts.eq("comment->>viewed", false);
@@ -64,6 +65,7 @@ export const TheInbox = ({ children }: InboxProps) => {
         .from("mention_notification")
         .select("*", { count: "exact" })
         .eq("mention->>receiver_id", user.userId)
+        .neq("mention->>sender_id", user.userId)
         .order("play->>created_at", { ascending: false });
       if (unreadOnly) {
         void mntns.eq("mention->>viewed", false);

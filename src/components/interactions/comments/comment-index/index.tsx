@@ -1,22 +1,30 @@
-import { Button } from "@mui/material";
+import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/utils/empty-msg";
+import { useMobileContext } from "~/contexts/mobile";
+import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { CommentType } from "~/utils/types";
 import Comment from "../comment";
 
 type CommentIndexProps = {
   playId: string;
+  commentCount: number;
   setCommentCount: (count: number) => void;
 };
 
-const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
+const CommentIndex = ({
+  playId,
+  commentCount,
+  setCommentCount,
+}: CommentIndexProps) => {
+  const { isMobile } = useMobileContext();
   const [index, setIndex] = useState<CommentType[] | null>(null);
-  const [page, setPage] = useState<number>(0);
-  const [isLoadMoreDisabled, setIsLoadMoreDisabled] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const itemsPerPage = isMobile ? 5 : 10;
 
   const fetchComments = async () => {
-    const { from, to } = getFromAndTo();
+    const { from, to } = getToAndFrom(itemsPerPage, page);
     const { data, count } = await supabase
       .from("comments")
       .select("*", { count: "exact" })
@@ -25,26 +33,14 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
       })
       .order("created_at")
       .range(from, to);
-    setPage(page + 1);
-    if (count) {
-      setCommentCount(count);
-      if (to >= count - 1) setIsLoadMoreDisabled(true);
-      else setIsLoadMoreDisabled(false);
-    }
-    if (data && data.length > 0) setIndex(index ? [...index, ...data] : data);
-    if (data?.length === 0) setIsLoadMoreDisabled(true);
+    if (data && data.length > 0) setIndex(data);
+    else setIndex(null);
+    if (count) setCommentCount(count);
   };
 
-  const getFromAndTo = () => {
-    const itemPerPage = 4;
-    let from = page * itemPerPage;
-    const to = from + itemPerPage;
-
-    if (page > 0) {
-      from += 1;
-    }
-
-    return { from, to };
+  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
+    e.preventDefault();
+    setPage(value);
   };
 
   useEffect(() => {
@@ -65,8 +61,13 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
   }, []);
 
   useEffect(() => {
+    if (page === 1) void fetchComments();
+    else setPage(1);
+  }, [isMobile, playId]);
+
+  useEffect(() => {
     void fetchComments();
-  }, []);
+  }, [page]);
 
   return (
     <div className="flex w-full flex-col gap-2">
@@ -74,17 +75,25 @@ const CommentIndex = ({ playId, setCommentCount }: CommentIndexProps) => {
         {index?.map((comment) => (
           <Comment key={comment.id} comment={comment} />
         ))}
-        {index ? (
-          <Button
-            disabled={isLoadMoreDisabled}
-            onClick={() => void fetchComments()}
-            sx={{ alignSelf: "center" }}
-          >
-            Load More
-          </Button>
-        ) : (
-          <EmptyMessage size="small" message="comments" />
-        )}
+        <div className="flex w-full flex-col items-center justify-center">
+          {index && commentCount ? (
+            <Pagination
+              siblingCount={1}
+              boundaryCount={0}
+              showFirstButton
+              showLastButton
+              sx={{ marginTop: "8px" }}
+              size="small"
+              variant="text"
+              shape="rounded"
+              count={getNumberOfPages(itemsPerPage, commentCount)}
+              page={page}
+              onChange={handlePageChange}
+            />
+          ) : (
+            <EmptyMessage size="small" message="comments" />
+          )}
+        </div>
       </div>
     </div>
   );
