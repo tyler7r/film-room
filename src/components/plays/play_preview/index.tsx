@@ -338,7 +338,11 @@ const PlayPreview = ({
       </div>
       {isExpanded && (
         <div className="mt-2">
-          <ExpandedPlay play={preview} setCommentCount={setCommentCount} />
+          <ExpandedPlay
+            play={preview}
+            commentCount={commentCount}
+            setCommentCount={setCommentCount}
+          />
         </div>
       )}
     </div>

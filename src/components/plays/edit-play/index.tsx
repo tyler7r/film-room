@@ -229,7 +229,12 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       receiver_name: mention.name,
       sender_name: user.name ? user.name : `${user.email}`,
     });
-    if (mention.email !== user.email && mention.send_notifications) {
+    const alreadyEmailed = initialMentions.find((v) => v.id === mention.id);
+    if (
+      mention.email !== user.email &&
+      mention.send_notifications &&
+      !alreadyEmailed
+    ) {
       await sendEmail({
         video: video,
         play: play,

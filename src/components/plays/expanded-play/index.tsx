@@ -14,11 +14,16 @@ import type { CollectionType, PlayPreviewType } from "~/utils/types";
 type ExpandedPlayProps = {
   play: PlayPreviewType;
   activePlay?: PlayPreviewType;
+  commentCount: number;
   setCommentCount: (count: number) => void;
   handleMentionAndTagClick?: (e: React.MouseEvent, topic: string) => void;
 };
 
-const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
+const ExpandedPlay = ({
+  play,
+  commentCount,
+  setCommentCount,
+}: ExpandedPlayProps) => {
   const { hoverText } = useIsDarkContext();
   const { affIds } = useAuthContext();
 
@@ -127,7 +132,11 @@ const ExpandedPlay = ({ play, setCommentCount }: ExpandedPlayProps) => {
       )}
       <div className="flex w-full flex-col items-center gap-4">
         <AddComment play={play.play} />
-        <CommentIndex playId={play.play.id} setCommentCount={setCommentCount} />
+        <CommentIndex
+          playId={play.play.id}
+          commentCount={commentCount}
+          setCommentCount={setCommentCount}
+        />
       </div>
     </div>
   );
