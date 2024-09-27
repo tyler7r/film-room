@@ -250,7 +250,6 @@ const CreatePlay = ({
           note: playDetails.note === "" ? null : playDetails.note,
           start_time: playDetails.start!,
           end_time: playDetails.end!,
-          author_name: user.name ? user.name : `${user.email}`,
           private: isPrivate,
           end_time_sort: playDetails.end!.toString().padStart(6, "0"),
           start_time_sort: playDetails.start!.toString().padStart(6, "0"),

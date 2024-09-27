@@ -178,7 +178,7 @@ export type PlayType = {
   author_id: string;
   highlight: boolean;
   exclusive_to: string | null;
-  author_name: string;
+  author_name: string | null;
   start_time: number;
   end_time: number;
   title: string;
