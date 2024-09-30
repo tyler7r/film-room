@@ -196,7 +196,7 @@ const Play = ({
             className={`${hoverText} tracking-tight`}
             onClick={() => void router.push(`/profile/${play.play.author_id}`)}
           >
-            {play.play.author_name}:
+            {play.author.name}:
           </strong>{" "}
           {play.play.title}
         </span>

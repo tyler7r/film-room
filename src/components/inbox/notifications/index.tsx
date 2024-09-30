@@ -86,6 +86,7 @@ const InboxNotification = () => {
                   mention: notification.mention,
                   play: notification.play,
                   video: notification.video,
+                  author: notification.author,
                 }}
               />
             )}
@@ -95,6 +96,7 @@ const InboxNotification = () => {
                   comment: notification.comment,
                   play: notification.play,
                   video: notification.video,
+                  author: notification.author,
                 }}
               />
             )}

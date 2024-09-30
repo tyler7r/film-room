@@ -219,7 +219,7 @@ const Play = ({ preview }: { preview: PlayPreviewType }) => {
                 void router.push(`/profile/${preview.play.author_id}`)
               }
             >
-              {preview.play.author_name}
+              {preview.author.name}
             </div>
             <Divider flexItem orientation="vertical" variant="middle" />
             <div className="flex flex-col items-center gap-2">

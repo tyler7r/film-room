@@ -336,7 +336,6 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
           note: playDetails.note === "" ? null : playDetails.note,
           start_time: playDetails.start!,
           end_time: playDetails.end!,
-          author_name: user.name ? user.name : `${user.email}`,
           private: isPrivate,
         })
         .eq("id", play.id)

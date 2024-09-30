@@ -232,7 +232,7 @@ const PlaysToCollectionModal = ({
                         <div className="flex gap-1">
                           <div className="text-center text-sm">
                             <strong className="text-sm font-bold tracking-tight">
-                              {option.play.author_name}:
+                              {option.author.name}:
                             </strong>{" "}
                             {option.play.title}
                           </div>

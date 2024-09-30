@@ -34,11 +34,13 @@ export type Database = MergeDeep<
             play: PlayType;
             video: VideoType;
             team: TeamType | null;
+            author: UserType;
           };
         };
         plays_via_tag: {
           Row: {
             play: PlayType;
+            author: UserType;
             tag: TagType;
             video: VideoType;
             team: TeamType | null;
@@ -50,6 +52,7 @@ export type Database = MergeDeep<
             mention: MentionType;
             video: VideoType;
             team: TeamType | null;
+            author: UserType;
           };
         };
         comment_notification: {
@@ -57,6 +60,7 @@ export type Database = MergeDeep<
             play: PlayType;
             video: VideoType;
             comment: CommentType;
+            author: UserType;
           };
         };
         last_watched_view: {
@@ -71,6 +75,7 @@ export type Database = MergeDeep<
             video: VideoType;
             mention: MentionType;
             team: TeamType;
+            author: UserType;
           };
         };
         team_video_view: {
@@ -90,6 +95,7 @@ export type Database = MergeDeep<
             collection: CollectionType;
             play: PlayType;
             video: VideoType;
+            author: UserType;
           };
         };
         collection_view: {
@@ -103,6 +109,7 @@ export type Database = MergeDeep<
           Row: {
             receiver: UserType;
             play: PlayType;
+            sender: UserType;
           };
         };
       };
@@ -178,7 +185,6 @@ export type PlayType = {
   author_id: string;
   highlight: boolean;
   exclusive_to: string | null;
-  author_name: string;
   start_time: number;
   end_time: number;
   title: string;
@@ -289,6 +295,7 @@ export type CollectionPlaysType = {
 export type PlayPreviewType = {
   play: PlayType;
   video: VideoType;
+  author: UserType;
   mention?: MentionType;
   tag?: TagType;
   collection?: CollectionType;
@@ -300,12 +307,14 @@ export type MentionNotificationType = {
   video: VideoType;
   team: TeamType | undefined;
   mention: MentionType;
+  author: UserType;
 };
 
 export type CommentNotificationType = {
   play: PlayType;
   video: VideoType;
   comment: CommentType;
+  author: UserType;
 };
 
 export type NotificationType = {
@@ -314,6 +323,7 @@ export type NotificationType = {
   comment?: CommentType;
   mention?: MentionType;
   team?: TeamType;
+  author: UserType;
 };
 
 export type UserTeamType = {
@@ -383,6 +393,7 @@ export type NewCollectionType = {
 export type PlayMentionViewType = {
   receiver: UserType;
   play: PlayType;
+  sender: UserType;
 };
 
 export type EmailNotificationType = {
