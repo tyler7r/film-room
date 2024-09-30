@@ -1,6 +1,4 @@
-Need to install the following packages:
-supabase@1.200.3
-Ok to proceed? (y) export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -350,9 +348,9 @@ export type Database = {
           id: string
           play_id: string
           receiver_id: string
-          receiver_name: string
+          receiver_name: string | null
           sender_id: string
-          sender_name: string
+          sender_name: string | null
           viewed: boolean
         }
         Insert: {
@@ -360,9 +358,9 @@ export type Database = {
           id?: string
           play_id?: string
           receiver_id?: string
-          receiver_name: string
+          receiver_name?: string | null
           sender_id?: string
-          sender_name: string
+          sender_name?: string | null
           viewed?: boolean
         }
         Update: {
@@ -370,9 +368,9 @@ export type Database = {
           id?: string
           play_id?: string
           receiver_id?: string
-          receiver_name?: string
+          receiver_name?: string | null
           sender_id?: string
-          sender_name?: string
+          sender_name?: string | null
           viewed?: boolean
         }
         Relationships: [
@@ -446,7 +444,6 @@ export type Database = {
       plays: {
         Row: {
           author_id: string
-          author_name: string | null
           created_at: string
           end_time: number
           end_time_sort: string
@@ -462,7 +459,6 @@ export type Database = {
         }
         Insert: {
           author_id: string
-          author_name?: string | null
           created_at?: string
           end_time: number
           end_time_sort: string
@@ -478,7 +474,6 @@ export type Database = {
         }
         Update: {
           author_id?: string
-          author_name?: string | null
           created_at?: string
           end_time?: number
           end_time_sort?: string
@@ -776,6 +771,7 @@ export type Database = {
       }
       comment_notification: {
         Row: {
+          author: Json | null
           comment: Json | null
           play: Json | null
           video: Json | null
@@ -822,6 +818,7 @@ export type Database = {
       }
       mention_notification: {
         Row: {
+          author: Json | null
           mention: Json | null
           play: Json | null
           team: Json | null
@@ -833,11 +830,13 @@ export type Database = {
         Row: {
           play: Json | null
           receiver: Json | null
+          sender: Json | null
         }
         Relationships: []
       }
       play_preview: {
         Row: {
+          author: Json | null
           play: Json | null
           team: Json | null
           video: Json | null
@@ -846,6 +845,7 @@ export type Database = {
       }
       plays_via_tag: {
         Row: {
+          author: Json | null
           play: Json | null
           tag: Json | null
           team: Json | null
@@ -855,19 +855,10 @@ export type Database = {
       }
       plays_via_user_mention: {
         Row: {
+          author: Json | null
           mention: Json | null
           play: Json | null
           team: Json | null
-          video: Json | null
-        }
-        Relationships: []
-      }
-      reply_notification: {
-        Row: {
-          comment: Json | null
-          comment_author: Json | null
-          play: Json | null
-          reply: Json | null
           video: Json | null
         }
         Relationships: []
@@ -881,6 +872,7 @@ export type Database = {
       }
       transition_comment_notification: {
         Row: {
+          author: Json | null
           comment: Json | null
           play: Json | null
           video_id: string | null
@@ -898,7 +890,6 @@ export type Database = {
       transition_mention_view: {
         Row: {
           author_id: string | null
-          author_name: string | null
           created_at: string | null
           end_time: number | null
           highlight: boolean | null
@@ -953,12 +944,20 @@ export type Database = {
       }
       transition_plays_via_tag: {
         Row: {
+          author: string | null
           play: Json | null
           tag: Json | null
           team_id: string | null
           video_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
@@ -977,6 +976,7 @@ export type Database = {
       }
       transition_plays_via_user_mention: {
         Row: {
+          author: Json | null
           mention: Json | null
           play: Json | null
           team_id: string | null
@@ -995,24 +995,6 @@ export type Database = {
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      transition_reply_notification: {
-        Row: {
-          comment: Json | null
-          comment_author: Json | null
-          play: Json | null
-          reply: Json | null
-          video_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "plays_video_id_fkey"
-            columns: ["video_id"]
-            isOneToOne: false
-            referencedRelation: "videos"
             referencedColumns: ["id"]
           },
         ]

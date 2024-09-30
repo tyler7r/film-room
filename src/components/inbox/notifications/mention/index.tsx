@@ -122,7 +122,7 @@ const InboxMention = ({ mention }: InboxMentionProps) => {
                   void router.push(`/profile/${mention.play.author_id}`);
                 }}
               >
-                {mention.play.author_name}
+                {mention.author.name}
               </strong>{" "}
               mentioned you:{" "}
               {mention.play.title.length > 50

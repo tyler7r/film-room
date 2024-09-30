@@ -30,7 +30,6 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
     const plays = supabase
       .from("plays_via_tag")
       .select("*", { count: "exact" })
-      // .ilike("tag->>title", `%${topic}%`)
       .order("play->>created_at", { ascending: false })
       .range(from, to);
     if (affIds) {

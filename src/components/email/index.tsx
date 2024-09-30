@@ -18,7 +18,7 @@ const EmailTemplate = ({ link, play, video }: EmailProps) => {
             <strong></strong> {video.title}
           </div>
           <div className="text-lg">
-            <strong>{play.author_name} - </strong> {play.title}
+            <strong>{play.author_id} - </strong> {play.title}
           </div>
           <Divider flexItem orientation="horizontal" variant="middle" />
           <div className="flex w-full items-center gap-8">
