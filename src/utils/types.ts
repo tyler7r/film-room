@@ -95,6 +95,7 @@ export type Database = MergeDeep<
             collection: CollectionType;
             play: PlayType;
             video: VideoType;
+            author: UserType;
           };
         };
         collection_view: {

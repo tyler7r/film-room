@@ -755,6 +755,7 @@ export type Database = {
     Views: {
       collection_plays_view: {
         Row: {
+          author: Json | null
           collection: Json | null
           play: Json | null
           video: Json | null
@@ -928,11 +929,19 @@ export type Database = {
       }
       transition_plays_via_collection: {
         Row: {
+          author: string | null
           collection: Json | null
           play: Json | null
           video_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
