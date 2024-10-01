@@ -6,6 +6,7 @@ import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { CommentNotificationType } from "~/utils/types";
 import LikeBtn from "../../likes/like-btn";
+import ReplyBtn from "../../replies/reply-btn";
 
 type CommentProps = {
   cmt: CommentNotificationType;
@@ -16,6 +17,8 @@ const Comment = ({ cmt }: CommentProps) => {
   const { user } = useAuthContext();
   const { hoverText } = useIsDarkContext();
   const router = useRouter();
+  const [replyCount, setReplyCount] = useState<number>(0);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
@@ -36,6 +39,13 @@ const Comment = ({ cmt }: CommentProps) => {
         >{`${cmt.author.name}: `}</strong>
         {comment.comment}
       </div>
+      <ReplyBtn
+        commentId={comment.id}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        replyCount={replyCount}
+        setReplyCount={setReplyCount}
+      />
       <LikeBtn playId={comment.id} commentLike={true} small={true} />
       {comment.comment_author === user.userId && (
         <DeleteMenu
