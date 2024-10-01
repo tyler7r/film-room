@@ -74,7 +74,7 @@ export type Database = MergeDeep<
             play: PlayType;
             video: VideoType;
             mention: MentionType;
-            team: TeamType | null;
+            team: TeamType;
             author: UserType;
           };
         };
