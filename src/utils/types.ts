@@ -226,7 +226,6 @@ export type CommentType = {
   created_at: string;
   comment: string;
   comment_author: string;
-  author_name: string;
   play_id: string;
   viewed: boolean;
 };

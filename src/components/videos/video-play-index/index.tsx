@@ -68,7 +68,7 @@ const VideoPlayIndex = ({
       void plays.eq("play->>highlight", true);
     }
     if (searchOptions?.author && searchOptions.author !== "") {
-      void plays.ilike("play->>author_name", `%${searchOptions.author}%`);
+      void plays.ilike("author->>name", `%${searchOptions.author}%`);
     }
     if (activePlay) {
       void plays.neq("play->>id", activePlay.play.id);
@@ -138,8 +138,8 @@ const VideoPlayIndex = ({
         void playsByTag.gte("play->>end_time_sort", searchOptions.timestamp);
       }
       if (searchOptions.author) {
-        void playsByMention.ilike("play->>author_name", searchOptions.author);
-        void playsByTag.ilike("play->>author_name", searchOptions.author);
+        void playsByMention.ilike("author->>name", searchOptions.author);
+        void playsByTag.ilike("author->>name", searchOptions.author);
       }
       if (affIds) {
         if (searchOptions.private_only === "all") {

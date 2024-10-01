@@ -249,7 +249,6 @@ export type Database = {
       }
       comments: {
         Row: {
-          author_name: string
           comment: string
           comment_author: string
           created_at: string
@@ -258,7 +257,6 @@ export type Database = {
           viewed: boolean
         }
         Insert: {
-          author_name: string
           comment: string
           comment_author?: string
           created_at?: string
@@ -267,7 +265,6 @@ export type Database = {
           viewed?: boolean
         }
         Update: {
-          author_name?: string
           comment?: string
           comment_author?: string
           created_at?: string

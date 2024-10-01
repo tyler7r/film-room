@@ -111,7 +111,7 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
                 void router.push(`/profile/${comment.comment.comment_author}`);
               }}
             >
-              {comment.comment.author_name}
+              {comment.author.name}
             </strong>{" "}
             commented:{" "}
             {comment.comment.comment.length > 50
