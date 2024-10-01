@@ -35,7 +35,6 @@ const CreateAnnouncement = ({ setIsOpen, teamId }: CreateAnnouncementProps) => {
         .insert({
           team_id: teamId,
           text: announcement,
-          author_name: user.name,
           author_id: user.userId,
         })
         .select();
