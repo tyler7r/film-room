@@ -545,40 +545,30 @@ export type Database = {
       }
       replies: {
         Row: {
+          author_id: string
           comment_id: string
           created_at: string
           id: string
           reply: string
-          reply_author: string
-          reply_author_name: string
         }
         Insert: {
+          author_id: string
           comment_id: string
           created_at?: string
           id?: string
           reply: string
-          reply_author: string
-          reply_author_name: string
         }
         Update: {
+          author_id?: string
           comment_id?: string
           created_at?: string
           id?: string
           reply?: string
-          reply_author?: string
-          reply_author_name?: string
         }
         Relationships: [
           {
-            foreignKeyName: "replies_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "replies_reply_author_fkey"
-            columns: ["reply_author"]
+            foreignKeyName: "replies_author_id_fkey"
+            columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -782,15 +772,16 @@ export type Database = {
       }
       first_transition_reply_notification: {
         Row: {
+          author: string | null
           comment: Json | null
-          comment_author: string | null
+          comment_author_id: string | null
           play_id: string | null
           reply: Json | null
         }
         Relationships: [
           {
             foreignKeyName: "comments_comment_author_fkey"
-            columns: ["comment_author"]
+            columns: ["comment_author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -808,6 +799,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "transition_mention_view"
             referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "replies_author_id_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -860,6 +858,38 @@ export type Database = {
           author: Json | null
           mention: Json | null
           play: Json | null
+          team: Json | null
+          video: Json | null
+        }
+        Relationships: []
+      }
+      reply_details: {
+        Row: {
+          comment: Json | null
+          comment_author: Json | null
+          reply: Json | null
+        }
+        Relationships: []
+      }
+      reply_notif: {
+        Row: {
+          author: Json | null
+          comment: Json | null
+          comment_author: Json | null
+          play: Json | null
+          reply: Json | null
+          team: Json | null
+          video: Json | null
+        }
+        Relationships: []
+      }
+      reply_notification: {
+        Row: {
+          author: Json | null
+          comment: Json | null
+          comment_author: Json | null
+          play: Json | null
+          reply: Json | null
           team: Json | null
           video: Json | null
         }
@@ -1003,6 +1033,33 @@ export type Database = {
           {
             foreignKeyName: "public_plays_exclusive_to_fkey"
             columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transition_reply_notification: {
+        Row: {
+          author: Json | null
+          comment: Json | null
+          comment_author: Json | null
+          exclusive_to: string | null
+          play: Json | null
+          reply: Json | null
+          video: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["exclusive_to"]
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
