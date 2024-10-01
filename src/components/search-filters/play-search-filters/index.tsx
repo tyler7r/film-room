@@ -128,7 +128,7 @@ const PlaySearchFilters = ({
   };
 
   const clearTopic = () => {
-    setSearchOptions({ ...searchOptions, topic: "" });
+    setSearchOptions({ ...searchOptions, topic: "", author: "" });
   };
 
   const checkToSwitchMode = () => {

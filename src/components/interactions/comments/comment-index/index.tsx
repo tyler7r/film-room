@@ -4,7 +4,7 @@ import EmptyMessage from "~/components/utils/empty-msg";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { CommentType } from "~/utils/types";
+import type { CommentNotificationType } from "~/utils/types";
 import Comment from "../comment";
 
 type CommentIndexProps = {
@@ -19,19 +19,17 @@ const CommentIndex = ({
   setCommentCount,
 }: CommentIndexProps) => {
   const { isMobile } = useMobileContext();
-  const [index, setIndex] = useState<CommentType[] | null>(null);
+  const [index, setIndex] = useState<CommentNotificationType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const itemsPerPage = isMobile ? 5 : 10;
 
   const fetchComments = async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const { data, count } = await supabase
-      .from("comments")
+      .from("comment_notification")
       .select("*", { count: "exact" })
-      .match({
-        play_id: playId,
-      })
-      .order("created_at")
+      .eq("play->>id", playId)
+      .order("comment->>created_at")
       .range(from, to);
     if (data && data.length > 0) setIndex(data);
     else setIndex(null);
@@ -73,7 +71,7 @@ const CommentIndex = ({
     <div className="flex w-full flex-col gap-2">
       <div className="flex flex-col gap-2 px-6">
         {index?.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
+          <Comment key={comment.comment.id} cmt={comment} />
         ))}
         <div className="flex w-full flex-col items-center justify-center">
           {index && commentCount ? (

@@ -4,14 +4,15 @@ import DeleteMenu from "~/components/utils/delete-menu";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { CommentType } from "~/utils/types";
+import type { CommentNotificationType } from "~/utils/types";
 import LikeBtn from "../../likes/like-btn";
 
 type CommentProps = {
-  comment: CommentType;
+  cmt: CommentNotificationType;
 };
 
-const Comment = ({ comment }: CommentProps) => {
+const Comment = ({ cmt }: CommentProps) => {
+  const comment = cmt.comment;
   const { user } = useAuthContext();
   const { hoverText } = useIsDarkContext();
   const router = useRouter();
@@ -32,7 +33,7 @@ const Comment = ({ comment }: CommentProps) => {
         <strong
           className={`${hoverText} tracking-tight`}
           onClick={() => handleAuthorClick(comment.comment_author)}
-        >{`${comment.author_name}: `}</strong>
+        >{`${cmt.author.name}: `}</strong>
         {comment.comment}
       </div>
       <LikeBtn playId={comment.id} commentLike={true} small={true} />
