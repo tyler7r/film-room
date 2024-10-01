@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useMobileContext } from "~/contexts/mobile";
 import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { AnnouncementType } from "~/utils/types";
+import type { AnnouncementViewType } from "~/utils/types";
 import EmptyMessage from "../../utils/empty-msg";
 import PageTitle from "../../utils/page-title";
 import StandardPopover from "../../utils/standard-popover";
@@ -18,7 +18,7 @@ type AnnouncementsProps = {
 
 const Announcements = ({ teamId, role }: AnnouncementsProps) => {
   const { isMobile } = useMobileContext();
-  const [anncs, setAnncs] = useState<AnnouncementType[] | null>(null);
+  const [anncs, setAnncs] = useState<AnnouncementViewType[] | null>(null);
   const [announcementCount, setAnnouncementCount] = useState<number | null>(
     null,
   );
@@ -41,10 +41,10 @@ const Announcements = ({ teamId, role }: AnnouncementsProps) => {
   const fetchAnnouncements = async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
     const { data, count } = await supabase
-      .from("announcements")
+      .from("announcement_view")
       .select("*", { count: "exact" })
-      .eq("team_id", teamId)
-      .order("created_at", { ascending: false })
+      .eq("announcement->>team_id", teamId)
+      .order("announcement->>created_at", { ascending: false })
       .range(from, to);
     if (data && data.length > 0) setAnncs(data);
     else setAnncs(null);
@@ -105,7 +105,9 @@ const Announcements = ({ teamId, role }: AnnouncementsProps) => {
         )}
       </div>
       {!anncs && <EmptyMessage message="team announcements" size="small" />}
-      {anncs?.map((annc) => <Announcement annc={annc} key={annc.id} />)}
+      {anncs?.map((annc) => (
+        <Announcement annc={annc} key={annc.announcement.id} />
+      ))}
       {anncs && announcementCount && (
         <Pagination
           siblingCount={1}

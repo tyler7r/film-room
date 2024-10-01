@@ -112,6 +112,12 @@ export type Database = MergeDeep<
             sender: UserType;
           };
         };
+        announcement_view: {
+          Row: {
+            announcement: AnnouncementType;
+            author: UserType;
+          };
+        };
       };
     };
   }
@@ -263,11 +269,15 @@ export type UserType = {
 
 export type AnnouncementType = {
   author_id: string;
-  author_name: string;
   created_at: string;
   id: string;
   team_id: string;
   text: string;
+};
+
+export type AnnouncementViewType = {
+  announcement: AnnouncementType;
+  author: UserType;
 };
 
 export type CollectionType = {

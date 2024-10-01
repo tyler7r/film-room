@@ -90,7 +90,6 @@ export type Database = {
       announcements: {
         Row: {
           author_id: string
-          author_name: string
           created_at: string
           id: string
           team_id: string
@@ -98,7 +97,6 @@ export type Database = {
         }
         Insert: {
           author_id: string
-          author_name: string
           created_at?: string
           id?: string
           team_id: string
@@ -106,7 +104,6 @@ export type Database = {
         }
         Update: {
           author_id?: string
-          author_name?: string
           created_at?: string
           id?: string
           team_id?: string
@@ -750,6 +747,13 @@ export type Database = {
       }
     }
     Views: {
+      announcement_view: {
+        Row: {
+          announcement: Json | null
+          author: Json | null
+        }
+        Relationships: []
+      }
       collection_plays_view: {
         Row: {
           author: Json | null

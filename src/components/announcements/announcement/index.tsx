@@ -7,11 +7,11 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { AnnouncementType } from "~/utils/types";
+import type { AnnouncementViewType } from "~/utils/types";
 import DeleteMenu from "../../utils/delete-menu";
 
 type AnnouncementProps = {
-  annc: AnnouncementType;
+  annc: AnnouncementViewType;
 };
 
 const Announcement = ({ annc }: AnnouncementProps) => {
@@ -28,7 +28,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
     const { count } = await supabase
       .from("announcement_likes")
       .select("user_name", { count: "exact" })
-      .eq("announcement_id", annc.id);
+      .eq("announcement_id", annc.announcement.id);
     if (count) setLikeCount(count);
     else {
       setLikeCount(0);
@@ -40,7 +40,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
       .from("announcement_likes")
       .select("*", { count: "exact" })
       .match({
-        announcement_id: annc.id,
+        announcement_id: annc.announcement.id,
         user_id: user.userId,
       });
     if (count && count > 0) {
@@ -56,7 +56,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
       const { data } = await supabase
         .from("announcement_likes")
         .insert({
-          announcement_id: annc.id,
+          announcement_id: annc.announcement.id,
           user_id: user.userId,
           user_name: user.name,
         })
@@ -77,7 +77,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
         .from("announcement_likes")
         .delete()
         .match({
-          announcement_id: annc.id,
+          announcement_id: annc.announcement.id,
           user_id: user.userId,
         })
         .select();
@@ -89,7 +89,10 @@ const Announcement = ({ annc }: AnnouncementProps) => {
   };
 
   const handleDelete = async () => {
-    await supabase.from("announcements").delete().eq("id", annc.id);
+    await supabase
+      .from("announcements")
+      .delete()
+      .eq("id", annc.announcement.id);
   };
 
   useEffect(() => {
@@ -100,17 +103,17 @@ const Announcement = ({ annc }: AnnouncementProps) => {
   return (
     <div
       style={backgroundStyle}
-      className="flex w-4/5 cursor-default items-center justify-center gap-2 rounded-md p-4 text-lg"
+      className="flex cursor-default items-center justify-center gap-2 rounded-md p-2 text-lg"
     >
-      <div className="text-sm font-light">
-        {convertTimestamp(annc.created_at)}
+      <div className="text-xs font-light">
+        {convertTimestamp(annc.announcement.created_at)}
       </div>
-      <div>
+      <div className="text-sm">
         <strong
-          className={`${hoverText} font-bold tracking-tight`}
-          onClick={() => void router.push(`/profile/${annc.author_id}`)}
-        >{`${annc.author_name}: `}</strong>
-        {annc.text}
+          className={`${hoverText} text-sm font-bold tracking-tight`}
+          onClick={() => void router.push(`/profile/${annc.author.id}`)}
+        >{`${annc.author.name}: `}</strong>
+        {annc.announcement.text}
       </div>
       <Divider
         flexItem
@@ -130,7 +133,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
           )}
           <div className="text-lg font-bold tracking-tight">{likeCount}</div>
         </div>
-        {annc.author_id === user.userId && (
+        {annc.author.id === user.userId && (
           <DeleteMenu
             isOpen={isDeleteMenuOpen}
             setIsOpen={setIsDeleteMenuOpen}
