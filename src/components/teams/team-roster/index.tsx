@@ -49,8 +49,10 @@ const Roster = ({ team, role }: RosterProps) => {
   }, []);
 
   useEffect(() => {
-    if (rosterReload) void fetchRoster();
-    else setRosterReload(false);
+    if (rosterReload) {
+      void fetchRoster();
+      setRosterReload(false);
+    } else return;
   }, [rosterReload]);
 
   useEffect(() => {

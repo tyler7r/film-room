@@ -9,6 +9,7 @@ type DeleteMenuProps = {
   setIsOpen: (isOpen: boolean) => void;
   actionMenu?: boolean;
   deleteType: string;
+  small?: boolean;
 };
 
 const DeleteMenu = ({
@@ -17,9 +18,10 @@ const DeleteMenu = ({
   setIsOpen,
   actionMenu,
   deleteType,
+  small,
 }: DeleteMenuProps) => {
   return isOpen ? (
-    <div className="flex w-full justify-around">
+    <div className="flex items-center justify-center">
       {actionMenu ? (
         <Button
           endIcon={<DeleteIcon />}
@@ -32,7 +34,7 @@ const DeleteMenu = ({
         </Button>
       ) : (
         <IconButton size="small" onClick={() => void handleDelete()}>
-          <DeleteIcon color="primary" />
+          <DeleteIcon color="primary" fontSize={small ? "small" : "medium"} />
         </IconButton>
       )}
       <IconButton size="small" onClick={() => setIsOpen(false)}>
@@ -41,7 +43,7 @@ const DeleteMenu = ({
     </div>
   ) : !actionMenu ? (
     <IconButton size="small" onClick={() => setIsOpen(true)}>
-      <DeleteOutlineIcon color="action" />
+      <DeleteOutlineIcon color="action" fontSize={small ? "small" : "medium"} />
     </IconButton>
   ) : (
     <div

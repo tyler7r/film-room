@@ -27,7 +27,7 @@ const Announcement = ({ annc }: AnnouncementProps) => {
   const fetchLikeCount = async () => {
     const { count } = await supabase
       .from("announcement_likes")
-      .select("user_name", { count: "exact" })
+      .select("*", { count: "exact" })
       .eq("announcement_id", annc.announcement.id);
     if (count) setLikeCount(count);
     else {
@@ -58,7 +58,6 @@ const Announcement = ({ annc }: AnnouncementProps) => {
         .insert({
           announcement_id: annc.announcement.id,
           user_id: user.userId,
-          user_name: user.name,
         })
         .select();
       if (data) {

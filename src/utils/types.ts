@@ -78,6 +78,17 @@ export type Database = MergeDeep<
             author: UserType;
           };
         };
+        reply_notification: {
+          Row: {
+            play: PlayType;
+            video: VideoType;
+            reply: ReplyType;
+            author: UserType;
+            comment_author: UserType;
+            comment: CommentType;
+            team: TeamType;
+          };
+        };
         team_video_view: {
           Row: {
             video: VideoType;
@@ -411,4 +422,22 @@ export type EmailNotificationType = {
   video: VideoType;
   link: string;
   play: PlayType;
+};
+
+export type ReplyType = {
+  id: string;
+  created_at: string;
+  reply: string;
+  comment_id: string;
+  author_id: string;
+};
+
+export type ReplyNotificationType = {
+  play: PlayType;
+  comment: CommentType;
+  reply: ReplyType;
+  comment_author: UserType;
+  author: UserType;
+  team: TeamType;
+  video: VideoType;
 };
