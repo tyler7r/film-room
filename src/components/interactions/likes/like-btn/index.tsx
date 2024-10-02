@@ -9,10 +9,11 @@ import { supabase } from "~/utils/supabase";
 type LikeBtnProps = {
   playId: string;
   commentLike?: boolean;
+  replyLike?: boolean;
   small?: boolean;
 };
 
-const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
+const LikeBtn = ({ playId, commentLike, replyLike, small }: LikeBtnProps) => {
   const { user } = useAuthContext();
   const router = useRouter();
 
@@ -22,13 +23,21 @@ const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
   const fetchLikeCount = async () => {
     const plays = supabase
       .from("play_likes")
-      .select("user_name", { count: "exact" })
+      .select("*", { count: "exact" })
       .eq("play_id", playId);
     const comments = supabase
       .from("comment_likes")
-      .select("user_name", { count: "exact" })
+      .select("*", { count: "exact" })
       .eq("comment_id", playId);
-    const { count } = commentLike ? await comments : await plays;
+    const replies = supabase
+      .from("reply_likes")
+      .select("*", { count: "exact" })
+      .eq("reply_id", playId);
+    const { count } = commentLike
+      ? await comments
+      : replyLike
+        ? await replies
+        : await plays;
     if (count) setLikeCount(count);
     else {
       setLikeCount(0);
@@ -43,7 +52,6 @@ const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
         .insert({
           play_id: playId,
           user_id: user.userId,
-          user_name: `${user.name}`,
         })
         .select();
       const comments = supabase
@@ -51,10 +59,20 @@ const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
         .insert({
           comment_id: playId,
           user_id: user.userId,
-          user_name: `${user.name}`,
         })
         .select();
-      const { data } = commentLike ? await comments : await plays;
+      const replies = supabase
+        .from("reply_likes")
+        .insert({
+          reply_id: playId,
+          user_id: user.userId,
+        })
+        .select();
+      const { data } = commentLike
+        ? await comments
+        : replyLike
+          ? await replies
+          : await plays;
       if (data) {
         void fetchLikeCount();
         void fetchIfUserLiked();
@@ -84,7 +102,16 @@ const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
           user_id: user.userId,
         })
         .select();
-      const { data } = commentLike ? await comments : await plays;
+      const replies = supabase
+        .from("reply_likes")
+        .delete()
+        .match({ reply_id: playId, user_id: user.userId })
+        .select();
+      const { data } = commentLike
+        ? await comments
+        : replyLike
+          ? await replies
+          : await plays;
       if (data) {
         void fetchLikeCount();
         void fetchIfUserLiked();
@@ -101,7 +128,15 @@ const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
       .from("comment_likes")
       .select("*", { count: "exact" })
       .match({ comment_id: playId, user_id: user.userId });
-    const { count } = commentLike ? await comments : await plays;
+    const replies = supabase
+      .from("reply_likes")
+      .select("*", { count: "exact" })
+      .match({ reply_id: playId, user_id: user.userId });
+    const { count } = commentLike
+      ? await comments
+      : replyLike
+        ? await replies
+        : await plays;
     if (count && count > 0) {
       setIsLiked(true);
     } else {
@@ -119,11 +154,17 @@ const LikeBtn = ({ playId, commentLike }: LikeBtnProps) => {
       <div className="flex items-center justify-center">
         {isLiked ? (
           <IconButton size="small" onClick={(e) => void handleUnlike(e)}>
-            <FavoriteIcon color="primary" fontSize="medium" />
+            <FavoriteIcon
+              color="primary"
+              fontSize={small ? "small" : "medium"}
+            />
           </IconButton>
         ) : (
           <IconButton size="small" onClick={(e) => void handleLike(e)}>
-            <FavoriteBorderIcon color="primary" fontSize="medium" />
+            <FavoriteBorderIcon
+              color="primary"
+              fontSize={small ? "small" : "medium"}
+            />
           </IconButton>
         )}
         <div className="text-lg font-bold tracking-tight">{likeCount}</div>

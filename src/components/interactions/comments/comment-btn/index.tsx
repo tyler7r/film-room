@@ -11,6 +11,7 @@ type CommentBtnProps = {
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean) => void;
   activePlay: PlayType | null | undefined;
+  small?: boolean;
 };
 
 const CommentBtn = ({
@@ -19,6 +20,7 @@ const CommentBtn = ({
   setIsOpen,
   commentCount,
   setCommentCount,
+  small,
 }: CommentBtnProps) => {
   const handleCommentClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -60,7 +62,10 @@ const CommentBtn = ({
   return (
     <div className="flex items-center">
       <IconButton size="small" onClick={handleCommentClick}>
-        <ModeCommentIcon color="primary" fontSize="medium" />
+        <ModeCommentIcon
+          color="primary"
+          fontSize={small ? "small" : "medium"}
+        />
       </IconButton>
       <div className="text-lg font-bold tracking-tight">{commentCount}</div>
     </div>

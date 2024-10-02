@@ -58,9 +58,9 @@ const ReplyBtn = ({
   return (
     <div className="flex items-center">
       <IconButton size="small" onClick={handleReplyClick}>
-        <CommentIcon color="primary" fontSize="medium" />
+        <CommentIcon color="primary" fontSize="small" />
       </IconButton>
-      <div className="text-lg font-bold tracking-tight">{replyCount}</div>
+      <div className="font-bold tracking-tight">{replyCount}</div>
     </div>
   );
 };

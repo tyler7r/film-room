@@ -56,19 +56,16 @@ export type Database = {
           announcement_id: string
           created_at: string
           user_id: string
-          user_name: string
         }
         Insert: {
           announcement_id: string
           created_at?: string
           user_id: string
-          user_name: string
         }
         Update: {
           announcement_id?: string
           created_at?: string
           user_id?: string
-          user_name?: string
         }
         Relationships: [
           {
@@ -213,19 +210,16 @@ export type Database = {
           comment_id: string
           created_at: string
           user_id: string
-          user_name: string
         }
         Insert: {
           comment_id: string
           created_at?: string
           user_id: string
-          user_name: string
         }
         Update: {
           comment_id?: string
           created_at?: string
           user_id?: string
-          user_name?: string
         }
         Relationships: [
           {
@@ -298,19 +292,16 @@ export type Database = {
           created_at: string
           play_id: string
           user_id: string
-          user_name: string
         }
         Insert: {
           created_at?: string
           play_id?: string
           user_id?: string
-          user_name: string
         }
         Update: {
           created_at?: string
           play_id?: string
           user_id?: string
-          user_name?: string
         }
         Relationships: [
           {
@@ -569,6 +560,39 @@ export type Database = {
           {
             foreignKeyName: "replies_author_id_fkey"
             columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reply_likes: {
+        Row: {
+          created_at: string
+          reply_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          reply_id?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          reply_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reply_likes_reply_id_fkey"
+            columns: ["reply_id"]
+            isOneToOne: false
+            referencedRelation: "replies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reply_likes_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

@@ -86,7 +86,7 @@ export type Database = MergeDeep<
             author: UserType;
             comment_author: UserType;
             comment: CommentType;
-            team: TeamType | null;
+            team: TeamType;
           };
         };
         team_video_view: {

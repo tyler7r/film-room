@@ -3,10 +3,12 @@ import { useState } from "react";
 import DeleteMenu from "~/components/utils/delete-menu";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import { getTimeSinceNotified } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { CommentNotificationType } from "~/utils/types";
 import LikeBtn from "../../likes/like-btn";
 import ReplyBtn from "../../replies/reply-btn";
+import ReplyIndex from "../../replies/reply-index";
 
 type CommentProps = {
   cmt: CommentNotificationType;
@@ -31,30 +33,56 @@ const Comment = ({ cmt }: CommentProps) => {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <div>
-        <strong
-          className={`${hoverText} tracking-tight`}
-          onClick={() => handleAuthorClick(comment.comment_author)}
-        >{`${cmt.author.name}: `}</strong>
-        {comment.comment}
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <div className="flex flex-col">
+          <div className="flex justify-between">
+            <div className="flex items-center gap-2">
+              <div
+                className={`${hoverText} text-sm font-bold tracking-tight`}
+                onClick={() => handleAuthorClick(comment.comment_author)}
+              >{`${cmt.author.name} `}</div>
+              <div className="text-xs font-light">
+                {getTimeSinceNotified(comment.created_at)}
+              </div>
+            </div>
+            <div className="flex items-center">
+              <ReplyBtn
+                commentId={comment.id}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                replyCount={replyCount}
+                setReplyCount={setReplyCount}
+              />
+              <LikeBtn playId={comment.id} commentLike={true} small={true} />
+              {comment.comment_author === user.userId && (
+                <DeleteMenu
+                  isOpen={isDeleteMenuOpen}
+                  setIsOpen={setIsDeleteMenuOpen}
+                  handleDelete={handleDelete}
+                  deleteType="comment"
+                  small={true}
+                />
+              )}
+            </div>
+          </div>
+          <div
+            className="cursor-pointer text-sm"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {comment.comment}
+          </div>
+        </div>
       </div>
-      <ReplyBtn
-        commentId={comment.id}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        replyCount={replyCount}
-        setReplyCount={setReplyCount}
-      />
-      <LikeBtn playId={comment.id} commentLike={true} small={true} />
-      {comment.comment_author === user.userId && (
-        <DeleteMenu
-          isOpen={isDeleteMenuOpen}
-          setIsOpen={setIsDeleteMenuOpen}
-          handleDelete={handleDelete}
-          deleteType="comment"
-        />
-      )}
+      <div className="flex w-full flex-col items-center justify-center">
+        {isOpen && (
+          <ReplyIndex
+            comment={cmt}
+            replyCount={replyCount}
+            setReplyCount={setReplyCount}
+          />
+        )}
+      </div>
     </div>
   );
 };
