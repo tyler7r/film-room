@@ -239,8 +239,11 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
         video: video,
         play: play,
         title: `${mention.name} mentioned you in a play!`,
-        link: `https://www.inside-break.com/play/${play.id}`,
-        recipient: `${mention.email}`,
+        author: {
+          name: user.name ? user.name : user.email!,
+          email: user.email!,
+        },
+        recipient: mention,
       });
     }
   };
