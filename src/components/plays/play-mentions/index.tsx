@@ -1,8 +1,9 @@
 import PersonIcon from "@mui/icons-material/Person";
-import { Button, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import StandardPopover from "~/components/utils/standard-popover";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { MentionType, PlayPreviewType } from "~/utils/types";
 
@@ -17,6 +18,7 @@ const PlayMentions = ({
   handleMentionAndTagClick,
   activePlay,
 }: PlayMentionsProps) => {
+  const { hoverText } = useIsDarkContext();
   const router = useRouter();
   const [mentions, setMentions] = useState<MentionType[] | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -84,18 +86,17 @@ const PlayMentions = ({
           handlePopoverClose={handlePopoverClose}
           anchorEl={anchorEl}
         />
-        <div className="flex items-center">
+        <div className={`flex cursor-pointer items-center gap-1`}>
           {mentions?.map((mention) => (
-            <Button
+            <div
               onClick={(e) =>
                 handleClick(e, mention.receiver_name, mention.receiver_id)
               }
               key={mention.id}
-              variant="text"
-              style={{ fontSize: "12px", padding: "2px", fontWeight: "bold" }}
+              className={`text-xs font-bold ${hoverText} transition delay-100 ease-in`}
             >
-              @{mention.receiver_name}
-            </Button>
+              @{mention.receiver_name.toLocaleUpperCase()}
+            </div>
           ))}
         </div>
       </div>
