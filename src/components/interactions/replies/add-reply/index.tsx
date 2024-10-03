@@ -43,7 +43,7 @@ const AddReply = ({ comment, comment_author, setReload }: ReplyProps) => {
         setReply("");
         setReload(true);
         if (
-          // comment.author.email !== user.email &&
+          comment.author.email !== user.email &&
           comment.author.send_notifications
         ) {
           await sendEmail({
