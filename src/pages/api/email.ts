@@ -25,30 +25,34 @@ export default async function POST(
     },
   });
 
-  const emailHtml = data.play
-    ? await render(
-        PlayEmailTemplate({
-          video: data.video,
-          play: data.play,
-          author: data.author,
-        }),
-      )
-    : data.comment
+  const emailHtml =
+    data.reply && data.comment && data.play
       ? await render(
-          CommentEmailTemplate({
-            video: data.video,
-            comment: data.comment,
-            author: data.author,
-          }),
-        )
-      : data.reply &&
-        (await render(
           ReplyEmailTemplate({
             video: data.video,
             reply: data.reply,
             author: data.author,
+            play: data.play,
+            comment: data.comment,
           }),
-        ));
+        )
+      : data.comment && data.play
+        ? await render(
+            CommentEmailTemplate({
+              video: data.video,
+              comment: data.comment,
+              author: data.author,
+              play: data.play,
+            }),
+          )
+        : data.play &&
+          (await render(
+            PlayEmailTemplate({
+              video: data.video,
+              play: data.play,
+              author: data.author,
+            }),
+          ));
 
   const mailOptions: Mail.Options = {
     from: process.env.MY_EMAIL!,

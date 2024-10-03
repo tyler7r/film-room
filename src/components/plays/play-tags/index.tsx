@@ -41,7 +41,7 @@ const PlayTags = ({
       .from("plays_via_tag")
       .select("*")
       .eq("play->>id", play.play.id);
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       void tags.or(`tag->>private.eq.false, tag->>exclusive_to.in.(${affIds})`);
     } else {
       void tags.eq("tag->>private", false);

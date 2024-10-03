@@ -47,7 +47,7 @@ const ExpandedPlay = ({
       .from("collection_plays_view")
       .select()
       .eq("play->>id", play.play.id);
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       void colls.or(
         `collection->>private.eq.false, collection->>exclusive_to.in.(${affIds})`,
       );
@@ -131,7 +131,7 @@ const ExpandedPlay = ({
         </div>
       )}
       <div className="flex w-full flex-col items-center gap-4">
-        <AddComment play={play.play} />
+        <AddComment play={play} />
         <CommentIndex
           playId={play.play.id}
           commentCount={commentCount}

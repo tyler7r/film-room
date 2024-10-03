@@ -46,7 +46,7 @@ const AddPlayToCollection = ({
       if (collectionIds) {
         void collections.not("collection->>id", "in", `(${collectionIds})`);
       }
-      if (affIds) {
+      if (affIds && affIds.length > 0) {
         void collections.or(
           `collection->>author_id.eq.${user.userId}, collection->>exclusive_to.in.(${affIds})`,
         );

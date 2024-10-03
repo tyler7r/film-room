@@ -34,7 +34,7 @@ const Home = () => {
       .select("*", { count: "exact" })
       .order("play->>created_at", { ascending: false })
       .range(from, to);
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       void plays.or(
         `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
       );

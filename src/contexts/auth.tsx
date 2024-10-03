@@ -68,10 +68,16 @@ export const IsAuth = ({ children }: AuthProps) => {
         if (typedAffiliations && typedAffiliations.length > 0) {
           setAffiliations(typedAffiliations);
           const affIds = typedAffiliations.map((aff) => aff.team.id);
-          affIds ? setAffIds(affIds) : setAffIds(null);
-        } else setAffiliations(null);
+          affIds ? setAffIds(affIds) : setAffIds([]);
+        } else {
+          setAffIds([]);
+          setAffiliations(null);
+        }
       }
-    } else setAffiliations(null);
+    } else {
+      setAffiliations(null);
+      setAffIds([]);
+    }
   };
 
   useEffect(() => {
@@ -93,7 +99,7 @@ export const IsAuth = ({ children }: AuthProps) => {
             name: undefined,
           });
           setAffiliations(null);
-          setAffIds(null);
+          setAffIds([]);
         }
       },
     );
@@ -143,7 +149,7 @@ export const IsAuth = ({ children }: AuthProps) => {
         setAffReload,
       }}
     >
-      {children}
+      {affIds && children}
     </isAuthContext.Provider>
   );
 };

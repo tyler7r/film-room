@@ -154,7 +154,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
 
   const fetchTags = async () => {
     const tags = supabase.from("tags").select("title, id");
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       void tags.or(`private.eq.false, exclusive_to.in.(${affIds})`);
     } else {
       void tags.eq("private", false);
@@ -185,7 +185,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       const collections = supabase
         .from("collection_view")
         .select("*, id:collection->>id, title:collection->>title");
-      if (affIds) {
+      if (affIds && affIds.length > 0) {
         void collections.or(
           `collection->>author_id.eq.${user.userId}, collection->>exclusive_to.in.(${affIds})`,
         );

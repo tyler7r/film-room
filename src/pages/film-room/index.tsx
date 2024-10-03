@@ -38,7 +38,7 @@ const FilmRoomHome = () => {
       .select("*", { count: "exact" })
       .order("uploaded_at", { ascending: false })
       .range(from, to);
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       if (searchOptions.privateOnly === "all") {
         void videos.or(`private.eq.false, exclusive_to.in.(${affIds})`);
       } else if (

@@ -175,7 +175,7 @@ const FilmRoom = () => {
     setTimeout(() => {
       setIsLoading(false);
     }, 100);
-  });
+  }, []);
 
   return (
     video && (

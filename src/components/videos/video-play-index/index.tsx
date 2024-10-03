@@ -76,7 +76,7 @@ const VideoPlayIndex = ({
     if (searchOptions.timestamp) {
       void plays.gte("play->>end_time_sort", searchOptions.timestamp);
     }
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       if (searchOptions.private_only === "all") {
         void plays.or(
           `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
@@ -141,7 +141,7 @@ const VideoPlayIndex = ({
         void playsByMention.ilike("author->>name", searchOptions.author);
         void playsByTag.ilike("author->>name", searchOptions.author);
       }
-      if (affIds) {
+      if (affIds && affIds.length > 0) {
         if (searchOptions.private_only === "all") {
           void playsByMention.or(
             `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,

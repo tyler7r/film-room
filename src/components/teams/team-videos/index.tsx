@@ -33,7 +33,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
       .eq("team->>id", teamId)
       .order("video->>uploaded_at", { ascending: false })
       .range(from, to);
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       void videos.or(
         `video->>private.eq.false, video->>exclusive_to.in.(${affIds})`,
       );

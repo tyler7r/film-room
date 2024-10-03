@@ -416,11 +416,6 @@ export type PlayMentionViewType = {
   sender: UserType;
 };
 
-export type ReplyDetails = {
-  comment: CommentType;
-  reply: ReplyType;
-};
-
 export type EmailNotificationType = {
   video: VideoType;
   recipient: UserType;
@@ -428,7 +423,7 @@ export type EmailNotificationType = {
   author: EmailAuthorType;
   play?: PlayType;
   comment?: CommentType;
-  reply?: ReplyDetails;
+  reply?: ReplyType;
 };
 
 export type EmailAuthorType = {
