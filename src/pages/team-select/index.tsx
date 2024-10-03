@@ -59,7 +59,7 @@ const TeamSelect = () => {
 
   const fetchTeams = async () => {
     const teams = supabase.from("teams").select();
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       void teams.not("id", "in", `(${affIds})`);
     }
     const { data } = await teams;

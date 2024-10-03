@@ -33,10 +33,10 @@ const Comment = ({ cmt }: CommentProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <div className="flex flex-col">
-          <div className="flex justify-between">
+    <div className={`flex w-full flex-col ${isOpen && "gap-3"}`}>
+      <div className="flex w-full items-center gap-2">
+        <div className="flex w-full flex-col">
+          <div className="flex w-full justify-between">
             <div className="flex items-center gap-2">
               <div
                 className={`${hoverText} text-sm font-bold tracking-tight`}

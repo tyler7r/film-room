@@ -85,7 +85,7 @@ const ReplyIndex = ({
     <div className="flex w-full flex-col gap-2">
       <div className="flex w-full flex-col gap-2 px-6">
         <AddReply
-          comment={comment.comment}
+          comment={comment}
           comment_author={comment.author}
           setReload={setReload}
         />

@@ -3,11 +3,12 @@ import { IconButton, TextField } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
+import sendEmail from "~/utils/send-email";
 import { supabase } from "~/utils/supabase";
-import type { CommentType, UserType } from "~/utils/types";
+import type { CommentNotificationType, UserType } from "~/utils/types";
 
 type ReplyProps = {
-  comment: CommentType;
+  comment: CommentNotificationType;
   comment_author: UserType;
   setReload: (reload: boolean) => void;
 };
@@ -32,14 +33,34 @@ const AddReply = ({ comment, comment_author, setReload }: ReplyProps) => {
       const { data } = await supabase
         .from("replies")
         .insert({
-          comment_id: comment.id,
+          comment_id: comment.comment.id,
           reply,
           author_id: user.userId,
         })
-        .select();
+        .select()
+        .single();
       if (data) {
         setReply("");
         setReload(true);
+        if (
+          // comment.author.email !== user.email &&
+          comment.author.send_notifications
+        ) {
+          await sendEmail({
+            video: comment.video,
+            comment: comment.comment,
+            reply: data,
+            play: comment.play,
+            author: {
+              name: `${user.name ? user.name : user.email!}`,
+              email: user.email!,
+            },
+            title: `${
+              user.name ? user.name : user.email!
+            } replied to your comment!`,
+            recipient: comment.author,
+          });
+        }
       }
     }
   };

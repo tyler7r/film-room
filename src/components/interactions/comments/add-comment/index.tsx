@@ -3,11 +3,12 @@ import { IconButton, TextField } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
+import sendEmail from "~/utils/send-email";
 import { supabase } from "~/utils/supabase";
-import type { PlayType } from "~/utils/types";
+import type { PlayPreviewType } from "~/utils/types";
 
 type CommentProps = {
-  play: PlayType;
+  play: PlayPreviewType;
 };
 
 const AddComment = ({ play }: CommentProps) => {
@@ -30,13 +31,32 @@ const AddComment = ({ play }: CommentProps) => {
       const { data } = await supabase
         .from("comments")
         .insert({
-          play_id: play.id,
+          play_id: play.play.id,
           comment,
           comment_author: user.userId,
         })
-        .select();
+        .select()
+        .single();
       if (data) {
         setComment("");
+        if (
+          play.author.email !== user.email &&
+          play.author.send_notifications
+        ) {
+          await sendEmail({
+            video: play.video,
+            comment: data,
+            play: play.play,
+            author: {
+              name: `${user.name ? user.name : user.email!}`,
+              email: user.email!,
+            },
+            title: `${
+              user.name ? user.name : user.email!
+            } commented on your play!`,
+            recipient: play.author,
+          });
+        }
       }
     }
   };

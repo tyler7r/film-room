@@ -92,7 +92,7 @@ const PlaysToCollectionModal = ({
     if (playIds) {
       void plays.not("play->>id", "in", `(${playIds})`);
     }
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       void plays.or(
         `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
       );

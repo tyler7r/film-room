@@ -37,7 +37,7 @@ const SearchCollections = ({ topic }: SearchCollectionsProps) => {
       .ilike("collection->>title", `%${topic}%`)
       .order("collection->>created_at", { ascending: false })
       .range(from, to);
-    if (affIds) {
+    if (affIds && affIds.length > 0) {
       void collections.or(
         `collection->>private.eq.false, collection->>exclusive_to.in.(${affIds})`,
       );

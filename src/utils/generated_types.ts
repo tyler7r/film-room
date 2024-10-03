@@ -541,6 +541,7 @@ export type Database = {
           created_at: string
           id: string
           reply: string
+          viewed: boolean
         }
         Insert: {
           author_id: string
@@ -548,6 +549,7 @@ export type Database = {
           created_at?: string
           id?: string
           reply: string
+          viewed?: boolean
         }
         Update: {
           author_id?: string
@@ -555,6 +557,7 @@ export type Database = {
           created_at?: string
           id?: string
           reply?: string
+          viewed?: boolean
         }
         Relationships: [
           {
@@ -882,26 +885,6 @@ export type Database = {
           author: Json | null
           mention: Json | null
           play: Json | null
-          team: Json | null
-          video: Json | null
-        }
-        Relationships: []
-      }
-      reply_details: {
-        Row: {
-          comment: Json | null
-          comment_author: Json | null
-          reply: Json | null
-        }
-        Relationships: []
-      }
-      reply_notif: {
-        Row: {
-          author: Json | null
-          comment: Json | null
-          comment_author: Json | null
-          play: Json | null
-          reply: Json | null
           team: Json | null
           video: Json | null
         }
