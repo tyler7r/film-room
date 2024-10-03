@@ -9,6 +9,7 @@ import StandardPopover from "~/components/utils/standard-popover";
 import { useInboxContext } from "~/contexts/inbox";
 import InboxComment from "./comment";
 import InboxMention from "./mention";
+import InboxReply from "./reply";
 
 const InboxNotification = () => {
   const { unreadOnly, setUnreadOnly, notifications } = useInboxContext();
@@ -90,7 +91,7 @@ const InboxNotification = () => {
                 }}
               />
             )}
-            {notification.comment && (
+            {notification.comment && !notification.reply && (
               <InboxComment
                 comment={{
                   comment: notification.comment,
@@ -100,6 +101,20 @@ const InboxNotification = () => {
                 }}
               />
             )}
+            {notification.reply &&
+              notification.comment_author &&
+              notification.comment && (
+                <InboxReply
+                  reply={{
+                    comment: notification.comment,
+                    reply: notification.reply,
+                    comment_author: notification.comment_author,
+                    video: notification.video,
+                    author: notification.author,
+                    play: notification.play,
+                  }}
+                />
+              )}
           </div>
         ))}
         {notifications && notifications.length > 0 && !loading && (

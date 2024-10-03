@@ -66,7 +66,7 @@ const PlayMentions = ({
 
   useEffect(() => {
     void fetchMentions();
-  }, [activePlay]);
+  }, [activePlay, play]);
 
   return (
     mentions && (

@@ -12,15 +12,16 @@ import ReplyIndex from "../../replies/reply-index";
 
 type CommentProps = {
   cmt: CommentNotificationType;
+  autoOpen?: boolean;
 };
 
-const Comment = ({ cmt }: CommentProps) => {
+const Comment = ({ cmt, autoOpen }: CommentProps) => {
   const comment = cmt.comment;
   const { user } = useAuthContext();
   const { hoverText } = useIsDarkContext();
   const router = useRouter();
   const [replyCount, setReplyCount] = useState<number>(0);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(autoOpen ? true : false);
 
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState<boolean>(false);
 
@@ -74,7 +75,7 @@ const Comment = ({ cmt }: CommentProps) => {
           </div>
         </div>
       </div>
-      <div className="flex w-full flex-col items-center justify-center">
+      <div className="mt-2 flex w-full flex-col items-center justify-center">
         {isOpen && (
           <ReplyIndex
             comment={cmt}

@@ -39,7 +39,7 @@ const ReplyEmailTemplate = ({
           <Divider flexItem orientation="horizontal" variant="middle" />
           <div className="flex w-full items-center gap-8">
             <Link
-              href={`https://www.inside-break.com/play/${comment.play_id}`}
+              href={`https://www.inside-break.com/play/${comment.play_id}?comment=${comment.id}`}
               className="text-lg font-bold text-purple-600"
             >
               View Play in Theatre

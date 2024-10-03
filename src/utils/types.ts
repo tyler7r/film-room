@@ -86,7 +86,6 @@ export type Database = MergeDeep<
             author: UserType;
             comment_author: UserType;
             comment: CommentType;
-            team: TeamType;
           };
         };
         team_video_view: {
@@ -343,6 +342,8 @@ export type NotificationType = {
   comment?: CommentType;
   mention?: MentionType;
   team?: TeamType;
+  reply?: ReplyType;
+  comment_author?: UserType;
   author: UserType;
 };
 
@@ -446,6 +447,5 @@ export type ReplyNotificationType = {
   reply: ReplyType;
   comment_author: UserType;
   author: UserType;
-  team: TeamType;
   video: VideoType;
 };

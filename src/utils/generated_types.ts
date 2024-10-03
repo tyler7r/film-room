@@ -904,7 +904,6 @@ export type Database = {
           comment_author: Json | null
           play: Json | null
           reply: Json | null
-          team: Json | null
           video: Json | null
         }
         Relationships: []
@@ -1058,7 +1057,6 @@ export type Database = {
           author: Json | null
           comment: Json | null
           comment_author: Json | null
-          exclusive_to: string | null
           play: Json | null
           reply: Json | null
           video: string | null
@@ -1069,13 +1067,6 @@ export type Database = {
             columns: ["video"]
             isOneToOne: false
             referencedRelation: "videos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_plays_exclusive_to_fkey"
-            columns: ["exclusive_to"]
-            isOneToOne: false
-            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]

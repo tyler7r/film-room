@@ -24,7 +24,7 @@ const ReplyIndex = ({
   const { isMobile } = useMobileContext();
   const [index, setIndex] = useState<ReplyNotificationType[] | null>(null);
   const [page, setPage] = useState<number>(1);
-  const itemsPerPage = isMobile ? 3 : 5;
+  const itemsPerPage = isMobile ? 5 : 10;
   const [reload, setReload] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
