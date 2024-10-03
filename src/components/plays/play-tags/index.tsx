@@ -87,7 +87,7 @@ const PlayTags = ({
 
   useEffect(() => {
     void fetchTags();
-  }, [activePlay]);
+  }, [activePlay, play]);
 
   return (
     tags &&

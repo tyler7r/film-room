@@ -70,9 +70,18 @@ export const TheInbox = ({ children }: InboxProps) => {
       if (unreadOnly) {
         void mntns.eq("mention->>viewed", false);
       }
-
+      const reps = supabase
+        .from("reply_notification")
+        .select("*", { count: "exact" })
+        .eq("comment_author->>id", user.userId)
+        .neq("reply->>author_id", user.userId)
+        .order("reply->>created_at", { ascending: false });
+      if (unreadOnly) {
+        void reps.eq("reply->>viewed", false);
+      }
       const comments = await cmts;
       const mentions = await mntns;
+      const replies = await reps;
 
       let notifs: NotificationType[] | null = null;
       let unread = 0;
@@ -90,11 +99,30 @@ export const TheInbox = ({ children }: InboxProps) => {
         ).length;
         unread += unreadMentions;
       }
+      if (replies.data) {
+        notifs = notifs ? [...notifs, ...replies.data] : replies.data;
+        const unreadReplies = replies.data.filter(
+          (rep) => !rep.reply.viewed,
+        ).length;
+        unread += unreadReplies;
+      }
       setUnreadCount(unread);
 
       const sortedNotifs = notifs?.sort((a, b) => {
-        return new Date(a.comment ? a.comment.created_at : a.play.created_at) <
-          new Date(b.comment ? b.comment.created_at : b.play.created_at)
+        return new Date(
+          a.comment
+            ? a.comment.created_at
+            : a.reply
+              ? a.reply.created_at
+              : a.play.created_at,
+        ) <
+          new Date(
+            b.comment
+              ? b.comment.created_at
+              : b.reply
+                ? b.reply.created_at
+                : b.play.created_at,
+          )
           ? 1
           : -1;
       });

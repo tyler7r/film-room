@@ -17,12 +17,14 @@ type ExpandedPlayProps = {
   commentCount: number;
   setCommentCount: (count: number) => void;
   handleMentionAndTagClick?: (e: React.MouseEvent, topic: string) => void;
+  activeComment?: string | undefined;
 };
 
 const ExpandedPlay = ({
   play,
   commentCount,
   setCommentCount,
+  activeComment,
 }: ExpandedPlayProps) => {
   const { hoverText } = useIsDarkContext();
   const { affIds } = useAuthContext();
@@ -86,7 +88,7 @@ const ExpandedPlay = ({
 
   useEffect(() => {
     void fetchCollections();
-  }, [affIds]);
+  }, [affIds, play]);
 
   return (
     <div className="flex w-full flex-col items-center gap-2 px-8">
@@ -136,6 +138,7 @@ const ExpandedPlay = ({
           playId={play.play.id}
           commentCount={commentCount}
           setCommentCount={setCommentCount}
+          activeComment={activeComment}
         />
       </div>
     </div>
