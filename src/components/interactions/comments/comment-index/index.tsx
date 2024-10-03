@@ -97,7 +97,7 @@ const CommentIndex = ({
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <div className="flex flex-col items-center justify-center px-6">
+      <div className="flex flex-col items-center justify-center gap-2 px-6">
         {activeCom && (
           <div
             style={backgroundStyle}
