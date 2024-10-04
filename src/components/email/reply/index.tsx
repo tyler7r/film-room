@@ -17,13 +17,7 @@ type EmailProps = {
   play: PlayType;
 };
 
-const ReplyEmailTemplate = ({
-  author,
-  reply,
-  play,
-  comment,
-  video,
-}: EmailProps) => {
+const ReplyEmailTemplate = ({ author, reply, comment, video }: EmailProps) => {
   return (
     <Tailwind>
       <Html lang="en">
@@ -43,12 +37,6 @@ const ReplyEmailTemplate = ({
               className="text-lg font-bold text-purple-600"
             >
               View Play in Theatre
-            </Link>
-            <Link
-              href={`https://inside-break.com/film-room/${video.id}?play=${play.id}&start=${play.start_time}`}
-              className="text-lg font-bold text-purple-600"
-            >
-              View Play in Film Room
             </Link>
           </div>
         </div>

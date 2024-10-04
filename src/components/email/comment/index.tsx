@@ -36,12 +36,6 @@ const CommentEmailTemplate = ({ author, comment, video, play }: EmailProps) => {
             >
               View Play in Theatre
             </Link>
-            <Link
-              href={`https://inside-break.com/film-room/${video.id}?play=${play.id}&start=${play.start_time}`}
-              className="text-lg font-bold text-purple-600"
-            >
-              View Play in Film Room
-            </Link>
           </div>
         </div>
       </Html>

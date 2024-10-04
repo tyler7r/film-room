@@ -60,7 +60,7 @@ const CommentIndex = ({
       const { data } = await comments;
       if (data) setActiveCom(data);
       else setActiveCom(null);
-    }
+    } else setActiveCom(null);
   };
 
   const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
@@ -86,8 +86,10 @@ const CommentIndex = ({
   }, []);
 
   useEffect(() => {
-    if (page === 1) void fetchComments();
-    else setPage(1);
+    if (page === 1) {
+      void fetchComments();
+      void fetchActiveComm();
+    } else setPage(1);
   }, [isMobile, playId]);
 
   useEffect(() => {
