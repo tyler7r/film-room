@@ -1,9 +1,10 @@
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import { Button, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType, TagType } from "~/utils/types";
 import StandardPopover from "../../utils/standard-popover";
@@ -20,6 +21,7 @@ const PlayTags = ({
   handleMentionAndTagClick,
 }: PlayTagProps) => {
   const { affIds } = useAuthContext();
+  const { colorText, isDark } = useIsDarkContext();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -106,15 +108,17 @@ const PlayTags = ({
           content="Play Tags"
           anchorEl={anchorEl}
         />
-        <div className="flex">
+        <div className="flex gap-1">
           {tags.map((tag) => (
-            <Button
+            <div
               key={tag.title + tag.id}
               onClick={(e) => handleClick(e, tag.title)}
-              style={{ fontSize: "12px", fontWeight: "bold" }}
+              className={`${colorText} cursor-pointer text-xs font-bold ${
+                isDark ? "hover:text-purple-300" : "hover:text-purple-A200"
+              }`}
             >
-              #{tag.title}
-            </Button>
+              #{tag.title.toLocaleUpperCase()}
+            </div>
           ))}
         </div>
       </div>
