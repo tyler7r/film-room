@@ -111,7 +111,7 @@ const PlayTags = ({
             <Button
               key={tag.title + tag.id}
               onClick={(e) => handleClick(e, tag.title)}
-              style={{ fontSize: "12px", padding: "2px", fontWeight: "bold" }}
+              style={{ fontSize: "12px", fontWeight: "bold" }}
             >
               #{tag.title}
             </Button>
