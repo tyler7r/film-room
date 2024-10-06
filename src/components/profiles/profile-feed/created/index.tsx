@@ -32,6 +32,7 @@ const CreatedFeed = ({ profileId }: FeedProps) => {
         .from("play_preview")
         .select("*", { count: "exact" })
         .eq("play->>author_id", profileId)
+        .eq("play->>post_to_feed", true)
         .order("play->>created_at", { ascending: false })
         .range(from, to);
       if (affIds && affIds.length > 0) {

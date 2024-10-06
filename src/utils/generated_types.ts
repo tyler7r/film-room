@@ -436,6 +436,7 @@ export type Database = {
           highlight: boolean
           id: string
           note: string | null
+          post_to_feed: boolean
           private: boolean
           start_time: number
           start_time_sort: string
@@ -451,6 +452,7 @@ export type Database = {
           highlight?: boolean
           id?: string
           note?: string | null
+          post_to_feed?: boolean
           private?: boolean
           start_time: number
           start_time_sort: string
@@ -466,6 +468,7 @@ export type Database = {
           highlight?: boolean
           id?: string
           note?: string | null
+          post_to_feed?: boolean
           private?: boolean
           start_time?: number
           start_time_sort?: string

@@ -1,5 +1,14 @@
-import StarIcon from "@mui/icons-material/Star";
-import { Box, Button, IconButton, Modal, TextField } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Modal,
+  Switch,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
@@ -16,7 +25,6 @@ import {
   type VideoType,
 } from "~/utils/types";
 import PageTitle from "../../utils/page-title";
-import StandardPopover from "../../utils/standard-popover";
 import AddCollectionsToPlay from "../add-collections-to-play";
 import AddMentionsToPlayProps from "../add-mentions-to-play";
 import AddTagsToPlay from "../add-tags-to-play";
@@ -66,6 +74,7 @@ const CreatePlay = ({
     end: null,
     private: false,
     exclusive_to: video.exclusive_to ? video.exclusive_to : "public",
+    post_to_feed: true,
   });
   const [mentions, setMentions] = useState<UserType[]>([]);
   const [players, setPlayers] = useState<UserType[] | null>(null);
@@ -79,18 +88,6 @@ const CreatePlay = ({
   >(null);
 
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
-
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
 
   const fetchPlayers = async () => {
     const players = supabase.from("user_view").select("profile").match({
@@ -184,6 +181,7 @@ const CreatePlay = ({
       end: null,
       private: false,
       exclusive_to: video.exclusive_to ? video.exclusive_to : "public",
+      post_to_feed: true,
     });
     setMentions([]);
     setPlayTags([]);
@@ -256,6 +254,7 @@ const CreatePlay = ({
           private: isPrivate,
           end_time_sort: playDetails.end!.toString().padStart(6, "0"),
           start_time_sort: playDetails.start!.toString().padStart(6, "0"),
+          post_to_feed: playDetails.post_to_feed,
         })
         .select()
         .single();
@@ -377,41 +376,17 @@ const CreatePlay = ({
             value={playDetails.title}
             inputProps={{ maxLength: 100 }}
           />
-          <div className="flex w-full items-center justify-center gap-2">
-            <TextField
-              className="w-full"
-              name="note"
-              autoComplete="note"
-              id="note"
-              label="Note"
-              onChange={handleInput}
-              value={playDetails.note}
-              multiline
-              maxRows={5}
-            />
-            <IconButton
-              size="small"
-              onClick={() =>
-                setPlayDetails({
-                  ...playDetails,
-                  highlight: !playDetails.highlight,
-                })
-              }
-              onMouseEnter={handlePopoverOpen}
-              onMouseLeave={handlePopoverClose}
-            >
-              <StarIcon
-                fontSize="large"
-                color={playDetails.highlight ? "secondary" : "action"}
-              />
-              <StandardPopover
-                content="Highlight Play?"
-                open={open}
-                anchorEl={anchorEl}
-                handlePopoverClose={handlePopoverClose}
-              />
-            </IconButton>
-          </div>
+          <TextField
+            className="w-full"
+            name="note"
+            autoComplete="note"
+            id="note"
+            label="Note"
+            onChange={handleInput}
+            value={playDetails.note}
+            multiline
+            maxRows={5}
+          />
           <AddTagsToPlay tags={playTags} setTags={setPlayTags} allTags={tags} />
           <AddMentionsToPlayProps
             players={players}
@@ -423,6 +398,61 @@ const CreatePlay = ({
             setCollections={setPlayCollections}
             allCollections={collections}
           />
+          <div className="flex gap-2">
+            <div className="flex items-center justify-center">
+              <div className="text-lg font-bold tracking-tight">
+                Highlight Play
+              </div>
+              <Switch
+                checked={playDetails.highlight}
+                className="items-center justify-center"
+                color="secondary"
+                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+                onChange={() =>
+                  setPlayDetails({
+                    ...playDetails,
+                    highlight: !playDetails.highlight,
+                  })
+                }
+              />
+            </div>
+            <Divider orientation="vertical" flexItem />
+            <div className="flex items-center justify-center gap-2">
+              <div className="text-lg font-bold tracking-tight">
+                Post to Home Page
+              </div>
+              <Switch
+                checked={playDetails.post_to_feed}
+                className="items-center justify-center"
+                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+                onChange={() =>
+                  setPlayDetails({
+                    ...playDetails,
+                    post_to_feed: !playDetails.post_to_feed,
+                  })
+                }
+              />
+              <Tooltip
+                title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, -14],
+                        },
+                      },
+                    ],
+                  },
+                }}
+              >
+                <IconButton size="small">
+                  <InfoOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </div>
           <PrivacyStatus
             video={video}
             newDetails={playDetails}

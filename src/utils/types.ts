@@ -209,6 +209,7 @@ export type PlayType = {
   created_at: string;
   end_time_sort: string;
   start_time_sort: string;
+  post_to_feed: boolean;
 };
 
 export type PlayerType = {
@@ -394,6 +395,7 @@ export type NewPlayType = {
   highlight: boolean;
   private: boolean;
   exclusive_to: string;
+  post_to_feed: boolean;
 };
 
 export type NewTagType = {
