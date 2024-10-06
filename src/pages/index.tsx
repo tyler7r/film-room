@@ -1,7 +1,7 @@
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
-import { Button, Pagination } from "@mui/material";
+import { Button, CircularProgress, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "utils/supabase/component";
@@ -24,6 +24,7 @@ const Home = () => {
   const [page, setPage] = useState<number>(1);
   const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
   const [playCount, setPlayCount] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const topRef = useRef<HTMLDivElement | null>(null);
 
@@ -32,6 +33,7 @@ const Home = () => {
     const plays = supabase
       .from("play_preview")
       .select("*", { count: "exact" })
+      .eq("play->>post_to_feed", true)
       .order("play->>created_at", { ascending: false })
       .range(from, to);
     if (affIds && affIds.length > 0) {
@@ -47,6 +49,7 @@ const Home = () => {
     else {
       setPlays(null);
     }
+    setLoading(false);
   };
 
   const scrollToTop = () => {
@@ -92,9 +95,17 @@ const Home = () => {
     void fetchPlays();
   }, [page]);
 
-  return (
+  return loading ? (
+    <CircularProgress />
+  ) : (
     <div className="flex flex-col items-center justify-center gap-6 p-4">
-      <Logo size={isMobile ? "medium" : "large"} />
+      <div className="flex w-full items-center justify-center gap-8">
+        <Logo size={"medium"} />
+        <Logo size={"medium"} />
+        <Logo size={"medium"} />
+        <Logo size={"medium"} />
+        <Logo size={"medium"} />
+      </div>
       {user.userId ? (
         <div className="flex gap-4">
           <Button
