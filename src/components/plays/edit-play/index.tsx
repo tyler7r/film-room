@@ -93,18 +93,6 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
   const [isEditPlayOpen, setIsEditPlayOpen] = useState<boolean>(false);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(true);
 
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-
   const fetchInitialMentions = async () => {
     if (play) {
       const { data } = await supabase

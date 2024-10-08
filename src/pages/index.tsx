@@ -99,13 +99,17 @@ const Home = () => {
     <CircularProgress />
   ) : (
     <div className="flex flex-col items-center justify-center gap-6 p-4">
-      <div className="flex w-full items-center justify-center gap-8">
-        <Logo size={"medium"} />
-        <Logo size={"medium"} />
-        <Logo size={"medium"} />
-        <Logo size={"medium"} />
-        <Logo size={"medium"} />
-      </div>
+      {isMobile ? (
+        <Logo size="medium" />
+      ) : (
+        <div className="flex w-full items-center justify-center gap-8">
+          <Logo size={"medium"} />
+          <Logo size={"medium"} />
+          <Logo size={"medium"} />
+          <Logo size={"medium"} />
+          <Logo size={"medium"} />
+        </div>
+      )}
       {user.userId ? (
         <div className="flex gap-4">
           <Button
