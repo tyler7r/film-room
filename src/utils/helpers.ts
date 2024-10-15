@@ -107,3 +107,11 @@ export const getTimeSinceNotified = (date: string) => {
     return `${Math.round(daysDiff / 30)}mo ago`;
   if (daysDiff >= 366) return `${Math.round(daysDiff / 365)}y ago`;
 };
+
+export const youtubeRegEx = (link: string) => {
+  const url = link.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+  const newLink =
+    url[2] !== undefined ? url[2].split(/[^0-9a-z_\-]/i)[0] : url[0];
+  const fullLink = `https://www.youtube.com/watch?v=${newLink}`;
+  return fullLink;
+};

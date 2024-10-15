@@ -398,9 +398,9 @@ const CreatePlay = ({
             setCollections={setPlayCollections}
             allCollections={collections}
           />
-          <div className="flex gap-2">
-            <div className="flex items-center justify-center">
-              <div className="text-lg font-bold tracking-tight">
+          <div className="flex w-full justify-around gap-2">
+            <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
+              <div className="text-sm font-bold tracking-tight md:text-base">
                 Highlight Play
               </div>
               <Switch
@@ -417,40 +417,42 @@ const CreatePlay = ({
               />
             </div>
             <Divider orientation="vertical" flexItem />
-            <div className="flex items-center justify-center gap-2">
-              <div className="text-lg font-bold tracking-tight">
+            <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
+              <div className="text-sm font-bold tracking-tight md:text-base">
                 Post to Home Page
               </div>
-              <Switch
-                checked={playDetails.post_to_feed}
-                className="items-center justify-center"
-                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
-                onChange={() =>
-                  setPlayDetails({
-                    ...playDetails,
-                    post_to_feed: !playDetails.post_to_feed,
-                  })
-                }
-              />
-              <Tooltip
-                title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
-                slotProps={{
-                  popper: {
-                    modifiers: [
-                      {
-                        name: "offset",
-                        options: {
-                          offset: [0, -14],
+              <div className="flex items-center justify-center">
+                <Switch
+                  checked={playDetails.post_to_feed}
+                  className="items-center justify-center"
+                  sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+                  onChange={() =>
+                    setPlayDetails({
+                      ...playDetails,
+                      post_to_feed: !playDetails.post_to_feed,
+                    })
+                  }
+                />
+                <Tooltip
+                  title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
+                  slotProps={{
+                    popper: {
+                      modifiers: [
+                        {
+                          name: "offset",
+                          options: {
+                            offset: [0, -14],
+                          },
                         },
-                      },
-                    ],
-                  },
-                }}
-              >
-                <IconButton size="small">
-                  <InfoOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
+                      ],
+                    },
+                  }}
+                >
+                  <IconButton size="small">
+                    <InfoOutlinedIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </div>
             </div>
           </div>
           <PrivacyStatus

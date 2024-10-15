@@ -21,7 +21,12 @@ import FormMessage from "~/components/utils/form-message";
 import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { divisions, isValidYoutubeLink, proDivs } from "~/utils/helpers";
+import {
+  divisions,
+  isValidYoutubeLink,
+  proDivs,
+  youtubeRegEx,
+} from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { MessageType, TeamType, VideoUploadType } from "~/utils/types";
 
@@ -137,6 +142,7 @@ const CreateVideo = () => {
   useEffect(() => {
     const { link, title, season, division } = videoData;
     const isValidLink = isValidYoutubeLink(link);
+    youtubeRegEx(link);
 
     if (
       title === "" ||
@@ -163,12 +169,13 @@ const CreateVideo = () => {
     e.preventDefault();
     updateErrorMessage();
     const { title, link, season, week, tournament, division } = videoData;
+    const updatedLink = youtubeRegEx(link);
     if (user.userId) {
       const { data, error } = await supabase
         .from("videos")
         .insert({
           title,
-          link,
+          link: updatedLink,
           season,
           division,
           week: week === "" ? null : `Week ${week}`,
