@@ -142,7 +142,6 @@ const CreateVideo = () => {
   useEffect(() => {
     const { link, title, season, division } = videoData;
     const isValidLink = isValidYoutubeLink(link);
-    youtubeRegEx(link);
 
     if (
       title === "" ||
