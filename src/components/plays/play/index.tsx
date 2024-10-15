@@ -1,5 +1,6 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import LinkIcon from "@mui/icons-material/Link";
 import PublicIcon from "@mui/icons-material/Public";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StarIcon from "@mui/icons-material/Star";
@@ -51,6 +52,7 @@ const Play = ({
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [commentCount, setCommentCount] = useState<number>(0);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
@@ -62,12 +64,14 @@ const Play = ({
 
   const handlePopoverOpen = (
     e: React.MouseEvent<HTMLElement>,
-    target: 1 | 2,
+    target: 1 | 2 | 3,
   ) => {
     if (target === 1) {
       setAnchorEl({ anchor1: e.currentTarget, anchor2: null, anchor3: null });
     } else if (target === 2) {
       setAnchorEl({ anchor1: null, anchor2: e.currentTarget, anchor3: null });
+    } else {
+      setAnchorEl({ anchor1: null, anchor2: null, anchor3: e.currentTarget });
     }
   };
 
@@ -77,6 +81,7 @@ const Play = ({
 
   const open = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
+  const open3 = Boolean(anchorEl.anchor3);
 
   const updateLastWatched = async (time: number) => {
     if (user.userId) {
@@ -118,6 +123,12 @@ const Play = ({
       ...searchOptions,
       private_only: exclusiveTeam?.id ? exclusiveTeam.id : "all",
     });
+  };
+
+  const copyToClipboard = () => {
+    const origin = window.location.origin;
+    void navigator.clipboard.writeText(`${origin}/play/${play.play.id}`);
+    setIsCopied(true);
   };
 
   return (
@@ -188,6 +199,20 @@ const Play = ({
                 <RestartAltIcon color="primary" />
               </IconButton>
             )}
+            <IconButton
+              onClick={copyToClipboard}
+              onMouseEnter={(e) => handlePopoverOpen(e, 3)}
+              onMouseLeave={handlePopoverClose}
+              size="small"
+            >
+              <LinkIcon />
+              <StandardPopover
+                open={open3}
+                anchorEl={anchorEl.anchor3}
+                content={isCopied ? "Copied!" : `Copy play link`}
+                handlePopoverClose={handlePopoverClose}
+              />
+            </IconButton>
             <PlayActionsMenu preview={play} />
           </div>
         </div>
