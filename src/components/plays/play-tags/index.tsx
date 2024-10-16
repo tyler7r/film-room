@@ -13,11 +13,13 @@ type PlayTagProps = {
   play: PlayPreviewType;
   activePlay?: PlayPreviewType;
   handleMentionAndTagClick?: (e: React.MouseEvent, topic: string) => void;
+  playId?: string;
 };
 
 const PlayTags = ({
   play,
   activePlay,
+  playId,
   handleMentionAndTagClick,
 }: PlayTagProps) => {
   const { affIds } = useAuthContext();
@@ -89,7 +91,7 @@ const PlayTags = ({
 
   useEffect(() => {
     void fetchTags();
-  }, [activePlay, play]);
+  }, [activePlay, play, playId]);
 
   return (
     tags &&

@@ -11,12 +11,14 @@ type PlayMentionsProps = {
   play: PlayPreviewType;
   activePlay?: PlayPreviewType;
   handleMentionAndTagClick?: (e: React.MouseEvent, topic: string) => void;
+  playId?: string;
 };
 
 const PlayMentions = ({
   play,
   handleMentionAndTagClick,
   activePlay,
+  playId,
 }: PlayMentionsProps) => {
   const { hoverText } = useIsDarkContext();
   const router = useRouter();
@@ -68,7 +70,7 @@ const PlayMentions = ({
 
   useEffect(() => {
     void fetchMentions();
-  }, [activePlay, play]);
+  }, [activePlay, play, playId]);
 
   return (
     mentions && (

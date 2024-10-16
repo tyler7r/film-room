@@ -303,8 +303,8 @@ const Play = () => {
             <PageTitle size="large" title="Loading Video..." />
           )}
           <div className="w-full">
-            <PlayMentions play={preview} />
-            <PlayTags play={preview} />
+            <PlayMentions play={preview} playId={playId} />
+            <PlayTags play={preview} playId={playId} />
           </div>
           <div className="flex w-full items-center gap-3 px-1">
             <div className="flex items-center justify-center gap-2">
