@@ -92,7 +92,6 @@ const CreatePlay = ({
   const fetchPlayers = async () => {
     const players = supabase.from("user_view").select("profile").match({
       "team->>id": video.exclusive_to,
-      "affiliation->>role": "player",
       "affiliation->>verified": true,
     });
     const allPlayers = supabase.from("profiles").select();

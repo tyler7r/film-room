@@ -51,7 +51,7 @@ const AddMentionsToPlayProps = ({
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Player Mentions"
+              label="Mentions"
               placeholder="Mentions..."
               id="player-mentions"
               name="player-mentions"
