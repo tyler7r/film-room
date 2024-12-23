@@ -96,7 +96,9 @@ const Home = () => {
   }, [page]);
 
   return loading ? (
-    <CircularProgress />
+    <div className="flex h-full w-full items-center justify-center p-4">
+      <CircularProgress size={128} />
+    </div>
   ) : (
     <div className="flex flex-col items-center justify-center gap-6 p-4">
       <Logo size="medium" />
