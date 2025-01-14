@@ -1,19 +1,11 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import {
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  Modal,
-  Switch,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Divider, IconButton, Switch, TextField, Tooltip } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import sendEmail from "~/utils/send-email";
 import { supabase } from "~/utils/supabase";
 import {
@@ -24,7 +16,6 @@ import {
   type UserType,
   type VideoType,
 } from "~/utils/types";
-import PageTitle from "../../utils/page-title";
 import AddCollectionsToPlay from "../add-collections-to-play";
 import AddMentionsToPlayProps from "../add-mentions-to-play";
 import AddTagsToPlay from "../add-tags-to-play";
@@ -63,7 +54,6 @@ const CreatePlay = ({
 }: CreatePlayProps) => {
   const router = useRouter();
   const { user, affIds } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
 
   const [isPlayStarted, setIsPlayStarted] = useState(false);
   const [playDetails, setPlayDetails] = useState<NewPlayType>({
@@ -291,11 +281,12 @@ const CreatePlay = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (video.private || playDetails.private) void createPlay(true);
-    else {
-      void createPlay(false);
-    }
-    void resetPlay();
+    console.log("it worked");
+    // if (video.private || playDetails.private) void createPlay(true);
+    // else {
+    //   void createPlay(false);
+    // }
+    // void resetPlay();
   };
 
   useEffect(() => {
@@ -339,31 +330,16 @@ const CreatePlay = ({
       endPlay={endPlay}
     />
   ) : (
-    <Modal open={isNewPlayOpen} onClose={resetPlay}>
-      <Box
-        className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid p-4"
-        sx={backgroundStyle}
+    <ModalSkeleton
+      isOpen={isNewPlayOpen}
+      setIsOpen={setIsNewPlayOpen}
+      title="Create New Play"
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full flex-col items-center justify-center gap-2"
       >
-        <Button
-          variant="text"
-          size="large"
-          sx={{
-            position: "absolute",
-            right: "0",
-            top: "0",
-            fontWeight: "bold",
-            fontSize: "24px",
-            lineHeight: "32px",
-          }}
-          onClick={resetPlay}
-        >
-          X
-        </Button>
-        <PageTitle title="Create New Play" size="medium" />
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
-        >
+        <div className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center">
           <TextField
             className="w-full"
             name="title"
@@ -459,27 +435,14 @@ const CreatePlay = ({
             newDetails={playDetails}
             setNewDetails={setPlayDetails}
           />
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!isValidPlay}
-              size="large"
-            >
-              Submit
-            </Button>
-            <Button
-              type="button"
-              variant="text"
-              onClick={() => resetPlay()}
-              size="large"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Box>
-    </Modal>
+        </div>
+        <FormButtons
+          isValid={isValidPlay}
+          handleCancel={resetPlay}
+          submitTitle="SUBMIT"
+        />
+      </form>
+    </ModalSkeleton>
   );
 };
 
