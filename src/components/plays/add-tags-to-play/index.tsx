@@ -1,17 +1,10 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   Autocomplete,
-  Box,
-  Button,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   FormControl,
   IconButton,
   InputLabel,
   MenuItem,
-  Modal,
   Select,
   TextField,
   Tooltip,
@@ -22,8 +15,9 @@ import {
 } from "@mui/material";
 import { useEffect, useState, type SyntheticEvent } from "react";
 import TeamLogo from "~/components/teams/team-logo";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { NewTagType } from "~/utils/types";
 import type { CreateNewTagType } from "../create-play";
@@ -38,7 +32,6 @@ const filter = createFilterOptions<CreateNewTagType>();
 
 const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
   const { affiliations } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
 
   const [open, toggleOpen] = useState<boolean>(false);
   const [isValidNewTag, setIsValidNewTag] = useState<boolean>(false);
@@ -177,96 +170,92 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
               />
             )}
           />
-          <Modal open={open} onClose={handleClose}>
-            <Box
-              className="border-1 relative inset-1/2 flex w-3/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid p-4"
-              sx={backgroundStyle}
+          <ModalSkeleton
+            title="Create Tag"
+            isOpen={open}
+            setIsOpen={toggleOpen}
+          >
+            <form
+              onSubmit={handleNewTag}
+              className="flex w-full flex-col items-center gap-2"
             >
-              <form onSubmit={handleNewTag} className="w-full">
-                <DialogTitle>Add a new tag</DialogTitle>
-                <DialogContent>
-                  <DialogContentText>
-                    Please add the tag that we're missing!
-                  </DialogContentText>
-                  <div className="flex w-full flex-col gap-6">
-                    <TextField
-                      name="tag-title"
-                      autoFocus
-                      margin="dense"
-                      id="title"
-                      value={newTag.title}
-                      onChange={(event) =>
-                        setNewTag({
-                          ...newTag,
-                          title: event.target.value,
-                        })
+              <div className="flex w-4/5 flex-col items-center justify-center gap-4 p-4">
+                <TextField
+                  className="w-full"
+                  name="tag-title"
+                  autoFocus
+                  required
+                  margin="dense"
+                  id="title"
+                  value={newTag.title}
+                  onChange={(event) =>
+                    setNewTag({
+                      ...newTag,
+                      title: event.target.value,
+                    })
+                  }
+                  label="Tag Title"
+                  type="text"
+                />
+                <FormControl className="w-full">
+                  <div className="flex w-full items-center justify-center gap-2">
+                    <InputLabel>Privacy Status</InputLabel>
+                    <Select
+                      value={newTag.exclusive_to}
+                      onChange={handlePrivacyStatus}
+                      label="Privacy Status"
+                      name="privacy"
+                      id="privacy-status"
+                      className="w-full"
+                    >
+                      <MenuItem value="public" style={{ fontSize: "14px" }}>
+                        Public
+                      </MenuItem>
+                      {affiliations?.map((aff) => (
+                        <MenuItem key={aff.team.id} value={aff.team.id}>
+                          <div className="flex gap-2">
+                            <div className="text-sm">
+                              Private to:{" "}
+                              <strong className="tracking-tight">
+                                {aff.team.full_name}
+                              </strong>
+                            </div>
+                            <TeamLogo tm={aff.team} size={25} />
+                          </div>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <Tooltip
+                      title={
+                        "Private tags are only viewable by your teammates and coaches, even on public plays. Public tags are viewable by all users."
                       }
-                      label="Tag Title"
-                      type="text"
-                      variant="standard"
-                    />
-                    <FormControl>
-                      <div className="flex w-full items-center justify-center gap-2">
-                        <InputLabel>Privacy Status</InputLabel>
-                        <Select
-                          value={newTag.exclusive_to}
-                          onChange={handlePrivacyStatus}
-                          label="Privacy Status"
-                          name="privacy"
-                          id="privacy-status"
-                          className="w-full"
-                        >
-                          <MenuItem value="public" style={{ fontSize: "14px" }}>
-                            Public
-                          </MenuItem>
-                          {affiliations?.map((aff) => (
-                            <MenuItem key={aff.team.id} value={aff.team.id}>
-                              <div className="flex gap-2">
-                                <div className="text-sm">
-                                  Private to:{" "}
-                                  <strong className="tracking-tight">
-                                    {aff.team.full_name}
-                                  </strong>
-                                </div>
-                                <TeamLogo tm={aff.team} size={25} />
-                              </div>
-                            </MenuItem>
-                          ))}
-                        </Select>
-                        <Tooltip
-                          title={
-                            "Private tags are only viewable by your teammates and coaches, even on public plays. Public tags are viewable by all users."
-                          }
-                          slotProps={{
-                            popper: {
-                              modifiers: [
-                                {
-                                  name: "offset",
-                                  options: {
-                                    offset: [0, -14],
-                                  },
-                                },
-                              ],
+                      slotProps={{
+                        popper: {
+                          modifiers: [
+                            {
+                              name: "offset",
+                              options: {
+                                offset: [0, -14],
+                              },
                             },
-                          }}
-                        >
-                          <IconButton size="small">
-                            <InfoOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </div>
-                    </FormControl>
+                          ],
+                        },
+                      }}
+                    >
+                      <IconButton size="small">
+                        <InfoOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
                   </div>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleClose}>Cancel</Button>
-                  <Button type="submit" disabled={!isValidNewTag}>
-                    Add
-                  </Button>
-                </DialogActions>
-              </form>
-            </Box>
-          </Modal>
+                </FormControl>
+              </div>
+              <FormButtons
+                isValid={isValidNewTag}
+                handleCancel={handleClose}
+                submitTitle="SUBMIT"
+              />
+            </form>
+          </ModalSkeleton>
         </div>
       )}
     </div>

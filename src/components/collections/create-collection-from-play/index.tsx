@@ -1,18 +1,11 @@
-import {
-  Box,
-  Button,
-  DialogActions,
-  DialogContent,
-  Modal,
-  TextField,
-} from "@mui/material";
+import { TextField } from "@mui/material";
 import { useEffect, useState } from "react";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { NewCollectionType } from "~/utils/types";
 import type { CreateNewCollectionType } from "../../plays/create-play";
-import PageTitle from "../../utils/page-title";
 import PrivacyStatus from "./privacy-status";
 
 type CreateCollectionFromPlayProps = {
@@ -33,7 +26,6 @@ const CreateCollectionFromPlay = ({
   setNewCollection,
 }: CreateCollectionFromPlayProps) => {
   const { user } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
 
   const [isValidNewCollection, setIsValidNewCollection] =
     useState<boolean>(false);
@@ -81,64 +73,59 @@ const CreateCollectionFromPlay = ({
   });
 
   return (
-    <Modal open={open} onClose={handleClose}>
-      <Box
-        className={`relative inset-1/2 flex w-3/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md p-4`}
-        sx={backgroundStyle}
+    <ModalSkeleton isOpen={open} setIsOpen={setOpen} title="Create Collection">
+      <form
+        onSubmit={handleNewCollection}
+        className="flex w-full flex-col gap-2"
       >
-        <form onSubmit={handleNewCollection} className="w-full">
-          <PageTitle title="Add New Collection" size="small" />
-          <DialogContent>
-            <div className="flex w-full flex-col items-center justify-center gap-2">
-              <TextField
-                name="collection-title"
-                autoFocus
-                margin="dense"
-                id="title"
-                value={newCollection.title}
-                onChange={(event) =>
-                  setNewCollection({
-                    ...newCollection,
-                    title: event.target.value,
-                  })
-                }
-                label="Collection Title"
-                type="text"
-                className="w-full"
-              />
-              <TextField
-                name="collection-description"
-                className="w-full"
-                autoFocus
-                margin="dense"
-                id="description"
-                value={newCollection.description}
-                onChange={(event) =>
-                  setNewCollection({
-                    ...newCollection,
-                    description: event.target.value,
-                  })
-                }
-                label="Description"
-                type="text"
-                placeholder="Description (100 characters max.)"
-                inputProps={{ maxLength: 100 }}
-              />
-              <PrivacyStatus
-                newDetails={newCollection}
-                setNewDetails={setNewCollection}
-              />
-            </div>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit" disabled={!isValidNewCollection}>
-              Add
-            </Button>
-          </DialogActions>
-        </form>
-      </Box>
-    </Modal>
+        <div className="flex w-full flex-col items-center justify-center gap-2 p-2">
+          <TextField
+            name="collection-title"
+            autoFocus
+            margin="dense"
+            id="title"
+            value={newCollection.title}
+            onChange={(event) =>
+              setNewCollection({
+                ...newCollection,
+                title: event.target.value,
+              })
+            }
+            required
+            label="Collection Title"
+            type="text"
+            className="w-full"
+          />
+          <TextField
+            name="collection-description"
+            className="w-full"
+            autoFocus
+            margin="dense"
+            id="description"
+            value={newCollection.description}
+            onChange={(event) =>
+              setNewCollection({
+                ...newCollection,
+                description: event.target.value,
+              })
+            }
+            label="Description"
+            type="text"
+            placeholder="Description (100 characters max.)"
+            inputProps={{ maxLength: 100 }}
+          />
+          <PrivacyStatus
+            newDetails={newCollection}
+            setNewDetails={setNewCollection}
+          />
+        </div>
+        <FormButtons
+          handleCancel={handleClose}
+          submitTitle="ADD"
+          isValid={isValidNewCollection}
+        />
+      </form>
+    </ModalSkeleton>
   );
 };
 

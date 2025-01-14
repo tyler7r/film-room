@@ -48,6 +48,13 @@ const TeamHub = () => {
     if (data) setTeam(data);
   };
 
+  const openTransferTeamModal = (isOpen: boolean) => {
+    setActionBarStatus({
+      ...actionBarStatus,
+      transferOwner: isOpen,
+    });
+  };
+
   useEffect(() => {
     const channel = supabase
       .channel("team_changes")
@@ -109,12 +116,7 @@ const TeamHub = () => {
           setRequestCount={setRequestCount}
         />
         <TransferTeamOwnershipModal
-          toggleOpen={() =>
-            setActionBarStatus({
-              ...actionBarStatus,
-              transferOwner: !actionBarStatus.transferOwner,
-            })
-          }
+          setIsOpen={openTransferTeamModal}
           team={team}
           isOpen={actionBarStatus.transferOwner}
           setRole={setRole}

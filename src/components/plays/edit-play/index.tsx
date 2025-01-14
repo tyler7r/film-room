@@ -1,18 +1,10 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import {
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  Modal,
-  Switch,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Divider, IconButton, Switch, TextField, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/utils/form-message";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import sendEmail from "~/utils/send-email";
 import { supabase } from "~/utils/supabase";
 import {
@@ -24,7 +16,6 @@ import {
   type UserType,
   type VideoType,
 } from "~/utils/types";
-import PageTitle from "../../utils/page-title";
 import AddCollectionsToPlay from "../add-collections-to-play";
 import AddMentionsToPlayProps from "../add-mentions-to-play";
 import AddTagsToPlay from "../add-tags-to-play";
@@ -54,7 +45,6 @@ export type CreateNewCollectionType = {
 
 const EditPlay = ({ play, video }: CreatePlayProps) => {
   const { user, affIds } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
 
   const [playDetails, setPlayDetails] = useState<NewPlayType>({
     title: play.title,
@@ -91,7 +81,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     status: "error",
   });
   const [isEditPlayOpen, setIsEditPlayOpen] = useState<boolean>(false);
-  const [isValidPlay, setIsValidPlay] = useState<boolean>(true);
+  const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   const fetchInitialMentions = async () => {
     if (play) {
@@ -407,11 +397,20 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       } else if (isUnedited) {
         setMessage({
           status: "error",
-          text: "Please make a change in order to submit the play's edit!",
+          text: "Please make an edit before submitting!",
         });
+        setIsValidPlay(false);
       } else {
         setMessage({ status: "error", text: undefined });
         setIsValidPlay(true);
+      }
+    } else {
+      if (isUnedited) {
+        setMessage({
+          status: "error",
+          text: "Please make an edit before submitting!",
+        });
+        setIsValidPlay(false);
       }
     }
   };
@@ -461,6 +460,10 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     void fetchInitialMentions();
   }, [isEditPlayOpen]);
 
+  useEffect(() => {
+    void updateErrorMessage();
+  }, [playDetails, playTags, playCollections, mentions]);
+
   return !isEditPlayOpen ? (
     <div
       className="text-sm font-bold tracking-tight"
@@ -469,31 +472,16 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       EDIT PLAY
     </div>
   ) : (
-    <Modal open={isEditPlayOpen} onClose={resetPlay}>
-      <Box
-        className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid p-4"
-        sx={backgroundStyle}
+    <ModalSkeleton
+      title="Edit Play"
+      isOpen={isEditPlayOpen}
+      setIsOpen={setIsEditPlayOpen}
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full flex-col items-center gap-2"
       >
-        <Button
-          variant="text"
-          size="large"
-          sx={{
-            position: "absolute",
-            right: "0",
-            top: "0",
-            fontWeight: "bold",
-            fontSize: "24px",
-            lineHeight: "32px",
-          }}
-          onClick={resetPlay}
-        >
-          X
-        </Button>
-        <PageTitle title="Edit Play" size="medium" />
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
-        >
+        <div className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center">
           <TextField
             className="w-full"
             name="title"
@@ -587,34 +575,15 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
             newDetails={playDetails}
             setNewDetails={setPlayDetails}
           />
-          <FormMessage message={message} />
-          <div className="flex items-center justify-center gap-2">
-            {isValidPlay ? (
-              <Button variant="contained" size="large" type="submit">
-                Edit Play
-              </Button>
-            ) : (
-              <Button
-                variant="outlined"
-                color="primary"
-                type="button"
-                onClick={() => updateErrorMessage()}
-              >
-                Edit Play
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="text"
-              onClick={() => resetPlay()}
-              size="large"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Box>
-    </Modal>
+        </div>
+        <FormMessage message={message} />
+        <FormButtons
+          handleCancel={resetPlay}
+          submitTitle="SUBMIT"
+          isValid={isValidPlay}
+        />
+      </form>
+    </ModalSkeleton>
   );
 };
 

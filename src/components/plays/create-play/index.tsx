@@ -281,12 +281,11 @@ const CreatePlay = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("it worked");
-    // if (video.private || playDetails.private) void createPlay(true);
-    // else {
-    //   void createPlay(false);
-    // }
-    // void resetPlay();
+    if (video.private || playDetails.private) void createPlay(true);
+    else {
+      void createPlay(false);
+    }
+    void resetPlay();
   };
 
   useEffect(() => {

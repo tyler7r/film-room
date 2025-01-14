@@ -1,22 +1,15 @@
 import AddIcon from "@mui/icons-material/Add";
 import StarIcon from "@mui/icons-material/Star";
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  Modal,
-  TextField,
-} from "@mui/material";
+import { Autocomplete, Divider, IconButton, TextField } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState, type SyntheticEvent } from "react";
 import TeamLogo from "~/components/teams/team-logo";
 import FormMessage from "~/components/utils/form-message";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { MessageType, PlayPreviewType } from "~/utils/types";
@@ -37,7 +30,6 @@ const PlaysToCollectionModal = ({
   playIds,
 }: PlaysToCollectionModalProps) => {
   const { user, affIds } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
   const router = useRouter();
 
   const [message, setMessage] = useState<MessageType>({
@@ -165,35 +157,13 @@ const PlaysToCollectionModal = ({
       />
     </IconButton>
   ) : (
-    <Modal
-      open={isOpen}
-      onClose={handleClose}
-      onClick={(e) => e.stopPropagation()}
+    <ModalSkeleton
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      title="Add to Collection"
     >
-      <Box
-        className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-4 rounded-md border-solid p-4"
-        sx={backgroundStyle}
-      >
-        <Button
-          variant="text"
-          size="large"
-          sx={{
-            position: "absolute",
-            right: "0",
-            top: "0",
-            fontWeight: "bold",
-            fontSize: "24px",
-            lineHeight: "32px",
-          }}
-          onClick={handleClose}
-        >
-          X
-        </Button>
-        <PageTitle title="Add to Collection" size="small" />
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-full flex-col gap-4 p-2"
-        >
+      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-2">
+        <div className="flex w-full flex-col gap-4 p-2">
           {plays && (
             <div className="w-full">
               <Autocomplete
@@ -256,18 +226,15 @@ const PlaysToCollectionModal = ({
               />
             </div>
           )}
-          <div className="flex items-center justify-center gap-4">
-            <Button type="submit" variant="contained" disabled={!isValidForm}>
-              Submit
-            </Button>
-            <Button type="button" variant="outlined" onClick={handleClose}>
-              Cancel
-            </Button>
-          </div>
-          <FormMessage message={message} />
-        </form>
-      </Box>
-    </Modal>
+        </div>
+        <FormMessage message={message} />
+        <FormButtons
+          isValid={isValidForm}
+          handleCancel={handleClose}
+          submitTitle="SUBMIT"
+        />
+      </form>
+    </ModalSkeleton>
   );
 };
 

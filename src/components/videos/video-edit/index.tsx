@@ -1,12 +1,9 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
-  Box,
-  Button,
   FormControl,
   IconButton,
   InputLabel,
   MenuItem,
-  Modal,
   Select,
   TextField,
   Tooltip,
@@ -16,9 +13,9 @@ import { useEffect, useState } from "react";
 import TeamLogo from "~/components/teams/team-logo";
 import TeamMentions from "~/components/teams/team-mentions";
 import FormMessage from "~/components/utils/form-message";
-import PageTitle from "~/components/utils/page-title";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { divisions, isValidYoutubeLink, proDivs } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type {
@@ -34,7 +31,6 @@ type EditVideoProps = {
 
 const EditVideo = ({ video }: EditVideoProps) => {
   const { user } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
   const { affiliations } = useAuthContext();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -281,31 +277,12 @@ const EditVideo = ({ video }: EditVideoProps) => {
   }, []);
 
   return isOpen ? (
-    <Modal open={isOpen} onClose={reset}>
-      <Box
-        className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid p-4"
-        sx={backgroundStyle}
+    <ModalSkeleton isOpen={isOpen} setIsOpen={setIsOpen} title="Edit Video">
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full flex-col items-center justify-center gap-2"
       >
-        <Button
-          variant="text"
-          size="large"
-          sx={{
-            position: "absolute",
-            top: "0",
-            right: "0",
-            fontSize: "1.5rem",
-            lineHeight: "2rem",
-            fontWeight: "bold",
-          }}
-          onClick={reset}
-        >
-          X
-        </Button>
-        <PageTitle title="Edit Video" size="medium" />
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
-        >
+        <div className="flex w-4/5 flex-col items-center justify-center gap-4 p-2 text-center">
           <TextField
             className="w-full"
             name="title"
@@ -424,29 +401,15 @@ const EditVideo = ({ video }: EditVideoProps) => {
               </Tooltip>
             </div>
           </FormControl>
-          <FormMessage message={message} />
-          <div className="flex gap-2">
-            {isValidForm ? (
-              <Button variant="contained" size="large" type="submit">
-                Edit Video
-              </Button>
-            ) : (
-              <Button
-                variant="outlined"
-                color="primary"
-                type="button"
-                onClick={() => updateErrorMessage()}
-              >
-                Edit Video
-              </Button>
-            )}
-            <Button type="button" onClick={reset} size="large">
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Box>
-    </Modal>
+        </div>
+        <FormMessage message={message} />
+        <FormButtons
+          submitTitle="SUBMIT"
+          handleCancel={reset}
+          isValid={isValidForm}
+        />
+      </form>
+    </ModalSkeleton>
   ) : (
     <div
       className="text-sm font-bold tracking-tight"

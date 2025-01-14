@@ -1,35 +1,33 @@
 import {
-  Box,
-  Button,
   FormControl,
   InputLabel,
   MenuItem,
-  Modal,
   Select,
   type SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { MessageType, PlayerType, TeamType } from "~/utils/types";
 import FormMessage from "../../utils/form-message";
-import PageTitle from "../../utils/page-title";
 
 type TransferTeamOwnershipProps = {
   team: TeamType;
   isOpen: boolean;
-  toggleOpen: (modal: string, open: boolean) => void;
   setRole: (role: string) => void;
+  setIsOpen: (isOpen: boolean) => void;
 };
 
 const TransferTeamOwnershipModal = ({
   team,
   isOpen,
-  toggleOpen,
   setRole,
+  setIsOpen,
 }: TransferTeamOwnershipProps) => {
-  const { backgroundStyle, colorText } = useIsDarkContext();
+  const { colorText } = useIsDarkContext();
   const { user } = useAuthContext();
 
   const [users, setUsers] = useState<PlayerType[] | null>(null);
@@ -72,7 +70,7 @@ const TransferTeamOwnershipModal = ({
 
   const handleClose = () => {
     setNewOwner("");
-    toggleOpen("transferOwner", false);
+    setIsOpen(false);
     setMessage({ text: undefined, status: "error" });
   };
 
@@ -107,81 +105,51 @@ const TransferTeamOwnershipModal = ({
 
   return (
     users && (
-      <Modal open={isOpen} onClose={handleClose}>
-        <Box
-          className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-4 rounded-md border-solid p-4 md:w-3/5"
-          sx={backgroundStyle}
+      <ModalSkeleton
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        title="Transfer Team Ownership"
+      >
+        {newRole ? (
+          <div className={`text-sm font-bold tracking-tight ${colorText}`}>
+            * You will still be a {newRole} with {team.full_name} *
+          </div>
+        ) : (
+          <div className={`text-sm font-bold tracking-tight ${colorText}`}>
+            * You will no longer be a member of {team.full_name}, as you are not
+            a registered player or coach *
+          </div>
+        )}
+        <form
+          className="flex w-full flex-col items-center justify-center gap-2"
+          onSubmit={handleSubmit}
         >
-          <Button
-            variant="text"
-            size="large"
-            sx={{
-              position: "absolute",
-              top: "0",
-              right: "0",
-              fontSize: "1.5rem",
-              lineHeight: "2rem",
-              fontWeight: "bold",
-            }}
-            onClick={handleClose}
-          >
-            X
-          </Button>
-          <PageTitle size="medium" title="Transfer Team Ownership" />
-          {newRole ? (
-            <div className={`text-sm font-bold tracking-tight ${colorText}`}>
-              * You will still be a {newRole} with {team.full_name} *
-            </div>
-          ) : (
-            <div className={`text-sm font-bold tracking-tight ${colorText}`}>
-              * You will no longer be a member of {team.full_name}, as you are
-              not a registered player or coach *
-            </div>
-          )}
-          <form
-            className="flex w-4/5 flex-col items-center justify-center gap-4"
-            onSubmit={handleSubmit}
-          >
-            <FormControl className="w-full">
-              <InputLabel htmlFor="change-owner">Change Team Owner</InputLabel>
-              <Select
-                value={newOwner}
-                onChange={handleChange}
-                label="Change Team Owner"
-                required
-                name="change-owner"
-                id="change-owner"
-              >
-                <MenuItem value="">None</MenuItem>
-                {users.map((user) => (
-                  <MenuItem key={user.profile.id} value={user.profile.id}>
-                    {user.profile.name} - ({user.affiliation.role})
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormMessage message={message} />
-            <div className="flex items-center justify-center gap-4">
-              <Button
-                size="large"
-                type="submit"
-                variant="contained"
-                disabled={!isValid}
-              >
-                Submit
-              </Button>
-              <Button
-                type="button"
-                onClick={handleClose}
-                variant="outlined"
-                size="large"
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        </Box>
-      </Modal>
+          <FormControl className="flex w-4/5 flex-col p-2">
+            <InputLabel htmlFor="change-owner">Change Team Owner</InputLabel>
+            <Select
+              value={newOwner}
+              onChange={handleChange}
+              label="Change Team Owner"
+              required
+              name="change-owner"
+              id="change-owner"
+            >
+              <MenuItem value="">None</MenuItem>
+              {users.map((user) => (
+                <MenuItem key={user.profile.id} value={user.profile.id}>
+                  {user.profile.name} - ({user.affiliation.role})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormMessage message={message} />
+          <FormButtons
+            submitTitle="SUBMIT"
+            handleCancel={handleClose}
+            isValid={isValid}
+          />
+        </form>
+      </ModalSkeleton>
     )
   );
 };

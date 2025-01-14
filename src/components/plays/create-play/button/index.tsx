@@ -29,7 +29,11 @@ const PlayModalBtn = ({
 
   return !isPlayStarted ? (
     <div>
-      <Button sx={{ marginRight: "-8px" }} onClick={handleStart} size="large">
+      <Button
+        sx={{ marginRight: "-8px", fontWeight: "bold" }}
+        onClick={handleStart}
+        size="large"
+      >
         Start Recording
       </Button>
       <Tooltip
@@ -54,7 +58,12 @@ const PlayModalBtn = ({
     </div>
   ) : (
     <div>
-      <Button disabled={!isValidBtn} onClick={handleEnd} size="large">
+      <Button
+        disabled={!isValidBtn}
+        sx={{ fontWeight: "bold" }}
+        onClick={handleEnd}
+        size="large"
+      >
         End Recording
       </Button>
       <Tooltip

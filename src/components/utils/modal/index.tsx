@@ -1,5 +1,5 @@
 import { Backdrop, Box, Button, Fade, Modal } from "@mui/material";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useIsDarkContext } from "~/pages/_app";
 import PageTitle from "../page-title";
 
@@ -16,7 +16,7 @@ const ModalSkeleton = ({
   setIsOpen,
   title,
 }: ModalSkeletonProps) => {
-  const { backgroundStyle, isDark } = useIsDarkContext();
+  const { backgroundStyle } = useIsDarkContext();
 
   const handleClose = () => {
     setIsOpen(false);
@@ -37,12 +37,11 @@ const ModalSkeleton = ({
     >
       <Fade in={isOpen}>
         <Box
-          className="relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-4 rounded-md"
+          className="relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-4 rounded-md pt-2"
           sx={backgroundStyle}
         >
           <Button
             variant="text"
-            size="large"
             sx={{
               position: "absolute",
               right: "0",
