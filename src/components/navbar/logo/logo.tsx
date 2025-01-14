@@ -23,8 +23,8 @@ export const Logo = ({ size, ...props }: LogoProps) => {
       fill={false}
       src={isDark ? SmallDarkLogoEffect : SmallLightLogoEffect}
       alt="Site logo"
-      height={50}
-      width={70}
+      height={40}
+      width={56}
       priority={true}
       {...props}
     />

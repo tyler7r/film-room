@@ -1,7 +1,5 @@
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
-import PersonIcon from "@mui/icons-material/Person";
-import SearchIcon from "@mui/icons-material/Search";
-import { Button, CircularProgress, Pagination } from "@mui/material";
+import { CircularProgress, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "utils/supabase/component";
@@ -14,9 +12,9 @@ import type { PlayPreviewType } from "~/utils/types";
 import { useIsDarkContext } from "./_app";
 
 const Home = () => {
-  const { user, affIds } = useAuthContext();
+  const { affIds } = useAuthContext();
   const { hoverText } = useIsDarkContext();
-  const { isMobile } = useMobileContext();
+  const { isMobile, screenWidth } = useMobileContext();
 
   const router = useRouter();
   const itemsPerPage = isMobile ? 5 : 10;
@@ -100,45 +98,8 @@ const Home = () => {
       <CircularProgress size={128} />
     </div>
   ) : (
-    <div className="flex flex-col items-center justify-center gap-6 p-4">
-      <Logo size="medium" />
-      {user.userId ? (
-        <div className="flex gap-4">
-          <Button
-            variant="outlined"
-            size="large"
-            onClick={() => void router.push(`/profile/${user.userId}`)}
-            startIcon={<PersonIcon />}
-          >
-            Profile
-          </Button>
-          <Button
-            variant="outlined"
-            size="large"
-            onClick={() => void router.push("/search/users")}
-            startIcon={<SearchIcon />}
-          >
-            Search
-          </Button>
-        </div>
-      ) : (
-        <div className="flex gap-4">
-          <Button
-            variant="outlined"
-            size="large"
-            onClick={() => void router.push("/signup")}
-          >
-            Signup
-          </Button>
-          <Button
-            variant="outlined"
-            size="large"
-            onClick={() => void router.push("/login")}
-          >
-            Login
-          </Button>
-        </div>
-      )}
+    <div className="flex flex-col items-center justify-center gap-4 p-4">
+      {screenWidth > 525 ? <Logo size="large" /> : <Logo size="medium" />}
       <div className="items-center justify-center text-xl">
         <div className="text-center">
           The film can't analyze itself.{" "}

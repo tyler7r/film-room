@@ -8,6 +8,7 @@ import {
 import { supabase } from "~/utils/supabase";
 import type { NotificationType } from "~/utils/types";
 import { useAuthContext } from "./auth";
+import { useMobileContext } from "./mobile";
 
 type InboxProps = {
   children: ReactNode;
@@ -41,8 +42,9 @@ export const InboxContext = createContext<InboxContextType>({
 
 export const TheInbox = ({ children }: InboxProps) => {
   const { user } = useAuthContext();
+  const { xlScreen } = useMobileContext();
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(xlScreen ? true : false);
   const [notifications, setNotifications] = useState<NotificationType[] | null>(
     null,
   );

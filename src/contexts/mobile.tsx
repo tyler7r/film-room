@@ -14,12 +14,14 @@ type MobileContextType = {
   isMobile: boolean;
   screenWidth: number;
   fullScreen: boolean;
+  xlScreen: boolean;
 };
 
 export const IsMobileContext = createContext<MobileContextType>({
   isMobile: false,
   screenWidth: 0,
   fullScreen: false,
+  xlScreen: false,
 });
 
 export const IsMobile = ({ children }: MobileProps) => {
@@ -27,6 +29,7 @@ export const IsMobile = ({ children }: MobileProps) => {
     isMobile: false,
     screenWidth: 0,
     fullScreen: false,
+    xlScreen: false,
   });
 
   useEffect(() => {
@@ -35,18 +38,28 @@ export const IsMobile = ({ children }: MobileProps) => {
         isMobile: true,
         screenWidth: window.innerWidth,
         fullScreen: false,
+        xlScreen: false,
       });
-    } else if (window.innerWidth >= 1020) {
+    } else if (window.innerWidth >= 1440) {
       setIsMobile({
         isMobile: false,
         screenWidth: window.innerWidth,
         fullScreen: true,
+        xlScreen: true,
+      });
+    } else if (window.innerWidth >= 1020 && window.innerWidth < 1440) {
+      setIsMobile({
+        isMobile: false,
+        screenWidth: window.innerWidth,
+        fullScreen: true,
+        xlScreen: false,
       });
     } else {
       setIsMobile({
         isMobile: false,
         screenWidth: window.innerWidth,
         fullScreen: false,
+        xlScreen: false,
       });
     }
     window.addEventListener("resize", () => {
@@ -55,18 +68,28 @@ export const IsMobile = ({ children }: MobileProps) => {
           isMobile: true,
           screenWidth: window.innerWidth,
           fullScreen: false,
+          xlScreen: false,
         });
-      } else if (window.innerWidth >= 1020) {
+      } else if (window.innerWidth >= 1440) {
         setIsMobile({
           isMobile: false,
           screenWidth: window.innerWidth,
           fullScreen: true,
+          xlScreen: true,
+        });
+      } else if (window.innerWidth >= 1020 && window.innerWidth < 1440) {
+        setIsMobile({
+          isMobile: false,
+          screenWidth: window.innerWidth,
+          fullScreen: true,
+          xlScreen: false,
         });
       } else {
         setIsMobile({
           isMobile: false,
           screenWidth: window.innerWidth,
           fullScreen: false,
+          xlScreen: false,
         });
       }
     });
@@ -77,18 +100,28 @@ export const IsMobile = ({ children }: MobileProps) => {
             isMobile: true,
             screenWidth: window.innerWidth,
             fullScreen: false,
+            xlScreen: false,
           });
-        } else if (window.innerWidth >= 1020) {
+        } else if (window.innerWidth >= 1440) {
           setIsMobile({
             isMobile: false,
             screenWidth: window.innerWidth,
             fullScreen: true,
+            xlScreen: true,
+          });
+        } else if (window.innerWidth >= 1020 && window.innerWidth < 1440) {
+          setIsMobile({
+            isMobile: false,
+            screenWidth: window.innerWidth,
+            fullScreen: true,
+            xlScreen: false,
           });
         } else {
           setIsMobile({
             isMobile: false,
             screenWidth: window.innerWidth,
             fullScreen: false,
+            xlScreen: false,
           });
         }
       });
