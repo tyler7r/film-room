@@ -26,15 +26,15 @@ const TeamPageButton = () => {
   return (
     <div>
       <Button
-        variant="text"
         onClick={handleClick}
         endIcon={
           <ExpandMoreIcon fontSize={screenWidth < 750 ? "small" : "large"} />
         }
         sx={{
-          fontSize: screenWidth < 750 ? "15px" : "18px",
           fontWeight: "bold",
+          wordSpacing: "-1px",
         }}
+        size="large"
       >
         Team Hub
       </Button>

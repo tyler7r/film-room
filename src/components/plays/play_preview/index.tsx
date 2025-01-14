@@ -13,7 +13,6 @@ import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
-import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
 import CommentBtn from "../../interactions/comments/comment-btn";
@@ -216,13 +215,8 @@ const PlayPreview = ({
             {preview.author.name}
           </div>
           <Divider flexItem orientation="vertical" variant="middle" />
-          <div className="flex flex-col items-center gap-2">
-            <div className="text-sm leading-3 tracking-tight text-slate-600">
-              {convertTimestamp(preview.play.created_at)}
-            </div>
-            <div className="text-xs font-bold leading-3 tracking-tight">
-              ({preview.play.end_time - preview.play.start_time}s)
-            </div>
+          <div className="text-xs font-bold leading-3 tracking-tight">
+            ({preview.play.end_time - preview.play.start_time}s)
           </div>
           {!isMobile && (
             <div className="flex-wrap p-2">{preview.play.title}</div>

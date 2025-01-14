@@ -16,7 +16,7 @@ type FetchOptions = {
 };
 
 export const Navbar = () => {
-  const { isMobile } = useMobileContext();
+  const { screenWidth } = useMobileContext();
   const { user } = useAuthContext();
   const router = useRouter();
 
@@ -34,7 +34,7 @@ export const Navbar = () => {
     setOptions({ ...options, loggedIn: user.isLoggedIn, userId: user.userId });
   }, [user]);
 
-  return isMobile ? (
+  return screenWidth <= 745 ? (
     <MobileNav logout={logout} />
   ) : (
     <DesktopNav logout={logout} />

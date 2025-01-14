@@ -29,6 +29,7 @@ type isDarkContextType = {
   hoverText: string;
   colorText: string;
   backgroundStyleString: string;
+  navbarBackground: { backgroundColor: string };
 };
 
 export const IsDarkContext = createContext<isDarkContextType>({
@@ -41,6 +42,7 @@ export const IsDarkContext = createContext<isDarkContextType>({
   hoverText: "",
   colorText: "",
   backgroundStyleString: "",
+  navbarBackground: { backgroundColor: "" },
 });
 
 const MyApp: AppType = ({ Component, pageProps }) => {
@@ -73,6 +75,10 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     isDark ? "hover:text-purple-400" : "hover:text-purple-A400"
   } hover:delay-100`;
 
+  const navbarBackground = {
+    backgroundColor: `${!isDark ? colors.common.white : colors.grey[900]}`,
+  };
+
   const colorText = `${isDark ? "text-purple-400" : "text-purple-A400"}`;
 
   return (
@@ -88,6 +94,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           hoverText,
           colorText,
           backgroundStyleString,
+          navbarBackground,
         }}
       >
         <CssBaseline />
