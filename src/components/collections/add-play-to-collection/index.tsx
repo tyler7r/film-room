@@ -1,14 +1,13 @@
-import { Box, Button, Modal } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { MessageType } from "~/utils/types";
 import AddCollectionsToPlay from "../../plays/add-collections-to-play";
 import type { CreateNewCollectionType } from "../../plays/create-play";
 import FormMessage from "../../utils/form-message";
-import PageTitle from "../../utils/page-title";
 
 type AddPlayToCollection = {
   playId: string;
@@ -20,7 +19,6 @@ const AddPlayToCollection = ({
   handleMenuClose,
 }: AddPlayToCollection) => {
   const { affIds, user } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -127,52 +125,27 @@ const AddPlayToCollection = ({
       ADD TO COLLECTIONS
     </div>
   ) : (
-    <Modal
-      open={isOpen}
-      onClose={handleClose}
-      onClick={(e) => e.stopPropagation()}
+    <ModalSkeleton
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      title="Add to Collections"
     >
-      <Box
-        className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-4 rounded-md border-solid p-4"
-        sx={backgroundStyle}
-      >
-        <Button
-          variant="text"
-          size="large"
-          sx={{
-            position: "absolute",
-            right: "0",
-            top: "0",
-            fontWeight: "bold",
-            fontSize: "24px",
-            lineHeight: "32px",
-          }}
-          onClick={handleClose}
-        >
-          X
-        </Button>
-        <PageTitle title="Add to Collection" size="small" />
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-full flex-col gap-4 p-2"
-        >
+      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-2">
+        <div className="flex w-full flex-col gap-4 p-2">
           <AddCollectionsToPlay
             collections={playCollections}
             setCollections={setPlayCollections}
             allCollections={collections}
           />
-          <div className="flex items-center justify-center gap-4">
-            <Button type="submit" variant="contained" disabled={!isValidForm}>
-              Submit
-            </Button>
-            <Button type="button" variant="outlined" onClick={handleClose}>
-              Cancel
-            </Button>
-          </div>
           <FormMessage message={message} />
-        </form>
-      </Box>
-    </Modal>
+        </div>
+        <FormButtons
+          isValid={isValidForm}
+          handleCancel={handleClose}
+          submitTitle="SUBMIT"
+        />
+      </form>
+    </ModalSkeleton>
   );
 };
 

@@ -1,19 +1,11 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import {
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  Modal,
-  Switch,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Divider, IconButton, Switch, TextField, Tooltip } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import sendEmail from "~/utils/send-email";
 import { supabase } from "~/utils/supabase";
 import {
@@ -24,7 +16,6 @@ import {
   type UserType,
   type VideoType,
 } from "~/utils/types";
-import PageTitle from "../../utils/page-title";
 import AddCollectionsToPlay from "../add-collections-to-play";
 import AddMentionsToPlayProps from "../add-mentions-to-play";
 import AddTagsToPlay from "../add-tags-to-play";
@@ -36,6 +27,7 @@ type CreatePlayProps = {
   video: VideoType;
   isNewPlayOpen: boolean;
   setIsNewPlayOpen: (status: boolean) => void;
+  scrollToPlayer: () => void;
 };
 
 export type CreateNewTagType = {
@@ -60,10 +52,10 @@ const CreatePlay = ({
   video,
   setIsNewPlayOpen,
   isNewPlayOpen,
+  scrollToPlayer,
 }: CreatePlayProps) => {
   const router = useRouter();
   const { user, affIds } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
 
   const [isPlayStarted, setIsPlayStarted] = useState(false);
   const [playDetails, setPlayDetails] = useState<NewPlayType>({
@@ -337,33 +329,19 @@ const CreatePlay = ({
       isPlayStarted={isPlayStarted}
       startPlay={startPlay}
       endPlay={endPlay}
+      scrollToPlayer={scrollToPlayer}
     />
   ) : (
-    <Modal open={isNewPlayOpen} onClose={resetPlay}>
-      <Box
-        className="border-1 relative inset-1/2 flex w-4/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md border-solid p-4"
-        sx={backgroundStyle}
+    <ModalSkeleton
+      isOpen={isNewPlayOpen}
+      setIsOpen={setIsNewPlayOpen}
+      title="Create New Play"
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full flex-col items-center justify-center gap-2"
       >
-        <Button
-          variant="text"
-          size="large"
-          sx={{
-            position: "absolute",
-            right: "0",
-            top: "0",
-            fontWeight: "bold",
-            fontSize: "24px",
-            lineHeight: "32px",
-          }}
-          onClick={resetPlay}
-        >
-          X
-        </Button>
-        <PageTitle title="Create New Play" size="medium" />
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center"
-        >
+        <div className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center">
           <TextField
             className="w-full"
             name="title"
@@ -397,7 +375,7 @@ const CreatePlay = ({
             setCollections={setPlayCollections}
             allCollections={collections}
           />
-          <div className="flex w-full justify-around gap-2">
+          <div className="flex w-full items-center justify-center gap-4 md:justify-around md:gap-0">
             <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
               <div className="text-sm font-bold tracking-tight md:text-base">
                 Highlight Play
@@ -413,14 +391,15 @@ const CreatePlay = ({
                     highlight: !playDetails.highlight,
                   })
                 }
+                size="small"
               />
             </div>
             <Divider orientation="vertical" flexItem />
-            <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
-              <div className="text-sm font-bold tracking-tight md:text-base">
-                Post to Home Page
-              </div>
-              <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center gap-2">
+              <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
+                <div className="text-sm font-bold tracking-tight md:text-base">
+                  Post to Home Page
+                </div>
                 <Switch
                   checked={playDetails.post_to_feed}
                   className="items-center justify-center"
@@ -431,27 +410,28 @@ const CreatePlay = ({
                       post_to_feed: !playDetails.post_to_feed,
                     })
                   }
+                  size="small"
                 />
-                <Tooltip
-                  title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
-                  slotProps={{
-                    popper: {
-                      modifiers: [
-                        {
-                          name: "offset",
-                          options: {
-                            offset: [0, -14],
-                          },
-                        },
-                      ],
-                    },
-                  }}
-                >
-                  <IconButton size="small">
-                    <InfoOutlinedIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
               </div>
+              <Tooltip
+                title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, -14],
+                        },
+                      },
+                    ],
+                  },
+                }}
+              >
+                <IconButton size="small">
+                  <InfoOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </div>
           </div>
           <PrivacyStatus
@@ -459,27 +439,14 @@ const CreatePlay = ({
             newDetails={playDetails}
             setNewDetails={setPlayDetails}
           />
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!isValidPlay}
-              size="large"
-            >
-              Submit
-            </Button>
-            <Button
-              type="button"
-              variant="text"
-              onClick={() => resetPlay()}
-              size="large"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Box>
-    </Modal>
+        </div>
+        <FormButtons
+          isValid={isValidPlay}
+          handleCancel={resetPlay}
+          submitTitle="SUBMIT"
+        />
+      </form>
+    </ModalSkeleton>
   );
 };
 

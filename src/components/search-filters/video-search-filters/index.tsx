@@ -44,8 +44,8 @@ const VideoSearchFilters = ({
   };
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-2">
-      <div className="flex w-full gap-2 p-2">
+    <div className="flex w-full flex-col items-center justify-center gap-2 lg:w-4/5">
+      <div className="flex w-full flex-col gap-4 p-2 md:flex-row md:gap-2">
         <label htmlFor="search" className="sr-only">
           Search
         </label>
@@ -72,7 +72,7 @@ const VideoSearchFilters = ({
         />
         {affiliations && (
           <FormControl className="w-full">
-            <InputLabel>Videos by Team</InputLabel>
+            <InputLabel>Video Privacy</InputLabel>
             <Select
               value={searchOptions.privateOnly}
               onChange={handlePrivacyStatus}

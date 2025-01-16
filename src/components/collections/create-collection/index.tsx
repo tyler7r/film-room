@@ -1,20 +1,13 @@
 import AddIcon from "@mui/icons-material/Add";
-import {
-  Box,
-  Button,
-  DialogActions,
-  DialogContent,
-  Modal,
-  TextField,
-} from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/utils/form-message";
+import ModalSkeleton from "~/components/utils/modal";
+import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
-import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { MessageType, NewCollectionType } from "~/utils/types";
-import PageTitle from "../../utils/page-title";
 import PrivacyStatus from "./privacy-status";
 
 type CreateCollectionProps = {
@@ -23,7 +16,6 @@ type CreateCollectionProps = {
 
 const CreateCollection = ({ small }: CreateCollectionProps) => {
   const { user } = useAuthContext();
-  const { backgroundStyle } = useIsDarkContext();
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -94,86 +86,69 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
       variant="contained"
       size={small ? "medium" : "large"}
       endIcon={<AddIcon />}
+      sx={{ fontWeight: "bold" }}
     >
       Create New Collection
     </Button>
   ) : (
-    <Modal open={isOpen} onClose={handleClose}>
-      <Box
-        className={`relative inset-1/2 flex w-3/5 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-md p-4`}
-        sx={backgroundStyle}
+    <ModalSkeleton
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      title="Create Collection"
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full flex-col items-center gap-2"
       >
-        <Button
-          variant="text"
-          size="large"
-          sx={{
-            position: "absolute",
-            right: "0",
-            top: "0",
-            fontWeight: "bold",
-            fontSize: "24px",
-            lineHeight: "32px",
-          }}
-          onClick={handleClose}
-        >
-          X
-        </Button>
-        <form onSubmit={handleSubmit} className="w-full">
-          <PageTitle title="Add New Collection" size="small" />
-          <DialogContent>
-            <div className="flex w-full flex-col items-center justify-center gap-2">
-              <TextField
-                name="collection-title"
-                autoFocus
-                margin="dense"
-                id="title"
-                value={newCollection.title}
-                onChange={(event) =>
-                  setNewCollection({
-                    ...newCollection,
-                    title: event.target.value,
-                  })
-                }
-                label="Collection Title"
-                type="text"
-                className="w-full"
-              />
-              <TextField
-                name="collection-description"
-                className="w-full"
-                autoFocus
-                margin="dense"
-                id="description"
-                value={newCollection.description}
-                onChange={(event) =>
-                  setNewCollection({
-                    ...newCollection,
-                    description: event.target.value,
-                  })
-                }
-                label="Description"
-                type="text"
-                placeholder="Description (100 characters max.)"
-                inputProps={{ maxLength: 100 }}
-              />
-              <PrivacyStatus
-                newDetails={newCollection}
-                setNewDetails={setNewCollection}
-              />
-            </div>
-            <FormMessage message={message} />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} size="large">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={!isValidForm} size="large">
-              Add
-            </Button>
-          </DialogActions>
-        </form>
-      </Box>
-    </Modal>
+        <div className="flex w-full flex-col items-center justify-center gap-2 p-2">
+          <TextField
+            name="collection-title"
+            autoFocus
+            margin="dense"
+            id="title"
+            required
+            value={newCollection.title}
+            onChange={(event) =>
+              setNewCollection({
+                ...newCollection,
+                title: event.target.value,
+              })
+            }
+            label="Collection Title"
+            type="text"
+            className="w-full"
+          />
+          <TextField
+            name="collection-description"
+            className="w-full"
+            autoFocus
+            margin="dense"
+            id="description"
+            value={newCollection.description}
+            onChange={(event) =>
+              setNewCollection({
+                ...newCollection,
+                description: event.target.value,
+              })
+            }
+            label="Description"
+            type="text"
+            placeholder="Description (100 characters max.)"
+            inputProps={{ maxLength: 100 }}
+          />
+          <PrivacyStatus
+            newDetails={newCollection}
+            setNewDetails={setNewCollection}
+          />
+          <FormMessage message={message} />
+        </div>
+        <FormButtons
+          handleCancel={handleClose}
+          submitTitle="SUBMIT"
+          isValid={isValidForm}
+        />
+      </form>
+    </ModalSkeleton>
   );
 };
 

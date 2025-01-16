@@ -112,7 +112,7 @@ const FilmRoomHome = () => {
           setSearchOptions={setSearchOptions}
         />
       </div>
-      <div className="flex w-4/5 flex-col items-center justify-center gap-6">
+      <div className="flex w-full flex-col items-center justify-center gap-6">
         {videos?.map((v) => <Video video={v} key={v.id} />)}
         {!videos && <EmptyMessage message="videos" size="large" />}
       </div>
