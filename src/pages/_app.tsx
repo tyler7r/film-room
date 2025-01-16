@@ -48,7 +48,7 @@ export const IsDarkContext = createContext<isDarkContextType>({
 const MyApp: AppType = ({ Component, pageProps }) => {
   const [isDark, setIsDark] = useState<boolean>(false);
   const backgroundStyle = {
-    backgroundColor: `${isDark ? colors.grey[900] : colors.grey[100]}`,
+    backgroundColor: `${isDark ? colors.grey[800] : colors.grey[100]}`,
   };
 
   const colorBackground = {

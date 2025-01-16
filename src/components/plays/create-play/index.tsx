@@ -27,6 +27,7 @@ type CreatePlayProps = {
   video: VideoType;
   isNewPlayOpen: boolean;
   setIsNewPlayOpen: (status: boolean) => void;
+  scrollToPlayer: () => void;
 };
 
 export type CreateNewTagType = {
@@ -51,6 +52,7 @@ const CreatePlay = ({
   video,
   setIsNewPlayOpen,
   isNewPlayOpen,
+  scrollToPlayer,
 }: CreatePlayProps) => {
   const router = useRouter();
   const { user, affIds } = useAuthContext();
@@ -327,6 +329,7 @@ const CreatePlay = ({
       isPlayStarted={isPlayStarted}
       startPlay={startPlay}
       endPlay={endPlay}
+      scrollToPlayer={scrollToPlayer}
     />
   ) : (
     <ModalSkeleton
@@ -372,7 +375,7 @@ const CreatePlay = ({
             setCollections={setPlayCollections}
             allCollections={collections}
           />
-          <div className="flex w-full justify-around gap-2">
+          <div className="flex w-full items-center justify-center gap-4 md:justify-around md:gap-0">
             <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
               <div className="text-sm font-bold tracking-tight md:text-base">
                 Highlight Play
@@ -388,14 +391,15 @@ const CreatePlay = ({
                     highlight: !playDetails.highlight,
                   })
                 }
+                size="small"
               />
             </div>
             <Divider orientation="vertical" flexItem />
-            <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
-              <div className="text-sm font-bold tracking-tight md:text-base">
-                Post to Home Page
-              </div>
-              <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center gap-2">
+              <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
+                <div className="text-sm font-bold tracking-tight md:text-base">
+                  Post to Home Page
+                </div>
                 <Switch
                   checked={playDetails.post_to_feed}
                   className="items-center justify-center"
@@ -406,27 +410,28 @@ const CreatePlay = ({
                       post_to_feed: !playDetails.post_to_feed,
                     })
                   }
+                  size="small"
                 />
-                <Tooltip
-                  title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
-                  slotProps={{
-                    popper: {
-                      modifiers: [
-                        {
-                          name: "offset",
-                          options: {
-                            offset: [0, -14],
-                          },
-                        },
-                      ],
-                    },
-                  }}
-                >
-                  <IconButton size="small">
-                    <InfoOutlinedIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
               </div>
+              <Tooltip
+                title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, -14],
+                        },
+                      },
+                    ],
+                  },
+                }}
+              >
+                <IconButton size="small">
+                  <InfoOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </div>
           </div>
           <PrivacyStatus

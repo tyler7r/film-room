@@ -1,5 +1,5 @@
 import LinkIcon from "@mui/icons-material/Link";
-import { Divider, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -179,13 +179,13 @@ const FilmRoom = () => {
 
   return (
     video && (
-      <div className="flex w-full flex-col items-center justify-center gap-2 p-4">
+      <div className="relative flex w-full flex-col items-center justify-center gap-2 p-4">
         <div className="flex flex-col items-center justify-center gap-1 text-center">
           <div className="flex items-center gap-1">
             <div
               className={`${
                 isDark ? "text-grey-400" : "text-grey-600"
-              } text-lg font-bold leading-4 tracking-tight lg:text-2xl`}
+              } font-bold leading-4 tracking-tight lg:text-lg`}
             >
               {video.season} -{" "}
               {video.week
@@ -208,20 +208,22 @@ const FilmRoom = () => {
               />
             </IconButton>
           </div>
-          <PageTitle title={video.title} size="large" />
+          <PageTitle title={video.title} size="medium" />
           <div className="mt-2 flex flex-wrap gap-2">
             {affiliatedTeams?.map((tm) => (
               <Team team={tm} small={true} key={tm.id} />
             ))}
           </div>
         </div>
-        <Divider flexItem variant="middle" sx={{ marginTop: "8px" }} />
-        <CreatePlay
-          player={player}
-          video={video}
-          isNewPlayOpen={isNewPlayOpen}
-          setIsNewPlayOpen={setIsNewPlayOpen}
-        />
+        <div className="fixed bottom-2 right-2">
+          <CreatePlay
+            player={player}
+            video={video}
+            isNewPlayOpen={isNewPlayOpen}
+            setIsNewPlayOpen={setIsNewPlayOpen}
+            scrollToPlayer={scrollToPlayer}
+          />
+        </div>
         {video.link && !isLoading && (
           <div ref={playerRef}>
             <Youtube

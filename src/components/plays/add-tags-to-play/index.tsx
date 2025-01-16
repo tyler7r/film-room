@@ -179,7 +179,7 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
               onSubmit={handleNewTag}
               className="flex w-full flex-col items-center gap-2"
             >
-              <div className="flex w-4/5 flex-col items-center justify-center gap-4 p-4">
+              <div className="flex flex-col items-center justify-center gap-4 p-4">
                 <TextField
                   className="w-full"
                   name="tag-title"

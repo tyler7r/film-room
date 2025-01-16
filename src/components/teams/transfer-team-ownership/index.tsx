@@ -111,11 +111,15 @@ const TransferTeamOwnershipModal = ({
         title="Transfer Team Ownership"
       >
         {newRole ? (
-          <div className={`text-sm font-bold tracking-tight ${colorText}`}>
+          <div
+            className={`text-center text-sm font-bold tracking-tight ${colorText}`}
+          >
             * You will still be a {newRole} with {team.full_name} *
           </div>
         ) : (
-          <div className={`text-sm font-bold tracking-tight ${colorText}`}>
+          <div
+            className={`text-center text-sm font-bold tracking-tight ${colorText}`}
+          >
             * You will no longer be a member of {team.full_name}, as you are not
             a registered player or coach *
           </div>
