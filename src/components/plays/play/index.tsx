@@ -139,7 +139,7 @@ const Play = ({
   return (
     <div
       className={`flex w-full flex-col gap-2 rounded-sm p-2 ${
-        isDark ? `odd:bg-grey-900` : `odd:bg-grey-100`
+        isDark ? `odd:bg-grey-800` : `odd:bg-grey-100`
       }`}
       style={activePlay && backgroundStyle}
     >
