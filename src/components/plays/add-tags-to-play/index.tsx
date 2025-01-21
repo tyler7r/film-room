@@ -174,6 +174,7 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
             title="Create Tag"
             isOpen={open}
             setIsOpen={toggleOpen}
+            handleClose={handleClose}
           >
             <form
               onSubmit={handleNewTag}

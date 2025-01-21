@@ -109,6 +109,7 @@ const TransferTeamOwnershipModal = ({
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         title="Transfer Team Ownership"
+        handleClose={handleClose}
       >
         {newRole ? (
           <div
