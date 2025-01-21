@@ -109,6 +109,7 @@ const EditVideo = ({ video }: EditVideoProps) => {
       division: video.division,
     });
     setIsOpen(false);
+    setTeamMentions(initialTeamMentions);
   };
 
   const updateErrorMessage = () => {
@@ -277,7 +278,12 @@ const EditVideo = ({ video }: EditVideoProps) => {
   }, []);
 
   return isOpen ? (
-    <ModalSkeleton isOpen={isOpen} setIsOpen={setIsOpen} title="Edit Video">
+    <ModalSkeleton
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      handleClose={reset}
+      title="Edit Video"
+    >
       <form
         onSubmit={handleSubmit}
         className="flex w-full flex-col items-center justify-center gap-2"

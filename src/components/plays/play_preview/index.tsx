@@ -36,7 +36,7 @@ const PlayPreview = ({
   setReload,
   collectionAuthor,
 }: PlayPreviewProps) => {
-  const { isMobile, fullScreen, screenWidth } = useMobileContext();
+  const { isMobile, fullScreen } = useMobileContext();
   const { hoverText } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
@@ -166,12 +166,10 @@ const PlayPreview = ({
 
   return (
     <div
-      className="flex flex-col rounded-md"
-      style={{
-        width: `${
-          isMobile ? `${screenWidth}px` : fullScreen ? "960px" : "640px"
-        }`,
-      }}
+      className="flex w-full flex-col justify-center rounded-md"
+      // style={{
+      //   width: `${isMobile ? `420px` : fullScreen ? "960px" : "640px"}`,
+      // }}
     >
       <div className="flex items-center justify-between gap-2 p-2">
         <div className="flex items-center gap-2">
@@ -267,10 +265,8 @@ const PlayPreview = ({
       {!isLoading && (
         <YouTube
           opts={{
-            width: `${isMobile ? screenWidth - 10 : fullScreen ? 960 : 640}`,
-            height: `${
-              isMobile ? (screenWidth - 10) / 1.62 : fullScreen ? 595 : 390
-            }`,
+            width: `${isMobile ? 450 : fullScreen ? 960 : 640}`,
+            height: `${isMobile ? 275 : fullScreen ? 595 : 390}`,
             playerVars: {
               end: preview.play.end_time,
               enablejsapi: 1,

@@ -12,6 +12,7 @@ type PlaysProps = {
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
   setSeenActivePlay: (seenActivePlay: boolean) => void;
+  setIsFiltersOpen: (isFiltersOpen: boolean) => void;
 };
 
 const Plays = ({
@@ -22,6 +23,7 @@ const Plays = ({
   searchOptions,
   setSearchOptions,
   setSeenActivePlay,
+  setIsFiltersOpen,
 }: PlaysProps) => {
   return plays && plays.length > 0 ? (
     <div className="grid w-11/12 grid-cols-1 justify-center gap-2">
@@ -35,6 +37,7 @@ const Plays = ({
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
           setSeenActivePlay={setSeenActivePlay}
+          setIsFiltersOpen={setIsFiltersOpen}
         />
       ))}
     </div>

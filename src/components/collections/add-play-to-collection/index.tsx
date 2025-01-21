@@ -128,6 +128,7 @@ const AddPlayToCollection = ({
     <ModalSkeleton
       isOpen={isOpen}
       setIsOpen={setIsOpen}
+      handleClose={handleClose}
       title="Add to Collections"
     >
       <form onSubmit={handleSubmit} className="flex w-full flex-col gap-2">

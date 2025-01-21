@@ -63,6 +63,7 @@ const PlaysToCollectionModal = ({
   const handleClose = () => {
     setIsOpen(false);
     setMessage({ text: undefined, status: "error" });
+    setAddedPlays(null);
   };
 
   const handleChange = (
@@ -160,6 +161,7 @@ const PlaysToCollectionModal = ({
     <ModalSkeleton
       isOpen={isOpen}
       setIsOpen={setIsOpen}
+      handleClose={handleClose}
       title="Add to Collection"
     >
       <form onSubmit={handleSubmit} className="flex w-full flex-col gap-2">

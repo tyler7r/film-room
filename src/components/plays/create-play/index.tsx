@@ -1,3 +1,5 @@
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { Divider, IconButton, Switch, TextField, Tooltip } from "@mui/material";
 import { useRouter } from "next/router";
@@ -79,6 +81,7 @@ const CreatePlay = ({
     CreateNewCollectionType[] | null
   >(null);
 
+  const [draftedPlay, setDraftedPlay] = useState<boolean>(false);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   const fetchPlayers = async () => {
@@ -142,6 +145,7 @@ const CreatePlay = ({
   };
 
   const startPlay = async () => {
+    scrollToPlayer();
     if (!user.isLoggedIn) {
       void router.push("/login");
       return;
@@ -177,6 +181,10 @@ const CreatePlay = ({
     setMentions([]);
     setPlayTags([]);
     setPlayCollections([]);
+  };
+
+  const handleClose = () => {
+    void resetPlay();
   };
 
   const handleMention = async (mention: UserType, play: PlayType) => {
@@ -281,6 +289,80 @@ const CreatePlay = ({
     }
   };
 
+  const checkDraftedPlay = () => {
+    if (
+      typeof playDetails.end === "number" &&
+      typeof playDetails.start === "number"
+    ) {
+      setDraftedPlay(true);
+    } else {
+      setDraftedPlay(false);
+    }
+  };
+
+  const handleTimeAdjustment = async (
+    time: "start" | "end",
+    increment: boolean,
+  ) => {
+    const videoLength = await player?.getDuration();
+    const playStart = playDetails.start;
+    const playEnd = playDetails.end;
+    const adjustEnd = playStart! + 1 === playEnd;
+    const adjustStart = playEnd! - 1 === playStart;
+    const startMin = playStart === 0;
+    const startMax = playStart === videoLength! - 1;
+    const endMin = playEnd === 1;
+    const endMax = playEnd === videoLength!;
+
+    if (time === "start") {
+      if (increment) {
+        if (startMax) return;
+        if (adjustEnd) {
+          setPlayDetails({
+            ...playDetails,
+            end: playEnd ? playEnd + 1 : 1,
+            start: playStart ? playStart + 1 : 1,
+          });
+        } else {
+          setPlayDetails({
+            ...playDetails,
+            start: playStart ? playStart + 1 : 1,
+          });
+        }
+      } else {
+        if (startMin) return;
+        else
+          setPlayDetails({
+            ...playDetails,
+            start: playStart ? playStart - 1 : 0,
+          });
+      }
+    } else {
+      if (!increment) {
+        if (endMin) return;
+        if (adjustStart) {
+          setPlayDetails({
+            ...playDetails,
+            end: playEnd ? playEnd - 1 : 1,
+            start: playStart ? playStart - 1 : 0,
+          });
+        } else {
+          setPlayDetails({
+            ...playDetails,
+            end: playEnd ? playEnd - 1 : 1,
+          });
+        }
+      } else {
+        if (endMax) return;
+        else
+          setPlayDetails({
+            ...playDetails,
+            end: playEnd ? playEnd + 1 : 1,
+          });
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (video.private || playDetails.private) void createPlay(true);
@@ -316,6 +398,7 @@ const CreatePlay = ({
 
   useEffect(() => {
     checkValidPlay();
+    checkDraftedPlay();
   }, [playDetails]);
 
   useEffect(() => {
@@ -330,18 +413,82 @@ const CreatePlay = ({
       startPlay={startPlay}
       endPlay={endPlay}
       scrollToPlayer={scrollToPlayer}
+      setIsOpen={setIsNewPlayOpen}
+      draftedPlay={draftedPlay}
     />
   ) : (
     <ModalSkeleton
       isOpen={isNewPlayOpen}
       setIsOpen={setIsNewPlayOpen}
+      handleClose={handleClose}
       title="Create New Play"
+      minimize={true}
     >
       <form
         onSubmit={handleSubmit}
         className="flex w-full flex-col items-center justify-center gap-2"
       >
         <div className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center">
+          <div className="flex w-full items-center justify-center gap-4">
+            <div className="flex items-center justify-center gap-1">
+              <div className="font-bold">START</div>
+              <div>
+                {playDetails.start
+                  ? playDetails.start < 3600
+                    ? new Date(playDetails.start * 1000)
+                        .toISOString()
+                        .substring(14, 19)
+                    : new Date(playDetails.start * 1000)
+                        .toISOString()
+                        .substring(11, 19)
+                  : "00:00"}
+              </div>
+              <div className="flex flex-col">
+                <IconButton
+                  onClick={() => handleTimeAdjustment("start", true)}
+                  size="small"
+                  sx={{ padding: "0px", margin: "0px" }}
+                >
+                  <ArrowDropUpIcon />
+                </IconButton>
+                <IconButton
+                  sx={{ padding: "0px", margin: "0px" }}
+                  size="small"
+                  onClick={() => handleTimeAdjustment("start", false)}
+                >
+                  <ArrowDropDownIcon />
+                </IconButton>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-1">
+              <div className="font-bold">END</div>
+              {playDetails.end
+                ? playDetails.end < 3600
+                  ? new Date(playDetails.end * 1000)
+                      .toISOString()
+                      .substring(14, 19)
+                  : new Date(playDetails.end * 1000)
+                      .toISOString()
+                      .substring(11, 19)
+                : "00:00"}
+              <div className="flex flex-col">
+                <IconButton
+                  onClick={() => handleTimeAdjustment("end", true)}
+                  size="small"
+                  sx={{ padding: "0px", margin: "0px" }}
+                >
+                  <ArrowDropUpIcon />
+                </IconButton>
+                <IconButton
+                  sx={{ padding: "0px", margin: "0px" }}
+                  size="small"
+                  onClick={() => handleTimeAdjustment("end", false)}
+                >
+                  <ArrowDropDownIcon />
+                </IconButton>
+              </div>
+            </div>
+          </div>
           <TextField
             className="w-full"
             name="title"
@@ -442,7 +589,7 @@ const CreatePlay = ({
         </div>
         <FormButtons
           isValid={isValidPlay}
-          handleCancel={resetPlay}
+          handleCancel={handleClose}
           submitTitle="SUBMIT"
         />
       </form>

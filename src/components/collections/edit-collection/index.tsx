@@ -116,6 +116,7 @@ const EditCollection = ({
     <ModalSkeleton
       isOpen={isEditOpen}
       setIsOpen={setIsEditOpen}
+      handleClose={handleClose}
       title="Edit Collection"
     >
       <form onSubmit={handleSubmit} className="flex w-full flex-col gap-2">

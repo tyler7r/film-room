@@ -215,15 +215,6 @@ const FilmRoom = () => {
             ))}
           </div>
         </div>
-        <div className="fixed bottom-2 right-2">
-          <CreatePlay
-            player={player}
-            video={video}
-            isNewPlayOpen={isNewPlayOpen}
-            setIsNewPlayOpen={setIsNewPlayOpen}
-            scrollToPlayer={scrollToPlayer}
-          />
-        </div>
         {video.link && !isLoading && (
           <div ref={playerRef}>
             <Youtube
@@ -245,6 +236,15 @@ const FilmRoom = () => {
             />
           </div>
         )}
+        <div className="fixed bottom-2 right-2">
+          <CreatePlay
+            player={player}
+            video={video}
+            isNewPlayOpen={isNewPlayOpen}
+            setIsNewPlayOpen={setIsNewPlayOpen}
+            scrollToPlayer={scrollToPlayer}
+          />
+        </div>
         {isLoading && <PageTitle size="large" title="Loading video..." />}
         <VideoPlayIndex
           player={player}

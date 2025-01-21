@@ -81,6 +81,7 @@ const ProfileEdit = ({ profile }: ProfileEditProps) => {
     <ModalSkeleton
       title="Edit Profile"
       isOpen={isProfileEditOpen}
+      handleClose={resetProfile}
       setIsOpen={setIsProfileEditOpen}
     >
       <form

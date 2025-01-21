@@ -476,6 +476,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       title="Edit Play"
       isOpen={isEditPlayOpen}
       setIsOpen={setIsEditPlayOpen}
+      handleClose={resetPlay}
     >
       <form
         onSubmit={handleSubmit}
