@@ -1,40 +1,63 @@
+import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import { IconButton, Tooltip } from "@mui/material";
-import { useState } from "react";
 
 type PlayModalBtnProps = {
   isPlayStarted: boolean;
   startPlay: () => void;
   endPlay: () => void;
   scrollToPlayer: () => void;
+  setIsOpen: (open: boolean) => void;
+  draftedPlay: boolean;
 };
 
 const PlayModalBtn = ({
   isPlayStarted,
   startPlay,
   endPlay,
-  scrollToPlayer,
+  draftedPlay,
+  setIsOpen,
 }: PlayModalBtnProps) => {
-  const [isValidBtn, setIsValidBtn] = useState<boolean>(false);
-
   const handleStart = () => {
-    scrollToPlayer();
     startPlay();
-    setTimeout(() => {
-      setIsValidBtn(true);
-    }, 2000);
   };
 
   const handleEnd = () => {
     endPlay();
-    setIsValidBtn(false);
   };
 
-  return !isPlayStarted ? (
-    <div>
+  return draftedPlay ? (
+    <div className="z-20">
       <Tooltip
-        title="START RECORDING, once your play ends make sure to click END RECORDING to complete your note! Plays must be at least 2 seconds long."
+        title="Edit your current drafted play."
+        slotProps={{
+          popper: {
+            modifiers: [
+              {
+                name: "offset",
+                options: {
+                  offset: [0, -14],
+                },
+              },
+            ],
+          },
+        }}
+      >
+        <IconButton
+          sx={{ fontWeight: "bold" }}
+          onClick={() => setIsOpen(true)}
+          size="small"
+          color="primary"
+        >
+          <BuildCircleIcon sx={{ fontSize: "64px" }} />
+        </IconButton>
+      </Tooltip>
+    </div>
+  ) : !isPlayStarted ? (
+    <div className="z-20">
+      <Tooltip
+        title="START RECORDING, once your play ends make sure to click END RECORDING to complete your note!"
         slotProps={{
           popper: {
             modifiers: [
@@ -54,12 +77,12 @@ const PlayModalBtn = ({
           size="small"
           color="primary"
         >
-          <PlayCircleFilledIcon sx={{ fontSize: "72px" }} />
+          <PlayCircleFilledIcon sx={{ fontSize: "64px" }} />
         </IconButton>
       </Tooltip>
     </div>
   ) : (
-    <div>
+    <div className="z-20">
       <Tooltip
         title="END RECORDING, once clicked you will be prompted to fill out the details of your play!"
         slotProps={{
@@ -79,10 +102,9 @@ const PlayModalBtn = ({
           sx={{ fontWeight: "bold" }}
           onClick={handleEnd}
           size="small"
-          disabled={!isValidBtn}
           color="primary"
         >
-          <StopCircleIcon sx={{ fontSize: "72px" }} />
+          <StopCircleIcon sx={{ fontSize: "64px" }} />
         </IconButton>
       </Tooltip>
     </div>

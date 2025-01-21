@@ -1,7 +1,10 @@
-import { Divider, Pagination } from "@mui/material";
+import SortIcon from "@mui/icons-material/Sort";
+import UpdateIcon from "@mui/icons-material/Update";
+import { Divider, IconButton, Pagination } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import type { YouTubePlayer } from "react-youtube";
 import Play from "~/components/plays/play";
+import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce";
@@ -43,6 +46,7 @@ const VideoPlayIndex = ({
   const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
   const [page, setPage] = useState<number>(1);
   const [playCount, setPlayCount] = useState<number | null>(null);
+  const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
 
   const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
     only_highlights: false,
@@ -53,6 +57,31 @@ const VideoPlayIndex = ({
   });
   const itemsPerPage = isMobile ? 5 : 10;
   const topRef = useRef<HTMLDivElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<{
+    anchor1: HTMLElement | null;
+    anchor2: HTMLElement | null;
+  }>({
+    anchor1: null,
+    anchor2: null,
+  });
+
+  const handlePopoverOpen = (
+    e: React.MouseEvent<HTMLElement>,
+    target: "a" | "b",
+  ) => {
+    if (target === "a") {
+      setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
+    } else {
+      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
+    }
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl({ anchor1: null, anchor2: null });
+  };
+
+  const open1 = Boolean(anchorEl.anchor1);
+  const open2 = Boolean(anchorEl.anchor2);
 
   const fetchPlays = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);
@@ -167,26 +196,9 @@ const VideoPlayIndex = ({
       const getMentions = await playsByMention;
       let ps: PlayPreviewType[] | null = null;
       if (getTags.data) {
-        // if (searchOptions.timestamp) {
-        //   ps = getTags.data.filter(
-        //     (p) =>
-        //       p.play.end_time.toString().padStart(6, "0") >=
-        //       searchOptions.timestamp!,
-        //   );
-        // } else {
-        //   ps = getTags.data;
-        // }
         ps = getTags.data;
       }
       if (getMentions.data) {
-        // if (searchOptions.timestamp) {
-        //   const ms = getMentions.data.filter(
-        //     (p) =>
-        //       p.play.end_time.toString().padStart(6, "0") >=
-        //       searchOptions.timestamp!,
-        //   );
-        //   ps = ps ? [...ps, ...ms] : ms;
-        // } else ps = ps ? [...ps, ...getMentions.data] : getMentions.data;
         ps = ps ? [...ps, ...getMentions.data] : getMentions.data;
       }
       const uniquePlays = [...new Map(ps?.map((x) => [x.play.id, x])).values()];
@@ -203,6 +215,26 @@ const VideoPlayIndex = ({
     e.preventDefault();
     setPage(value);
     scrollToTop();
+  };
+
+  const getCurrentTime = async (player: YouTubePlayer) => {
+    return Math.round(await player.getCurrentTime()) - 1;
+  };
+
+  const setTimestamp = async () => {
+    if (searchOptions.timestamp) {
+      setSearchOptions({ ...searchOptions, timestamp: null });
+      return;
+    }
+    if (player && !searchOptions.timestamp) {
+      void getCurrentTime(player).then((currentTime) => {
+        const paddedCurrentTime = currentTime.toString().padStart(6, "0");
+        setSearchOptions({
+          ...searchOptions,
+          timestamp: paddedCurrentTime,
+        });
+      });
+    }
   };
 
   useEffect(() => {
@@ -262,6 +294,7 @@ const VideoPlayIndex = ({
             searchOptions={searchOptions}
             setSearchOptions={setSearchOptions}
             setSeenActivePlay={setSeenActivePlay}
+            setIsFiltersOpen={setIsFiltersOpen}
           />
           <Divider sx={{ marginTop: "16px", marginBottom: "16px" }} flexItem />
         </div>
@@ -270,11 +303,58 @@ const VideoPlayIndex = ({
         ref={topRef}
         className="flex w-full flex-col items-center justify-center gap-4"
       >
-        <PlaySearchFilters
-          searchOptions={searchOptions}
-          setSearchOptions={setSearchOptions}
-          player={player}
-        />
+        <div className="flex items-center justify-center gap-2 text-lg font-bold">
+          <PageTitle
+            title={`${
+              playCount
+                ? playCount > 1
+                  ? `${playCount} Plays`
+                  : `${playCount} Play`
+                : "0 Plays"
+            }`}
+            size="x-small"
+          />
+          <IconButton
+            size="small"
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            onMouseEnter={(e) => handlePopoverOpen(e, "a")}
+            onMouseLeave={handlePopoverClose}
+          >
+            <SortIcon />
+          </IconButton>
+          <StandardPopover
+            open={open1}
+            anchorEl={anchorEl.anchor1}
+            handlePopoverClose={handlePopoverClose}
+            content="Open Filters"
+          />
+          <IconButton
+            size="small"
+            onClick={setTimestamp}
+            onMouseEnter={(e) => handlePopoverOpen(e, "b")}
+            onMouseLeave={handlePopoverClose}
+          >
+            <UpdateIcon
+              color={!searchOptions.timestamp ? "action" : "primary"}
+            />
+          </IconButton>
+          <StandardPopover
+            open={open2}
+            anchorEl={anchorEl.anchor2}
+            handlePopoverClose={handlePopoverClose}
+            content={`${
+              !searchOptions.timestamp
+                ? "Plays found at this timestamp or later"
+                : "All plays"
+            }`}
+          />
+        </div>
+        {isFiltersOpen && (
+          <PlaySearchFilters
+            searchOptions={searchOptions}
+            setSearchOptions={setSearchOptions}
+          />
+        )}
         <Plays
           scrollToPlayer={scrollToPlayer}
           player={player}
@@ -283,6 +363,7 @@ const VideoPlayIndex = ({
           setSearchOptions={setSearchOptions}
           searchOptions={searchOptions}
           setSeenActivePlay={setSeenActivePlay}
+          setIsFiltersOpen={setIsFiltersOpen}
         />
         {playCount && (
           <Pagination

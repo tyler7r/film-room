@@ -73,7 +73,12 @@ const CreateCollectionFromPlay = ({
   });
 
   return (
-    <ModalSkeleton isOpen={open} setIsOpen={setOpen} title="Create Collection">
+    <ModalSkeleton
+      isOpen={open}
+      setIsOpen={setOpen}
+      handleClose={handleClose}
+      title="Create Collection"
+    >
       <form
         onSubmit={handleNewCollection}
         className="flex w-full flex-col gap-2"

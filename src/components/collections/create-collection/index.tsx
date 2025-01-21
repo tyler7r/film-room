@@ -94,6 +94,7 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
     <ModalSkeleton
       isOpen={isOpen}
       setIsOpen={setIsOpen}
+      handleClose={handleClose}
       title="Create Collection"
     >
       <form

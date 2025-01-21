@@ -214,7 +214,12 @@ const CreateVideo = () => {
   }, []);
 
   return isOpen ? (
-    <ModalSkeleton title="Add Video" isOpen={isOpen} setIsOpen={setIsOpen}>
+    <ModalSkeleton
+      title="Add Video"
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      handleClose={reset}
+    >
       <form
         onSubmit={handleSubmit}
         className="flex w-full flex-col items-center justify-center gap-2"

@@ -3,7 +3,6 @@ import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import StarIcon from "@mui/icons-material/Star";
-import UpdateIcon from "@mui/icons-material/Update";
 import {
   Button,
   Checkbox,
@@ -17,7 +16,6 @@ import {
   type SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import type { YouTubePlayer } from "react-youtube";
 import TeamLogo from "~/components/teams/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import StandardPopover from "../../utils/standard-popover";
@@ -26,13 +24,11 @@ import type { PlaySearchOptions } from "../../videos/video-play-index";
 type PlaySearchFilterProps = {
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
-  player: YouTubePlayer | null;
 };
 
 const PlaySearchFilters = ({
   searchOptions,
   setSearchOptions,
-  player,
 }: PlaySearchFilterProps) => {
   const { affiliations } = useAuthContext();
   const [isAuthorSearch, setIsAuthorSearch] = useState<boolean>(false);
@@ -40,33 +36,28 @@ const PlaySearchFilters = ({
   const [anchorEl, setAnchorEl] = useState<{
     anchor1: HTMLElement | null;
     anchor2: HTMLElement | null;
-    anchor3: HTMLElement | null;
   }>({
     anchor1: null,
     anchor2: null,
-    anchor3: null,
   });
 
   const handlePopoverOpen = (
     e: React.MouseEvent<HTMLElement>,
-    target: "a" | "b" | "c",
+    target: "a" | "b",
   ) => {
     if (target === "a") {
       setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
-    } else if (target === "b") {
-      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
     } else {
-      setAnchorEl({ ...anchorEl, anchor3: e.currentTarget });
+      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
     }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
+    setAnchorEl({ anchor1: null, anchor2: null });
   };
 
   const open1 = Boolean(anchorEl.anchor1);
   const open2 = Boolean(anchorEl.anchor2);
-  const open3 = Boolean(anchorEl.anchor3);
 
   const handleModeChange = () => {
     if (isAuthorSearch) {
@@ -93,26 +84,6 @@ const PlaySearchFilters = ({
       setSearchOptions({ ...searchOptions, private_only: "all" });
     } else {
       setSearchOptions({ ...searchOptions, private_only: status });
-    }
-  };
-
-  const getCurrentTime = async (player: YouTubePlayer) => {
-    return Math.round(await player.getCurrentTime()) - 1;
-  };
-
-  const setTimestamp = async () => {
-    if (searchOptions.timestamp) {
-      setSearchOptions({ ...searchOptions, timestamp: null });
-      return;
-    }
-    if (player && !searchOptions.timestamp) {
-      void getCurrentTime(player).then((currentTime) => {
-        const paddedCurrentTime = currentTime.toString().padStart(6, "0");
-        setSearchOptions({
-          ...searchOptions,
-          timestamp: paddedCurrentTime,
-        });
-      });
     }
   };
 
@@ -228,64 +199,42 @@ const PlaySearchFilters = ({
             </FormControl>
           )}
         </div>
-        <div className="flex flex-col items-center justify-center gap-2 lg:gap-0">
-          <Checkbox
-            icon={
-              <IconButton size="small">
-                <StarIcon color="action" fontSize="large" />
-              </IconButton>
-            }
-            checkedIcon={
-              <IconButton size="small">
-                <StarIcon color="secondary" fontSize="large" />
-              </IconButton>
-            }
-            checked={searchOptions.only_highlights}
-            onChange={() => {
-              setSearchOptions({
-                ...searchOptions,
-                only_highlights: !searchOptions.only_highlights,
-              });
-            }}
-            size="small"
-            id="highlights-search"
-            name="highlights-search"
-            onMouseEnter={(e) => handlePopoverOpen(e, "b")}
-            onMouseLeave={handlePopoverClose}
-          />
-          <StandardPopover
-            open={open2}
-            anchorEl={anchorEl.anchor2}
-            handlePopoverClose={handlePopoverClose}
-            content="Highlights only"
-          />
-          <IconButton
-            size="small"
-            onClick={setTimestamp}
-            onMouseEnter={(e) => handlePopoverOpen(e, "c")}
-            onMouseLeave={handlePopoverClose}
-          >
-            <UpdateIcon
-              fontSize="large"
-              color={!searchOptions.timestamp ? "action" : "primary"}
-            />
-          </IconButton>
-          <StandardPopover
-            open={open3}
-            anchorEl={anchorEl.anchor3}
-            handlePopoverClose={handlePopoverClose}
-            content={`${
-              !searchOptions.timestamp
-                ? "Plays found at this timestamp or later"
-                : "All plays"
-            }`}
-          />
-        </div>
+        <Checkbox
+          icon={
+            <IconButton size="small">
+              <StarIcon color="action" fontSize="large" />
+            </IconButton>
+          }
+          checkedIcon={
+            <IconButton size="small">
+              <StarIcon color="secondary" fontSize="large" />
+            </IconButton>
+          }
+          checked={searchOptions.only_highlights}
+          onChange={() => {
+            setSearchOptions({
+              ...searchOptions,
+              only_highlights: !searchOptions.only_highlights,
+            });
+          }}
+          size="small"
+          id="highlights-search"
+          name="highlights-search"
+          onMouseEnter={(e) => handlePopoverOpen(e, "b")}
+          onMouseLeave={handlePopoverClose}
+        />
+        <StandardPopover
+          open={open2}
+          anchorEl={anchorEl.anchor2}
+          handlePopoverClose={handlePopoverClose}
+          content="Highlights only"
+        />
       </div>
       <Button
         endIcon={<DeleteIcon />}
         variant="text"
         onClick={clearSearchOptions}
+        sx={{ fontWeight: "bold" }}
       >
         Clear Filters
       </Button>

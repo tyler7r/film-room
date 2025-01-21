@@ -1,4 +1,6 @@
-import { Backdrop, Box, Button, Fade, Modal } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
+import { Backdrop, Box, Fade, IconButton, Modal } from "@mui/material";
 import type { ReactNode } from "react";
 import { Logo } from "~/components/navbar/logo/logo";
 import { useIsDarkContext } from "~/pages/_app";
@@ -8,7 +10,9 @@ type ModalSkeletonProps = {
   children: ReactNode;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  handleClose: () => void;
   title: string;
+  minimize?: boolean;
 };
 
 const ModalSkeleton = ({
@@ -16,12 +20,10 @@ const ModalSkeleton = ({
   isOpen,
   setIsOpen,
   title,
+  handleClose,
+  minimize,
 }: ModalSkeletonProps) => {
   const { backgroundStyle } = useIsDarkContext();
-
-  const handleClose = () => {
-    setIsOpen(false);
-  };
 
   return (
     <Modal
@@ -41,20 +43,16 @@ const ModalSkeleton = ({
           className="relative inset-1/2 flex w-11/12 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-1 rounded-md pt-2 md:w-4/5 lg:w-1/2"
           sx={backgroundStyle}
         >
-          <Button
-            variant="text"
-            sx={{
-              position: "absolute",
-              right: "0",
-              top: "0",
-              fontWeight: "bold",
-              fontSize: "24px",
-              lineHeight: "32px",
-            }}
-            onClick={() => handleClose()}
-          >
-            X
-          </Button>
+          <div className="absolute right-0 top-0">
+            {minimize && (
+              <IconButton onClick={() => setIsOpen(false)} size="small">
+                <CloseFullscreenIcon />
+              </IconButton>
+            )}
+            <IconButton onClick={handleClose} size="small" color="error">
+              <CloseIcon sx={{ fontSize: "28px" }} />
+            </IconButton>
+          </div>
           <div className="absolute left-0 top-0">
             <Logo size="small" />
           </div>

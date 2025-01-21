@@ -32,6 +32,7 @@ type PlayProps = {
   setActivePlay: (play: PlayPreviewType) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
+  setIsFiltersOpen: (isFiltersOpen: boolean) => void;
 };
 
 const Play = ({
@@ -43,6 +44,7 @@ const Play = ({
   searchOptions,
   setSearchOptions,
   setSeenActivePlay,
+  setIsFiltersOpen,
 }: PlayProps) => {
   const { user } = useAuthContext();
   const { isDark, hoverText, backgroundStyle } = useIsDarkContext();
@@ -106,11 +108,13 @@ const Play = ({
 
   const handleMentionAndTagClick = (e: React.MouseEvent, topic: string) => {
     e.stopPropagation();
+    setIsFiltersOpen(true);
     setSearchOptions({ ...searchOptions, topic: topic });
   };
 
   const handleHighlightClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsFiltersOpen(true);
     setSearchOptions({
       ...searchOptions,
       only_highlights: !searchOptions.only_highlights,
@@ -119,6 +123,7 @@ const Play = ({
 
   const handlePrivateClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsFiltersOpen(true);
     setSearchOptions({
       ...searchOptions,
       private_only: exclusiveTeam?.id ? exclusiveTeam.id : "all",
