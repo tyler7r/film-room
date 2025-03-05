@@ -1,5 +1,7 @@
+import AddIcon from "@mui/icons-material/Add";
 import LinkIcon from "@mui/icons-material/Link";
-import { IconButton } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
+import { Button, IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -17,7 +19,7 @@ import type { PlayPreviewType, TeamType, VideoType } from "~/utils/types";
 
 const FilmRoom = () => {
   const router = useRouter();
-  const { affIds } = useAuthContext();
+  const { user, affIds } = useAuthContext();
   const { screenWidth } = useMobileContext();
   const { isDark } = useIsDarkContext();
   const playParam = useSearchParams().get("play") ?? null;
@@ -38,6 +40,7 @@ const FilmRoom = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [accessDenied, setAccessDenied] = useState<boolean>(true);
 
   const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
@@ -62,8 +65,10 @@ const FilmRoom = () => {
       setVideo(data);
       if (data.exclusive_to) {
         const accessAllowed = affIds?.includes(data.exclusive_to);
-        if (!accessAllowed) void router.push("/");
-      }
+        if (!accessAllowed) {
+          setAccessDenied(true);
+        } else setAccessDenied(false);
+      } else setAccessDenied(false);
     }
   };
 
@@ -136,12 +141,20 @@ const FilmRoom = () => {
     setIsCopied(true);
   };
 
+  const handleNewTeamClick = () => {
+    if (user.isLoggedIn) {
+      void router.push("/team-select");
+    } else {
+      void router.push("/login");
+    }
+  };
+
   useEffect(() => {
     if (router.query.video) {
       void fetchVideo();
       void fetchAffiliatedTeams();
     }
-  }, [router.query.video]);
+  }, [router.query.video, affIds]);
 
   useEffect(() => {
     void fetchActivePlay();
@@ -215,45 +228,61 @@ const FilmRoom = () => {
             ))}
           </div>
         </div>
-        {video.link && !isLoading && (
-          <div ref={playerRef}>
-            <Youtube
-              opts={{
-                width: `${screenWidth * 0.8}`,
-                height: `${(screenWidth * 0.8) / 1.778}`,
-                playerVars: {
-                  enablejsapi: 1,
-                  playsinline: 1,
-                  fs: 1,
-                  rel: 0,
-                  color: "red",
-                  origin: "https://www.youtube.com",
-                },
-              }}
-              id="player"
-              videoId={video.link.split("v=")[1]?.split("&")[0]}
-              onReady={videoOnReady}
+        {!accessDenied ? (
+          <div className="relative flex w-full flex-col items-center justify-center gap-2 p-2">
+            {video.link && !isLoading && (
+              <div ref={playerRef}>
+                <Youtube
+                  opts={{
+                    width: `${screenWidth * 0.8}`,
+                    height: `${(screenWidth * 0.8) / 1.778}`,
+                    playerVars: {
+                      enablejsapi: 1,
+                      playsinline: 1,
+                      fs: 1,
+                      rel: 0,
+                      color: "red",
+                      origin: "https://www.youtube.com",
+                    },
+                  }}
+                  id="player"
+                  videoId={video.link.split("v=")[1]?.split("&")[0]}
+                  onReady={videoOnReady}
+                />
+              </div>
+            )}
+            <div className="fixed bottom-2 right-2">
+              <CreatePlay
+                player={player}
+                video={video}
+                isNewPlayOpen={isNewPlayOpen}
+                setIsNewPlayOpen={setIsNewPlayOpen}
+                scrollToPlayer={scrollToPlayer}
+              />
+            </div>
+            {isLoading && <PageTitle size="large" title="Loading video..." />}
+            <VideoPlayIndex
+              player={player}
+              videoId={video.id}
+              scrollToPlayer={scrollToPlayer}
+              setActivePlay={setActivePlay}
+              activePlay={activePlay}
+              setSeenActivePlay={setSeenActivePlay}
             />
           </div>
+        ) : (
+          <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
+            <LockIcon sx={{ fontSize: "96px" }} />
+            <div className="text-lg font-bold">This video is private!</div>
+            <Button
+              variant="contained"
+              endIcon={<AddIcon />}
+              onClick={handleNewTeamClick}
+            >
+              Join a new team
+            </Button>
+          </div>
         )}
-        <div className="fixed bottom-2 right-2">
-          <CreatePlay
-            player={player}
-            video={video}
-            isNewPlayOpen={isNewPlayOpen}
-            setIsNewPlayOpen={setIsNewPlayOpen}
-            scrollToPlayer={scrollToPlayer}
-          />
-        </div>
-        {isLoading && <PageTitle size="large" title="Loading video..." />}
-        <VideoPlayIndex
-          player={player}
-          videoId={video.id}
-          scrollToPlayer={scrollToPlayer}
-          setActivePlay={setActivePlay}
-          activePlay={activePlay}
-          setSeenActivePlay={setSeenActivePlay}
-        />
       </div>
     )
   );
