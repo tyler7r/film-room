@@ -27,7 +27,12 @@ import {
   youtubeRegEx,
 } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { MessageType, TeamType, VideoUploadType } from "~/utils/types";
+import type {
+  MessageType,
+  TeamAffiliationType,
+  TeamType,
+  VideoUploadType,
+} from "~/utils/types";
 
 type CreateVideoProps = {
   listItem?: boolean;
@@ -52,6 +57,7 @@ const CreateVideo = ({ listItem }: CreateVideoProps) => {
     season: "",
     tournament: "",
     division: "",
+    coach_video: false,
   });
   const [teamMentions, setTeamMentions] = useState<TeamType[]>([]);
   const [teams, setTeams] = useState<TeamType[] | null>(null);
@@ -89,12 +95,47 @@ const CreateVideo = ({ listItem }: CreateVideoProps) => {
     setVideoData({ ...videoData, week: week });
   };
 
+  const getRoleByTeamId = (affs: TeamAffiliationType[] | null, id: string) => {
+    const found = affs?.find((item) => item.team.id === id);
+    console.log(found);
+    return found ? found.role : null;
+  };
+
+  const findPrivatedTeam = (arr: TeamType[] | null, id: string) => {
+    const team = arr?.find((item) => item.id === id);
+    return team ? team : null;
+  };
+
   const handlePrivacyStatus = (e: SelectChangeEvent) => {
     const status = e.target.value;
     if (status === "public" || status === "") {
-      setVideoData({ ...videoData, private: false, exclusive_to: "public" });
+      setVideoData({
+        ...videoData,
+        private: false,
+        exclusive_to: "public",
+        coach_video: false,
+      });
     } else {
-      setVideoData({ ...videoData, private: true, exclusive_to: status });
+      const isCoachVideo = getRoleByTeamId(affiliations, status);
+      const addPrivateTeamToMentions = findPrivatedTeam(teams, status);
+      if (addPrivateTeamToMentions) {
+        setTeamMentions((prev) => [...prev, addPrivateTeamToMentions]);
+      }
+      if (isCoachVideo === "coach") {
+        setVideoData({
+          ...videoData,
+          private: true,
+          exclusive_to: status,
+          coach_video: true,
+        });
+      } else {
+        setVideoData({
+          ...videoData,
+          private: true,
+          exclusive_to: status,
+          coach_video: false,
+        });
+      }
     }
   };
 
@@ -108,6 +149,7 @@ const CreateVideo = ({ listItem }: CreateVideoProps) => {
       season: "",
       tournament: "",
       division: "",
+      coach_video: false,
     });
     setTeamMentions([]);
     setIsOpen(false);
@@ -186,6 +228,7 @@ const CreateVideo = ({ listItem }: CreateVideoProps) => {
           division,
           week: week === "" ? null : `${week}`,
           tournament: tournament === "" ? null : tournament,
+          coach_video: videoData.coach_video,
           private: videoData.private,
           exclusive_to: videoData.private ? videoData.exclusive_to : null,
           author_id: user.userId,
@@ -209,6 +252,7 @@ const CreateVideo = ({ listItem }: CreateVideoProps) => {
           season: "",
           tournament: "",
           division: "",
+          coach_video: false,
         });
         setTeamMentions([]);
         setIsOpen(false);

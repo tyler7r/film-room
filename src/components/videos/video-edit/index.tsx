@@ -16,10 +16,16 @@ import FormMessage from "~/components/utils/form-message";
 import ModalSkeleton from "~/components/utils/modal";
 import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
-import { divisions, isValidYoutubeLink, proDivs } from "~/utils/helpers";
+import {
+  divisions,
+  isValidYoutubeLink,
+  proDivs,
+  proDivWeeks,
+} from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type {
   MessageType,
+  TeamAffiliationType,
   TeamType,
   VideoType,
   VideoUploadType,
@@ -47,6 +53,7 @@ const EditVideo = ({ video }: EditVideoProps) => {
     season: video.season ?? "",
     tournament: video.tournament ?? "",
     division: video.division,
+    coach_video: video.coach_video,
   });
   const [initialTeamMentions, setInitialTeamMentions] = useState<TeamType[]>(
     [],
@@ -88,13 +95,47 @@ const EditVideo = ({ video }: EditVideoProps) => {
     setVideoData({ ...videoData, division: div });
   };
 
+  const getRoleByTeamId = (affs: TeamAffiliationType[] | null, id: string) => {
+    const found = affs?.find((item) => item.team.id === id);
+    return found ? found.role : null;
+  };
+
+  const findPrivatedTeam = (arr: TeamType[] | null, id: string) => {
+    const team = arr?.find((item) => item.id === id);
+    return team ? team : null;
+  };
+
   const handlePrivacyStatus = (e: SelectChangeEvent) => {
     const status = e.target.value;
     if (status === "public" || status === "") {
       setVideoData({ ...videoData, private: false, exclusive_to: "public" });
     } else {
-      setVideoData({ ...videoData, private: true, exclusive_to: status });
+      const isCoachVideo = getRoleByTeamId(affiliations, status);
+      const addPrivateTeamToMentions = findPrivatedTeam(teams, status);
+      if (addPrivateTeamToMentions) {
+        setTeamMentions((prev) => [...prev, addPrivateTeamToMentions]);
+      }
+      if (isCoachVideo === "coach") {
+        setVideoData({
+          ...videoData,
+          private: true,
+          exclusive_to: status,
+          coach_video: true,
+        });
+      } else {
+        setVideoData({
+          ...videoData,
+          private: true,
+          exclusive_to: status,
+          coach_video: false,
+        });
+      }
     }
+  };
+
+  const handleWeek = (e: SelectChangeEvent) => {
+    const week = e.target.value;
+    setVideoData({ ...videoData, week: week });
   };
 
   const reset = () => {
@@ -107,6 +148,7 @@ const EditVideo = ({ video }: EditVideoProps) => {
       season: video.season ?? "",
       tournament: video.tournament ?? "",
       division: video.division,
+      coach_video: video.coach_video,
     });
     setIsOpen(false);
     setTeamMentions(initialTeamMentions);
@@ -239,6 +281,7 @@ const EditVideo = ({ video }: EditVideoProps) => {
           private: videoData.private,
           exclusive_to: videoData.private ? videoData.exclusive_to : null,
           author_id: user.userId,
+          coach_video: videoData.coach_video,
           keywords: `${title} ${season} ${
             week === "" ? null : `Week ${week}`
           } ${tournament === "" ? null : tournament} ${division}`,
@@ -330,15 +373,23 @@ const EditVideo = ({ video }: EditVideoProps) => {
             />
           </div>
           {proDivs.includes(videoData.division) ? (
-            <TextField
-              className="w-full"
-              name="week"
-              autoComplete="week"
-              id="week"
-              label="Week #  (if applicable)"
-              onChange={handleInput}
-              value={videoData.week}
-            />
+            <FormControl className="w-full">
+              <InputLabel htmlFor="divisions">Week</InputLabel>
+              <Select
+                value={videoData.week}
+                onChange={handleWeek}
+                label="Week"
+                name="weeks"
+                id="weeks"
+              >
+                <MenuItem value="">No Week</MenuItem>
+                {proDivWeeks.map((div) => (
+                  <MenuItem key={div} value={div}>
+                    {div}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           ) : (
             <TextField
               className="w-full"
