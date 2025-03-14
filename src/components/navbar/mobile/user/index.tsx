@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import type { ChildrenNavProps } from "../..";
+import AddContentBtn from "../../add-content-btn";
 
 const UserMobileNav = ({ logout }: ChildrenNavProps) => {
   const { isOpen, setIsOpen, unreadCount } = useInboxContext();
@@ -13,6 +14,7 @@ const UserMobileNav = ({ logout }: ChildrenNavProps) => {
 
   return (
     <div className="flex items-center justify-center gap-2">
+      <AddContentBtn />
       <IconButton
         onClick={() => {
           setIsOpen(!isOpen);

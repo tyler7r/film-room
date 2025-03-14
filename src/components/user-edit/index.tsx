@@ -89,7 +89,7 @@ const UserEdit = ({
   return !isOpen ? (
     <div
       style={backgroundStyle}
-      className="flex items-center justify-center gap-1 px-2"
+      className="flex items-center justify-center px-2"
     >
       <User
         user={user}
@@ -100,16 +100,16 @@ const UserEdit = ({
       />
       <Divider flexItem orientation="vertical" variant="middle" />
       <div className="flex flex-col items-center justify-center p-2">
-        <div className="text-xs font-bold leading-3 tracking-tight">EDIT</div>
-        <div className="flex gap-2 leading-3">
+        <div className="flex gap-1 leading-3">
           <IconButton size="small" onClick={() => setIsOpen(true)}>
-            <EditIcon color="primary" />
+            <EditIcon color="primary" fontSize="small" />
           </IconButton>
           <DeleteMenu
             isOpen={isDeleteMenuOpen}
             setIsOpen={setIsDeleteMenuOpen}
             handleDelete={handleDelete}
             deleteType="user from team"
+            small={true}
           />
         </div>
       </div>
@@ -120,7 +120,10 @@ const UserEdit = ({
       style={backgroundStyle}
     >
       <div>
-        <PageTitle size="x-small" title={user.name ? user.name : user.email!} />
+        <PageTitle
+          size="xx-small"
+          title={user.name ? user.name : user.email!}
+        />
       </div>
       <form
         onSubmit={handleSubmit}

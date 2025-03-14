@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Announcements from "~/components/announcements/all-announcements";
 import Requests from "~/components/requests";
 import TeamActionBar from "~/components/teams/team-action-bar";
 import TeamCollections from "~/components/teams/team-collections";
@@ -121,14 +120,14 @@ const TeamHub = () => {
           isOpen={actionBarStatus.transferOwner}
           setRole={setRole}
         />
+        <TeamVideos teamId={team.id} />
         {role !== "guest" && (
           <div className="flex w-full flex-col items-center justify-center gap-6">
-            <Announcements teamId={team.id} role={role ? role : "guest"} />
+            {/* <Announcements teamId={team.id} role={role ? role : "guest"} /> */}
             <TeamCollections teamId={team.id} />
           </div>
         )}
         <Roster team={team} role={role ? role : "guest"} />
-        <TeamVideos teamId={team.id} />
       </div>
     )
   );

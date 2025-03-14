@@ -1,4 +1,5 @@
 import LinkIcon from "@mui/icons-material/Link";
+import LockIcon from "@mui/icons-material/Lock";
 import PublicIcon from "@mui/icons-material/Public";
 import { colors, Divider, IconButton, Pagination } from "@mui/material";
 import { useRouter } from "next/router";
@@ -43,6 +44,7 @@ const Collection = () => {
 
   const [playCount, setPlayCount] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
+  const [accessDenied, setAccessDenied] = useState(true);
   const topRef = useRef<HTMLDivElement | null>(null);
 
   const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
@@ -71,8 +73,15 @@ const Collection = () => {
         .select("*, profiles(name)")
         .eq("id", id)
         .single();
-      if (data) setCollection(data);
-      else setCollection(null);
+      if (data) {
+        setCollection(data);
+        if (data.exclusive_to) {
+          const accessAllowed = affIds?.includes(data.exclusive_to);
+          if (!accessAllowed) {
+            setAccessDenied(true);
+          } else setAccessDenied(false);
+        } else setAccessDenied(false);
+      } else setCollection(null);
       if (data?.profiles?.name) setAuthorName(data.profiles.name);
     }
   };
@@ -204,7 +213,7 @@ const Collection = () => {
             )}
           </div>
           <div className="flex flex-col gap-1">
-            <PageTitle title={collection.title} size="medium" />
+            <PageTitle title={collection.title} size="small" />
             <div className="flex items-center justify-center gap-2">
               <div className="text-sm font-light">
                 {convertTimestamp(collection.created_at)}
@@ -223,14 +232,14 @@ const Collection = () => {
             </div>
           </div>
           <div
-            className="flex flex-col items-center justify-center rounded-lg p-3"
+            className="flex flex-col items-center justify-center gap-1 rounded-lg p-3"
             style={
               isDark
                 ? { backgroundColor: `${colors.purple[200]}` }
                 : { backgroundColor: `${colors.purple[50]}` }
             }
           >
-            <div className="text-4xl font-bold leading-7 tracking-tight">
+            <div className="text-3xl font-bold leading-5 tracking-tight">
               {playCount}
             </div>
             <div className="text-lg font-bold leading-4 tracking-tight">
@@ -238,7 +247,7 @@ const Collection = () => {
             </div>
           </div>
           <div className="flex items-center justify-center gap-2">
-            {userCanEdit && (
+            {userCanEdit && !accessDenied && (
               <PlaysToCollectionModal
                 collectionId={collection.id}
                 isOpen={isOpen}
@@ -272,34 +281,43 @@ const Collection = () => {
             {collection.description}
           </div>
         )}
-        <div ref={topRef} className="flex flex-col gap-6">
-          {plays?.map((play) => (
-            <PlayPreview
-              preview={play}
-              key={play.play.id}
-              setReload={setReload}
-              collectionId={collection.id}
-              collectionAuthor={collection.author_id}
-            />
-          ))}
-        </div>
-        {playCount > 0 && (
-          <Pagination
-            siblingCount={1}
-            boundaryCount={0}
-            size={isMobile ? "small" : "medium"}
-            showFirstButton
-            showLastButton
-            sx={{ marginTop: "8px" }}
-            variant="text"
-            shape="rounded"
-            count={getNumberOfPages(itemsPerPage, playCount)}
-            page={page}
-            onChange={handlePageChange}
-          />
-        )}
-        {!plays && (
-          <EmptyMessage message="plays in this collection" size="medium" />
+        {accessDenied ? (
+          <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
+            <LockIcon sx={{ fontSize: "96px" }} />
+            <div className="text-lg font-bold">This collection is private!</div>
+          </div>
+        ) : (
+          <div className="">
+            <div ref={topRef} className="flex flex-col gap-6">
+              {plays?.map((play) => (
+                <PlayPreview
+                  preview={play}
+                  key={play.play.id}
+                  setReload={setReload}
+                  collectionId={collection.id}
+                  collectionAuthor={collection.author_id}
+                />
+              ))}
+            </div>
+            {playCount > 0 && (
+              <Pagination
+                siblingCount={1}
+                boundaryCount={0}
+                size={isMobile ? "small" : "medium"}
+                showFirstButton
+                showLastButton
+                sx={{ marginTop: "8px" }}
+                variant="text"
+                shape="rounded"
+                count={getNumberOfPages(itemsPerPage, playCount)}
+                page={page}
+                onChange={handlePageChange}
+              />
+            )}
+            {!plays && (
+              <EmptyMessage message="plays in this collection" size="medium" />
+            )}
+          </div>
         )}
       </div>
     )

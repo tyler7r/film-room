@@ -8,7 +8,7 @@ type EmptyMessageProps = {
 const EmptyMessage = ({ message, size }: EmptyMessageProps) => {
   const { isDark } = useIsDarkContext();
   const fontSize =
-    size === "small" ? "text-lg" : size === "medium" ? "text-xl" : "text-2xl";
+    size === "small" ? "text-base" : size === "medium" ? "text-lg" : "text-xl";
 
   return (
     <div

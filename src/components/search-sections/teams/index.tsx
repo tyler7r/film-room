@@ -21,7 +21,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
   const [teamCount, setTeamCount] = useState<number | null>(null);
 
   const [page, setPage] = useState<number>(1);
-  const itemsPerPage = isMobile ? 10 : 20;
+  const itemsPerPage = isMobile ? 10 : 50;
 
   const fetchTeams = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);

@@ -1,5 +1,6 @@
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { IconButton, Menu, MenuItem } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { supabase } from "~/utils/supabase";
 import type { CollectionType } from "~/utils/types";
@@ -11,10 +12,8 @@ type CollectionActionsMenuProps = {
   setReload?: (reload: boolean) => void;
 };
 
-const CollectionActionsMenu = ({
-  collection,
-  setReload,
-}: CollectionActionsMenuProps) => {
+const CollectionActionsMenu = ({ collection }: CollectionActionsMenuProps) => {
+  const router = useRouter();
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -35,8 +34,8 @@ const CollectionActionsMenu = ({
       .delete()
       .eq("id", collection.id)
       .select();
-    if (data && setReload) {
-      setReload(true);
+    if (data) {
+      void router.push("/");
     }
     handleClose();
   };

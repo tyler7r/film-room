@@ -23,12 +23,17 @@ import {
   divisions,
   isValidYoutubeLink,
   proDivs,
+  proDivWeeks,
   youtubeRegEx,
 } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { MessageType, TeamType, VideoUploadType } from "~/utils/types";
 
-const CreateVideo = () => {
+type CreateVideoProps = {
+  listItem?: boolean;
+};
+
+const CreateVideo = ({ listItem }: CreateVideoProps) => {
   const router = useRouter();
   const { user } = useAuthContext();
   const { affiliations } = useAuthContext();
@@ -77,6 +82,11 @@ const CreateVideo = () => {
   const handleDivision = (e: SelectChangeEvent) => {
     const div = e.target.value;
     setVideoData({ ...videoData, division: div });
+  };
+
+  const handleWeek = (e: SelectChangeEvent) => {
+    const week = e.target.value;
+    setVideoData({ ...videoData, week: week });
   };
 
   const handlePrivacyStatus = (e: SelectChangeEvent) => {
@@ -174,7 +184,7 @@ const CreateVideo = () => {
           link: updatedLink,
           season,
           division,
-          week: week === "" ? null : `Week ${week}`,
+          week: week === "" ? null : `${week}`,
           tournament: tournament === "" ? null : tournament,
           private: videoData.private,
           exclusive_to: videoData.private ? videoData.exclusive_to : null,
@@ -190,7 +200,19 @@ const CreateVideo = () => {
         teamMentions.forEach((mention) => {
           void handleTeamMention(mention.id, data.id);
         });
-        void reset();
+        setVideoData({
+          link: "",
+          title: "",
+          private: false,
+          exclusive_to: "public",
+          week: "",
+          season: "",
+          tournament: "",
+          division: "",
+        });
+        setTeamMentions([]);
+        setIsOpen(false);
+        void router.push(`/film-room/${data.id}`);
       }
       if (error)
         if (error.code === "23505") {
@@ -256,7 +278,7 @@ const CreateVideo = () => {
                 name="divisions"
                 id="divisions"
               >
-                <MenuItem value="">No Division</MenuItem>
+                <MenuItem value="">No Week</MenuItem>
                 {divisions.map((div) => (
                   <MenuItem key={div} value={div}>
                     {div}
@@ -276,15 +298,23 @@ const CreateVideo = () => {
             />
           </div>
           {proDivs.includes(videoData.division) ? (
-            <TextField
-              className="w-full"
-              name="week"
-              autoComplete="week"
-              id="week"
-              label="Week #  (if applicable)"
-              onChange={handleInput}
-              value={videoData.week}
-            />
+            <FormControl className="w-full">
+              <InputLabel htmlFor="divisions">Week</InputLabel>
+              <Select
+                value={videoData.week}
+                onChange={handleWeek}
+                label="Week"
+                name="weeks"
+                id="weeks"
+              >
+                <MenuItem value="">No Week</MenuItem>
+                {proDivWeeks.map((div) => (
+                  <MenuItem key={div} value={div}>
+                    {div}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           ) : (
             <TextField
               className="w-full"
@@ -362,7 +392,7 @@ const CreateVideo = () => {
         />
       </form>
     </ModalSkeleton>
-  ) : (
+  ) : !listItem ? (
     <Button
       type="button"
       endIcon={<AddIcon />}
@@ -372,6 +402,10 @@ const CreateVideo = () => {
     >
       Add New Video
     </Button>
+  ) : (
+    <div onClick={handleOpen} className="text-sm font-bold">
+      NEW VIDEO
+    </div>
   );
 };
 

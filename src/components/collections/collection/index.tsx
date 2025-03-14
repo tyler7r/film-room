@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import TeamLogo from "~/components/teams/team-logo";
 import { useIsDarkContext } from "~/pages/_app";
-import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { CollectionViewType } from "~/utils/types";
 import PageTitle from "../../utils/page-title";
@@ -50,21 +49,17 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
 
   return (
     <div
-      className={`flex items-center justify-center gap-2 p-2 px-4 ${
+      className={`flex items-center justify-center gap-2 p-1 px-2 ${
         !listItem ? `${hoverBorder} flex-col rounded-md` : "w-full"
       }`}
       style={backgroundStyle}
       onClick={handleClick}
     >
-      <div
-        className={`flex items-center justify-center ${
-          small ? "gap-4" : "gap-6"
-        }`}
-      >
+      <div className={`flex items-center justify-center gap-4`}>
         {collection.team ? (
           <TeamLogo
             tm={collection.team}
-            size={small ? 25 : 60}
+            size={small ? 25 : 35}
             inactive={true}
             popover={listItem ? false : true}
           />
@@ -76,23 +71,20 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
             !small ? "flex-col" : "gap-4"
           } w-full items-center justify-center`}
         >
-          <div className="flex items-center justify-center gap-2">
+          <div
+            className={`flex flex-col items-center justify-center ${
+              small ? "gap-0.5" : "gap-0.5"
+            }`}
+          >
             <PageTitle
               title={collection.collection.title}
-              size={small ? "x-small" : "small"}
+              size={small ? "xxx-small" : "xx-small"}
             />
-          </div>
-          <div className="flex items-center justify-center gap-4">
-            {!small && (
-              <div className="text-sm font-light">
-                {convertTimestamp(collection.collection.created_at)}
-              </div>
-            )}
-            <Divider flexItem orientation="vertical" />
+            <Divider flexItem />
             <div
               className={`${
                 !listItem && hoverText
-              } w-full text-center font-bold tracking-tight`}
+              } w-full text-center text-sm font-bold tracking-tight`}
               onClick={handleProfileClick}
             >
               {collection.profile.name !== ""
@@ -102,8 +94,8 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
           </div>
         </div>
         <div
-          className={`flex items-center justify-center gap-1 rounded-lg p-2 ${
-            small ? "" : "flex-col"
+          className={`flex items-center justify-center rounded-lg p-2 ${
+            small ? "gap-1" : "flex-col"
           }`}
           style={
             isDark
@@ -113,8 +105,8 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
         >
           <div
             className={`${
-              small ? "text-xl" : "text-3xl"
-            } font-bold leading-7 tracking-tight`}
+              small ? "text-lg" : "text-xl"
+            } font-bold leading-5 tracking-tight`}
           >
             {playCount}
           </div>

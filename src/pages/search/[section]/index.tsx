@@ -9,9 +9,11 @@ import SearchPlayTags from "~/components/search-sections/tags";
 import SearchTeams from "~/components/search-sections/teams";
 import SearchUsers from "~/components/search-sections/users";
 import SearchVideos from "~/components/search-sections/videos";
+import { useIsDarkContext } from "~/pages/_app";
 
 const SearchSection = () => {
   const router = useRouter();
+  const { backgroundStyle } = useIsDarkContext();
 
   const section = router.query.section as string;
   const topic = useSearchParams().get("topic") ?? "";
@@ -86,12 +88,15 @@ const SearchSection = () => {
         }}
       />
       <div className="flex w-full flex-col items-center justify-center gap-4">
-        <div className="flex w-full flex-wrap items-center justify-center gap-4 lg:w-4/5 lg:justify-around">
+        <div
+          style={backgroundStyle}
+          className="flex w-full flex-wrap items-center justify-around"
+        >
           <Button
             onClick={() => handleActionBarClick("users")}
-            variant={section === "users" ? "outlined" : "text"}
+            variant={section === "users" ? "contained" : "text"}
             sx={{
-              fontSize: "20px",
+              // fontSize: "20px",
               fontWeight: "bold",
             }}
           >
@@ -99,9 +104,9 @@ const SearchSection = () => {
           </Button>
           <Button
             onClick={() => handleActionBarClick("teams")}
-            variant={section == "teams" ? "outlined" : "text"}
+            variant={section == "teams" ? "contained" : "text"}
             sx={{
-              fontSize: "20px",
+              // fontSize: "20px",
               fontWeight: "bold",
             }}
           >
@@ -109,9 +114,9 @@ const SearchSection = () => {
           </Button>
           <Button
             onClick={() => handleActionBarClick("videos")}
-            variant={section == "videos" ? "outlined" : "text"}
+            variant={section == "videos" ? "contained" : "text"}
             sx={{
-              fontSize: "20px",
+              // fontSize: "20px",
               fontWeight: "bold",
             }}
           >
@@ -119,9 +124,9 @@ const SearchSection = () => {
           </Button>
           <Button
             onClick={() => handleActionBarClick("collections")}
-            variant={section === "collections" ? "outlined" : "text"}
+            variant={section === "collections" ? "contained" : "text"}
             sx={{
-              fontSize: "20px",
+              // fontSize: "20px",
               fontWeight: "bold",
             }}
           >
@@ -129,9 +134,9 @@ const SearchSection = () => {
           </Button>
           <Button
             onClick={() => handleActionBarClick("tags")}
-            variant={section === "tags" ? "outlined" : "text"}
+            variant={section === "tags" ? "contained" : "text"}
             sx={{
-              fontSize: "20px",
+              // fontSize: "20px",
               fontWeight: "bold",
             }}
           >

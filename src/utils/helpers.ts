@@ -115,3 +115,24 @@ export const youtubeRegEx = (link: string) => {
   const fullLink = `https://www.youtube.com/watch?v=${newLink}`;
   return fullLink;
 };
+
+export const proDivWeeks = [
+  "Practice",
+  "Preseason",
+  "Week 1",
+  "Week 2",
+  "Week 3",
+  "Week 4",
+  "Week 4",
+  "Week 5",
+  "Week 6",
+  "Week 7",
+  "Week 8",
+  "Week 9",
+  "Week 10",
+  "Week 11",
+  "Week 12",
+  "Week 13",
+  "Playoffs",
+  "Championship Weekend",
+];

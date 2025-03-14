@@ -29,10 +29,13 @@ const Team = ({ team, small, onVideo }: TeamProps) => {
       style={small ? {} : backgroundStyle}
       onClick={handleTeamClick}
     >
-      <TeamLogo tm={team} size={small ? 25 : 60} />
+      <TeamLogo tm={team} size={small ? 25 : 35} />
       <Divider variant="middle" orientation="vertical" flexItem />
       <div className="flex flex-col items-center justify-center">
-        <PageTitle title={team.full_name} size={small ? "xx-small" : "small"} />
+        <PageTitle
+          title={team.full_name}
+          size={small ? "xxx-small" : onVideo ? "xxx-small" : "x-small"}
+        />
       </div>
     </div>
   );

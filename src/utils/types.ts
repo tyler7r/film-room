@@ -223,7 +223,7 @@ export type VideoUploadType = {
   title: string;
   private: boolean;
   exclusive_to: string;
-  week: string | null;
+  week: string;
   season: string;
   tournament: string | null;
   division: string;
