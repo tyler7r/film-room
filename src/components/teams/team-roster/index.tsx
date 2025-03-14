@@ -1,9 +1,12 @@
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
+import EmptyMessage from "~/components/utils/empty-msg";
 import { supabase } from "~/utils/supabase";
 import type { PlayerType, TeamType } from "~/utils/types";
 import User from "../../user";
 import UserEdit from "../../user-edit";
-import EmptyMessage from "../../utils/empty-msg";
 import PageTitle from "../../utils/page-title";
 
 type RosterProps = {
@@ -14,6 +17,7 @@ type RosterProps = {
 const Roster = ({ team, role }: RosterProps) => {
   const [roster, setRoster] = useState<PlayerType[] | null>(null);
   const [rosterReload, setRosterReload] = useState<boolean>(false);
+  const [hide, setHide] = useState(false);
 
   const fetchRoster = async () => {
     const { data } = await supabase
@@ -61,36 +65,49 @@ const Roster = ({ team, role }: RosterProps) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4 p-2">
-      <PageTitle size="medium" title="Roster" />
-      {!roster && (
-        <EmptyMessage message="active player accounts" size="small" />
-      )}
-      <div className="flex flex-wrap items-center justify-center gap-4">
-        {(role === "player" || role === "guest") &&
-          roster?.map((p) => (
-            <div key={p.affiliation.id}>
-              <User
-                user={p.profile}
-                goToProfile={true}
-                number={p.affiliation.number}
-                small={true}
-                coach={p.affiliation.role === "coach" ? true : false}
-              />
-            </div>
-          ))}
-        {(role === "coach" || role === "owner") &&
-          roster?.map((p) => (
-            <div key={p.affiliation.id}>
-              <UserEdit
-                user={p.profile}
-                goToProfile={true}
-                affiliation={p.affiliation}
-                small={true}
-                setRosterReload={setRosterReload}
-              />
-            </div>
-          ))}
+      <div className="flex w-full items-center justify-center gap-2">
+        <PageTitle size="small" title="Roster" fullWidth={false} />
+        {hide ? (
+          <IconButton onClick={() => setHide(false)} size="small">
+            <KeyboardArrowRightIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={() => setHide(true)} size="small">
+            <KeyboardArrowDownIcon />
+          </IconButton>
+        )}
       </div>
+      {!hide &&
+        (!roster ? (
+          <EmptyMessage message="active player accounts" size="small" />
+        ) : (
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {(role === "player" || role === "guest") &&
+              roster?.map((p) => (
+                <div key={p.affiliation.id}>
+                  <User
+                    user={p.profile}
+                    goToProfile={true}
+                    number={p.affiliation.number}
+                    small={true}
+                    coach={p.affiliation.role === "coach" ? true : false}
+                  />
+                </div>
+              ))}
+            {(role === "coach" || role === "owner") &&
+              roster?.map((p) => (
+                <div key={p.affiliation.id}>
+                  <UserEdit
+                    user={p.profile}
+                    goToProfile={true}
+                    affiliation={p.affiliation}
+                    small={true}
+                    setRosterReload={setRosterReload}
+                  />
+                </div>
+              ))}
+          </div>
+        ))}
     </div>
   );
 };

@@ -12,9 +12,10 @@ import PrivacyStatus from "./privacy-status";
 
 type CreateCollectionProps = {
   small?: boolean;
+  listItem?: boolean;
 };
 
-const CreateCollection = ({ small }: CreateCollectionProps) => {
+const CreateCollection = ({ small, listItem }: CreateCollectionProps) => {
   const { user } = useAuthContext();
   const router = useRouter();
 
@@ -65,7 +66,14 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
         .select("title, id")
         .single();
       if (data) {
-        handleClose();
+        setIsOpen(false);
+        setNewCollection({
+          title: "",
+          private: false,
+          exclusive_to: "public",
+          description: "",
+        });
+        void router.push(`/collections/${data.id}`);
         setMessage({ text: undefined, status: "error" });
       } else if (error)
         setMessage({
@@ -81,15 +89,21 @@ const CreateCollection = ({ small }: CreateCollectionProps) => {
   });
 
   return !isOpen ? (
-    <Button
-      onClick={handleOpen}
-      variant="contained"
-      size={small ? "medium" : "large"}
-      endIcon={<AddIcon />}
-      sx={{ fontWeight: "bold" }}
-    >
-      Create New Collection
-    </Button>
+    listItem ? (
+      <div onClick={handleOpen} className="text-sm font-bold">
+        NEW COLLECTION
+      </div>
+    ) : (
+      <Button
+        onClick={handleOpen}
+        variant="contained"
+        size={small ? "medium" : "large"}
+        endIcon={<AddIcon />}
+        sx={{ fontWeight: "bold" }}
+      >
+        Create New Collection
+      </Button>
+    )
   ) : (
     <ModalSkeleton
       isOpen={isOpen}

@@ -27,7 +27,7 @@ const SearchCollections = ({ topic }: SearchCollectionsProps) => {
   const [collectionCount, setCollectionCount] = useState<number | null>(null);
 
   const [page, setPage] = useState<number>(1);
-  const itemsPerPage = isMobile ? 10 : 20;
+  const itemsPerPage = isMobile ? 10 : 50;
 
   const fetchCollections = useDebounce(async () => {
     const { from, to } = getToAndFrom(itemsPerPage, page);

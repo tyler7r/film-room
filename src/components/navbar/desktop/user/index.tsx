@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useAuthContext } from "~/contexts/auth";
 import { useInboxContext } from "~/contexts/inbox";
 import type { ChildrenNavProps } from "../..";
+import AddContentBtn from "../../add-content-btn";
 import TeamPageButton from "../../team-profile-btn";
 
 const UserDesktopNav = ({ logout }: ChildrenNavProps) => {
@@ -33,6 +34,7 @@ const UserDesktopNav = ({ logout }: ChildrenNavProps) => {
         </IconButton>
       </div>
       <div className="flex w-full items-center justify-end gap-2">
+        <AddContentBtn />
         <IconButton
           onClick={() => {
             setIsOpen(!isOpen);

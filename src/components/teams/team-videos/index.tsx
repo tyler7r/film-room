@@ -1,4 +1,6 @@
-import { Pagination } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { Divider, IconButton, Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import EmptyMessage from "~/components/utils/empty-msg";
 import PageTitle from "~/components/utils/page-title";
@@ -20,6 +22,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
 
   const [videos, setVideos] = useState<TeamVideoType[] | null>(null);
   const [videoCount, setVideoCount] = useState<number | null>(null);
+  const [hide, setHide] = useState(false);
 
   const itemsPerPage = isMobile ? 5 : 10;
 
@@ -62,31 +65,50 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
   }, [page]);
 
   return (
-    <div className="flex w-11/12 flex-col items-center justify-center gap-2">
-      <PageTitle size="medium" title="Team Film" />
-      <div className="flex w-full flex-wrap justify-center gap-6">
-        {videos?.map((video) => (
-          <Video video={video.video} key={video.video.id} />
-        ))}
+    <div className="flex w-11/12 flex-col items-center justify-center gap-6">
+      <div className="flex w-full items-center justify-center gap-2">
+        <PageTitle size="small" title="Team Film" />
+        {hide ? (
+          <IconButton onClick={() => setHide(false)} size="small">
+            <KeyboardArrowRightIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={() => setHide(true)} size="small">
+            <KeyboardArrowDownIcon />
+          </IconButton>
+        )}
       </div>
-      {videos && videoCount && (
-        <Pagination
-          siblingCount={1}
-          boundaryCount={0}
-          size={isMobile ? "small" : "medium"}
-          showFirstButton
-          showLastButton
-          sx={{ marginTop: "24px" }}
-          variant="text"
-          shape="rounded"
-          count={getNumberOfPages(itemsPerPage, videoCount)}
-          page={page}
-          onChange={handleChange}
-        />
+      {!hide && (
+        <div className="flex w-full flex-col items-center justify-center gap-2">
+          <div className="flex w-full flex-wrap justify-center gap-6">
+            {!videos && (
+              <EmptyMessage
+                message="team videos in the database"
+                size="small"
+              />
+            )}
+            {videos?.map((video) => (
+              <Video video={video.video} key={video.video.id} />
+            ))}
+          </div>
+          {videos && videoCount && (
+            <Pagination
+              siblingCount={1}
+              boundaryCount={0}
+              size={isMobile ? "small" : "medium"}
+              showFirstButton
+              showLastButton
+              sx={{ marginTop: "24px" }}
+              variant="text"
+              shape="rounded"
+              count={getNumberOfPages(itemsPerPage, videoCount)}
+              page={page}
+              onChange={handleChange}
+            />
+          )}
+        </div>
       )}
-      {!videos && (
-        <EmptyMessage message="team videos in the database" size="small" />
-      )}
+      {hide && <Divider flexItem className="mt-2" />}
     </div>
   );
 };

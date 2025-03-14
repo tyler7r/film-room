@@ -5,7 +5,6 @@ import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { TeamType, UserType } from "~/utils/types";
 import TeamLogo from "../teams/team-logo";
-import EmptyMessage from "../utils/empty-msg";
 import PageTitle from "../utils/page-title";
 
 type UserProps = {
@@ -56,11 +55,11 @@ const User = ({
   }, []);
 
   return (
-    (user.name || user.email) && (
+    (user.name !== "" || user.email) && (
       <div
         style={backgroundStyle}
         className={`flex items-center justify-center ${
-          small ? "w-full gap-2" : "gap-4"
+          small ? "w-full gap-2" : "gap-2"
         } rounded-sm p-1 px-2`}
         onClick={handleClick}
       >
@@ -70,40 +69,38 @@ const User = ({
           } ${small ? "gap-2" : "gap-4"}`}
         >
           <PageTitle
-            title={user.name ? user.name : user.email!}
-            size={small ? "x-small" : "small"}
+            title={user.name !== "" ? user.name : user.email!}
+            size={small ? "xx-small" : "x-small"}
           />
           {number && <div className="text-sm font-light">#{number}</div>}
           {coach && <div className="text-sm font-light">coach</div>}
         </div>
-        <Divider orientation="vertical" flexItem variant="middle" />
+        {userTeams && (
+          <Divider orientation="vertical" flexItem variant="middle" />
+        )}
         <div
           className={`flex items-center justify-center ${
             small ? "gap-1" : "gap-2"
           }`}
         >
-          <div className="flex items-center justify-center gap-2">
-            {userTeams ? (
-              userTeams.map((team) =>
-                !listItem ? (
-                  <IconButton
-                    key={team.id}
-                    onClick={(e) => handleTeamClick(e, team.id)}
-                  >
-                    <TeamLogo tm={team} size={35} popover={true} />
-                  </IconButton>
-                ) : (
-                  <TeamLogo
-                    key={team.id}
-                    tm={team}
-                    size={35}
-                    inactive={true}
-                    popover={false}
-                  />
-                ),
-              )
-            ) : (
-              <EmptyMessage message="affiliations" size="small" />
+          <div className="flex items-center justify-center gap-1">
+            {userTeams?.map((team) =>
+              !listItem ? (
+                <IconButton
+                  key={team.id}
+                  onClick={(e) => handleTeamClick(e, team.id)}
+                >
+                  <TeamLogo tm={team} size={25} popover={true} />
+                </IconButton>
+              ) : (
+                <TeamLogo
+                  key={team.id}
+                  tm={team}
+                  size={25}
+                  inactive={true}
+                  popover={false}
+                />
+              ),
             )}
           </div>
         </div>

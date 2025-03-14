@@ -114,10 +114,10 @@ const Video = ({ video, startTime }: VideoProps) => {
       <div
         style={backgroundStyle}
         key={video.id}
-        className={`${hoverBorder} flex flex-col items-center justify-center rounded-md p-2 px-4`}
+        className={`${hoverBorder} flex flex-col items-center justify-center rounded-md p-1 px-2`}
         onClick={() => handleClick(video.id)}
       >
-        <div className="flex w-full items-center justify-between">
+        <div className="flex w-full items-center justify-between gap-1">
           {!video.private && (
             <IconButton
               onMouseEnter={(e) => handlePopoverOpen(e, 1)}
@@ -153,13 +153,13 @@ const Video = ({ video, startTime }: VideoProps) => {
           )}
           <div className={`flex w-full items-center justify-center gap-2`}>
             {
-              <div className="text-sm font-light">
+              <div className="text-xs font-light">
                 {convertTimestamp(video.uploaded_at)}
               </div>
             }
             <Divider flexItem orientation="vertical" />
             <div
-              className={`text-center text-base font-bold leading-5 tracking-tight lg:text-lg ${
+              className={`text-center text-sm font-bold leading-5 tracking-tight lg:text-base ${
                 isDark ? "text-purple-400" : "text-purple-A400"
               }`}
             >
@@ -192,7 +192,7 @@ const Video = ({ video, startTime }: VideoProps) => {
             <VideoActionsMenu video={video} />
           </div>
         </div>
-        <PageTitle size="small" title={video.title} />
+        <PageTitle size="x-small" title={video.title} />
         <div className="flex w-full flex-wrap items-center justify-center gap-1">
           {affiliatedTeams?.map((tm) => (
             <Team team={tm} key={tm.id} small={true} onVideo={true} />

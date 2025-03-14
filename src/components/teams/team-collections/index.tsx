@@ -1,4 +1,6 @@
-import { Pagination } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { Divider, IconButton, Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import Collection from "~/components/collections/collection";
 import EmptyMessage from "~/components/utils/empty-msg";
@@ -19,6 +21,7 @@ const TeamCollections = ({ teamId }: TeamCollectionsProps) => {
     null,
   );
   const [collectionCount, setCollectionCount] = useState<number | null>(null);
+  const [hide, setHide] = useState(false);
 
   const [page, setPage] = useState<number>(1);
   const itemsPerPage = isMobile ? 5 : 10;
@@ -58,28 +61,47 @@ const TeamCollections = ({ teamId }: TeamCollectionsProps) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-6">
-      <PageTitle size="medium" title="Team Collections" />
-      {!collections && <EmptyMessage size="small" message="collections" />}
-      <div className="flex w-full flex-wrap items-center justify-center gap-6">
-        {collections?.map((collection) => (
-          <Collection key={collection.collection.id} collection={collection} />
-        ))}
+      <div className="flex w-full items-center justify-center gap-2">
+        <PageTitle size="small" title="Team Collections" />
+        {hide ? (
+          <IconButton onClick={() => setHide(false)} size="small">
+            <KeyboardArrowRightIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={() => setHide(true)} size="small">
+            <KeyboardArrowDownIcon />
+          </IconButton>
+        )}
       </div>
-      {collections && collectionCount && (
-        <Pagination
-          siblingCount={1}
-          boundaryCount={0}
-          size={isMobile ? "small" : "medium"}
-          showFirstButton
-          showLastButton
-          sx={{ marginTop: "8px" }}
-          variant="text"
-          shape="rounded"
-          count={getNumberOfPages(itemsPerPage, collectionCount)}
-          page={page}
-          onChange={handlePageChange}
-        />
+      {!collections && <EmptyMessage size="small" message="collections" />}
+      {!hide && (
+        <div className="flex w-full flex-col items-center justify-center gap-6">
+          <div className="flex w-full flex-wrap items-center justify-center gap-6">
+            {collections?.map((collection) => (
+              <Collection
+                key={collection.collection.id}
+                collection={collection}
+              />
+            ))}
+          </div>
+          {collections && collectionCount && (
+            <Pagination
+              siblingCount={1}
+              boundaryCount={0}
+              size={isMobile ? "small" : "medium"}
+              showFirstButton
+              showLastButton
+              sx={{ marginTop: "8px" }}
+              variant="text"
+              shape="rounded"
+              count={getNumberOfPages(itemsPerPage, collectionCount)}
+              page={page}
+              onChange={handlePageChange}
+            />
+          )}
+        </div>
       )}
+      {hide && <Divider flexItem />}
     </div>
   );
 };
