@@ -1,7 +1,5 @@
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import { IconButton } from "@mui/material";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
@@ -24,8 +22,6 @@ const PlayTags = ({
 }: PlayTagProps) => {
   const { affIds } = useAuthContext();
   const { colorText, isDark } = useIsDarkContext();
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [tags, setTags] = useState<TagType[] | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -57,19 +53,8 @@ const PlayTags = ({
     } else setTags(null);
   };
 
-  const handleTagClick = (term: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (term) {
-      params.set("topic", term);
-    } else {
-      params.delete("topic");
-    }
-    void router.push(`/search/tags?${params.toString()}`);
-  };
-
   const handleClick = (e: React.MouseEvent, tag: string) => {
     if (handleMentionAndTagClick) handleMentionAndTagClick(e, tag);
-    else handleTagClick(tag);
   };
 
   useEffect(() => {

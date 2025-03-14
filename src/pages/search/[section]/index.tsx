@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import SearchCollections from "~/components/search-sections/collections";
-import SearchPlayTags from "~/components/search-sections/tags";
 import SearchTeams from "~/components/search-sections/teams";
 import SearchUsers from "~/components/search-sections/users";
 import SearchVideos from "~/components/search-sections/videos";
@@ -28,10 +27,6 @@ const SearchSection = () => {
     } else if (sect === "users") {
       void router.push(
         `/search/users/${topic === "" ? topic : `?topic=${topic}`}`,
-      );
-    } else if (sect === "tags") {
-      void router.push(
-        `/search/tags/${topic === "" ? topic : `?topic=${topic}`}`,
       );
     } else if (sect === "teams") {
       void router.push(
@@ -132,21 +127,10 @@ const SearchSection = () => {
           >
             Collections
           </Button>
-          <Button
-            onClick={() => handleActionBarClick("tags")}
-            variant={section === "tags" ? "contained" : "text"}
-            sx={{
-              // fontSize: "20px",
-              fontWeight: "bold",
-            }}
-          >
-            Tags
-          </Button>
         </div>
         {section === "videos" && <SearchVideos topic={search} />}
         {section === "users" && <SearchUsers topic={search} />}
         {section === "teams" && <SearchTeams topic={search} />}
-        {section === "tags" && <SearchPlayTags topic={search} />}
         {section === "collections" && <SearchCollections topic={search} />}
       </div>
     </div>
