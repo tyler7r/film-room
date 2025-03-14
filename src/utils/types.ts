@@ -181,6 +181,7 @@ export type MessageType = {
 
 export type VideoType = {
   exclusive_to: string | null;
+  coach_video: boolean;
   id: string;
   link: string;
   private: boolean;
@@ -227,6 +228,7 @@ export type VideoUploadType = {
   season: string;
   tournament: string | null;
   division: string;
+  coach_video: boolean;
 };
 
 export type LikeListType = {
