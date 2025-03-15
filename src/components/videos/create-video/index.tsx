@@ -97,7 +97,6 @@ const CreateVideo = ({ listItem }: CreateVideoProps) => {
 
   const getRoleByTeamId = (affs: TeamAffiliationType[] | null, id: string) => {
     const found = affs?.find((item) => item.team.id === id);
-    console.log(found);
     return found ? found.role : null;
   };
 
@@ -226,15 +225,15 @@ const CreateVideo = ({ listItem }: CreateVideoProps) => {
           link: updatedLink,
           season,
           division,
-          week: week === "" ? null : `${week}`,
+          week: week === "" ? null : week,
           tournament: tournament === "" ? null : tournament,
           coach_video: videoData.coach_video,
           private: videoData.private,
           exclusive_to: videoData.private ? videoData.exclusive_to : null,
           author_id: user.userId,
-          keywords: `${title} ${season} ${
-            week === "" ? null : `Week ${week}`
-          } ${tournament === "" ? null : tournament} ${division}`,
+          keywords: `${title} ${season} ${week === "" ? null : `${week}`} ${
+            tournament === "" ? null : tournament
+          } ${division}`,
           duplicate_check: videoData.private ? `${videoData.exclusive_to}` : "",
         })
         .select()
@@ -342,7 +341,7 @@ const CreateVideo = ({ listItem }: CreateVideoProps) => {
             />
           </div>
           {proDivs.includes(videoData.division) ? (
-            <FormControl className="w-full">
+            <FormControl className="w-full text-start">
               <InputLabel htmlFor="divisions">Week</InputLabel>
               <Select
                 value={videoData.week}
