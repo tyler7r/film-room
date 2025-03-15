@@ -194,7 +194,7 @@ const EditVideo = ({ video }: EditVideoProps) => {
   };
 
   const checkForUnEdited = () => {
-    const week = videoData.week === "" ? null : `Week ${videoData.week}`;
+    const week = videoData.week === "" ? null : videoData.week;
     const tournament =
       videoData.tournament === "" ? null : videoData.tournament;
     const exclusive =
@@ -276,15 +276,15 @@ const EditVideo = ({ video }: EditVideoProps) => {
           link,
           season,
           division,
-          week: week === "" ? null : `Week ${week}`,
+          week: week === "" ? null : week,
           tournament: tournament === "" ? null : tournament,
           private: videoData.private,
           exclusive_to: videoData.private ? videoData.exclusive_to : null,
           author_id: user.userId,
           coach_video: videoData.coach_video,
-          keywords: `${title} ${season} ${
-            week === "" ? null : `Week ${week}`
-          } ${tournament === "" ? null : tournament} ${division}`,
+          keywords: `${title} ${season} ${week === "" ? null : week} ${
+            tournament === "" ? null : tournament
+          } ${division}`,
           duplicate_check: videoData.private ? `${videoData.exclusive_to}` : "",
           uploaded_at: video.uploaded_at,
         })
@@ -373,7 +373,7 @@ const EditVideo = ({ video }: EditVideoProps) => {
             />
           </div>
           {proDivs.includes(videoData.division) ? (
-            <FormControl className="w-full">
+            <FormControl className="w-full text-start">
               <InputLabel htmlFor="divisions">Week</InputLabel>
               <Select
                 value={videoData.week}
