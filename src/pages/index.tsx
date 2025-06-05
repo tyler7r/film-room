@@ -1,15 +1,16 @@
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
-import { CircularProgress, Pagination } from "@mui/material";
+import { Box, CircularProgress, Fab, Typography } from "@mui/material"; // Import Box for layout
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component"; // Import InfiniteScroll
 import { supabase } from "utils/supabase/component";
 import { Logo } from "~/components/navbar/logo/logo";
 import PlayPreview from "~/components/plays/play_preview";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
 import type { PlayPreviewType } from "~/utils/types";
-import { useIsDarkContext } from "./_app";
+import { useIsDarkContext } from "./_app"; // Assuming this import path is correct
 
 const Home = () => {
   const { affIds } = useAuthContext();
@@ -17,131 +18,183 @@ const Home = () => {
   const { isMobile, screenWidth } = useMobileContext();
 
   const router = useRouter();
-  const itemsPerPage = isMobile ? 5 : 10;
+  // Items per load will dynamically adjust based on mobile/desktop
+  const itemsPerLoad = isMobile ? 10 : 20;
 
-  const [page, setPage] = useState<number>(1);
-  const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
-  const [playCount, setPlayCount] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [plays, setPlays] = useState<PlayPreviewType[]>([]); // Initialize as empty array
+  const [loading, setLoading] = useState<boolean>(true); // Initial loading state
+  const [offset, setOffset] = useState<number>(0); // Tracks how many items have been loaded
+  const [hasMore, setHasMore] = useState<boolean>(true); // Indicates if more data is available
 
-  const topRef = useRef<HTMLDivElement | null>(null);
+  // bottomRef is no longer needed with react-infinite-scroll-component
 
-  const fetchPlays = async () => {
-    const { from, to } = getToAndFrom(itemsPerPage, page);
-    const plays = supabase
-      .from("play_preview")
-      .select("*", { count: "exact" })
-      .eq("play->>post_to_feed", true)
-      .order("play->>created_at", { ascending: false })
-      .range(from, to);
-    if (affIds && affIds.length > 0) {
-      void plays.or(
-        `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-      );
-    } else {
-      void plays.eq("play->>private", false);
-    }
-    const { data, count } = await plays;
-    if (count) setPlayCount(count);
-    if (data && data.length > 0) setPlays(data);
-    else {
-      setPlays(null);
-    }
-    setLoading(false);
+  // Memoized fetchPlays function to prevent unnecessary re-creation
+  const fetchPlays = useCallback(
+    async (currentOffset: number, append = true) => {
+      if (!supabase) {
+        console.warn("Supabase client is not initialized.");
+        if (!append) {
+          // Only set loading to false if it's an initial fetch failing
+          setLoading(false);
+        }
+        setHasMore(false); // No more data if Supabase isn't ready
+        return;
+      }
+
+      if (!append) {
+        setLoading(true); // Indicate initial loading
+        setPlays([]); // Clear plays on initial fetch/reset
+        setOffset(0); // Reset offset
+        setHasMore(true); // Assume has more for initial fetch
+      }
+
+      try {
+        const playsQuery = supabase
+          .from("play_preview")
+          .select("*", { count: "exact" })
+          .eq("play->>post_to_feed", true)
+          .order("play->>created_at", { ascending: false })
+          .range(currentOffset, currentOffset + itemsPerLoad - 1); // Fetch range based on offset and itemsPerLoad
+
+        if (affIds && affIds.length > 0) {
+          // Apply visibility logic based on `affIds`
+          void playsQuery.or(
+            `play->>private.eq.false, play->>exclusive_to.in.(${affIds.join(
+              ",",
+            )})`,
+          );
+        } else {
+          void playsQuery.eq("play->>private", false);
+        }
+
+        const { data, error } = await playsQuery;
+
+        if (error) {
+          console.error("Error fetching plays:", error);
+          setHasMore(false);
+          return;
+        }
+
+        if (data) {
+          setPlays((prevPlays) => (append ? [...prevPlays, ...data] : data)); // Append or replace data
+          setOffset((prevOffset) => prevOffset + data.length); // Increase offset by number of items fetched
+          setHasMore(data.length === itemsPerLoad); // If fewer items than itemsPerLoad, no more data
+        } else {
+          setHasMore(false); // No data means no more plays
+        }
+      } catch (error) {
+        console.error("Unexpected error in fetchPlays:", error);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [itemsPerLoad, affIds],
+  ); // Dependencies for useCallback: itemsPerLoad and affIds
+
+  // Effect for initial data load and resetting when filters change
+  useEffect(() => {
+    // When affIds or isMobile change, reset the feed and fetch from scratch
+    void fetchPlays(0, false); // Pass 0 for offset and false for append to reset
+  }, [affIds, isMobile, fetchPlays]); // Add fetchPlays as a dependency
+
+  const loadMorePlays = () => {
+    void fetchPlays(offset, true);
   };
 
   const scrollToTop = () => {
-    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
-    e.preventDefault();
-    setPage(value);
-    scrollToTop();
-  };
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("play_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "plays" },
-        () => {
-          void fetchPlays();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_tags" },
-        () => {
-          void fetchPlays();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (page === 1) void fetchPlays();
-    else setPage(1);
-  }, [isMobile, affIds]);
-
-  useEffect(() => {
-    void fetchPlays();
-  }, [page]);
-
-  return loading ? (
-    <div className="flex h-full w-full items-center justify-center p-4">
-      <CircularProgress size={128} />
-    </div>
-  ) : (
-    <div className="flex flex-col items-center justify-center gap-4 p-4">
-      {screenWidth > 525 ? <Logo size="large" /> : <Logo size="medium" />}
-      <div className="items-center justify-center text-xl">
-        <div className="text-center">
-          The film can't analyze itself.{" "}
-          <strong
-            onClick={() => void router.push("/film-room")}
-            className={`${hoverText} tracking-tight`}
+  return (
+    <Box className="flex flex-col items-center justify-center gap-4 p-4">
+      {loading && plays.length === 0 ? ( // Show initial loading spinner if no plays are loaded yet
+        <Box className="flex h-full w-full items-center justify-center p-4">
+          <CircularProgress size={128} />
+        </Box>
+      ) : (
+        <>
+          {screenWidth > 525 ? <Logo size="large" /> : <Logo size="medium" />}
+          <Box className="items-center justify-center text-xl">
+            <Box className="text-center">
+              The film can't analyze itself.{" "}
+              <strong
+                onClick={() => void router.push("/film-room")}
+                className={`${hoverText} cursor-pointer tracking-tight`}
+              >
+                Get started!
+              </strong>
+            </Box>
+          </Box>
+          <Box
+            className="flex items-center justify-center gap-4 text-center"
+            // topRef is still used for scrolling to top if you re-introduce that feature
           >
-            Get started!
-          </strong>
-        </div>
-      </div>
-      <div
-        className="flex items-center justify-center gap-4 text-center"
-        ref={topRef}
-      >
-        <KeyboardDoubleArrowDownIcon fontSize="large" color="primary" />
-        <div className="text-2xl font-bold tracking-tight">
-          OR GET INSPIRED!
-        </div>
-        <KeyboardDoubleArrowDownIcon fontSize="large" color="primary" />
-      </div>
-      <div className="grid grid-cols-1 items-center justify-center gap-6">
-        {plays?.map((play) => (
-          <PlayPreview preview={play} key={play.play.id} />
-        ))}
-      </div>
-      {plays && playCount && (
-        <Pagination
-          siblingCount={1}
-          boundaryCount={0}
-          showFirstButton
-          showLastButton
-          sx={{ marginTop: "8px" }}
-          size={isMobile ? "small" : "medium"}
-          variant="text"
-          shape="rounded"
-          count={getNumberOfPages(itemsPerPage, playCount)}
-          page={page}
-          onChange={handlePageChange}
-        />
+            <KeyboardDoubleArrowDownIcon fontSize="large" color="primary" />
+            <Box className="text-2xl font-bold tracking-tight">
+              OR GET INSPIRED!
+            </Box>
+            <KeyboardDoubleArrowDownIcon fontSize="large" color="primary" />
+          </Box>
+
+          <Box>
+            <InfiniteScroll
+              dataLength={plays.length} // This is important field to render the amount of data
+              next={loadMorePlays}
+              hasMore={hasMore}
+              loader={
+                // Loader component shown while fetching more data
+                <Box className="my-4 flex justify-center">
+                  <CircularProgress />
+                </Box>
+              }
+              endMessage={
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    textAlign: "center",
+                    color: "text.disabled",
+                    my: 2,
+                  }}
+                >
+                  — End of the Plays —
+                </Typography>
+              } // Message when no more data is available
+              scrollThreshold={0.9}
+              scrollableTarget="scrollableDiv" // Ensure your main scroll container has this ID
+            >
+              {plays.map((play) => (
+                <PlayPreview preview={play} key={play.play.id} />
+              ))}
+            </InfiniteScroll>
+          </Box>
+
+          {/* If no plays at all */}
+          {!loading && plays.length === 0 && (
+            <Box className="py-4 text-center text-gray-500">
+              No plays available yet. Be the first to create one!
+            </Box>
+          )}
+
+          {/* bottomRef is no longer needed */}
+        </>
       )}
-    </div>
+      <Fab
+        color="primary"
+        onClick={scrollToTop}
+        size="small"
+        sx={{
+          position: "fixed",
+          bottom: "16px",
+          right: "16px",
+          zIndex: 1000,
+        }}
+        aria-label="Scroll to top"
+      >
+        <ArrowUpwardIcon />
+      </Fab>
+    </Box>
   );
 };
 

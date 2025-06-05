@@ -1,130 +1,172 @@
-import { Pagination } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import { Box, CircularProgress, Fab, Typography } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { supabase } from "utils/supabase/component";
 import PlayPreview from "~/components/plays/play_preview";
-import EmptyMessage from "~/components/utils/empty-msg";
-import { useAuthContext } from "~/contexts/auth";
-import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
-import { supabase } from "~/utils/supabase";
-import type { PlayPreviewType } from "~/utils/types";
+import { useAuthContext } from "~/contexts/auth"; // Assuming this context exists
+import { useMobileContext } from "~/contexts/mobile"; // Assuming this context exists
+import type { PlayPreviewType } from "~/utils/types"; // Assuming this type exists
 
 export type FeedProps = {
-  profileId: string | undefined;
+  profileId: string; // The ID of the user whose created plays are being displayed
+  // Any other props needed for filtering/context
 };
 
-const CreatedFeed = ({ profileId }: FeedProps) => {
-  const { isMobile } = useMobileContext();
+const CreatedPlaysFeed = ({ profileId }: FeedProps) => {
   const { affIds } = useAuthContext();
+  const { isMobile } = useMobileContext();
 
-  const itemsPerPage = isMobile ? 5 : 10;
+  const itemsPerLoad = isMobile ? 5 : 10; // Adjust items per load dynamically
 
-  const [page, setPage] = useState<number>(1);
-  const [playCount, setPlayCount] = useState<number | null>(null);
+  const [plays, setPlays] = useState<PlayPreviewType[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [offset, setOffset] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
-  const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
-
-  const topRef = useRef<HTMLDivElement | null>(null);
-
-  const fetchCreatedPlays = async () => {
-    const { from, to } = getToAndFrom(itemsPerPage, page);
-    if (profileId) {
-      const plays = supabase
-        .from("play_preview")
-        .select("*", { count: "exact" })
-        .eq("play->>author_id", profileId)
-        .eq("play->>post_to_feed", true)
-        .order("play->>created_at", { ascending: false })
-        .range(from, to);
-      if (affIds && affIds.length > 0) {
-        void plays.or(
-          `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-        );
-      } else {
-        void plays.eq("play->>private", false);
+  // Memoized fetch function for created plays
+  const fetchCreatedPlays = useCallback(
+    async (currentOffset: number, append = true) => {
+      if (!supabase) {
+        console.warn("Supabase client is not initialized.");
+        if (!append) {
+          setLoading(false);
+        }
+        setHasMore(false);
+        return;
       }
-      const { data, count } = await plays;
-      if (data && data.length > 0) setPlays(data);
-      else setPlays(null);
-      if (count) setPlayCount(count);
-    }
+
+      if (!append) {
+        setLoading(true);
+        setPlays([]);
+        setOffset(0);
+        setHasMore(true);
+      }
+
+      try {
+        const playsQuery = supabase
+          .from("play_preview")
+          .select("*", { count: "exact" })
+          .eq("play->>author_id", profileId) // Filter by author_id
+          .eq("play->>post_to_feed", true) // Only show plays meant for feed
+          .order("play->>created_at", { ascending: false })
+          .range(currentOffset, currentOffset + itemsPerLoad - 1);
+
+        // Apply visibility logic similar to Home feed
+        if (affIds && affIds.length > 0) {
+          void playsQuery.or(
+            `play->>private.eq.false, play->>exclusive_to.in.(${affIds.join(
+              ",",
+            )})`,
+          );
+        } else {
+          // If no affiliations, only show truly public plays from this author
+          void playsQuery.eq("play->>private", false);
+        }
+
+        const { data, error } = await playsQuery;
+
+        if (error) {
+          console.error("Error fetching created plays:", error);
+          setHasMore(false);
+          return;
+        }
+
+        if (data) {
+          setPlays((prevPlays) => (append ? [...prevPlays, ...data] : data));
+          setOffset((prevOffset) => prevOffset + data.length);
+          setHasMore(data.length === itemsPerLoad);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.error("Unexpected error in fetchCreatedPlays:", error);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [itemsPerLoad, profileId, affIds],
+  ); // Dependencies for useCallback
+
+  // Effect for initial data load and resetting when filters change
+  useEffect(() => {
+    void fetchCreatedPlays(0, false);
+  }, [fetchCreatedPlays]); // Dependency on memoized fetch function
+
+  const loadMorePlays = () => {
+    void fetchCreatedPlays(offset, true);
   };
 
   const scrollToTop = () => {
-    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
-    e.preventDefault();
-    setPage(value);
-    scrollToTop();
-  };
+  return (
+    <Box className="flex flex-col items-center justify-center gap-4 p-4">
+      {loading && plays.length === 0 ? (
+        <Box className="flex h-full w-full items-center justify-center p-4">
+          <CircularProgress size={128} />
+        </Box>
+      ) : (
+        <>
+          <Box className="grid grid-cols-1 items-center justify-center gap-6">
+            <InfiniteScroll
+              dataLength={plays.length}
+              next={loadMorePlays}
+              hasMore={hasMore}
+              loader={
+                <Box className="my-4 flex justify-center">
+                  <CircularProgress />
+                </Box>
+              }
+              endMessage={
+                plays.length > 0 && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: "block",
+                      textAlign: "center",
+                      color: "text.disabled",
+                      my: 2,
+                    }}
+                  >
+                    — End of this user's plays —
+                  </Typography>
+                )
+              }
+              // For full page scroll, remove scrollableTarget or set to window
+              // For contained scroll, ensure parent has id="scrollableDiv" and overflow-y: auto
+            >
+              {plays.map((play) => (
+                <PlayPreview preview={play} key={play.play.id} />
+              ))}
+            </InfiniteScroll>
+          </Box>
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("play_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "plays" },
-        () => {
-          void fetchCreatedPlays();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_mentions" },
-        () => {
-          void fetchCreatedPlays();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_tags" },
-        () => {
-          void fetchCreatedPlays();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (page === 1) void fetchCreatedPlays();
-    else setPage(1);
-  }, [isMobile]);
-
-  useEffect(() => {
-    void fetchCreatedPlays();
-  }, [profileId, affIds, page]);
-
-  return plays ? (
-    <div className="flex flex-col items-center justify-center">
-      <div className="grid grid-cols-1 justify-center gap-6" ref={topRef}>
-        {plays.map((play) => (
-          <PlayPreview key={play.play.id} preview={play} />
-        ))}
-      </div>
-      {playCount && (
-        <Pagination
-          siblingCount={1}
-          boundaryCount={0}
-          size={isMobile ? "small" : "medium"}
-          showFirstButton
-          showLastButton
-          sx={{ marginTop: "32px", marginBottom: "8px" }}
-          variant="text"
-          shape="rounded"
-          count={getNumberOfPages(itemsPerPage, playCount)}
-          page={page}
-          onChange={handlePageChange}
-        />
+          {!loading && plays.length === 0 && (
+            <Box className="py-4 text-center text-gray-500">
+              No plays created by this user yet.
+            </Box>
+          )}
+        </>
       )}
-    </div>
-  ) : (
-    <EmptyMessage size="medium" message="user created plays" />
+      <Fab
+        color="primary"
+        onClick={scrollToTop}
+        size="small"
+        sx={{
+          position: "fixed",
+          bottom: "16px",
+          right: "16px",
+          zIndex: 1000,
+        }}
+        aria-label="Scroll to top"
+      >
+        <ArrowUpwardIcon />
+      </Fab>
+    </Box>
   );
 };
 
-export default CreatedFeed;
+export default CreatedPlaysFeed;
