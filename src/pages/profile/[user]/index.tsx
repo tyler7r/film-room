@@ -23,7 +23,7 @@ import type {
 } from "~/utils/types";
 
 type FetchOptions = {
-  profileId?: string | undefined;
+  profileId: string;
 };
 
 const Profile = () => {
