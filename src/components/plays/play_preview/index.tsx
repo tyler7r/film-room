@@ -1,12 +1,20 @@
+import FullscreenIcon from "@mui/icons-material/Fullscreen"; // Import FullscreenIcon
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import LinkIcon from "@mui/icons-material/Link";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import StarIcon from "@mui/icons-material/Star";
-import { Button, Divider, IconButton, Menu, MenuItem } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react"; // Added useCallback
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import TeamLogo from "~/components/teams/team-logo";
 import PageTitle from "~/components/utils/page-title";
@@ -20,8 +28,8 @@ import LikeBtn from "../../interactions/likes/like-btn";
 import StandardPopover from "../../utils/standard-popover";
 import ExpandedPlay from "../expanded-play";
 import PlayActionsMenu from "../play-actions-menu";
-import PlayMentions from "../play-mentions";
-import PlayTags from "../play-tags";
+import PlayPreviewMentions from "./play-mentions";
+import PlayPreviewTags from "./play-tags";
 
 type PlayPreviewProps = {
   preview: PlayPreviewType;
@@ -36,7 +44,7 @@ const PlayPreview = ({
   setReload,
   collectionAuthor,
 }: PlayPreviewProps) => {
-  const { isMobile, fullScreen, screenWidth } = useMobileContext();
+  const { isMobile } = useMobileContext();
   const { hoverText } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
@@ -47,7 +55,14 @@ const PlayPreview = ({
     anchor2: HTMLElement | null;
     anchor3: HTMLElement | null;
     anchor4: HTMLElement | null;
-  }>({ anchor1: null, anchor2: null, anchor3: null, anchor4: null });
+    anchor5: HTMLElement | null; // Added for fullscreen popover
+  }>({
+    anchor1: null,
+    anchor2: null,
+    anchor3: null,
+    anchor4: null,
+    anchor5: null,
+  }); // Initialize
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -61,41 +76,30 @@ const PlayPreview = ({
 
   const handlePopoverOpen = (
     e: React.MouseEvent<HTMLElement>,
-    target: 1 | 2 | 3 | 4,
+    target: 1 | 2 | 3 | 4 | 5, // Updated to include target 5
   ) => {
     if (target === 1) {
-      setAnchorEl({
-        anchor1: e.currentTarget,
-        anchor2: null,
-        anchor3: null,
-        anchor4: null,
-      });
+      setAnchorEl((prev) => ({ ...prev, anchor1: e.currentTarget }));
     } else if (target === 2) {
-      setAnchorEl({
-        anchor1: null,
-        anchor2: e.currentTarget,
-        anchor3: null,
-        anchor4: null,
-      });
+      setAnchorEl((prev) => ({ ...prev, anchor2: e.currentTarget }));
     } else if (target === 3) {
-      setAnchorEl({
-        anchor1: null,
-        anchor2: null,
-        anchor3: e.currentTarget,
-        anchor4: null,
-      });
+      setAnchorEl((prev) => ({ ...prev, anchor3: e.currentTarget }));
+    } else if (target === 4) {
+      setAnchorEl((prev) => ({ ...prev, anchor4: e.currentTarget }));
     } else {
-      setAnchorEl({
-        anchor1: null,
-        anchor2: null,
-        anchor3: null,
-        anchor4: e.currentTarget,
-      });
+      // target === 5
+      setAnchorEl((prev) => ({ ...prev, anchor5: e.currentTarget }));
     }
   };
 
   const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null, anchor4: null });
+    setAnchorEl({
+      anchor1: null,
+      anchor2: null,
+      anchor3: null,
+      anchor4: null,
+      anchor5: null,
+    }); // Reset all
     setIsCopied(false);
   };
 
@@ -103,6 +107,7 @@ const PlayPreview = ({
   const open2 = Boolean(anchorEl.anchor2);
   const open3 = Boolean(anchorEl.anchor3);
   const open4 = Boolean(anchorEl.anchor4);
+  const open5 = Boolean(anchorEl.anchor5); // State for fullscreen popover
 
   const videoOnReady = async (e: YouTubeEvent) => {
     const video = e.target;
@@ -115,15 +120,27 @@ const PlayPreview = ({
   };
 
   const onPlayerStateChange = (e: YouTubeEvent) => {
-    if (e.data == YT.PlayerState.ENDED) {
+    // Ensure YT is defined before using it
+    if (typeof YT !== "undefined" && e.data == YT.PlayerState.ENDED) {
       void restartPreview();
     }
   };
 
-  const restartPreview = () => {
-    void player?.seekTo(preview.play.start_time, true);
-    void player?.pauseVideo();
-  };
+  const restartPreview = useCallback(async () => {
+    // Check if player exists and if it's currently in fullscreen
+    if (player) {
+      const iframe = await player.getIframe();
+      // If the document is not in fullscreen mode, or if the player itself is not the fullscreen element,
+      // then we want to reset the preview. This handles cases where user exits fullscreen via system controls.
+      if (
+        !document.fullscreenElement ||
+        document.fullscreenElement !== iframe
+      ) {
+        void player.seekTo(preview.play.start_time, true);
+        void player.pauseVideo();
+      }
+    }
+  }, [player, preview.play.start_time]); // Dependencies for useCallback
 
   const updateLastWatched = async (video: string, time: number) => {
     if (user.userId) {
@@ -154,27 +171,88 @@ const PlayPreview = ({
 
   const copyToClipboard = () => {
     const origin = window.location.origin;
-    void navigator.clipboard.writeText(`${origin}/play/${preview.play.id}`);
+    // Using document.execCommand('copy') for better compatibility within iframes
+    const tempInput = document.createElement("input");
+    tempInput.value = `${origin}/play/${preview.play.id}`;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
     setIsCopied(true);
   };
 
+  // Function to handle fullscreen request
+  const handleFullscreen = async () => {
+    if (player) {
+      const iframe = await player.getIframe();
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen().catch((err: Error) => {
+          console.error(
+            `Error attempting to enable fullscreen: ${err.message} (${err.name})`,
+          );
+          // Optionally, display a user-friendly message here
+        });
+      }
+    }
+  };
+
   useEffect(() => {
+    // Small delay to ensure component is fully mounted before YouTube attempts to render
     setTimeout(() => {
       setIsLoading(false);
     }, 100);
-  });
+  }, []); // Empty dependency array means this runs once on mount
+
+  // Effect to handle fullscreen changes
+  useEffect(() => {
+    // Define the synchronous event handler
+    const handleFullscreenChange = () => {
+      // Wrap the async call in a self-invoking async function with catch
+      // This satisfies the no-floating-promises rule and keeps the event listener synchronous.
+      void (async () => {
+        if (!document.fullscreenElement) {
+          // Only call restart if fullscreen is exited
+          try {
+            await restartPreview();
+          } catch (error) {
+            console.error("Error during fullscreen exit restart:", error);
+          }
+        }
+      })();
+    };
+
+    // Add event listeners for fullscreen change (cross-browser compatibility)
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+
+    // Cleanup function
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener(
+        "webkitfullscreenchange",
+        handleFullscreenChange,
+      );
+      document.removeEventListener(
+        "mozfullscreenchange",
+        handleFullscreenChange,
+      );
+      document.removeEventListener(
+        "MSFullscreenChange",
+        handleFullscreenChange,
+      );
+    };
+  }, [restartPreview]); // Dependencies: only restartPreview callback is needed here
 
   return (
-    <div
+    <Box
       className="flex w-full flex-col justify-center rounded-md"
-      style={{
-        width: `${
-          isMobile ? screenWidth - 10 : fullScreen ? "960px" : "640px"
-        }`,
-      }}
+      // Removed inline style for width. The parent container of PlayPreview should
+      // handle the overall max-width for desktop, and this component will be `w-full`.
     >
-      <div className="flex items-center justify-between gap-2 p-2">
-        <div className="flex items-center gap-2">
+      <Box className="flex items-center justify-between gap-2 p-2">
+        <Box className="flex items-center gap-2">
           {preview.play.private && exclusiveTeam && (
             <IconButton
               size="small"
@@ -182,7 +260,7 @@ const PlayPreview = ({
               onMouseEnter={(e) => handlePopoverOpen(e, 2)}
               onMouseLeave={handlePopoverClose}
             >
-              <TeamLogo tm={exclusiveTeam} size={35} inactive={true} />
+              <TeamLogo tm={exclusiveTeam} size={25} inactive={true} />
               <StandardPopover
                 open={open2}
                 anchorEl={anchorEl.anchor2}
@@ -192,7 +270,7 @@ const PlayPreview = ({
             </IconButton>
           )}
           {preview.play.highlight && (
-            <div
+            <Box
               onMouseEnter={(e) => handlePopoverOpen(e, 3)}
               onMouseLeave={handlePopoverClose}
               className="flex cursor-pointer items-center justify-center"
@@ -204,25 +282,25 @@ const PlayPreview = ({
                 content="Highlight!"
                 handlePopoverClose={handlePopoverClose}
               />
-            </div>
+            </Box>
           )}
-          <div
+          <Box
             className={`text-center font-bold tracking-tighter md:text-xl ${hoverText}`}
             onClick={() =>
               void router.push(`/profile/${preview.play.author_id}`)
             }
           >
             {preview.author.name}
-          </div>
+          </Box>
           <Divider flexItem orientation="vertical" variant="middle" />
-          <div className="text-xs font-bold leading-3 tracking-tight">
+          <Box className="text-xs font-bold leading-3 tracking-tight">
             ({preview.play.end_time - preview.play.start_time}s)
-          </div>
+          </Box>
           {!isMobile && (
-            <div className="flex-wrap p-2">{preview.play.title}</div>
+            <Box className="flex-wrap p-2">{preview.play.title}</Box>
           )}
-        </div>
-        <div className="flex items-center gap-1">
+        </Box>
+        <Box className="flex items-center gap-1">
           <PlayActionsMenu
             preview={preview}
             collectionId={collectionId}
@@ -243,10 +321,25 @@ const PlayPreview = ({
               handlePopoverClose={handlePopoverClose}
             />
           </IconButton>
+          {/* Fullscreen Button */}
+          <IconButton
+            onClick={handleFullscreen}
+            onMouseEnter={(e) => handlePopoverOpen(e, 5)} // Use new anchor5
+            onMouseLeave={handlePopoverClose}
+            size="small"
+          >
+            <FullscreenIcon />
+            <StandardPopover
+              open={open5} // Use new open5 state
+              anchorEl={anchorEl.anchor5}
+              content="Fullscreen"
+              handlePopoverClose={handlePopoverClose}
+            />
+          </IconButton>
           <IconButton onClick={(e) => handlePopoverOpen(e, 1)} size="small">
             <ShortcutIcon color="primary" />
           </IconButton>
-        </div>
+        </Box>
         {open && (
           <Menu
             open={open}
@@ -254,50 +347,56 @@ const PlayPreview = ({
             onClose={handlePopoverClose}
           >
             <MenuItem onClick={handlePlayClick}>
-              <div className="text-sm font-bold tracking-tight">GO TO PLAY</div>
+              <Box className="text-sm font-bold tracking-tight">GO TO PLAY</Box>
             </MenuItem>
             <MenuItem onClick={handleVideoClick}>
-              <div className="text-sm font-bold tracking-tight">
+              <Box className="text-sm font-bold tracking-tight">
                 GO TO VIDEO
-              </div>
+              </Box>
             </MenuItem>
           </Menu>
         )}
-      </div>
-      {!isLoading && (
-        <YouTube
-          opts={{
-            width: `${isMobile ? screenWidth - 10 : fullScreen ? 960 : 640}`,
-            height: `${
-              isMobile ? (screenWidth - 10) / 1.62 : fullScreen ? 595 : 390
-            }`,
-            playerVars: {
-              end: preview.play.end_time,
-              enablejsapi: 1,
-              playsinline: 1,
-              disablekb: 1,
-              fs: 1,
-              controls: 0,
-              rel: 0,
-              origin: `https://www.youtube.com`,
-            },
-          }}
-          onReady={videoOnReady}
-          onStateChange={onPlayerStateChange}
-          id="player"
-          videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
-        />
-      )}
+      </Box>
+      {/* Refactored YouTube player container for responsiveness */}
+      <Box className="relative aspect-video w-full overflow-hidden rounded-md">
+        {!isLoading && (
+          <YouTube
+            opts={{
+              // Set width and height to 100% to fill the parent container
+              width: "100%",
+              height: "100%",
+              playerVars: {
+                end: preview.play.end_time,
+                enablejsapi: 1,
+                playsinline: 1,
+                disablekb: 1,
+                // Keep `controls: 0` to hide native controls and prevent seeking
+                controls: 0,
+                rel: 0,
+                origin: `https://www.youtube.com`,
+              },
+            }}
+            onReady={videoOnReady}
+            onStateChange={onPlayerStateChange}
+            id="player"
+            videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
+            // Apply absolute positioning and full size to fill the relative parent
+            className="absolute left-0 top-0 h-full w-full"
+          />
+        )}
+      </Box>
       {isLoading && <PageTitle size="small" title="Loading..." />}
       {isMobile && (
-        <div className="-my-1 flex flex-wrap p-2 text-sm md:text-base">
+        <Box className="-my-1 flex flex-wrap p-2 text-sm md:text-base">
           {preview.play.title}
-        </div>
+        </Box>
       )}
-      <PlayMentions play={preview} />
-      <PlayTags play={preview} />
-      <div className="flex w-full items-center gap-3 px-1">
-        <div className="flex items-center justify-center gap-2">
+      <Box sx={{ display: "flex", width: "100%", alignItems: "center" }}>
+        <PlayPreviewMentions play={preview} />
+        <PlayPreviewTags play={preview} />
+      </Box>
+      <Box className="flex w-full items-center gap-3 px-1">
+        <Box className="flex items-center justify-center gap-2">
           <LikeBtn playId={preview.play.id} />
           <CommentBtn
             isOpen={isExpanded}
@@ -328,18 +427,18 @@ const PlayPreview = ({
               <KeyboardArrowDownIcon color="primary" fontSize="large" />
             </IconButton>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
       {isExpanded && (
-        <div className="mt-2">
+        <Box className="mt-2">
           <ExpandedPlay
             play={preview}
             commentCount={commentCount}
             setCommentCount={setCommentCount}
           />
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 
