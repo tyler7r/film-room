@@ -1,5 +1,16 @@
+import CreateIcon from "@mui/icons-material/Create";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Divider, IconButton, Switch, TextField, Tooltip } from "@mui/material";
+import {
+  Box,
+  Divider,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Switch,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/utils/form-message";
 import ModalSkeleton from "~/components/utils/modal";
@@ -465,12 +476,21 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
   }, [playDetails, playTags, playCollections, mentions]);
 
   return !isEditPlayOpen ? (
-    <div
-      className="text-sm font-bold tracking-tight"
+    <Box
+      sx={{ display: "flex", alignItems: "center" }}
       onClick={() => setIsEditPlayOpen(true)}
     >
-      EDIT PLAY
-    </div>
+      <ListItemIcon sx={{ minWidth: "12px" }}>
+        <CreateIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText
+        primary={
+          <Typography variant="body2" fontWeight={"bold"}>
+            Edit Play
+          </Typography>
+        }
+      />
+    </Box>
   ) : (
     <ModalSkeleton
       title="Edit Play"

@@ -1,7 +1,13 @@
-import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { Button, IconButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 
 type DeleteMenuProps = {
   handleDelete: () => void;
@@ -21,13 +27,13 @@ const DeleteMenu = ({
   small,
 }: DeleteMenuProps) => {
   return isOpen ? (
-    <div className="flex items-center justify-center">
+    <Box className="flex w-full items-center justify-around">
       {actionMenu ? (
         <Button
           endIcon={<DeleteIcon />}
           variant="contained"
           size="small"
-          color="primary"
+          color="error"
           onClick={() => void handleDelete()}
         >
           Delete
@@ -37,21 +43,35 @@ const DeleteMenu = ({
           <DeleteIcon color="primary" fontSize={small ? "small" : "medium"} />
         </IconButton>
       )}
-      <IconButton size="small" onClick={() => setIsOpen(false)}>
-        <ClearIcon fontSize="small" color="action" />
-      </IconButton>
-    </div>
+      <Button
+        size="small"
+        variant="outlined"
+        color="info"
+        onClick={() => setIsOpen(false)}
+      >
+        Cancel
+      </Button>
+    </Box>
   ) : !actionMenu ? (
     <IconButton size="small" onClick={() => setIsOpen(true)}>
       <DeleteOutlineIcon color="action" fontSize={small ? "small" : "medium"} />
     </IconButton>
   ) : (
-    <div
-      className="text-sm font-bold tracking-tight"
+    <Box
+      sx={{ display: "flex", alignItems: "center" }}
       onClick={() => setIsOpen(true)}
     >
-      DELETE {deleteType.toLocaleUpperCase()}
-    </div>
+      <ListItemIcon sx={{ minWidth: "12px" }}>
+        <DeleteIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText
+        primary={
+          <Typography variant="body2" fontWeight={"bold"}>
+            Delete {deleteType}
+          </Typography>
+        }
+      />
+    </Box>
   );
 };
 
