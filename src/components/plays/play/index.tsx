@@ -130,6 +130,11 @@ const Play = ({
     });
   };
 
+  const handlePlayClick = () => {
+    const playId = play.play.id;
+    void router.push(`/play/${playId}`);
+  };
+
   const copyToClipboard = () => {
     const origin = window.location.origin;
     void navigator.clipboard.writeText(`${origin}/play/${play.play.id}`);
@@ -218,7 +223,11 @@ const Play = ({
                 handlePopoverClose={handlePopoverClose}
               />
             </IconButton>
-            <PlayActionsMenu preview={play} />
+            <PlayActionsMenu
+              preview={play}
+              onCopyLink={copyToClipboard}
+              onPlayClick={handlePlayClick}
+            />
           </div>
         </div>
         <span>
@@ -288,7 +297,6 @@ const Play = ({
         <ExpandedPlay
           play={play}
           handleMentionAndTagClick={handleMentionAndTagClick}
-          commentCount={commentCount}
           setCommentCount={setCommentCount}
         />
       )}

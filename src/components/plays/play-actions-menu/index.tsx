@@ -28,7 +28,7 @@ type PlayActionsMenuProps = {
   setReload?: (reload: boolean) => void;
   collectionAuthor?: string;
   onCopyLink: () => void; // Callback for copy link
-  onGoToFilmRoom: () => void; // Callback for go to film room
+  onGoToFilmRoom?: () => void; // Callback for go to film room
   onPlayClick: () => void; // Callback for go to play's theatre mode
 };
 
@@ -137,25 +137,26 @@ const PlayActionsMenu = ({
           </MenuItem>
 
           {/* Option: Go to Associated Video's Film Room */}
-          <MenuItem
-            onClick={() => {
-              onGoToFilmRoom();
-              handleClose();
-            }}
-            sx={{ px: 1, py: 0.5, minHeight: "auto" }}
-          >
-            <ListItemIcon sx={{ minWidth: "12px" }}>
-              <VideocamIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <Typography variant="body2" fontWeight={"bold"}>
-                  View in Film Room
-                </Typography>
-              }
-            />
-          </MenuItem>
-
+          {onGoToFilmRoom && (
+            <MenuItem
+              onClick={() => {
+                onGoToFilmRoom();
+                handleClose();
+              }}
+              sx={{ px: 1, py: 0.5, minHeight: "auto" }}
+            >
+              <ListItemIcon sx={{ minWidth: "12px" }}>
+                <VideocamIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography variant="body2" fontWeight={"bold"}>
+                    View in Film Room
+                  </Typography>
+                }
+              />
+            </MenuItem>
+          )}
           {/* Option: Go to Play's Theatre Mode */}
           <MenuItem
             onClick={() => {
