@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import StandardPopover from "~/components/utils/standard-popover"; // Assuming this component exists
 import { supabase } from "~/utils/supabase"; // Assuming Supabase client is initialized here
 import type { MentionType, PlayPreviewType } from "~/utils/types"; // Assuming these types exist
 
@@ -32,19 +31,9 @@ const PlayPreviewMentions = ({
   activePlay,
   playId,
 }: PlayPreviewMentionsProps) => {
-  //   const { hoverText } = useIsDarkContext();
   const router = useRouter();
   const [mentions, setMentions] = useState<MentionType[] | null>(null);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null); // For the Chip's popover (if any)
   const [openDialog, setOpenDialog] = useState<boolean>(false); // State to control the dialog
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleOpenDialog = () => {
     setOpenDialog(true);
@@ -54,13 +43,7 @@ const PlayPreviewMentions = ({
     setOpenDialog(false);
   };
 
-  const open = Boolean(anchorEl);
-
   const fetchMentions = async () => {
-    // Ensure you're fetching the correct data for mentions here.
-    // The previous schema suggestion included `receiver_name` and `receiver_id` directly in the `mentions` table,
-    // which simplifies this. If `plays_via_user_mention` is a view, ensure it correctly joins
-    // to get the `receiver_name` and `receiver_id` for each mention.
     const { data } = await supabase
       .from("plays_via_user_mention")
       .select("*")
@@ -124,31 +107,28 @@ const PlayPreviewMentions = ({
   // const fetchMentionsMemoized = useCallback(fetchMentions, [play.play.id]); // Uncomment and use if needed
 
   return (
-    <Box className="px-1 py-2">
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
       {mentions && mentions.length > 0 && (
         <Chip
-          icon={<PersonIcon fontSize="small" />}
+          icon={<PersonIcon sx={{ fontSize: "14px" }} />}
           label={`Mentions (${mentions.length})`}
           onClick={handleOpenDialog}
-          onMouseEnter={handlePopoverOpen} // Keep popover for initial quick info
-          onMouseLeave={handlePopoverClose}
           variant="outlined"
-          sx={{ cursor: "pointer", fontWeight: "bold" }}
+          sx={{
+            cursor: "pointer",
+            fontWeight: "bold",
+            fontSize: "0.75rem", // Smaller font size
+            height: "24px", // Smaller height}}
+          }}
         />
       )}
-      <StandardPopover
-        content="View all player mentions"
-        open={open}
-        handlePopoverClose={handlePopoverClose}
-        anchorEl={anchorEl}
-      />
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle sx={{ m: 0, p: 2 }}>
+        <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Player Mentions
           </Typography>
@@ -165,8 +145,8 @@ const PlayPreviewMentions = ({
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers>
-          <List>
+        <DialogContent dividers sx={{ p: 0.5 }}>
+          <List dense>
             {mentions?.map((mention) => (
               <ListItem
                 key={mention.id}
@@ -176,13 +156,15 @@ const PlayPreviewMentions = ({
                 sx={{
                   cursor: "pointer",
                   "&:hover": {
-                    backgroundColor: "action.hover", // Material UI hover state
+                    backgroundColor: "action.hover",
                   },
-                  borderRadius: 2, // Rounded corners for list items
-                  mb: 1, // Margin bottom for spacing between items
+                  borderRadius: 2,
+                  mb: 0.5, // Slightly reduced margin bottom
+                  px: 1.5, // Reduced horizontal padding
+                  py: 0.5, // Reduced vertical padding
                 }}
               >
-                <Avatar sx={{ mr: 2 }}>
+                <Avatar sx={{ mr: 1, width: 30, height: 30 }}>
                   {/* You can use mention.profiles?.avatar_url if available, or fall back to first letter */}
                   {mention.receiver_name[0] ? (
                     mention.receiver_name[0].toLocaleUpperCase()
@@ -192,7 +174,7 @@ const PlayPreviewMentions = ({
                 </Avatar>
                 <ListItemText
                   primary={
-                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                       {mention.receiver_name}
                     </Typography>
                   }

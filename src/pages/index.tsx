@@ -19,7 +19,7 @@ const Home = () => {
 
   const router = useRouter();
   // Items per load will dynamically adjust based on mobile/desktop
-  const itemsPerLoad = isMobile ? 10 : 20;
+  const itemsPerLoad = isMobile ? 3 : 5;
 
   const [plays, setPlays] = useState<PlayPreviewType[]>([]); // Initialize as empty array
   const [loading, setLoading] = useState<boolean>(true); // Initial loading state
@@ -107,7 +107,7 @@ const Home = () => {
   };
 
   return (
-    <Box className="flex flex-col items-center justify-center gap-4 p-4">
+    <Box className="flex flex-col items-center justify-center gap-4">
       {loading && plays.length === 0 ? ( // Show initial loading spinner if no plays are loaded yet
         <Box className="flex h-full w-full items-center justify-center p-4">
           <CircularProgress size={128} />
@@ -137,7 +137,12 @@ const Home = () => {
             <KeyboardDoubleArrowDownIcon fontSize="large" color="primary" />
           </Box>
 
-          <Box>
+          <Box
+            sx={{
+              width: `${isMobile ? "100%" : "80%"}`,
+              px: 1,
+            }}
+          >
             <InfiniteScroll
               dataLength={plays.length} // This is important field to render the amount of data
               next={loadMorePlays}
@@ -164,9 +169,18 @@ const Home = () => {
               scrollThreshold={0.9}
               scrollableTarget="scrollableDiv" // Ensure your main scroll container has this ID
             >
-              {plays.map((play) => (
-                <PlayPreview preview={play} key={play.play.id} />
-              ))}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                {plays.map((play) => (
+                  <PlayPreview preview={play} key={play.play.id} />
+                ))}
+              </Box>
             </InfiniteScroll>
           </Box>
 

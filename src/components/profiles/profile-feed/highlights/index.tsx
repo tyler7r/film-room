@@ -103,14 +103,19 @@ const HighlightedPlaysFeed = ({ profileId }: HighlightedPlaysFeedProps) => {
   };
 
   return (
-    <Box className="flex flex-col items-center justify-center gap-4 p-4">
+    <Box className="flex w-full flex-col items-center justify-center">
       {loading && plays.length === 0 ? (
         <Box className="flex h-full w-full items-center justify-center p-4">
           <CircularProgress size={128} />
         </Box>
       ) : (
         <>
-          <Box className="grid grid-cols-1 items-center justify-center gap-6">
+          <Box
+            sx={{
+              width: `${isMobile ? "100%" : "80%"}`,
+              px: 1,
+            }}
+          >
             <InfiniteScroll
               dataLength={plays.length}
               next={loadMorePlays}
@@ -136,9 +141,18 @@ const HighlightedPlaysFeed = ({ profileId }: HighlightedPlaysFeedProps) => {
                 )
               }
             >
-              {plays.map((play) => (
-                <PlayPreview preview={play} key={play.play.id} />
-              ))}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                {plays.map((play) => (
+                  <PlayPreview preview={play} key={play.play.id} />
+                ))}
+              </Box>
             </InfiniteScroll>
           </Box>
 

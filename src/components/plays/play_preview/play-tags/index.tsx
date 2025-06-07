@@ -13,7 +13,6 @@ import {
   Typography, // Import Typography for text
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react"; // Add useCallback
-import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth"; // Assuming this context exists
 import { supabase } from "~/utils/supabase"; // Assuming Supabase client is initialized here
 import type { PlayPreviewType, TagType } from "~/utils/types"; // Assuming these types exist
@@ -34,16 +33,7 @@ const PlayPreviewTags = ({
   const { affIds } = useAuthContext();
 
   const [tags, setTags] = useState<TagType[] | null>(null);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null); // For the Chip's popover
   const [openDialog, setOpenDialog] = useState<boolean>(false); // State to control the dialog
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleOpenDialog = () => {
     setOpenDialog(true);
@@ -52,8 +42,6 @@ const PlayPreviewTags = ({
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
-
-  const open = Boolean(anchorEl);
 
   // Memoize fetchTags to prevent unnecessary re-creation and infinite loops in useEffect
   const fetchTags = useCallback(async () => {
@@ -115,31 +103,28 @@ const PlayPreviewTags = ({
   }, [activePlay, play, playId, fetchTags]);
 
   return (
-    <Box className="px-1 py-2">
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
       {tags && tags.length > 0 && (
         <Chip
-          icon={<LocalOfferIcon fontSize="small" />}
+          icon={<LocalOfferIcon sx={{ fontSize: "12px" }} />}
           label={`Tags (${tags.length})`}
           onClick={handleOpenDialog}
-          onMouseEnter={handlePopoverOpen} // Keep popover for initial quick info
-          onMouseLeave={handlePopoverClose}
           variant="outlined"
-          sx={{ cursor: "pointer", fontWeight: "bold" }}
+          sx={{
+            cursor: "pointer",
+            fontWeight: "bold",
+            fontSize: "0.75rem", // Smaller font size
+            height: "24px", // Smaller height}}
+          }}
         />
       )}
-      <StandardPopover
-        content="View all play tags"
-        open={open}
-        handlePopoverClose={handlePopoverClose}
-        anchorEl={anchorEl}
-      />
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle sx={{ m: 0, p: 2 }}>
+        <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Play Tags
           </Typography>
@@ -156,8 +141,8 @@ const PlayPreviewTags = ({
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers>
-          <List>
+        <DialogContent dividers sx={{ padding: 0.5 }}>
+          <List dense>
             {tags?.map((tag) => (
               <ListItem
                 key={tag.id} // Use tag.id for key, as tag.title might not be unique globally
@@ -165,17 +150,19 @@ const PlayPreviewTags = ({
                 sx={{
                   cursor: "pointer",
                   "&:hover": {
-                    backgroundColor: "action.hover", // Material UI hover state
+                    backgroundColor: "action.hover",
                   },
-                  borderRadius: 2, // Rounded corners for list items
-                  mb: 1, // Margin bottom for spacing between items
+                  borderRadius: 2,
+                  mb: 0.5, // Slightly reduced margin bottom
+                  px: 1.5, // Reduced horizontal padding
+                  py: 0.5, // Reduced vertical padding
                 }}
               >
-                <LocalOfferIcon sx={{ mr: 2 }} /> {/* Icon for tags */}
+                <LocalOfferIcon sx={{ mr: 1 }} /> {/* Icon for tags */}
                 <ListItemText
                   primary={
-                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                      {tag.title.toLocaleUpperCase()}
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                      {tag.title}
                     </Typography>
                   }
                 />

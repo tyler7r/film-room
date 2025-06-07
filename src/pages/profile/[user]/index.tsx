@@ -1,5 +1,6 @@
 import AddIcon from "@mui/icons-material/Add";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { Box } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ProfileActionBar from "~/components/profiles/profile-action-bar";
@@ -144,7 +145,7 @@ const Profile = () => {
 
   return (
     profile && (
-      <div className="flex w-full flex-col items-center justify-center gap-8 p-4">
+      <Box className="flex w-full flex-col items-center justify-center gap-8">
         <div className="flex w-4/5 flex-col items-center justify-center gap-4">
           <div className="flex w-full flex-col items-center justify-center">
             <PageTitle
@@ -200,22 +201,32 @@ const Profile = () => {
           )}
         </div>
         <ProfileCollections profileId={profile.id} />
-        <div className="flex w-full items-center justify-center">
-          <ProfileActionBar
-            actionBarStatus={actionBarStatus}
-            setActionBarStatus={setActionBarStatus}
-          />
-        </div>
-        {actionBarStatus.createdPlays && (
-          <CreatedFeed profileId={options.profileId} />
-        )}
-        {actionBarStatus.mentions && (
-          <MentionsFeed profileId={options.profileId} />
-        )}
-        {actionBarStatus.highlights && (
-          <HighlightsFeed profileId={options.profileId} />
-        )}
-      </div>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+            width: "100%",
+          }}
+        >
+          <div className="flex w-full items-center justify-center">
+            <ProfileActionBar
+              actionBarStatus={actionBarStatus}
+              setActionBarStatus={setActionBarStatus}
+            />
+          </div>
+          {actionBarStatus.createdPlays && (
+            <CreatedFeed profileId={options.profileId} />
+          )}
+          {actionBarStatus.mentions && (
+            <MentionsFeed profileId={options.profileId} />
+          )}
+          {actionBarStatus.highlights && (
+            <HighlightsFeed profileId={options.profileId} />
+          )}
+        </Box>
+      </Box>
     )
   );
 };

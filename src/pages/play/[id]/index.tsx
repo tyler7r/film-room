@@ -239,7 +239,12 @@ const Play = () => {
               <div className="flex-wrap p-2">{preview.play.title}</div>
             </div>
             <div className="flex items-center gap-1">
-              <PlayActionsMenu preview={preview} />
+              <PlayActionsMenu
+                preview={preview}
+                onCopyLink={copyToClipboard}
+                onGoToFilmRoom={handleVideoClick}
+                onPlayClick={restartPreview}
+              />
               <IconButton
                 onClick={copyToClipboard}
                 onMouseEnter={(e) => handlePopoverOpen(e, 4)}
@@ -320,7 +325,6 @@ const Play = () => {
           <div className="mt-2 w-full">
             <ExpandedPlay
               play={preview}
-              commentCount={commentCount}
               setCommentCount={setCommentCount}
               activeComment={activeComment}
             />

@@ -1,3 +1,5 @@
+import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
+import { Box, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ModalSkeleton from "~/components/utils/modal";
@@ -11,13 +13,9 @@ import FormMessage from "../../utils/form-message";
 
 type AddPlayToCollection = {
   playId: string;
-  handleMenuClose: () => void;
 };
 
-const AddPlayToCollection = ({
-  playId,
-  handleMenuClose,
-}: AddPlayToCollection) => {
+const AddPlayToCollection = ({ playId }: AddPlayToCollection) => {
   const { affIds, user } = useAuthContext();
   const router = useRouter();
 
@@ -77,7 +75,7 @@ const AddPlayToCollection = ({
     setIsOpen(false);
     setPlayCollections([]);
     setMessage({ text: undefined, status: "error" });
-    handleMenuClose();
+    // handleMenuClose();
   };
 
   const handleNewCollection = async (collection: string, title: string) => {
@@ -104,7 +102,7 @@ const AddPlayToCollection = ({
     }
     setTimeout(() => {
       handleClose();
-    }, 1500);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -121,9 +119,18 @@ const AddPlayToCollection = ({
   }, [collectionIds]);
 
   return !isOpen ? (
-    <div className="text-sm font-bold tracking-tight" onClick={handleOpen}>
-      ADD TO COLLECTIONS
-    </div>
+    <Box sx={{ display: "flex", alignItems: "center" }} onClick={handleOpen}>
+      <ListItemIcon sx={{ minWidth: "12px" }}>
+        <CollectionsBookmarkIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText
+        primary={
+          <Typography variant="body2" fontWeight={"bold"}>
+            Add to Collections
+          </Typography>
+        }
+      />
+    </Box>
   ) : (
     <ModalSkeleton
       isOpen={isOpen}
