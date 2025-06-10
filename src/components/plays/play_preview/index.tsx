@@ -364,7 +364,6 @@ const PlayPreview = ({
           width: "100%",
           alignItems: "center",
           gap: 1,
-          p: 0.5,
         }}
       >
         <PlayPreviewMentions play={preview} />

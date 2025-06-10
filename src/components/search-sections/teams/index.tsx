@@ -60,7 +60,7 @@ const SearchTeams = ({ topic }: SearchTeamsProps) => {
           {teamCount} results found
         </div>
       )}
-      {!teams && !loading && <EmptyMessage size="large" message="teams" />}
+      {!teams && !loading && <EmptyMessage message="teams" />}
       <div className="flex w-4/5 flex-wrap items-center justify-center gap-6">
         {teams?.map((team) => <Team team={team} key={team.id} />)}
       </div>

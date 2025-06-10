@@ -82,9 +82,7 @@ const CoachesCorner = ({ teamId }: CoachesCornerProps) => {
       {!hide && (
         <div className="flex w-full flex-col items-center justify-center gap-2">
           <div className="flex w-full flex-wrap justify-center gap-6">
-            {!videos && (
-              <EmptyMessage message="coach uploaded videos" size="small" />
-            )}
+            {!videos && <EmptyMessage message="coach uploaded videos" />}
             {videos?.map((video) => (
               <Video video={video.video} key={video.video.id} />
             ))}

@@ -114,7 +114,7 @@ const FilmRoomHome = () => {
       </div>
       <div className="flex w-full flex-wrap justify-center gap-6">
         {videos?.map((v) => <Video video={v} key={v.id} />)}
-        {!videos && <EmptyMessage message="videos" size="large" />}
+        {!videos && <EmptyMessage message="videos" />}
       </div>
       {videos && videoCount && (
         <Pagination

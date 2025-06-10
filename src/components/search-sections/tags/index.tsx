@@ -128,9 +128,7 @@ const SearchPlayTags = ({ topic }: SearchPlayTagsProps) => {
           {playCount} results found
         </div>
       )}
-      {!playTags && !loading && (
-        <EmptyMessage size="large" message="plays with that tag" />
-      )}
+      {!playTags && !loading && <EmptyMessage message="plays with that tag" />}
       {playTags?.map((play) => (
         <PlayPreview key={play.play.id} preview={play} />
       ))}

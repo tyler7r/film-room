@@ -133,7 +133,7 @@ const InboxNotification = () => {
       </div>
       <div className="flex flex-col items-center justify-center">
         {(!notifications || notifications.length === 0) && !loading && (
-          <EmptyMessage message="notifications" size="small" />
+          <EmptyMessage message="notifications" />
         )}
       </div>
     </div>

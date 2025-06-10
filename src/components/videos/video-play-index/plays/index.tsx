@@ -42,7 +42,7 @@ const Plays = ({
       ))}
     </div>
   ) : (
-    <EmptyMessage message="plays" size="medium" />
+    <EmptyMessage message="plays" />
   );
 };
 

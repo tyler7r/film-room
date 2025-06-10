@@ -83,7 +83,6 @@ const AddReply = ({ comment, comment_author, setReload }: ReplyProps) => {
         label={`Reply to ${comment_author.name}`}
         name="reply"
         autoComplete="reply"
-        autoFocus
         id="reply"
         onChange={changeHandler}
         value={reply}

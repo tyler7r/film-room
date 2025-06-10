@@ -1,11 +1,13 @@
-import { Pagination } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { useCallback, useEffect, useRef, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import Collection from "~/components/collections/collection";
 import CreateCollection from "~/components/collections/create-collection";
 import EmptyMessage from "~/components/utils/empty-msg";
 import PageTitle from "~/components/utils/page-title";
+import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
-import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
+import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { CollectionViewType } from "~/utils/types";
 
@@ -15,95 +17,243 @@ type ProfileCollectionsProps = {
 
 const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
   const { isMobile } = useMobileContext();
+  const { isDark } = useIsDarkContext();
+  const { user } = useAuthContext();
 
-  const [collections, setCollections] = useState<CollectionViewType[] | null>(
-    null,
-  );
-  const [collectionCount, setCollectionCount] = useState<number | null>(null);
+  const [collections, setCollections] = useState<CollectionViewType[]>([]);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [currentOffset, setCurrentOffset] = useState<number>(0);
+  const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
 
-  const [page, setPage] = useState<number>(1);
+  const [showScrollDownIndicator, setShowScrollDownIndicator] = useState(false);
+
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
+
   const itemsPerPage = isMobile ? 5 : 10;
 
-  const fetchCollections = async () => {
-    if (profileId) {
-      const { from, to } = getToAndFrom(itemsPerPage, page);
-      const { data, count } = await supabase
-        .from("collection_view")
-        .select("*", { count: "exact" })
-        .eq("collection->>author_id", profileId)
-        .order("collection->>created_at", { ascending: false })
-        .range(from, to);
-      if (data && data.length > 0) setCollections(data);
-      else setCollections(null);
-      if (count) setCollectionCount(count);
-      else setCollectionCount(null);
-    } else {
-      setCollections(null);
-      setCollectionCount(null);
-    }
-  };
+  const checkScrollPosition = useCallback(() => {
+    if (scrollableContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } =
+        scrollableContainerRef.current;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
+      const isScrollable = scrollHeight > clientHeight;
+      const isAtTop = scrollTop === 0;
 
-  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
-    e.preventDefault();
-    setPage(value);
+      setShowScrollDownIndicator(isScrollable && !isAtBottom && isAtTop);
+    }
+  }, [hasMore]);
+
+  const fetchCollections = useCallback(
+    async (offsetToFetch: number, append = true) => {
+      if (!profileId) {
+        if (!append) {
+          setLoadingInitial(false);
+        }
+        setHasMore(false);
+        return;
+      }
+      if (!append) {
+        setLoadingInitial(true);
+        setCollections([]);
+        setCurrentOffset(0);
+        setHasMore(true);
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("collection_view")
+          .select("*", { count: "exact" })
+          .eq("collection->>author_id", profileId)
+          .order("collection->>created_at", { ascending: false })
+          .range(offsetToFetch, offsetToFetch + itemsPerPage - 1);
+
+        if (error) {
+          console.error("Error fetching collections:", error);
+          setHasMore(false);
+          return;
+        }
+
+        if (data) {
+          setCollections((prev) => {
+            const newCollections = append ? [...prev, ...data] : data;
+            return newCollections;
+          });
+          setCurrentOffset(offsetToFetch + data.length);
+          setHasMore(data.length === itemsPerPage);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.error("Unexpected error in fetchCollections: ", error);
+        setHasMore(false);
+      } finally {
+        setLoadingInitial(false);
+      }
+    },
+    [profileId, itemsPerPage],
+  );
+
+  useEffect(() => {
+    void fetchCollections(0, false);
+  }, [profileId, isMobile, fetchCollections]);
+
+  const loadMoreCollections = () => {
+    void fetchCollections(currentOffset, true);
   };
 
   useEffect(() => {
-    const channel = supabase
-      .channel("collection_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "collections" },
-        () => {
-          void fetchCollections();
-        },
-      )
-      .subscribe();
+    const currentRef = scrollableContainerRef.current;
+    if (currentRef) {
+      currentRef.addEventListener("scroll", checkScrollPosition);
+    }
+
+    setTimeout(() => {
+      checkScrollPosition();
+    }, 150);
 
     return () => {
-      void supabase.removeChannel(channel);
+      if (currentRef) {
+        currentRef.removeEventListener("scroll", checkScrollPosition);
+      }
     };
-  }, []);
-
-  useEffect(() => {
-    if (page === 1) void fetchCollections();
-    else setPage(1);
-  }, [isMobile]);
-
-  useEffect(() => {
-    void fetchCollections();
-  }, [page]);
+  }, [checkScrollPosition, collections.length, hasMore]);
 
   return (
-    <div className="mb-2 flex w-full flex-col items-center justify-center gap-2">
-      <PageTitle size="small" title="User Collections" />
-      {!collections && <EmptyMessage size="small" message="collections" />}
-      <div className="mb-4 flex w-full flex-wrap items-center justify-center gap-6">
-        {collections?.map((collection) => (
-          <Collection
-            key={collection.collection.id}
-            collection={collection}
-            small={true}
-          />
-        ))}
-      </div>
-      <CreateCollection small={true} />
-      {collections && collectionCount && (
-        <Pagination
-          siblingCount={1}
-          boundaryCount={0}
-          showFirstButton
-          showLastButton
-          sx={{ marginTop: "8px" }}
-          size={isMobile ? "small" : "medium"}
-          variant="text"
-          shape="rounded"
-          count={getNumberOfPages(itemsPerPage, collectionCount)}
-          page={page}
-          onChange={handlePageChange}
-        />
-      )}
-    </div>
+    <Box
+      sx={{
+        display: "flex",
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 1,
+        p: 1,
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          width: "100%",
+          gap: 2,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <PageTitle size="small" title="User Collections" />
+        {user.userId === profileId && <CreateCollection icon={true} />}
+      </Box>
+
+      <Box
+        id="collectionsScrollableContainer"
+        ref={scrollableContainerRef}
+        sx={{
+          flexGrow: 1,
+          position: "relative",
+          overflowY: "auto",
+          maxHeight: { xs: "300px", md: "400px" },
+          p: 0.5,
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+          // Removed alignItems: "center" here to allow collections to fill width
+          width: "100%",
+        }}
+      >
+        {loadingInitial && collections.length === 0 ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "150px",
+            }}
+          >
+            <CircularProgress size={60} />
+          </Box>
+        ) : (
+          <InfiniteScroll
+            dataLength={collections.length}
+            next={loadMoreCollections}
+            hasMore={hasMore}
+            loader={
+              <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
+                <CircularProgress />
+              </Box>
+            }
+            endMessage={
+              collections.length > 0 &&
+              !loadingInitial && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    textAlign: "center",
+                    color: "text.disabled",
+                    my: 1,
+                  }}
+                >
+                  — End of Collections —
+                </Typography>
+              )
+            }
+            scrollableTarget="collectionsScrollableContainer"
+            scrollThreshold={0.9}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                width: "100%",
+                gap: 1,
+              }}
+            >
+              {collections.map((collection) => (
+                <Collection
+                  key={collection.collection.id}
+                  collection={collection}
+                  small={true}
+                />
+              ))}
+            </Box>
+          </InfiniteScroll>
+        )}
+
+        {collections.length === 0 && !loadingInitial && (
+          <EmptyMessage message="collections" />
+        )}
+
+        {showScrollDownIndicator && (
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              display: "flex",
+              justifyContent: "center",
+              zIndex: 1,
+              background: !isDark ? "black" : "white",
+              py: 1,
+              pointerEvents: "none",
+              transition: "opacity 0.3s ease-in-out",
+              opacity: 1,
+            }}
+          >
+            <Typography
+              sx={{
+                pointerEvents: "auto",
+                fontWeight: "bold",
+                fontSize: "12px",
+              }}
+              variant="button"
+              color={!isDark ? "white" : "black"}
+            >
+              Scroll for more
+            </Typography>
+          </Box>
+        )}
+      </Box>
+    </Box>
   );
 };
 

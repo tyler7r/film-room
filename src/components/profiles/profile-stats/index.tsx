@@ -6,10 +6,9 @@ import type { StatsType } from "~/utils/types";
 
 type ProfileStatsProps = {
   profileId: string | undefined;
-  changeActionBar: (topic: "createdPlays" | "highlights" | "mentions") => void;
 };
 
-const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
+const ProfileStats = ({ profileId }: ProfileStatsProps) => {
   const { isDark } = useIsDarkContext();
 
   const [stats, setStats] = useState<StatsType>({
@@ -97,10 +96,7 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
             : { backgroundColor: `${colors.purple.A200}` }
         }
       >
-        <div
-          className="flex cursor-pointer flex-col items-center justify-center"
-          onClick={() => changeActionBar("createdPlays")}
-        >
+        <div className="flex cursor-pointer flex-col items-center justify-center">
           <div className="text-3xl font-bold tracking-tight">
             {stats.playCount}
           </div>
@@ -109,20 +105,14 @@ const ProfileStats = ({ profileId, changeActionBar }: ProfileStatsProps) => {
           </div>
         </div>
         <Divider flexItem orientation="vertical" />
-        <div
-          className="flex cursor-pointer flex-col items-center justify-center"
-          onClick={() => changeActionBar("mentions")}
-        >
+        <div className="flex cursor-pointer flex-col items-center justify-center">
           <div className="text-3xl font-bold tracking-tight">
             {stats.mentionCount}
           </div>
           <div className="font-bold leading-4 tracking-tighter">mentions</div>
         </div>
         <Divider flexItem orientation="vertical" />
-        <div
-          className="flex cursor-pointer flex-col items-center justify-center"
-          onClick={() => changeActionBar("highlights")}
-        >
+        <div className="flex cursor-pointer flex-col items-center justify-center">
           <div className="text-3xl font-bold tracking-tight">
             {stats.highlightCount}
           </div>

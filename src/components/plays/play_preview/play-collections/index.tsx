@@ -62,7 +62,7 @@ const PlayPreviewCollections = ({ play }: PlayCollectionsProps) => {
   }, [play.play.id]);
 
   const handleCollectionClick = (collectionId: string) => {
-    void router.push(`/collection/${collectionId}`);
+    void router.push(`/collections/${collectionId}`);
   };
 
   if (collections.length === 0) {
@@ -70,10 +70,11 @@ const PlayPreviewCollections = ({ play }: PlayCollectionsProps) => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-      {collections.length > 0 && ( // Only render chip if there are collections
+    collections &&
+    collections.length > 0 && (
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, py: 0.5 }}>
         <Chip
-          icon={<CollectionsBookmarkIcon sx={{ fontSize: "12px" }} />}
+          icon={<CollectionsBookmarkIcon sx={{ fontSize: "14px" }} />}
           label={`Collections (${collections.length})`}
           onClick={handleOpenDialog}
           variant="outlined"
@@ -84,64 +85,63 @@ const PlayPreviewCollections = ({ play }: PlayCollectionsProps) => {
             height: "24px", // Smaller height}}
           }}
         />
-      )}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            Play Collections
-          </Typography>
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseDialog}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        {/* Adjusted padding on DialogContent */}
-        <DialogContent dividers sx={{ p: 0.5 }}>
-          <List dense>
-            {collections.map((collection) => (
-              <ListItem
-                key={collection.id}
-                onClick={() => handleCollectionClick(collection.id)}
-                sx={{
-                  cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: "action.hover",
-                  },
-                  borderRadius: 2,
-                  mb: 0.5, // Slightly reduced margin bottom
-                  px: 1.5, // Reduced horizontal padding
-                  py: 0.5, // Reduced vertical padding
-                }}
-              >
-                <CollectionsBookmarkIcon sx={{ mr: 1 }} fontSize="small" />{" "}
-                {/* Reduced right margin */}
-                <ListItemText
-                  primary={
-                    // Using variant="body2" for smaller text, and bold
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                      {collection.title}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-        </DialogContent>
-      </Dialog>
-    </Box>
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              Play Collections
+            </Typography>
+            <IconButton
+              aria-label="close"
+              onClick={handleCloseDialog}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          {/* Adjusted padding on DialogContent */}
+          <DialogContent dividers sx={{ p: 0.5 }}>
+            <List dense>
+              {collections.map((collection) => (
+                <ListItem
+                  key={collection.id}
+                  onClick={() => handleCollectionClick(collection.id)}
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                    borderRadius: 2,
+                    mb: 0.5, // Slightly reduced margin bottom
+                    px: 1.5, // Reduced horizontal padding
+                    py: 0.5, // Reduced vertical padding
+                  }}
+                >
+                  <CollectionsBookmarkIcon sx={{ mr: 1 }} fontSize="small" />{" "}
+                  {/* Reduced right margin */}
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        {collection.title}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </DialogContent>
+        </Dialog>
+      </Box>
+    )
   );
 };
 

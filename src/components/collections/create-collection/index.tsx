@@ -1,5 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
-import { Button, TextField } from "@mui/material";
+import { Button, IconButton, TextField } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import FormMessage from "~/components/utils/form-message";
@@ -13,9 +13,10 @@ import PrivacyStatus from "./privacy-status";
 type CreateCollectionProps = {
   small?: boolean;
   listItem?: boolean;
+  icon?: boolean;
 };
 
-const CreateCollection = ({ small, listItem }: CreateCollectionProps) => {
+const CreateCollection = ({ small, listItem, icon }: CreateCollectionProps) => {
   const { user } = useAuthContext();
   const router = useRouter();
 
@@ -93,6 +94,15 @@ const CreateCollection = ({ small, listItem }: CreateCollectionProps) => {
       <div onClick={handleOpen} className="text-sm font-bold">
         NEW COLLECTION
       </div>
+    ) : icon ? (
+      <IconButton
+        onClick={handleOpen}
+        size={"small"}
+        sx={{ padding: 0 }}
+        color="primary"
+      >
+        <AddIcon />
+      </IconButton>
     ) : (
       <Button
         onClick={handleOpen}

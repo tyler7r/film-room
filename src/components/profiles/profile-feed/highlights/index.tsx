@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { supabase } from "utils/supabase/component";
 import PlayPreview from "~/components/plays/play_preview";
+import EmptyMessage from "~/components/utils/empty-msg";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import type { PlayPreviewType } from "~/utils/types";
@@ -157,9 +158,7 @@ const HighlightedPlaysFeed = ({ profileId }: HighlightedPlaysFeedProps) => {
           </Box>
 
           {!loading && plays.length === 0 && (
-            <Box className="py-4 text-center text-gray-500">
-              No highlighted plays by this user yet.
-            </Box>
+            <EmptyMessage message="highlight plays of this user" />
           )}
         </>
       )}
