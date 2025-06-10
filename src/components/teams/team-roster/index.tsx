@@ -79,7 +79,7 @@ const Roster = ({ team, role }: RosterProps) => {
       </div>
       {!hide &&
         (!roster ? (
-          <EmptyMessage message="active player accounts" size="small" />
+          <EmptyMessage message="active player accounts" />
         ) : (
           <div className="flex flex-wrap items-center justify-center gap-4">
             {(role === "player" || role === "guest") &&

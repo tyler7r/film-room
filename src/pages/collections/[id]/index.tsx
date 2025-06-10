@@ -314,9 +314,7 @@ const Collection = () => {
                 onChange={handlePageChange}
               />
             )}
-            {!plays && (
-              <EmptyMessage message="plays in this collection" size="medium" />
-            )}
+            {!plays && <EmptyMessage message="plays in this collection" />}
           </div>
         )}
       </div>

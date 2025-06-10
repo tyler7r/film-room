@@ -1,9 +1,16 @@
 import AddIcon from "@mui/icons-material/Add";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { Box } from "@mui/material";
+import {
+  Box, // Added Typography for text styling
+  Button,
+  CircularProgress, // Import Tabs for navigation
+  Tab, // Keep IconButton for edit
+  Tabs,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import ProfileActionBar from "~/components/profiles/profile-action-bar";
+import { type SyntheticEvent, useCallback, useEffect, useState } from "react"; // Added useCallback, SyntheticEvent
 import ProfileCollections from "~/components/profiles/profile-collections";
 import ProfileEdit from "~/components/profiles/profile-edit";
 import CreatedFeed from "~/components/profiles/profile-feed/created";
@@ -17,8 +24,7 @@ import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type {
-  LastWatchedType,
-  ProfileActionBarType,
+  LastWatchedType, // Will adapt this or create new state for tabs
   TeamAffiliationType,
   UserType,
 } from "~/utils/types";
@@ -30,7 +36,8 @@ type FetchOptions = {
 const Profile = () => {
   const router = useRouter();
   const { user } = useAuthContext();
-  const { backgroundStyle, hoverBorder } = useIsDarkContext();
+  const { backgroundStyle } = useIsDarkContext();
+  const theme = useTheme();
 
   const [options, setOptions] = useState<FetchOptions>({
     profileId: router.query.user as string,
@@ -41,84 +48,103 @@ const Profile = () => {
   >(null);
 
   const [lastWatched, setLastWatched] = useState<LastWatchedType | null>(null);
-  const [actionBarStatus, setActionBarStatus] = useState<ProfileActionBarType>({
-    createdPlays: true,
-    mentions: false,
-    highlights: false,
-  });
+  // Replaced actionBarStatus with selectedTab for Material UI Tabs
+  const [selectedTab, setSelectedTab] = useState<
+    "created" | "mentions" | "highlights"
+  >("created");
 
-  const fetchProfile = async (options?: FetchOptions) => {
-    if (options?.profileId) {
-      const profile = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", options.profileId)
-        .single();
-      if (profile.data) {
-        setProfile(profile.data);
-        const { data } = await supabase
-          .from("user_view")
-          .select("*")
-          .eq("profile->>id", options.profileId);
-        if (data) {
-          const typedAffiliations: TeamAffiliationType[] = data
-            .filter((aff) => aff.affiliation.verified)
-            .map((aff) => ({
-              team: aff.team,
-              role: aff.affiliation.role,
-              number: aff.affiliation.number,
-              affId: aff.affiliation.id,
-            }));
-          if (typedAffiliations && typedAffiliations.length > 0)
-            setProfileAffiliations(typedAffiliations);
-          else setProfileAffiliations(null);
-        } else setProfileAffiliations(null);
-      }
-    }
+  const handleChangeTab = (
+    _event: SyntheticEvent,
+    newValue: "created" | "mentions" | "highlights",
+  ) => {
+    setSelectedTab(newValue);
   };
 
-  const fetchLastWatched = async () => {
-    if (user.userId === options.profileId) {
-      const { data } = await supabase
+  const fetchProfile = useCallback(
+    async (currentOptions?: FetchOptions) => {
+      const profileIdToFetch =
+        currentOptions?.profileId ?? (router.query.user as string);
+
+      if (profileIdToFetch) {
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", profileIdToFetch)
+          .single();
+
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          setProfile(null);
+          setProfileAffiliations(null);
+          return;
+        }
+
+        if (profileData) {
+          setProfile(profileData);
+
+          const { data: userData, error: userError } = await supabase
+            .from("user_view")
+            .select("*")
+            .eq("profile->>id", profileIdToFetch);
+
+          if (userError) {
+            console.error("Error fetching user affiliations:", userError);
+            setProfileAffiliations(null);
+            return;
+          }
+
+          if (userData) {
+            const typedAffiliations: TeamAffiliationType[] = userData
+              .filter((aff) => aff.affiliation.verified)
+              .map((aff) => ({
+                team: aff.team,
+                role: aff.affiliation.role,
+                number: aff.affiliation.number,
+                affId: aff.affiliation.id,
+              }));
+            setProfileAffiliations(
+              typedAffiliations.length > 0 ? typedAffiliations : null,
+            );
+          } else {
+            setProfileAffiliations(null);
+          }
+        }
+      }
+    },
+    [router.query.user],
+  ); // Added router.query.user to dependencies
+
+  const fetchLastWatched = useCallback(async () => {
+    if (user.userId && user.userId === options.profileId) {
+      const { data, error } = await supabase
         .from("last_watched_view")
         .select()
         .eq("profile->>id", `${user.userId}`)
         .single();
+      if (error) {
+        console.error("Error fetching last watched:", error);
+        setLastWatched(null);
+        return;
+      }
       if (data?.video) setLastWatched(data);
       else setLastWatched(null);
     }
-  };
+  }, [user.userId, options.profileId]); // Added options.profileId to dependencies
 
-  const changeActionBar = (
-    topic: "createdPlays" | "highlights" | "mentions",
-  ) => {
-    topic === "createdPlays"
-      ? setActionBarStatus({
-          createdPlays: true,
-          mentions: false,
-          highlights: false,
-        })
-      : topic === "highlights"
-        ? setActionBarStatus({
-            highlights: true,
-            mentions: false,
-            createdPlays: false,
-          })
-        : setActionBarStatus({
-            createdPlays: false,
-            mentions: true,
-            highlights: false,
-          });
-  };
-
+  // Realtime subscription for profile updates
   useEffect(() => {
+    if (!supabase) {
+      console.warn("Supabase client is not initialized for real-time.");
+      return;
+    }
+
     const channel = supabase
       .channel("profile_changes")
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "profiles" },
         () => {
-          void fetchProfile();
+          void fetchProfile(); // Re-fetch profile on update
         },
       )
       .subscribe();
@@ -126,108 +152,245 @@ const Profile = () => {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchProfile]); // Dependency on memoized fetchProfile
 
+  // Effect for initial fetch of last watched
   useEffect(() => {
     if (user.userId) void fetchLastWatched();
-  }, [user]);
+  }, [user, fetchLastWatched]); // Dependencies on user and memoized fetchLastWatched
 
+  // Effect to update options state when router query changes
   useEffect(() => {
     setOptions({
       ...options,
       profileId: router.query.user as string,
     });
-  }, [router.query.user, user]);
+  }, [router.query.user]); // Only depends on router.query.user
 
+  // Effect to fetch profile when options change
   useEffect(() => {
     void fetchProfile(options);
-  }, [options]);
+  }, [options, fetchProfile]); // Depends on options and memoized fetchProfile
+
+  if (!profile) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    ); // Or a loading spinner/skeleton
+  }
 
   return (
-    profile && (
-      <Box className="flex w-full flex-col items-center justify-center gap-8">
-        <div className="flex w-4/5 flex-col items-center justify-center gap-4">
-          <div className="flex w-full flex-col items-center justify-center">
-            <PageTitle
-              size="x-large"
-              title={profile.name === "" ? profile.email! : profile.name}
-            />
-            <div className="flex w-full items-center justify-center gap-2">
-              <div className="text-lg font-light leading-5 tracking-tighter">
-                Member since {profile.join_date.substring(0, 4)}
-              </div>
-              {user.userId === router.query.user && (
-                <ProfileEdit profile={profile} />
-              )}
-            </div>
-          </div>
-          <ProfileStats
-            profileId={options.profileId}
-            changeActionBar={changeActionBar}
-          />
-        </div>
-        {router.query.user === user.userId && lastWatched && (
-          <div className="flex w-full items-center justify-center">
-            <div className="flex w-11/12 flex-col items-center justify-center gap-3">
-              <div className="flex items-center gap-2">
-                <PlayArrowIcon fontSize="large" />
-                <PageTitle size="small" title="Continue Watching" />
-              </div>
-              <Video
-                video={lastWatched.video}
-                startTime={`${lastWatched.profile.last_watched_time}`}
-              />
-            </div>
-          </div>
-        )}
-        <div className=" flex flex-col items-center justify-center gap-2">
-          <PageTitle title="Team Affiliations" size="small" />
-          {profileAffiliations && (
-            <div className="flex w-full flex-wrap items-center justify-center gap-1">
-              {profileAffiliations.map((aff) => (
-                <TeamAffiliation key={aff.affId} aff={aff} />
-              ))}
-            </div>
-          )}
-          {!profileAffiliations && router.query.user === user.userId && (
-            <div
-              onClick={() => void router.push("/team-select")}
-              style={backgroundStyle}
-              className={`${hoverBorder} flex cursor-pointer items-center justify-center gap-1 p-2`}
-            >
-              <AddIcon fontSize="small" />
-              <div className="text-sm font-bold">JOIN A NEW TEAM!</div>
-            </div>
-          )}
-        </div>
-        <ProfileCollections profileId={profile.id} />
+    <Box
+      sx={{
+        display: "flex",
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2, // Increased gap for overall spacing between major sections
+        p: 2, // Responsive padding for the whole page
+      }}
+    >
+      {/* 1. Unified Profile Header */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" }, // Stack on mobile, row on tablet/desktop
+          alignItems: { xs: "center", sm: "flex-start" }, // Center items on mobile, align to start on larger
+          justifyContent: { xs: "center", sm: "space-between" }, // Center content on mobile, space between on larger
+          width: { xs: "100%", sm: "90%", md: "70%" },
+          maxWidth: "800px", // Max width for larger screens
+          p: 2,
+          borderRadius: "12px",
+          boxShadow: 3, // Subtle shadow for prominence
+          ...backgroundStyle,
+          position: "relative", // For absolute positioning of edit button
+        }}
+      >
+        {/* Name, Join Date, Edit Button */}
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            gap: 2,
-            width: "100%",
+            alignItems: { xs: "center", sm: "flex-start" }, // Center text on mobile, left-align on larger
+            flexShrink: 0, // Prevent shrinking
+            textAlign: { xs: "center", sm: "left" },
           }}
         >
-          <div className="flex w-full items-center justify-center">
-            <ProfileActionBar
-              actionBarStatus={actionBarStatus}
-              setActionBarStatus={setActionBarStatus}
-            />
-          </div>
-          {actionBarStatus.createdPlays && (
-            <CreatedFeed profileId={options.profileId} />
-          )}
-          {actionBarStatus.mentions && (
-            <MentionsFeed profileId={options.profileId} />
-          )}
-          {actionBarStatus.highlights && (
-            <HighlightsFeed profileId={options.profileId} />
+          <PageTitle
+            size="large"
+            title={profile.name === "" ? profile.email! : profile.name}
+          />
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mb: 2, fontWeight: "light", letterSpacing: "-0.025em" }}
+          >
+            Member since {profile.join_date.substring(0, 4)}
+          </Typography>
+          {user.userId === router.query.user && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 5,
+                right: 5,
+              }}
+            >
+              <ProfileEdit profile={profile} />
+            </Box>
           )}
         </Box>
+
+        {/* Profile Stats */}
+        <ProfileStats profileId={options.profileId} />
       </Box>
-    )
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center", // Center content vertically within this section
+          gap: 1,
+          p: 2,
+          borderRadius: "12px",
+          boxShadow: 2,
+          ...backgroundStyle,
+          width: { xs: "100%", sm: "90%", md: "70%" },
+          maxWidth: "800px",
+        }}
+      >
+        <PageTitle title="Team Affiliations" size="small" />
+        {profileAffiliations && profileAffiliations.length > 0 ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center", // Always center affiliations for better mobile look
+              width: "100%",
+            }}
+          >
+            {profileAffiliations.map((aff) => (
+              <TeamAffiliation key={aff.affId} aff={aff} />
+            ))}
+          </Box>
+        ) : (
+          router.query.user === user.userId && (
+            <Button
+              onClick={() => void router.push("/team-select")}
+              variant="outlined"
+              startIcon={<AddIcon />}
+              sx={{
+                ...backgroundStyle,
+                py: 1,
+                px: 2,
+                borderRadius: "8px",
+                fontWeight: "bold",
+                textTransform: "none",
+                border: `1px solid ${theme.palette.divider}`,
+                "&:hover": {
+                  borderColor: theme.palette.primary.main,
+                  boxShadow: 1,
+                },
+              }}
+            >
+              JOIN A NEW TEAM!
+            </Button>
+          )
+        )}
+      </Box>
+      {/* </Box> */}
+
+      {/* 5. Optional: Continue Watching (Personalized) */}
+      {router.query.user === user.userId && lastWatched && (
+        <Box
+          sx={{
+            display: "flex",
+            width: { xs: "100%", sm: "90%", md: "70%" },
+            maxWidth: "800px",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            p: 2,
+            borderRadius: "12px",
+            boxShadow: 2,
+            ...backgroundStyle,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <PlayArrowIcon fontSize="large" color="primary" />
+            <PageTitle size="small" title="Continue Watching" />
+          </Box>
+          <Video
+            video={lastWatched.video}
+            startTime={`${lastWatched.profile.last_watched_time}`}
+          />
+        </Box>
+      )}
+
+      {/* 4. Collections Section */}
+      <Box
+        sx={{
+          width: { xs: "100%", sm: "90%", md: "70%" },
+          maxWidth: "800px",
+          p: 2,
+          borderRadius: "12px",
+          boxShadow: 2,
+          ...backgroundStyle,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 2,
+        }}
+      >
+        <ProfileCollections profileId={profile.id} />
+      </Box>
+
+      {/* 3. Tabbed Activity Feeds */}
+      <Tabs
+        value={selectedTab}
+        onChange={handleChangeTab}
+        textColor="primary"
+        indicatorColor="primary"
+        variant="fullWidth"
+        sx={{
+          borderBottom: 1, // Add a subtle bottom border
+          borderColor: "divider",
+          "& .MuiTabs-indicator": {
+            height: "3px", // Thicker indicator
+            borderRadius: "2px", // Rounded indicator
+          },
+        }}
+      >
+        <Tab
+          value="created"
+          label="Created Plays"
+          sx={{ fontWeight: "bold" }}
+        />
+        <Tab value="mentions" label="Mentions" sx={{ fontWeight: "bold" }} />
+        <Tab
+          value="highlights"
+          label="Highlights"
+          sx={{ fontWeight: "bold" }}
+        />
+      </Tabs>
+
+      {selectedTab === "created" && (
+        <CreatedFeed profileId={options.profileId} />
+      )}
+      {selectedTab === "mentions" && (
+        <MentionsFeed profileId={options.profileId} /> // Pass mentionedUserId prop
+      )}
+      {selectedTab === "highlights" && (
+        <HighlightsFeed profileId={options.profileId} />
+      )}
+    </Box>
   );
 };
 

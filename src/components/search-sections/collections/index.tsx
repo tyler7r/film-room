@@ -75,9 +75,7 @@ const SearchCollections = ({ topic }: SearchCollectionsProps) => {
           {collectionCount} results found
         </div>
       )}
-      {!collections && !loading && (
-        <EmptyMessage size="large" message="collections" />
-      )}
+      {!collections && !loading && <EmptyMessage message="collections" />}
       <div className="flex w-4/5 flex-wrap items-center justify-center gap-6">
         {collections?.map((collection) => (
           <Collection key={collection.collection.id} collection={collection} />

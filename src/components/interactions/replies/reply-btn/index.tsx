@@ -1,7 +1,6 @@
 import CommentIcon from "@mui/icons-material/Comment";
 import { IconButton } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import StandardPopover from "~/components/utils/standard-popover";
+import React, { useEffect } from "react";
 import { supabase } from "~/utils/supabase";
 
 type ReplyBtnProps = {
@@ -19,18 +18,6 @@ const ReplyBtn = ({
   replyCount,
   setReplyCount,
 }: ReplyBtnProps) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-
   const handleReplyClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (setIsOpen) {
@@ -70,19 +57,8 @@ const ReplyBtn = ({
 
   return (
     <div className="flex items-center">
-      <IconButton
-        size="small"
-        onClick={handleReplyClick}
-        onMouseEnter={handlePopoverOpen}
-        onMouseLeave={handlePopoverClose}
-      >
+      <IconButton size="small" onClick={handleReplyClick}>
         <CommentIcon color="primary" fontSize="small" />
-        <StandardPopover
-          content="Replies"
-          open={open}
-          handlePopoverClose={handlePopoverClose}
-          anchorEl={anchorEl}
-        />
       </IconButton>
       <div className="font-bold tracking-tight">{replyCount}</div>
     </div>

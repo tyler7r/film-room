@@ -73,7 +73,7 @@ const TeamCollections = ({ teamId }: TeamCollectionsProps) => {
           </IconButton>
         )}
       </div>
-      {!collections && <EmptyMessage size="small" message="collections" />}
+      {!collections && <EmptyMessage message="collections" />}
       {!hide && (
         <div className="flex w-full flex-col items-center justify-center gap-6">
           <div className="flex w-full flex-wrap items-center justify-center gap-6">

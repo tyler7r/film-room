@@ -61,7 +61,7 @@ const SearchUsers = ({ topic }: SearchUsersProps) => {
           {userCount} results found
         </div>
       )}
-      {!users && !loading && <EmptyMessage size="large" message="users" />}
+      {!users && !loading && <EmptyMessage message="users" />}
       <div className="flex w-full flex-wrap justify-center gap-6">
         {users?.map((u) => <User user={u} key={u.id} goToProfile={true} />)}
       </div>

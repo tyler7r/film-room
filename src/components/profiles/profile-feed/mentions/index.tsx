@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { supabase } from "utils/supabase/component";
 import PlayPreview from "~/components/plays/play_preview";
+import EmptyMessage from "~/components/utils/empty-msg";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import type { PlayPreviewType } from "~/utils/types";
@@ -77,9 +78,7 @@ const MentionedPlaysFeed = ({ profileId }: MentionedPlaysFeedProps) => {
         // Apply visibility logic
         if (affIds && affIds.length > 0) {
           void playsQuery.or(
-            `play->>private.eq.false, play->>exclusive_to.in.(${affIds.join(
-              ",",
-            )})`,
+            `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
           );
         } else {
           void playsQuery.eq("play->>private", false);
@@ -200,9 +199,7 @@ const MentionedPlaysFeed = ({ profileId }: MentionedPlaysFeedProps) => {
           </Box>
 
           {!loading && plays.length === 0 && (
-            <Box className="py-4 text-center text-gray-500">
-              No plays where this user is mentioned yet.
-            </Box>
+            <EmptyMessage message="play mentions of this user" />
           )}
         </>
       )}

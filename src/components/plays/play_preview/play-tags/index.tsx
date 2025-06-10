@@ -103,10 +103,18 @@ const PlayPreviewTags = ({
   }, [activePlay, play, playId, fetchTags]);
 
   return (
-    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-      {tags && tags.length > 0 && (
+    tags &&
+    tags.length > 0 && (
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 0.5,
+          py: 0.5,
+        }}
+      >
         <Chip
-          icon={<LocalOfferIcon sx={{ fontSize: "12px" }} />}
+          icon={<LocalOfferIcon sx={{ fontSize: "14px" }} />}
           label={`Tags (${tags.length})`}
           onClick={handleOpenDialog}
           variant="outlined"
@@ -117,61 +125,61 @@ const PlayPreviewTags = ({
             height: "24px", // Smaller height}}
           }}
         />
-      )}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            Play Tags
-          </Typography>
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseDialog}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers sx={{ padding: 0.5 }}>
-          <List dense>
-            {tags?.map((tag) => (
-              <ListItem
-                key={tag.id} // Use tag.id for key, as tag.title might not be unique globally
-                onClick={(e) => handleClick(e, tag.title)}
-                sx={{
-                  cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: "action.hover",
-                  },
-                  borderRadius: 2,
-                  mb: 0.5, // Slightly reduced margin bottom
-                  px: 1.5, // Reduced horizontal padding
-                  py: 0.5, // Reduced vertical padding
-                }}
-              >
-                <LocalOfferIcon sx={{ mr: 1 }} /> {/* Icon for tags */}
-                <ListItemText
-                  primary={
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                      {tag.title}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-        </DialogContent>
-      </Dialog>
-    </Box>
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          fullWidth
+          maxWidth="xs"
+        >
+          <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              Play Tags
+            </Typography>
+            <IconButton
+              aria-label="close"
+              onClick={handleCloseDialog}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers sx={{ padding: 0.5 }}>
+            <List dense>
+              {tags?.map((tag) => (
+                <ListItem
+                  key={tag.id} // Use tag.id for key, as tag.title might not be unique globally
+                  onClick={(e) => handleClick(e, tag.title)}
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                    borderRadius: 2,
+                    mb: 0.5, // Slightly reduced margin bottom
+                    px: 1.5, // Reduced horizontal padding
+                    py: 0.5, // Reduced vertical padding
+                  }}
+                >
+                  <LocalOfferIcon sx={{ mr: 1 }} /> {/* Icon for tags */}
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        {tag.title}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </DialogContent>
+        </Dialog>
+      </Box>
+    )
   );
 };
 

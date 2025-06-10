@@ -81,12 +81,7 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
       {!hide && (
         <div className="flex w-full flex-col items-center justify-center gap-2">
           <div className="flex w-full flex-wrap justify-center gap-6">
-            {!videos && (
-              <EmptyMessage
-                message="team videos in the database"
-                size="small"
-              />
-            )}
+            {!videos && <EmptyMessage message="team videos in the database" />}
             {videos?.map((video) => (
               <Video video={video.video} key={video.video.id} />
             ))}

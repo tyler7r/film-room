@@ -1,23 +1,21 @@
-import { useIsDarkContext } from "~/pages/_app";
+import { Typography } from "@mui/material";
 
 type EmptyMessageProps = {
   message: string;
-  size: "small" | "medium" | "large";
 };
 
-const EmptyMessage = ({ message, size }: EmptyMessageProps) => {
-  const { isDark } = useIsDarkContext();
-  const fontSize =
-    size === "small" ? "text-base" : size === "medium" ? "text-lg" : "text-xl";
-
+const EmptyMessage = ({ message }: EmptyMessageProps) => {
   return (
-    <div
-      className={`text-center font-bold tracking-tight ${fontSize} ${
-        isDark ? "text-grey-400" : "text-grey-600"
-      }`}
+    <Typography
+      variant="caption"
+      sx={{
+        display: "block",
+        color: "text.disabled",
+        my: 1,
+      }}
     >
-      No {message} found!
-    </div>
+      — No {message} found —
+    </Typography>
   );
 };
 

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { supabase } from "utils/supabase/component";
 import PlayPreview from "~/components/plays/play_preview";
+import EmptyMessage from "~/components/utils/empty-msg";
 import { useAuthContext } from "~/contexts/auth"; // Assuming this context exists
 import { useMobileContext } from "~/contexts/mobile"; // Assuming this context exists
 import type { PlayPreviewType } from "~/utils/types"; // Assuming this type exists
@@ -159,9 +160,7 @@ const CreatedPlaysFeed = ({ profileId }: FeedProps) => {
           </Box>
 
           {!loading && plays.length === 0 && (
-            <Box className="py-4 text-center text-gray-500">
-              No plays created by this user yet.
-            </Box>
+            <EmptyMessage message="created plays by this user" />
           )}
         </>
       )}

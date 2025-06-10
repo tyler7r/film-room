@@ -59,7 +59,7 @@ const Requests = ({ team, setRequestCount, isOpen }: RequestsProps) => {
   return isOpen ? (
     <div className="flex flex-col gap-2 text-center">
       <PageTitle title="Join Requests" size="small" />
-      {!requests && <EmptyMessage message="requests" size="medium" />}
+      {!requests && <EmptyMessage message="requests" />}
       {requests?.map((req) => (
         <div
           key={req.affiliation.id}

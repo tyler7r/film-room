@@ -20,7 +20,7 @@ const CommentIndex = ({
   activeComment,
 }: CommentIndexProps) => {
   const { isMobile } = useMobileContext();
-  const { backgroundStyle, isDark } = useIsDarkContext();
+  const { backgroundStyle } = useIsDarkContext();
 
   const [index, setIndex] = useState<CommentNotificationType[]>([]); // Initialize as empty array
   const [activeCom, setActiveCom] = useState<CommentNotificationType | null>(
@@ -33,24 +33,8 @@ const CommentIndex = ({
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loadingInitial, setLoadingInitial] = useState<boolean>(true); // For initial load indicator
 
-  // State for scroll indicator visibility
-  const [showScrollDownIndicator, setShowScrollDownIndicator] = useState(true);
-
   // Ref for the scrollable container
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
-
-  // Callback to handle scroll events for the indicator
-  const handleScroll = useCallback(() => {
-    if (scrollableContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } =
-        scrollableContainerRef.current;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50; // 50px buffer from the bottom
-      const isScrollable = scrollHeight > clientHeight; // Check if content actually overflows
-      const isAtTop = scrollTop === 0;
-
-      setShowScrollDownIndicator(isScrollable && !isAtBottom && isAtTop);
-    }
-  }, [hasMore]); // Dependency on hasMore (this callback itself only changes when hasMore changes)
 
   const fetchComments = useCallback(
     async (currentOffset: number, append = true) => {
@@ -178,31 +162,8 @@ const CommentIndex = ({
     void fetchComments(offset, true);
   };
 
-  // Effect for attaching and detaching scroll listener, and initial check
-  useEffect(() => {
-    const currentRef = scrollableContainerRef.current;
-    if (currentRef) {
-      currentRef.addEventListener("scroll", handleScroll);
-    }
-
-    // Initial check for scroll indicator after component mounts/updates.
-    // This will run when index.length changes (comments are loaded/updated) or handleScroll/hasMore change.
-    // Use a small timeout to ensure comments have rendered and container dimensions are correct.
-    setTimeout(() => {
-      handleScroll();
-    }, 150); // Small delay to allow DOM to render
-
-    return () => {
-      if (currentRef) {
-        currentRef.removeEventListener("scroll", handleScroll);
-      }
-    };
-  }, [handleScroll, index.length, hasMore]); // Added index.length and hasMore as dependencies
-
   return (
-    <Box
-      sx={{ display: "flex", width: "100%", flexDirection: "column", gap: 2 }}
-    >
+    <Box sx={{ display: "flex", width: "100%", flexDirection: "column" }}>
       {/* Active Comment display */}
       {activeCom && (
         <Box
@@ -228,7 +189,9 @@ const CommentIndex = ({
           <Comment key={activeCom.comment.id} cmt={activeCom} autoOpen={true} />
         </Box>
       )}
-
+      {!loadingInitial && index.length === 0 && !activeCom && (
+        <EmptyMessage message="comments" />
+      )}
       {/* Scrollable Container for Infinite Scroll */}
       <Box
         id="commentsScrollableContainer" // Crucial ID for scrollableTarget
@@ -237,7 +200,7 @@ const CommentIndex = ({
           flexGrow: 1, // Allow it to take available height
           position: "relative", // IMPORTANT: for absolute positioning of the indicator
           overflowY: "auto", // Enable vertical scrolling
-          maxHeight: "300px", // Example max height, adjust as needed
+          maxHeight: "400px", // Example max height, adjust as needed
           p: 0.5, // Adjusted padding for comments area
           display: "flex",
           flexDirection: "column",
@@ -298,43 +261,6 @@ const CommentIndex = ({
                 ))}
               </Box>
             </InfiniteScroll>
-          </Box>
-        )}
-
-        {!loadingInitial && index.length === 0 && !activeCom && (
-          <EmptyMessage size="small" message="comments" />
-        )}
-
-        {/* Scroll Down Indicator */}
-        {showScrollDownIndicator && (
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              display: "flex",
-              justifyContent: "center",
-              py: 1,
-              zIndex: 1,
-              background: !isDark
-                ? "linear-gradient(to top, rgba(0,0,0,0.3), rgba(0,0,0,0))" // Darker fade for dark mode
-                : "linear-gradient(to top, rgba(255,255,255,0.3), rgba(255,255,255,0))", // Lighter fade for light mode
-              pointerEvents: "none", // Allow clicks/scrolls to pass through initially
-              transition: "opacity 0.3s ease-in-out",
-              opacity: 1,
-            }}
-          >
-            <Typography
-              sx={{
-                pointerEvents: "auto",
-                fontWeight: "bold",
-                fontSize: "12px",
-              }}
-              variant="button"
-            >
-              Scroll for more
-            </Typography>
           </Box>
         )}
       </Box>

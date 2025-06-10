@@ -107,8 +107,9 @@ const PlayPreviewMentions = ({
   // const fetchMentionsMemoized = useCallback(fetchMentions, [play.play.id]); // Uncomment and use if needed
 
   return (
-    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-      {mentions && mentions.length > 0 && (
+    mentions &&
+    mentions.length > 0 && (
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, py: 0.5 }}>
         <Chip
           icon={<PersonIcon sx={{ fontSize: "14px" }} />}
           label={`Mentions (${mentions.length})`}
@@ -121,70 +122,70 @@ const PlayPreviewMentions = ({
             height: "24px", // Smaller height}}
           }}
         />
-      )}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            Player Mentions
-          </Typography>
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseDialog}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers sx={{ p: 0.5 }}>
-          <List dense>
-            {mentions?.map((mention) => (
-              <ListItem
-                key={mention.id}
-                onClick={(e) =>
-                  handleClick(e, mention.receiver_name, mention.receiver_id)
-                }
-                sx={{
-                  cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: "action.hover",
-                  },
-                  borderRadius: 2,
-                  mb: 0.5, // Slightly reduced margin bottom
-                  px: 1.5, // Reduced horizontal padding
-                  py: 0.5, // Reduced vertical padding
-                }}
-              >
-                <Avatar sx={{ mr: 1, width: 30, height: 30 }}>
-                  {/* You can use mention.profiles?.avatar_url if available, or fall back to first letter */}
-                  {mention.receiver_name[0] ? (
-                    mention.receiver_name[0].toLocaleUpperCase()
-                  ) : (
-                    <PersonIcon fontSize="small" />
-                  )}
-                </Avatar>
-                <ListItemText
-                  primary={
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                      {mention.receiver_name}
-                    </Typography>
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          fullWidth
+          maxWidth="xs"
+        >
+          <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              Player Mentions
+            </Typography>
+            <IconButton
+              aria-label="close"
+              onClick={handleCloseDialog}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers sx={{ p: 0.5 }}>
+            <List dense>
+              {mentions?.map((mention) => (
+                <ListItem
+                  key={mention.id}
+                  onClick={(e) =>
+                    handleClick(e, mention.receiver_name, mention.receiver_id)
                   }
-                />
-              </ListItem>
-            ))}
-          </List>
-        </DialogContent>
-      </Dialog>
-    </Box>
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                    borderRadius: 2,
+                    mb: 0.5, // Slightly reduced margin bottom
+                    px: 1.5, // Reduced horizontal padding
+                    py: 0.5, // Reduced vertical padding
+                  }}
+                >
+                  <Avatar sx={{ mr: 1, width: 30, height: 30 }}>
+                    {/* You can use mention.profiles?.avatar_url if available, or fall back to first letter */}
+                    {mention.receiver_name[0] ? (
+                      mention.receiver_name[0].toLocaleUpperCase()
+                    ) : (
+                      <PersonIcon fontSize="small" />
+                    )}
+                  </Avatar>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        {mention.receiver_name}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </DialogContent>
+        </Dialog>
+      </Box>
+    )
   );
 };
 

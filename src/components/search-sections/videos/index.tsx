@@ -104,7 +104,7 @@ const SearchVideos = ({ topic }: SearchVideosProps) => {
           {videoCount} results found
         </div>
       )}
-      {!videos && !loading && <EmptyMessage size="large" message="videos" />}
+      {!videos && !loading && <EmptyMessage message="videos" />}
       <div className="flex w-full flex-wrap justify-center gap-6">
         {videos?.map((v) => <Video video={v} key={v.id} />)}
       </div>

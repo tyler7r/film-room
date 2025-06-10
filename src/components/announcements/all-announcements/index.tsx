@@ -104,7 +104,7 @@ const Announcements = ({ teamId, role }: AnnouncementsProps) => {
           </IconButton>
         )}
       </div>
-      {!anncs && <EmptyMessage message="team announcements" size="small" />}
+      {!anncs && <EmptyMessage message="team announcements" />}
       {anncs?.map((annc) => (
         <Announcement annc={annc} key={annc.announcement.id} />
       ))}
