@@ -1,7 +1,7 @@
 import BuildCircleIcon from "@mui/icons-material/BuildCircle";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
-import { IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 
 type PlayModalBtnProps = {
   isPlayStarted: boolean;
@@ -28,7 +28,7 @@ const PlayModalBtn = ({
   };
 
   return draftedPlay ? (
-    <div className="z-20">
+    <Box sx={{ zIndex: 20 }}>
       <Tooltip
         title="Edit your current drafted play."
         slotProps={{
@@ -50,12 +50,12 @@ const PlayModalBtn = ({
           size="small"
           color="primary"
         >
-          <BuildCircleIcon sx={{ fontSize: "64px" }} />
+          <BuildCircleIcon sx={{ fontSize: "64px", zIndex: 10 }} />
         </IconButton>
       </Tooltip>
-    </div>
+    </Box>
   ) : !isPlayStarted ? (
-    <div className="z-20">
+    <Box sx={{ zIndex: 20 }}>
       <Tooltip
         title="START RECORDING, once your play ends make sure to click END RECORDING to complete your note!"
         slotProps={{
@@ -72,7 +72,7 @@ const PlayModalBtn = ({
         }}
       >
         <IconButton
-          sx={{ fontWeight: "bold" }}
+          sx={{ fontWeight: "bold", zIndex: 10 }}
           onClick={handleStart}
           size="small"
           color="primary"
@@ -80,9 +80,9 @@ const PlayModalBtn = ({
           <PlayCircleFilledIcon sx={{ fontSize: "64px" }} />
         </IconButton>
       </Tooltip>
-    </div>
+    </Box>
   ) : (
-    <div className="z-20">
+    <Box className="z-20">
       <Tooltip
         title="END RECORDING, once clicked you will be prompted to fill out the details of your play!"
         slotProps={{
@@ -99,7 +99,7 @@ const PlayModalBtn = ({
         }}
       >
         <IconButton
-          sx={{ fontWeight: "bold" }}
+          sx={{ fontWeight: "bold", zIndex: 10 }}
           onClick={handleEnd}
           size="small"
           color="primary"
@@ -107,7 +107,7 @@ const PlayModalBtn = ({
           <StopCircleIcon sx={{ fontSize: "64px" }} />
         </IconButton>
       </Tooltip>
-    </div>
+    </Box>
   );
 };
 

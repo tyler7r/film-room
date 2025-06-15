@@ -1,39 +1,49 @@
+import CloseIcon from "@mui/icons-material/Close"; // Import CloseIcon for the dialog
 import PersonIcon from "@mui/icons-material/Person";
-import { IconButton } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Chip,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Typography
+} from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import StandardPopover from "~/components/utils/standard-popover";
-import { useIsDarkContext } from "~/pages/_app";
-import { supabase } from "~/utils/supabase";
-import type { MentionType, PlayPreviewType } from "~/utils/types";
+import { supabase } from "~/utils/supabase"; // Assuming Supabase client is initialized here
+import type { MentionType, PlayPreviewType } from "~/utils/types"; // Assuming these types exist
 
-type PlayMentionsProps = {
+type PlayPreviewMentionsProps = {
   play: PlayPreviewType;
   activePlay?: PlayPreviewType;
   handleMentionAndTagClick?: (e: React.MouseEvent, topic: string) => void;
   playId?: string;
 };
 
-const PlayMentions = ({
+const PlayPreviewMentions = ({
   play,
   handleMentionAndTagClick,
   activePlay,
   playId,
-}: PlayMentionsProps) => {
-  const { hoverText } = useIsDarkContext();
+}: PlayPreviewMentionsProps) => {
   const router = useRouter();
   const [mentions, setMentions] = useState<MentionType[] | null>(null);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [openDialog, setOpenDialog] = useState<boolean>(false); // State to control the dialog
 
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
+  const handleOpenDialog = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenDialog(true);
   };
 
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
+  const handleCloseDialog = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenDialog(false);
   };
-
-  const open = Boolean(anchorEl);
 
   const fetchMentions = async () => {
     const { data } = await supabase
@@ -46,17 +56,39 @@ const PlayMentions = ({
     } else setMentions(null);
   };
 
-  const handleClick = (e: React.MouseEvent, name: string, id: string) => {
-    if (handleMentionAndTagClick) handleMentionAndTagClick(e, name);
-    else void router.push(`/profile/${id}`);
+  const handleClick = (
+    e: React.MouseEvent,
+    name: string,
+    id: string,
+    closeDialog = true, // Optional parameter to close dialog
+  ) => {
+    if (handleMentionAndTagClick) {
+      handleMentionAndTagClick(e, name);
+    } else {
+      void router.push(`/profile/${id}`);
+    }
+    if (closeDialog) {
+      handleCloseDialog(e);
+    }
   };
 
   useEffect(() => {
+    // Check if the supabase client is available before subscribing
+    if (!supabase) {
+      console.warn("Supabase client is not initialized.");
+      return;
+    }
+
     const channel = supabase
-      .channel("mention_changes")
+      .channel(`play_mentions_${play.play.id}_changes`) // Unique channel name for specific play's mentions
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "play_mentions" },
+        {
+          event: "*",
+          schema: "public",
+          table: "play_mentions",
+          filter: `play_id=eq.${play.play.id}`,
+        }, // Filter for relevant plays
         () => {
           void fetchMentions();
         },
@@ -66,44 +98,98 @@ const PlayMentions = ({
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [play.play.id, fetchMentions]); // Add play.play.id and fetchMentions to dependencies
 
   useEffect(() => {
     void fetchMentions();
-  }, [activePlay, play, playId]);
+  }, [activePlay, play, playId]); // Initial fetch and refetch on relevant prop changes
+
+  // Memoize `fetchMentions` to prevent infinite loop if it's a dependency of `useEffect`
+  // and `play.play.id` is stable.
+  // const fetchMentionsMemoized = useCallback(fetchMentions, [play.play.id]); // Uncomment and use if needed
+
+  if (!mentions || mentions.length === 0) {
+    return null; // Don't render if no collections
+  }
 
   return (
-    mentions && (
-      <div className={`flex items-center`}>
-        <IconButton
-          size="small"
-          onMouseEnter={handlePopoverOpen}
-          onMouseLeave={handlePopoverClose}
-        >
-          <PersonIcon fontSize="small" />
-        </IconButton>
-        <StandardPopover
-          content="Player Mentions"
-          open={open}
-          handlePopoverClose={handlePopoverClose}
-          anchorEl={anchorEl}
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, py: 0.5 }}>
+        <Chip
+          icon={<PersonIcon sx={{ fontSize: "14px" }} />}
+          label={`Mentions (${mentions.length})`}
+          onClick={handleOpenDialog}
+          variant="outlined"
+          sx={{
+            cursor: "pointer",
+            fontWeight: "bold",
+            fontSize: "0.75rem", // Smaller font size
+            height: "24px", // Smaller height}}
+          }}
         />
-        <div className={`flex cursor-pointer items-center gap-1`}>
-          {mentions?.map((mention) => (
-            <div
-              onClick={(e) =>
-                handleClick(e, mention.receiver_name, mention.receiver_id)
-              }
-              key={mention.id}
-              className={`text-xs font-bold ${hoverText} transition delay-100 ease-in`}
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          fullWidth
+          maxWidth="xs"
+        >
+          <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              Player Mentions
+            </Typography>
+            <IconButton
+              aria-label="close"
+              onClick={handleCloseDialog}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
             >
-              @{mention.receiver_name.toLocaleUpperCase()}
-            </div>
-          ))}
-        </div>
-      </div>
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers sx={{ p: 0.5 }}>
+            <List dense>
+              {mentions?.map((mention) => (
+                <ListItem
+                  key={mention.id}
+                  onClick={(e) =>
+                    handleClick(e, mention.receiver_name, mention.receiver_id)
+                  }
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                    borderRadius: 2,
+                    mb: 0.5, // Slightly reduced margin bottom
+                    px: 1.5, // Reduced horizontal padding
+                    py: 0.5, // Reduced vertical padding
+                  }}
+                >
+                  <Avatar sx={{ mr: 1, width: 30, height: 30 }}>
+                    {/* You can use mention.profiles?.avatar_url if available, or fall back to first letter */}
+                    {mention.receiver_name[0] ? (
+                      mention.receiver_name[0].toLocaleUpperCase()
+                    ) : (
+                      <PersonIcon fontSize="small" />
+                    )}
+                  </Avatar>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        {mention.receiver_name}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </DialogContent>
+        </Dialog>
+      </Box>
     )
-  );
 };
 
-export default PlayMentions;
+export default PlayPreviewMentions;

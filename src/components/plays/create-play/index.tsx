@@ -1,9 +1,17 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Divider, IconButton, Switch, TextField, Tooltip } from "@mui/material";
+import {
+  Box,
+  Divider,
+  IconButton,
+  Switch,
+  TextField,
+  Tooltip, // Import Box
+  Typography, // Import Typography for text styling
+} from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react"; // Import useCallback
 import type { YouTubePlayer } from "react-youtube";
 import ModalSkeleton from "~/components/utils/modal";
 import FormButtons from "~/components/utils/modal/form-buttons";
@@ -84,14 +92,16 @@ const CreatePlay = ({
   const [draftedPlay, setDraftedPlay] = useState<boolean>(false);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
-  const fetchPlayers = async () => {
-    const players = supabase.from("user_view").select("profile").match({
+  // Memoized fetchPlayers
+  const fetchPlayers = useCallback(async () => {
+    const playersQuery = supabase.from("user_view").select("profile").match({
       "team->>id": video.exclusive_to,
       "affiliation->>verified": true,
     });
-    const allPlayers = supabase.from("profiles").select();
+    const allPlayersQuery = supabase.from("profiles").select();
+
     if (video.exclusive_to) {
-      const { data } = await players;
+      const { data } = await playersQuery;
       if (data) {
         const uniquePlayers = [
           ...new Map(data.map((x) => [x.profile.id, x])).values(),
@@ -99,42 +109,51 @@ const CreatePlay = ({
         setPlayers(uniquePlayers.map((p) => p.profile));
       }
     } else {
-      const { data } = await allPlayers;
+      const { data } = await allPlayersQuery;
       if (data) {
         const uniquePlayers = [...new Map(data.map((x) => [x.id, x])).values()];
         setPlayers(uniquePlayers);
       }
     }
-  };
+  }, [video.exclusive_to]); // Dependency: video.exclusive_to
 
-  const fetchTags = async () => {
-    const tags = supabase.from("tags").select("title, id");
+  // Memoized fetchTags
+  const fetchTags = useCallback(async () => {
+    const tagsQuery = supabase
+      .from("tags")
+      .select("title, id, private, exclusive_to"); // Select needed fields
     if (affIds && affIds.length > 0) {
-      void tags.or(`private.eq.false, exclusive_to.in.(${affIds})`);
+      void tagsQuery.or(
+        `private.eq.false, exclusive_to.in.(${affIds.join(",")})`,
+      );
     } else {
-      void tags.eq("private", false);
+      void tagsQuery.eq("private", false);
     }
-
-    const { data } = await tags;
+    const { data } = await tagsQuery;
     if (data) setTags(data);
-  };
+  }, [affIds]); // Dependency: affIds
 
-  const fetchCollections = async () => {
+  // Memoized fetchCollections
+  const fetchCollections = useCallback(async () => {
     if (user.userId) {
-      const collections = supabase
+      const collectionsQuery = supabase
         .from("collection_view")
-        .select("*, id:collection->>id, title:collection->>title");
+        .select(
+          "*, id:collection->>id, title:collection->>title, private:collection->>private, exclusive_to:collection->>exclusive_to",
+        ); // Select needed fields
       if (affIds && affIds.length > 0) {
-        void collections.or(
-          `collection->>author_id.eq.${user.userId}, collection->>exclusive_to.in.(${affIds})`,
+        void collectionsQuery.or(
+          `collection->>author_id.eq.${
+            user.userId
+          }, collection->>exclusive_to.in.(${affIds.join(",")})`,
         );
       } else {
-        void collections.eq("collection->>author_id", user.userId);
+        void collectionsQuery.eq("collection->>author_id", user.userId);
       }
-      const { data } = await collections;
+      const { data } = await collectionsQuery;
       if (data) setCollections(data);
     }
-  };
+  }, [user.userId, affIds]); // Dependencies: user.userId, affIds
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -277,7 +296,7 @@ const CreatePlay = ({
     }
   };
 
-  const checkValidPlay = () => {
+  const checkValidPlay = useCallback(() => {
     if (
       typeof playDetails.end !== "number" ||
       typeof playDetails.start !== "number" ||
@@ -287,9 +306,9 @@ const CreatePlay = ({
     } else {
       setIsValidPlay(true);
     }
-  };
+  }, [playDetails.end, playDetails.start, playDetails.title]);
 
-  const checkDraftedPlay = () => {
+  const checkDraftedPlay = useCallback(() => {
     if (
       typeof playDetails.end === "number" &&
       typeof playDetails.start === "number"
@@ -298,7 +317,7 @@ const CreatePlay = ({
     } else {
       setDraftedPlay(false);
     }
-  };
+  }, [playDetails.end, playDetails.start]);
 
   const handleTimeAdjustment = async (
     time: "start" | "end",
@@ -369,12 +388,15 @@ const CreatePlay = ({
     else {
       void createPlay(false);
     }
+    // After creating a play, ensure all dropdowns are refreshed
+    void fetchTags();
+    void fetchCollections();
     void resetPlay();
   };
 
   useEffect(() => {
     const channel = supabase
-      .channel("tag_changes")
+      .channel("tag_and_collection_changes") // Combined channel for tags and collections
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "tags" },
@@ -394,18 +416,18 @@ const CreatePlay = ({
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchTags, fetchCollections]); // Dependencies: memoized fetch functions
 
   useEffect(() => {
     checkValidPlay();
     checkDraftedPlay();
-  }, [playDetails]);
+  }, [playDetails, checkValidPlay, checkDraftedPlay]);
 
   useEffect(() => {
     void fetchPlayers();
     void fetchTags();
     void fetchCollections();
-  }, [video]);
+  }, [video, fetchPlayers, fetchTags, fetchCollections]);
 
   return !isNewPlayOpen ? (
     <PlayModalBtn
@@ -424,15 +446,51 @@ const CreatePlay = ({
       title="Create New Play"
       minimize={true}
     >
-      <form
+      <Box
+        component="form" // Use Box as a form element
         onSubmit={handleSubmit}
-        className="flex w-full flex-col items-center justify-center gap-2"
+        sx={{
+          display: "flex",
+          width: "100%",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 1,
+        }}
       >
-        <div className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center">
-          <div className="flex w-full items-center justify-center gap-4">
-            <div className="flex items-center justify-center gap-1">
-              <div className="font-bold">START</div>
-              <div>
+        <Box
+          sx={{
+            display: "flex",
+            width: { xs: "100%", sm: "80%" }, // Equivalent to w-4/5
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            p: 2,
+            textAlign: "center",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+              }}
+            >
+              <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                START
+              </Typography>
+              <Typography variant="body1">
                 {playDetails.start
                   ? playDetails.start < 3600
                     ? new Date(playDetails.start * 1000)
@@ -442,8 +500,8 @@ const CreatePlay = ({
                         .toISOString()
                         .substring(11, 19)
                   : "00:00"}
-              </div>
-              <div className="flex flex-col">
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <IconButton
                   onClick={() => handleTimeAdjustment("start", true)}
                   size="small"
@@ -458,20 +516,31 @@ const CreatePlay = ({
                 >
                   <ArrowDropDownIcon />
                 </IconButton>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-1">
-              <div className="font-bold">END</div>
-              {playDetails.end
-                ? playDetails.end < 3600
-                  ? new Date(playDetails.end * 1000)
-                      .toISOString()
-                      .substring(14, 19)
-                  : new Date(playDetails.end * 1000)
-                      .toISOString()
-                      .substring(11, 19)
-                : "00:00"}
-              <div className="flex flex-col">
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+              }}
+            >
+              <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                END
+              </Typography>
+              <Typography variant="body1">
+                {playDetails.end
+                  ? playDetails.end < 3600
+                    ? new Date(playDetails.end * 1000)
+                        .toISOString()
+                        .substring(14, 19)
+                    : new Date(playDetails.end * 1000)
+                        .toISOString()
+                        .substring(11, 19)
+                  : "00:00"}
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <IconButton
                   onClick={() => handleTimeAdjustment("end", true)}
                   size="small"
@@ -486,11 +555,11 @@ const CreatePlay = ({
                 >
                   <ArrowDropDownIcon />
                 </IconButton>
-              </div>
-            </div>
-          </div>
+              </Box>
+            </Box>
+          </Box>
           <TextField
-            className="w-full"
+            sx={{ width: "100%" }} // Equivalent to w-full
             name="title"
             autoComplete="title"
             required
@@ -499,9 +568,10 @@ const CreatePlay = ({
             onChange={handleInput}
             value={playDetails.title}
             inputProps={{ maxLength: 100 }}
+            size="small"
           />
           <TextField
-            className="w-full"
+            sx={{ width: "100%" }} // Equivalent to w-full
             name="note"
             autoComplete="note"
             id="note"
@@ -511,7 +581,12 @@ const CreatePlay = ({
             multiline
             maxRows={5}
           />
-          <AddTagsToPlay tags={playTags} setTags={setPlayTags} allTags={tags} />
+          <AddTagsToPlay
+            tags={playTags}
+            setTags={setPlayTags}
+            allTags={tags}
+            refetchTags={fetchTags} // Pass refetch callback
+          />
           <AddMentionsToPlayProps
             players={players}
             setMentions={setMentions}
@@ -521,17 +596,39 @@ const CreatePlay = ({
             collections={playCollections}
             setCollections={setPlayCollections}
             allCollections={collections}
+            refetchCollections={fetchCollections} // Pass refetch callback
           />
-          <div className="flex w-full items-center justify-center gap-4 md:justify-around md:gap-0">
-            <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
-              <div className="text-sm font-bold tracking-tight md:text-base">
+          <Box
+            sx={{
+              display: "flex",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: { xs: "center", md: "space-around" }, // Equivalent to justify-center md:justify-around
+              gap: { xs: 4, md: 0 }, // Equivalent to gap-4 md:gap-0
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" }, // Equivalent to flex-col md:flex-row
+                alignItems: "center",
+                justifyContent: "center",
+                gap: { xs: 0, md: 2 }, // Equivalent to gap-2
+              }}
+            >
+              <Typography
+                variant="body2" // Changed to body2 for text-sm/text-base
+                sx={{
+                  fontWeight: "bold",
+                  letterSpacing: "-0.025em", // Equivalent to tracking-tight
+                }}
+              >
                 Highlight Play
-              </div>
+              </Typography>
               <Switch
                 checked={playDetails.highlight}
-                className="items-center justify-center"
                 color="secondary"
-                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
+                sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }} // This sx might be problematic for Switch size
                 onChange={() =>
                   setPlayDetails({
                     ...playDetails,
@@ -540,16 +637,37 @@ const CreatePlay = ({
                 }
                 size="small"
               />
-            </div>
+            </Box>
             <Divider orientation="vertical" flexItem />
-            <div className="flex items-center justify-center gap-2">
-              <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
-                <div className="text-sm font-bold tracking-tight md:text-base">
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: { xs: "column", md: "row" },
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: { xs: 0, md: 2 },
+                }}
+              >
+                <Typography
+                  variant="body2" // Changed to body2 for text-sm/text-base
+                  sx={{
+                    fontWeight: "bold",
+                    letterSpacing: "-0.025em",
+                  }}
+                >
                   Post to Home Page
-                </div>
+                </Typography>
                 <Switch
                   checked={playDetails.post_to_feed}
-                  className="items-center justify-center"
+                  color="primary" // Changed color for contrast
                   sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
                   onChange={() =>
                     setPlayDetails({
@@ -559,7 +677,7 @@ const CreatePlay = ({
                   }
                   size="small"
                 />
-              </div>
+              </Box>
               <Tooltip
                 title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
                 slotProps={{
@@ -579,20 +697,20 @@ const CreatePlay = ({
                   <InfoOutlinedIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-            </div>
-          </div>
+            </Box>
+          </Box>
           <PrivacyStatus
             video={video}
             newDetails={playDetails}
             setNewDetails={setPlayDetails}
           />
-        </div>
+        </Box>
         <FormButtons
           isValid={isValidPlay}
           handleCancel={handleClose}
           submitTitle="SUBMIT"
         />
-      </form>
+      </Box>
     </ModalSkeleton>
   );
 };

@@ -13,13 +13,14 @@ const UserMobileNav = ({ logout }: ChildrenNavProps) => {
   const router = useRouter();
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-3">
       <AddContentBtn />
       <IconButton
         onClick={() => {
           setIsOpen(!isOpen);
         }}
         size="small"
+        sx={{ padding: 0 }}
       >
         <MailIcon />
         <Badge
@@ -31,6 +32,7 @@ const UserMobileNav = ({ logout }: ChildrenNavProps) => {
       <IconButton
         onClick={() => void router.push(`/profile/${user.userId}`)}
         size="small"
+        sx={{ padding: 0 }}
       >
         <PersonIcon />
       </IconButton>
@@ -38,7 +40,12 @@ const UserMobileNav = ({ logout }: ChildrenNavProps) => {
         variant="contained"
         size="small"
         onClick={logout}
-        sx={{ fontWeight: "bold" }}
+        sx={{
+          fontSize: { xs: "10px", sm: "12px" }, // Responsive font size
+          py: { xs: 0.4, sm: 0.5 },
+          px: { xs: 1, sm: 1.5 }, // Responsive padding
+          fontWeight: "bold",
+        }}
       >
         Logout
       </Button>

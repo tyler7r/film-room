@@ -1,5 +1,6 @@
 import {
   Autocomplete,
+  Box,
   TextField,
   createFilterOptions,
   type AutocompleteChangeDetails,
@@ -15,6 +16,7 @@ type AddCollectionsToPlayProps = {
   collections: CreateNewCollectionType[];
   setCollections: (tags: CreateNewCollectionType[]) => void;
   allCollections: CreateNewCollectionType[] | null;
+  refetchCollections: () => void; // New prop for refetching collections in parent
 };
 
 const filter = createFilterOptions<CreateNewCollectionType>();
@@ -23,6 +25,7 @@ const AddCollectionsToPlay = ({
   collections,
   setCollections,
   allCollections,
+  refetchCollections, // Destructure new prop
 }: AddCollectionsToPlayProps) => {
   const [open, setOpen] = useState<boolean>(false);
 
@@ -74,9 +77,13 @@ const AddCollectionsToPlay = ({
   };
 
   return (
-    <div className="w-full">
+    <Box sx={{ width: "100%" }}>
+      {" "}
+      {/* Replaced div with Box */}
       {allCollections && (
-        <div>
+        <Box>
+          {" "}
+          {/* Replaced div with Box */}
           <Autocomplete
             value={collections}
             multiple
@@ -111,7 +118,9 @@ const AddCollectionsToPlay = ({
             }}
             renderOption={(props, option) => (
               <li key={option.id} {...props}>
-                {option.title && option.collection && option.profile && (
+                {" "}
+                {/* Use option.id for key */}
+                {option.title && option.collection && option.profile ? (
                   <Collection
                     collection={{
                       collection: option.collection,
@@ -121,8 +130,11 @@ const AddCollectionsToPlay = ({
                     listItem={true}
                     small={true}
                   />
+                ) : option.create ? (
+                  option.label
+                ) : (
+                  option.title
                 )}
-                {option.create && option.label}
               </li>
             )}
             freeSolo
@@ -139,6 +151,7 @@ const AddCollectionsToPlay = ({
                 }
               />
             )}
+            size="small"
           />
           <CreateCollectionFromPlay
             collections={collections}
@@ -147,10 +160,11 @@ const AddCollectionsToPlay = ({
             setOpen={setOpen}
             newCollection={newCollection}
             setNewCollection={setNewCollection}
+            refetchCollections={refetchCollections} // Pass refetch callback here
           />
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

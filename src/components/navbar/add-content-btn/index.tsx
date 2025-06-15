@@ -24,6 +24,7 @@ const AddContentBtn = () => {
         onClick={handleClick}
         sx={{
           fontWeight: "bold",
+          padding: 0,
         }}
         size="small"
       >

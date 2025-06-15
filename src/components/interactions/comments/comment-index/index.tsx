@@ -107,6 +107,10 @@ const CommentIndex = ({
     [itemsPerLoad, playId, activeComment, setCommentCount],
   ); // Removed handleScroll from dependencies
 
+  const refetchComments = () => {
+    void fetchComments(offset);
+  };
+
   const fetchActiveComm = useCallback(async () => {
     if (activeComment) {
       const { data, error } = await supabase
@@ -186,7 +190,12 @@ const CommentIndex = ({
           >
             Active Comment
           </Typography>
-          <Comment key={activeCom.comment.id} cmt={activeCom} autoOpen={true} />
+          <Comment
+            key={activeCom.comment.id}
+            cmt={activeCom}
+            autoOpen={true}
+            refetchComments={refetchComments}
+          />
         </Box>
       )}
       {!loadingInitial && index.length === 0 && !activeCom && (
@@ -257,7 +266,11 @@ const CommentIndex = ({
                 }}
               >
                 {index.map((comment) => (
-                  <Comment key={comment.comment.id} cmt={comment} />
+                  <Comment
+                    key={comment.comment.id}
+                    cmt={comment}
+                    refetchComments={refetchComments}
+                  />
                 ))}
               </Box>
             </InfiniteScroll>

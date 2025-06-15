@@ -13,9 +13,10 @@ import ReplyIndex from "../../replies/reply-index";
 type CommentProps = {
   cmt: CommentNotificationType;
   autoOpen?: boolean;
+  refetchComments: () => void;
 };
 
-const Comment = ({ cmt, autoOpen }: CommentProps) => {
+const Comment = ({ cmt, autoOpen, refetchComments }: CommentProps) => {
   const comment = cmt.comment;
   const { user } = useAuthContext();
   const { hoverText } = useIsDarkContext();
@@ -31,6 +32,7 @@ const Comment = ({ cmt, autoOpen }: CommentProps) => {
 
   const handleDelete = async () => {
     await supabase.from("comments").delete().eq("id", comment.id);
+    refetchComments();
   };
 
   return (

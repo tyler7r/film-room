@@ -187,9 +187,9 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
                   variant="caption"
                   sx={{
                     display: "block",
-                    textAlign: "center",
                     color: "text.disabled",
                     my: 1,
+                    mx: 1,
                   }}
                 >
                   — End of Collections —

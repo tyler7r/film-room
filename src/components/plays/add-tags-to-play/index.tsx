@@ -1,13 +1,15 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   Autocomplete,
+  Box,
   FormControl,
   IconButton,
   InputLabel,
   MenuItem,
   Select,
   TextField,
-  Tooltip,
+  Tooltip, // Import Box
+  Typography,
   createFilterOptions,
   type AutocompleteChangeDetails,
   type AutocompleteChangeReason,
@@ -26,11 +28,17 @@ type AddTagsToPlayProps = {
   tags: CreateNewTagType[];
   setTags: (tags: CreateNewTagType[]) => void;
   allTags: CreateNewTagType[] | null;
+  refetchTags: () => void; // New prop for refetching tags in parent
 };
 
 const filter = createFilterOptions<CreateNewTagType>();
 
-const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
+const AddTagsToPlay = ({
+  tags,
+  setTags,
+  allTags,
+  refetchTags,
+}: AddTagsToPlayProps) => {
   const { affiliations } = useAuthContext();
 
   const [open, toggleOpen] = useState<boolean>(false);
@@ -111,18 +119,25 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
       })
       .select("title, id")
       .single();
-    if (data) setTags([...tags, data]);
+    if (data) {
+      setTags([...tags, data]);
+      refetchTags(); // <--- Call refetchTags after successful creation
+    }
   };
 
   useEffect(() => {
     if (newTag.title === "") setIsValidNewTag(false);
     else setIsValidNewTag(true);
-  });
+  }, [newTag.title]); // Added dependency to useEffect
 
   return (
-    <div className="w-full">
+    <Box sx={{ width: "100%" }}>
+      {" "}
+      {/* Replaced div with Box */}
       {allTags && (
-        <div>
+        <Box>
+          {" "}
+          {/* Replaced div with Box */}
           <Autocomplete
             value={tags}
             multiple
@@ -169,6 +184,7 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
                 name="play-tags"
               />
             )}
+            size="small"
           />
           <ModalSkeleton
             title="Create Tag"
@@ -176,13 +192,30 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
             setIsOpen={toggleOpen}
             handleClose={handleClose}
           >
-            <form
+            <Box
+              component="form" // Use Box as a form element
               onSubmit={handleNewTag}
-              className="flex w-full flex-col items-center gap-2"
+              sx={{
+                display: "flex",
+                width: "100%",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1,
+              }}
             >
-              <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "100%",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 1,
+                  p: 2,
+                }}
+              >
                 <TextField
-                  className="w-full"
+                  sx={{ width: "100%" }} // Equivalent to w-full
                   name="tag-title"
                   autoFocus
                   required
@@ -197,9 +230,18 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
                   }
                   label="Tag Title"
                   type="text"
+                  size="small"
                 />
-                <FormControl className="w-full">
-                  <div className="flex w-full items-center justify-center gap-2">
+                <FormControl sx={{ width: "100%" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      width: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 2,
+                    }}
+                  >
                     <InputLabel>Privacy Status</InputLabel>
                     <Select
                       value={newTag.exclusive_to}
@@ -207,22 +249,36 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
                       label="Privacy Status"
                       name="privacy"
                       id="privacy-status"
-                      className="w-full"
+                      sx={{ width: "100%" }} // Equivalent to w-full
+                      size="small"
                     >
-                      <MenuItem value="public" style={{ fontSize: "14px" }}>
-                        Public
+                      <MenuItem value="public">
+                        <Typography variant="body2" sx={{ fontSize: "14px" }}>
+                          Public
+                        </Typography>
                       </MenuItem>
                       {affiliations?.map((aff) => (
                         <MenuItem key={aff.team.id} value={aff.team.id}>
-                          <div className="flex gap-2">
-                            <div className="text-sm">
+                          <Box sx={{ display: "flex", gap: 2 }}>
+                            {" "}
+                            {/* Replaced div with Box */}
+                            <Typography
+                              variant="body2"
+                              sx={{ fontSize: "14px" }}
+                            >
                               Private to:{" "}
-                              <strong className="tracking-tight">
+                              <Typography
+                                component="strong"
+                                sx={{
+                                  fontWeight: "bold",
+                                  letterSpacing: "-0.025em",
+                                }}
+                              >
                                 {aff.team.full_name}
-                              </strong>
-                            </div>
+                              </Typography>
+                            </Typography>
                             <TeamLogo tm={aff.team} size={25} />
-                          </div>
+                          </Box>
                         </MenuItem>
                       ))}
                     </Select>
@@ -247,19 +303,19 @@ const AddTagsToPlay = ({ tags, setTags, allTags }: AddTagsToPlayProps) => {
                         <InfoOutlinedIcon />
                       </IconButton>
                     </Tooltip>
-                  </div>
+                  </Box>
                 </FormControl>
-              </div>
+              </Box>
               <FormButtons
                 isValid={isValidNewTag}
                 handleCancel={handleClose}
                 submitTitle="SUBMIT"
               />
-            </form>
+            </Box>
           </ModalSkeleton>
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

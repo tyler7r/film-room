@@ -40,23 +40,11 @@ const Collection = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [reload, setReload] = useState<boolean>(false);
   const [isCopied, setIsCopied] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const [playCount, setPlayCount] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [accessDenied, setAccessDenied] = useState(true);
   const topRef = useRef<HTMLDivElement | null>(null);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-    setIsCopied(false);
-  };
-
-  const open = Boolean(anchorEl);
 
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === collection?.exclusive_to,
@@ -207,7 +195,7 @@ const Collection = () => {
         <div className="flex items-center gap-4">
           <div className="flex items-center justify-center gap-2">
             {exclusiveTeam?.logo ? (
-              <TeamLogo tm={exclusiveTeam} size={60} popover={true} />
+              <TeamLogo tm={exclusiveTeam} size={60} />
             ) : (
               <PublicIcon fontSize="large" color="action" />
             )}
@@ -259,20 +247,14 @@ const Collection = () => {
             {user.userId === collection.author_id && (
               <CollectionActionsMenu collection={collection} />
             )}
-            <IconButton
-              onClick={copyToClipboard}
-              onMouseEnter={handlePopoverOpen}
-              onMouseLeave={handlePopoverClose}
-              size="small"
-            >
-              <LinkIcon />
-              <StandardPopover
-                open={open}
-                anchorEl={anchorEl}
-                content={isCopied ? "Copied!" : `Copy collection link`}
-                handlePopoverClose={handlePopoverClose}
-              />
-            </IconButton>
+            <StandardPopover
+              content={isCopied ? "Copied!" : `Copy collection link`}
+              children={
+                <IconButton onClick={copyToClipboard} size="small">
+                  <LinkIcon />
+                </IconButton>
+              }
+            />
           </div>
         </div>
         {collection.description && (

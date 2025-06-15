@@ -37,27 +37,15 @@ const PlaysToCollectionModal = ({
     text: undefined,
   });
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
   const [addedPlays, setAddedPlays] = useState<PlayPreviewType[] | null>(null);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
 
   const handleOpen = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (user.userId) {
       setIsOpen(true);
     } else void router.push("/login");
-    handlePopoverClose();
   };
 
   const handleClose = () => {
@@ -143,20 +131,14 @@ const PlaysToCollectionModal = ({
   }, [addedPlays]);
 
   return !isOpen ? (
-    <IconButton
-      onClick={handleOpen}
-      size="small"
-      onMouseEnter={handlePopoverOpen}
-      onMouseLeave={handlePopoverClose}
-    >
-      <AddIcon color="primary" fontSize="large" />
-      <StandardPopover
-        content="Add plays to the Collection"
-        open={open}
-        anchorEl={anchorEl}
-        handlePopoverClose={handlePopoverClose}
-      />
-    </IconButton>
+    <StandardPopover
+      content="Add plays to the Collection"
+      children={
+        <IconButton onClick={handleOpen} size="small">
+          <AddIcon color="primary" fontSize="large" />
+        </IconButton>
+      }
+    />
   ) : (
     <ModalSkeleton
       isOpen={isOpen}
@@ -184,7 +166,6 @@ const PlaysToCollectionModal = ({
                             tm={option.team}
                             size={25}
                             inactive={true}
-                            popover={false}
                           />
                         )}
                         {option.play.highlight && (

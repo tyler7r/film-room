@@ -30,37 +30,6 @@ const Video = ({ video, startTime }: VideoProps) => {
     TeamType | null | undefined
   >(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<{
-    anchor1: HTMLElement | null;
-    anchor2: HTMLElement | null;
-    anchor3: HTMLElement | null;
-  }>({
-    anchor1: null,
-    anchor2: null,
-    anchor3: null,
-  });
-
-  const handlePopoverOpen = (
-    e: React.MouseEvent<HTMLElement>,
-    target: 1 | 2 | 3,
-  ) => {
-    if (target === 1) {
-      setAnchorEl({ anchor1: e.currentTarget, anchor2: null, anchor3: null });
-    } else if (target === 2) {
-      setAnchorEl({ anchor2: e.currentTarget, anchor1: null, anchor3: null });
-    } else {
-      setAnchorEl({ anchor1: null, anchor2: null, anchor3: e.currentTarget });
-    }
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null, anchor3: null });
-    setIsCopied(false);
-  };
-
-  const open1 = Boolean(anchorEl.anchor1);
-  const open2 = Boolean(anchorEl.anchor2);
-  const open3 = Boolean(anchorEl.anchor3);
 
   const fetchExclusiveToTeam = () => {
     if (video?.exclusive_to) {
@@ -119,37 +88,24 @@ const Video = ({ video, startTime }: VideoProps) => {
       >
         <div className="flex w-full items-center justify-between gap-1">
           {!video.private && (
-            <IconButton
-              onMouseEnter={(e) => handlePopoverOpen(e, 1)}
-              onMouseLeave={handlePopoverClose}
-            >
-              <PublicIcon />
-              <StandardPopover
-                content="Public video"
-                open={open1}
-                handlePopoverClose={handlePopoverClose}
-                anchorEl={anchorEl.anchor1}
-              />
-            </IconButton>
+            <StandardPopover
+              content="Public video"
+              children={
+                <IconButton>
+                  <PublicIcon />
+                </IconButton>
+              }
+            />
           )}
           {video.private && exclusiveTeam && (
-            <IconButton
-              onMouseEnter={(e) => handlePopoverOpen(e, 2)}
-              onMouseLeave={handlePopoverClose}
-            >
-              <TeamLogo
-                tm={exclusiveTeam}
-                size={25}
-                inactive={true}
-                popover={false}
-              />
-              <StandardPopover
-                content={`Private to ${exclusiveTeam.full_name}`}
-                open={open2}
-                anchorEl={anchorEl.anchor2}
-                handlePopoverClose={handlePopoverClose}
-              />
-            </IconButton>
+            <StandardPopover
+              content={`Private to ${exclusiveTeam.full_name}`}
+              children={
+                <IconButton>
+                  <TeamLogo tm={exclusiveTeam} size={25} inactive={true} />
+                </IconButton>
+              }
+            />
           )}
           <div className={`flex w-full items-center justify-center gap-2`}>
             {
@@ -176,19 +132,14 @@ const Video = ({ video, startTime }: VideoProps) => {
             onClick={(e) => e.stopPropagation()}
             className="flex items-center"
           >
-            <IconButton
-              onClick={copyToClipboard}
-              onMouseEnter={(e) => handlePopoverOpen(e, 3)}
-              onMouseLeave={handlePopoverClose}
-            >
-              <LinkIcon />
-              <StandardPopover
-                open={open3}
-                anchorEl={anchorEl.anchor3}
-                content={isCopied ? "Copied!" : `Copy video link`}
-                handlePopoverClose={handlePopoverClose}
-              />
-            </IconButton>
+            <StandardPopover
+              content={isCopied ? "Copied!" : `Copy video link`}
+              children={
+                <IconButton onClick={copyToClipboard}>
+                  <LinkIcon />
+                </IconButton>
+              }
+            />
             <VideoActionsMenu video={video} />
           </div>
         </div>

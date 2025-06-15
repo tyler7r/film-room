@@ -43,6 +43,7 @@ const PrivacyStatus = ({ newDetails, setNewDetails }: PrivacyStatusProps) => {
           name="privacy"
           id="privacy-status"
           className="w-full"
+          size="small"
         >
           <MenuItem value="public" style={{ fontSize: "14px" }}>
             Public
