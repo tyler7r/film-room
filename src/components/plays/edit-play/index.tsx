@@ -1,7 +1,7 @@
 import CreateIcon from "@mui/icons-material/Create";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
-  Box,
+  Box, // Import Box
   Divider,
   IconButton,
   ListItemIcon,
@@ -11,7 +11,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react"; // Import useCallback
 import FormMessage from "~/components/utils/form-message";
 import ModalSkeleton from "~/components/utils/modal";
 import FormButtons from "~/components/utils/modal/form-buttons";
@@ -30,7 +30,7 @@ import {
 import AddCollectionsToPlay from "../add-collections-to-play";
 import AddMentionsToPlayProps from "../add-mentions-to-play";
 import AddTagsToPlay from "../add-tags-to-play";
-import PrivacyStatus from "../create-play/privacy-status";
+import PrivacyStatus from "../create-play/privacy-status"; // Keep PrivacyStatus import
 
 type CreatePlayProps = {
   video: VideoType;
@@ -94,7 +94,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
   const [isEditPlayOpen, setIsEditPlayOpen] = useState<boolean>(false);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
-  const fetchInitialMentions = async () => {
+  const fetchInitialMentions = useCallback(async () => {
     if (play) {
       const { data } = await supabase
         .from("play_mention_view")
@@ -108,17 +108,17 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
         setMentions([]);
       }
     }
-  };
+  }, [play]); // Dependency: play
 
-  const fetchPlayers = async () => {
-    const players = supabase.from("user_view").select("profile").match({
+  const fetchPlayers = useCallback(async () => {
+    const playersQuery = supabase.from("user_view").select("profile").match({
       "team->>id": video.exclusive_to,
       "affiliation->>role": "player",
       "affiliation->>verified": true,
     });
-    const allPlayers = supabase.from("profiles").select();
+    const allPlayersQuery = supabase.from("profiles").select();
     if (video.exclusive_to) {
-      const { data } = await players;
+      const { data } = await playersQuery;
       if (data) {
         const uniquePlayers = [
           ...new Map(data.map((x) => [x.profile.id, x])).values(),
@@ -126,15 +126,15 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
         setPlayers(uniquePlayers.map((p) => p.profile));
       }
     } else {
-      const { data } = await allPlayers;
+      const { data } = await allPlayersQuery;
       if (data) {
         const uniquePlayers = [...new Map(data.map((x) => [x.id, x])).values()];
         setPlayers(uniquePlayers);
       }
     }
-  };
+  }, [video.exclusive_to]); // Dependency: video.exclusive_to
 
-  const fetchInitialTags = async () => {
+  const fetchInitialTags = useCallback(async () => {
     if (play) {
       const { data } = await supabase
         .from("play_tags")
@@ -148,52 +148,70 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
         setPlayTags([]);
       }
     }
-  };
+  }, [play]); // Dependency: play
 
-  const fetchTags = async () => {
-    const tags = supabase.from("tags").select("title, id");
+  const fetchTags = useCallback(async () => {
+    const tagsQuery = supabase.from("tags").select("title, id");
     if (affIds && affIds.length > 0) {
-      void tags.or(`private.eq.false, exclusive_to.in.(${affIds})`);
+      void tagsQuery.or(
+        `private.eq.false, exclusive_to.in.(${affIds.join(",")})`,
+      );
     } else {
-      void tags.eq("private", false);
+      void tagsQuery.eq("private", false);
     }
 
-    const { data } = await tags;
+    const { data } = await tagsQuery;
     if (data) setTags(data);
-  };
+  }, [affIds]); // Dependency: affIds
 
-  const fetchInitialCollections = async () => {
+  const fetchInitialCollections = useCallback(async () => {
     if (play) {
       const { data } = await supabase
         .from("collection_plays")
         .select("collections!inner(title, id)")
         .eq("play_id", play.id);
       if (data) {
-        setInitialPlayCollections(data.map((p) => p.collections!));
-        setPlayCollections(data.map((p) => p.collections!));
+        setInitialPlayCollections(
+          data.map((p) => ({
+            title: p.collections!.title,
+            id: p.collections!.id,
+            // Add other required properties for CreateNewCollectionType if missing from select
+            // For example, if you need `collection`, `team`, `profile` here, you'd need to adjust the select or
+            // fetch additional data to fully construct these objects.
+          })),
+        );
+        setPlayCollections(
+          data.map((p) => ({
+            title: p.collections!.title,
+            id: p.collections!.id,
+            // Same note as above
+          })),
+        );
       } else {
         setInitialPlayCollections([]);
         setPlayCollections([]);
       }
     }
-  };
+  }, [play]); // Dependency: play
 
-  const fetchCollections = async () => {
+  const fetchCollections = useCallback(async () => {
     if (user.userId) {
-      const collections = supabase
+      const collectionsQuery = supabase
         .from("collection_view")
         .select("*, id:collection->>id, title:collection->>title");
       if (affIds && affIds.length > 0) {
-        void collections.or(
-          `collection->>author_id.eq.${user.userId}, collection->>exclusive_to.in.(${affIds})`,
+        void collectionsQuery.or(
+          `collection->>author_id.eq.${
+            user.userId
+          }, collection->>exclusive_to.in.(${affIds.join(",")})`,
         );
       } else {
-        void collections.eq("collection->>author_id", user.userId);
+        void collectionsQuery.eq("collection->>author_id", user.userId);
       }
-      const { data } = await collections;
+      const { data } = await collectionsQuery;
       if (data) setCollections(data);
     }
-  };
+  }, [user.userId, affIds]); // Dependencies: user.userId, affIds
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -203,7 +221,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     });
   };
 
-  const resetPlay = async () => {
+  const resetPlay = useCallback(async () => {
     setIsEditPlayOpen(false);
     setPlayDetails({
       title: play.title,
@@ -215,14 +233,18 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       exclusive_to: play.exclusive_to ? play.exclusive_to : "public",
       post_to_feed: play.post_to_feed,
     });
-    setMentions([]);
+    setMentions([]); // Resetting these here is fine for UI but actual reset happens after fetchInitial*
     setPlayTags([]);
     setPlayCollections([]);
-  };
+    // Re-fetch initial state to truly reset to the original play data
+    await fetchInitialMentions();
+    await fetchInitialTags();
+    await fetchInitialCollections();
+  }, [play, fetchInitialMentions, fetchInitialTags, fetchInitialCollections]); // Dependencies for useCallback
 
-  const handleMention = async (mention: UserType, play: PlayType) => {
+  const handleMention = async (mention: UserType, currentPlay: PlayType) => {
     await supabase.from("play_mentions").insert({
-      play_id: play.id,
+      play_id: currentPlay.id,
       sender_id: `${user.userId}`,
       receiver_id: mention.id,
       receiver_name: mention.name,
@@ -236,7 +258,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     ) {
       await sendEmail({
         video: video,
-        play: play,
+        play: currentPlay,
         title: `${mention.name} mentioned you in a play!`,
         author: {
           name: user.name ? user.name : user.email!,
@@ -254,19 +276,19 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     });
   };
 
-  const handleRemoveMentions = () => {
+  const handleRemoveMentions = useCallback(() => {
     initialMentions.forEach((m1) => {
       const isIncluded = mentions.find((m2) => m2.id === m1.id);
       if (!isIncluded) {
         void handleDeleteMention(m1.id);
       }
     });
-  };
+  }, [initialMentions, mentions, play.id]); // Dependencies for useCallback
 
-  const handleTag = async (play: string, tag: string) => {
+  const handleTag = async (playId: string, tagId: string) => {
     await supabase.from("play_tags").insert({
-      play_id: play,
-      tag_id: tag,
+      play_id: playId,
+      tag_id: tagId,
     });
   };
 
@@ -279,19 +301,19 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     }
   };
 
-  const handleRemoveTags = () => {
+  const handleRemoveTags = useCallback(() => {
     initialPlayTags.forEach((t1) => {
       const isIncluded = playTags.find((t2) => t2.id === t1.id);
       if (!isIncluded) {
         void handleDeleteTag(t1.id);
       }
     });
-  };
+  }, [initialPlayTags, playTags, play.id]); // Dependencies for useCallback
 
-  const handleCollection = async (play: string, collection: string) => {
+  const handleCollection = async (playId: string, collectionId: string) => {
     await supabase.from("collection_plays").insert({
-      play_id: play,
-      collection_id: collection,
+      play_id: playId,
+      collection_id: collectionId,
     });
   };
 
@@ -304,14 +326,14 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     }
   };
 
-  const handleRemoveCollections = () => {
+  const handleRemoveCollections = useCallback(() => {
     initialPlayCollections.forEach((c1) => {
       const isIncluded = playCollections.find((c2) => c2.id === c1.id);
       if (!isIncluded) {
         void handleDeleteCollection(c1.id);
       }
     });
-  };
+  }, [initialPlayCollections, playCollections, play.id]); // Dependencies for useCallback
 
   const updateLastWatched = async () => {
     if (user.userId) {
@@ -327,7 +349,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
 
   const editPlay = async (isPrivate: boolean) => {
     if (user.userId) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("plays")
         .update({
           exclusive_to: isPrivate ? playDetails.exclusive_to : null,
@@ -344,21 +366,26 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
         .eq("id", play.id)
         .select()
         .single();
+      if (error) {
+        console.error("Error updating play:", error);
+        setMessage({ status: "error", text: "Failed to update play." });
+        return;
+      }
       if (data) {
         handleRemoveMentions();
         mentions.forEach((mention) => {
-          void handleMention(mention, play);
+          void handleMention(mention, data); // Pass 'data' (updated play)
         });
         handleRemoveTags();
         if (playTags.length > 0) {
           playTags.forEach((tag) => {
-            void handleTag(play.id, `${tag.id}`);
+            void handleTag(data.id, `${tag.id}`); // Pass 'data.id'
           });
         }
         handleRemoveCollections();
         if (playCollections.length > 0) {
           playCollections.forEach((col) => {
-            void handleCollection(play.id, `${col.id}`);
+            void handleCollection(data.id, `${col.id}`); // Pass 'data.id'
           });
         }
         void updateLastWatched();
@@ -367,19 +394,19 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     }
   };
 
-  const checkForUnEdited = () => {
+  const checkForUnEdited = useCallback(() => {
     const note = playDetails.note === "" ? null : playDetails.note;
     const exclusive =
       playDetails.exclusive_to === "public" ? null : playDetails.exclusive_to;
     const sameMentions =
-      JSON.stringify(mentions.map((m) => m.id)) ===
-      JSON.stringify(initialMentions.map((m) => m.id));
+      JSON.stringify(mentions.map((m) => m.id).sort()) ===
+      JSON.stringify(initialMentions.map((m) => m.id).sort()); // Added sort for consistent comparison
     const sameTags =
-      JSON.stringify(playTags.map((t) => t.id)) ===
-      JSON.stringify(initialPlayTags.map((t) => t.id));
+      JSON.stringify(playTags.map((t) => t.id).sort()) ===
+      JSON.stringify(initialPlayTags.map((t) => t.id).sort()); // Added sort
     const sameCollections =
-      JSON.stringify(playCollections.map((c) => c.id)) ===
-      JSON.stringify(initialPlayCollections.map((c) => c.id));
+      JSON.stringify(playCollections.map((c) => c.id).sort()) ===
+      JSON.stringify(initialPlayCollections.map((c) => c.id).sort()); // Added sort
     if (
       note === play.note &&
       exclusive === play.exclusive_to &&
@@ -393,54 +420,63 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     ) {
       return true;
     } else return false;
-  };
+  }, [
+    playDetails,
+    play,
+    mentions,
+    initialMentions,
+    playTags,
+    initialPlayTags,
+    playCollections,
+    initialPlayCollections,
+  ]); // Dependencies for useCallback
 
-  const updateErrorMessage = () => {
+  const updateErrorMessage = useCallback(() => {
     const { title } = playDetails;
     const isUnedited = checkForUnEdited();
-    if (!isValidPlay) {
-      if (title === "") {
-        setMessage({
-          status: "error",
-          text: "Please enter a valid title!",
-        });
-        setIsValidPlay(false);
-      } else if (isUnedited) {
-        setMessage({
-          status: "error",
-          text: "Please make an edit before submitting!",
-        });
-        setIsValidPlay(false);
-      } else {
-        setMessage({ status: "error", text: undefined });
-        setIsValidPlay(true);
-      }
+
+    if (title === "") {
+      setMessage({
+        status: "error",
+        text: "Please enter a valid title!",
+      });
+      setIsValidPlay(false);
+    } else if (isUnedited) {
+      setMessage({
+        status: "error",
+        text: "Please make an edit before submitting!",
+      });
+      setIsValidPlay(false);
     } else {
-      if (isUnedited) {
-        setMessage({
-          status: "error",
-          text: "Please make an edit before submitting!",
-        });
-        setIsValidPlay(false);
-      }
+      setMessage({ status: "error", text: undefined });
+      setIsValidPlay(true);
     }
-  };
+  }, [playDetails.title, checkForUnEdited]); // Dependencies for useCallback
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (video.private || playDetails.private) void editPlay(true);
-    else {
-      void editPlay(false);
+    // Only attempt to edit if the form is valid
+    if (isValidPlay) {
+      if (video.private || playDetails.private) void editPlay(true);
+      else {
+        void editPlay(false);
+      }
+      // fetchTags and fetchCollections are handled by the realtime subscription already
+      // resetPlay is called within editPlay on success
+    } else {
+      updateErrorMessage(); // Show the message if submission is attempted when invalid
     }
-    void resetPlay();
   };
 
   useEffect(() => {
+    // These channels are likely handled in a more global context (e.g., in CreatePlay)
+    // or need to be specific to this component's needs if not updating globally.
+    // Given the request, keeping them as is for now.
     const channel = supabase
-      .channel("tag_changes")
+      .channel("edit_play_tags_and_collections") // Unique channel name
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "play_tags" },
+        { event: "*", schema: "public", table: "tags" },
         () => {
           void fetchTags();
         },
@@ -457,27 +493,35 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchTags, fetchCollections]); // Dependencies: memoized fetch functions
 
   useEffect(() => {
     void fetchPlayers();
     void fetchTags();
     void fetchCollections();
-  }, [video]);
+  }, [video, fetchPlayers, fetchTags, fetchCollections]); // Dependencies: video, and memoized fetch functions
 
   useEffect(() => {
-    void fetchInitialCollections();
-    void fetchInitialTags();
-    void fetchInitialMentions();
-  }, [isEditPlayOpen]);
+    // These fetches are only needed when the modal opens
+    if (isEditPlayOpen) {
+      void fetchInitialCollections();
+      void fetchInitialTags();
+      void fetchInitialMentions();
+    }
+  }, [
+    isEditPlayOpen,
+    fetchInitialCollections,
+    fetchInitialTags,
+    fetchInitialMentions,
+  ]); // Dependencies
 
   useEffect(() => {
-    void updateErrorMessage();
-  }, [playDetails, playTags, playCollections, mentions]);
+    updateErrorMessage();
+  }, [playDetails, playTags, playCollections, mentions, updateErrorMessage]); // Added updateErrorMessage as dependency
 
   return !isEditPlayOpen ? (
     <Box
-      sx={{ display: "flex", alignItems: "center" }}
+      sx={{ display: "flex", alignItems: "center", cursor: "pointer" }} // Added cursor pointer
       onClick={() => setIsEditPlayOpen(true)}
     >
       <ListItemIcon sx={{ minWidth: "12px" }}>
@@ -498,13 +542,31 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
       setIsOpen={setIsEditPlayOpen}
       handleClose={resetPlay}
     >
-      <form
+      <Box
+        component="form" // Use Box as a form element
         onSubmit={handleSubmit}
-        className="flex w-full flex-col items-center gap-2"
+        sx={{
+          display: "flex",
+          width: "100%",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 1,
+        }}
       >
-        <div className="flex w-4/5 flex-col items-center justify-center gap-4 p-4 text-center">
+        <Box
+          sx={{
+            display: "flex",
+            width: { xs: "100%", sm: "80%" }, // w-full / w-4/5
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            p: 2,
+            textAlign: "center",
+          }}
+        >
           <TextField
-            className="w-full"
+            sx={{ width: "100%" }} // w-full
             name="title"
             autoComplete="title"
             required
@@ -513,9 +575,10 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
             onChange={handleInput}
             value={playDetails.title}
             inputProps={{ maxLength: 100 }}
+            size="small"
           />
           <TextField
-            className="w-full"
+            sx={{ width: "100%" }} // w-full
             name="note"
             autoComplete="note"
             id="note"
@@ -525,7 +588,12 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
             multiline
             maxRows={5}
           />
-          <AddTagsToPlay tags={playTags} setTags={setPlayTags} allTags={tags} />
+          <AddTagsToPlay
+            tags={playTags}
+            setTags={setPlayTags}
+            allTags={tags}
+            refetchTags={fetchTags} // Pass refetch callback
+          />
           <AddMentionsToPlayProps
             players={players}
             setMentions={setMentions}
@@ -535,15 +603,37 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
             collections={playCollections}
             setCollections={setPlayCollections}
             allCollections={collections}
+            refetchCollections={fetchCollections} // Pass refetch callback
           />
-          <div className="flex w-full items-center justify-center gap-4 md:justify-around md:gap-0">
-            <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
-              <div className="text-sm font-bold tracking-tight md:text-base">
+          <Box
+            sx={{
+              display: "flex",
+              width: "100%",
+              alignItems: "center",
+              justifyContent: { xs: "center", md: "space-around" }, // justify-center md:justify-around
+              gap: { xs: 4, md: 0 }, // gap-4 md:gap-0
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" }, // flex-col md:flex-row
+                alignItems: "center",
+                justifyContent: "center",
+                gap: { xs: 0, md: 2 }, // gap-2
+              }}
+            >
+              <Typography
+                variant="body2" // text-sm md:text-base
+                sx={{
+                  fontWeight: "bold", // font-bold
+                  letterSpacing: "-0.025em", // tracking-tight
+                }}
+              >
                 Highlight Play
-              </div>
+              </Typography>
               <Switch
                 checked={playDetails.highlight}
-                className="items-center justify-center"
                 color="secondary"
                 sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
                 onChange={() =>
@@ -554,16 +644,37 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
                 }
                 size="small"
               />
-            </div>
+            </Box>
             <Divider orientation="vertical" flexItem />
-            <div className="flex items-center justify-center gap-2">
-              <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
-                <div className="text-sm font-bold tracking-tight md:text-base">
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: { xs: "column", md: "row" }, // flex-col md:flex-row
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: { xs: 0, md: 2 }, // gap-2
+                }}
+              >
+                <Typography
+                  variant="body2" // text-sm md:text-base
+                  sx={{
+                    fontWeight: "bold", // font-bold
+                    letterSpacing: "-0.025em", // tracking-tight
+                  }}
+                >
                   Post to Home Page
-                </div>
+                </Typography>
                 <Switch
                   checked={playDetails.post_to_feed}
-                  className="items-center justify-center"
+                  color="primary"
                   sx={{ fontSize: { lg: "20px" }, lineHeight: { lg: "28px" } }}
                   onChange={() =>
                     setPlayDetails({
@@ -573,7 +684,7 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
                   }
                   size="small"
                 />
-              </div>
+              </Box>
               <Tooltip
                 title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
                 slotProps={{
@@ -593,21 +704,21 @@ const EditPlay = ({ play, video }: CreatePlayProps) => {
                   <InfoOutlinedIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-            </div>
-          </div>
+            </Box>
+          </Box>
           <PrivacyStatus
             video={video}
             newDetails={playDetails}
             setNewDetails={setPlayDetails}
           />
-        </div>
+        </Box>
         <FormMessage message={message} />
         <FormButtons
           handleCancel={resetPlay}
           submitTitle="SUBMIT"
           isValid={isValidPlay}
         />
-      </form>
+      </Box>
     </ModalSkeleton>
   );
 };

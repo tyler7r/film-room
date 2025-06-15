@@ -19,7 +19,7 @@ const Home = () => {
 
   const router = useRouter();
   // Items per load will dynamically adjust based on mobile/desktop
-  const itemsPerLoad = isMobile ? 3 : 5;
+  const itemsPerLoad = isMobile ? 5 : 10;
 
   const [plays, setPlays] = useState<PlayPreviewType[]>([]); // Initialize as empty array
   const [loading, setLoading] = useState<boolean>(true); // Initial loading state
@@ -113,7 +113,16 @@ const Home = () => {
           <CircularProgress size={128} />
         </Box>
       ) : (
-        <>
+        <Box
+          sx={{
+            width: "100%",
+            p: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            alignItems: "center",
+          }}
+        >
           {screenWidth > 525 ? <Logo size="large" /> : <Logo size="medium" />}
           <Box className="items-center justify-center text-xl">
             <Box className="text-center">
@@ -192,7 +201,7 @@ const Home = () => {
           )}
 
           {/* bottomRef is no longer needed */}
-        </>
+        </Box>
       )}
       <Fab
         color="primary"

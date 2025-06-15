@@ -1,21 +1,29 @@
+import AddIcon from "@mui/icons-material/Add";
+import ClearIcon from "@mui/icons-material/Clear";
 import SortIcon from "@mui/icons-material/Sort";
-import UpdateIcon from "@mui/icons-material/Update";
-import { Divider, IconButton, Pagination } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import { useCallback, useEffect, useRef, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import type { YouTubePlayer } from "react-youtube";
 import Play from "~/components/plays/play";
 import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
-import useDebounce from "~/utils/debounce";
-import { getNumberOfPages, getToAndFrom } from "~/utils/helpers";
+import useDebounce from "~/utils/debounce"; // Assuming useDebounce is correctly implemented
+import { convertYouTubeTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { PlayPreviewType } from "~/utils/types";
+import type { Database, PlayPreviewType } from "~/utils/types"; // Import PlayPreviewType and Database type
 import PlaySearchFilters from "../../search-filters/play-search-filters";
 import PageTitle from "../../utils/page-title";
-import Plays from "./plays";
 
-type VideoPlayIndex = {
+type VideoPlayIndexProps = {
   player: YouTubePlayer | null;
   videoId: string;
   scrollToPlayer: () => void;
@@ -25,7 +33,7 @@ type VideoPlayIndex = {
 };
 
 export type PlaySearchOptions = {
-  author?: string | undefined;
+  author?: string;
   only_highlights?: boolean;
   topic: string;
   private_only?: string;
@@ -39,14 +47,19 @@ const VideoPlayIndex = ({
   setActivePlay,
   activePlay,
   setSeenActivePlay,
-}: VideoPlayIndex) => {
+}: VideoPlayIndexProps) => {
   const { affIds } = useAuthContext();
   const { isMobile } = useMobileContext();
 
-  const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
-  const [page, setPage] = useState<number>(1);
+  const [plays, setPlays] = useState<PlayPreviewType[]>([]);
   const [playCount, setPlayCount] = useState<number | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
+
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [currentOffset, setCurrentOffset] = useState<number>(0);
+  const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
+
+  const itemsPerLoad = isMobile ? 5 : 10;
 
   const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
     only_highlights: false,
@@ -55,210 +68,290 @@ const VideoPlayIndex = ({
     topic: "",
     timestamp: null,
   });
-  const itemsPerPage = isMobile ? 5 : 10;
+
   const topRef = useRef<HTMLDivElement | null>(null);
-  const [anchorEl, setAnchorEl] = useState<{
-    anchor1: HTMLElement | null;
-    anchor2: HTMLElement | null;
-  }>({
-    anchor1: null,
-    anchor2: null,
-  });
 
-  const handlePopoverOpen = (
-    e: React.MouseEvent<HTMLElement>,
-    target: "a" | "b",
-  ) => {
-    if (target === "a") {
-      setAnchorEl({ ...anchorEl, anchor1: e.currentTarget });
-    } else {
-      setAnchorEl({ ...anchorEl, anchor2: e.currentTarget });
-    }
-  };
+  const fetchPlays = useCallback(
+    async (offset: number, append = true) => {
+      setLoadingInitial(!append);
 
-  const handlePopoverClose = () => {
-    setAnchorEl({ anchor1: null, anchor2: null });
-  };
+      try {
+        let combinedPlays: PlayPreviewType[] = [];
+        let totalCount: number | null = 0;
 
-  const open1 = Boolean(anchorEl.anchor1);
-  const open2 = Boolean(anchorEl.anchor2);
+        if (searchOptions.topic && searchOptions.topic !== "") {
+          // --- Fetch by mention and tag (topic search) ---
+          let playsByMentionQuery = supabase
+            .from("plays_via_user_mention")
+            .select<
+              string,
+              Database["public"]["Views"]["plays_via_user_mention"]["Row"]
+            >("*", { count: "exact" })
+            .eq("video->>id", videoId)
+            .order("play->>start_time_sort")
+            .ilike("mention->>receiver_name", `%${searchOptions.topic}%`);
 
-  const fetchPlays = useDebounce(async () => {
-    const { from, to } = getToAndFrom(itemsPerPage, page);
-    const plays = supabase
-      .from("play_preview")
-      .select(`*`, {
-        count: "exact",
-      })
-      .order("play->>start_time_sort")
-      .eq("video->>id", videoId)
-      .range(from, to);
-    if (searchOptions.only_highlights) {
-      void plays.eq("play->>highlight", true);
-    }
-    if (searchOptions?.author && searchOptions.author !== "") {
-      void plays.ilike("author->>name", `%${searchOptions.author}%`);
-    }
-    if (activePlay) {
-      void plays.neq("play->>id", activePlay.play.id);
-    }
-    if (searchOptions.timestamp) {
-      void plays.gte("play->>end_time_sort", searchOptions.timestamp);
-    }
-    if (affIds && affIds.length > 0) {
-      if (searchOptions.private_only === "all") {
-        void plays.or(
-          `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-        );
-      } else if (
-        searchOptions.private_only &&
-        searchOptions.private_only !== "all"
-      ) {
-        void plays.eq("play->>exclusive_to", searchOptions.private_only);
-      }
-    } else {
-      void plays.eq("play->>private", false);
-    }
-    const { data, count } = await plays;
-    if (data)
-      if (searchOptions.timestamp) {
-        setPlays(
-          data.filter(
-            (p) =>
-              p.play.end_time.toString().padStart(6, "0") >=
-              searchOptions.timestamp!,
-          ),
-        );
-      } else
-        setPlays(data.sort((a, b) => a.play.start_time - b.play.start_time));
-    if (count) setPlayCount(count);
-  });
+          let playsByTagQuery = supabase
+            .from("plays_via_tag")
+            .select<
+              string,
+              Database["public"]["Views"]["plays_via_tag"]["Row"]
+            >("*", { count: "exact" })
+            .eq("video->>id", videoId)
+            .order("play->>start_time_sort")
+            .ilike("tag->>title", `%${searchOptions.topic}%`);
 
-  const fetchPlaysBySearch = useDebounce(async () => {
-    const { from, to } = getToAndFrom(itemsPerPage, page);
-    if (searchOptions.topic && searchOptions.topic !== "") {
-      const playsByMention = supabase
-        .from("plays_via_user_mention")
-        .select("*")
-        .eq("video->>id", videoId)
-        .order("play->>start_time_sort")
-        .ilike("mention->>receiver_name", `%${searchOptions.topic}%`)
-        .range(from, to);
-      const playsByTag = supabase
-        .from("plays_via_tag")
-        .select("*")
-        .eq("video->>id", videoId)
-        .order("play->>start_time_sort")
-        .ilike("tag->>title", `%${searchOptions.topic}%`)
-        .range(from, to);
-      if (searchOptions.only_highlights) {
-        void playsByMention.eq("play->>highlight", true);
-        void playsByTag.eq("play->>highlight", true);
-      }
-      if (activePlay) {
-        void playsByMention.neq("play->>id", activePlay.play.id);
-        void playsByTag.neq("play->>id", activePlay.play.id);
-      }
-      if (searchOptions.timestamp) {
-        void playsByMention.gte(
-          "play->>end_time_sort",
-          searchOptions.timestamp,
-        );
-        void playsByTag.gte("play->>end_time_sort", searchOptions.timestamp);
-      }
-      if (searchOptions.author) {
-        void playsByMention.ilike("author->>name", searchOptions.author);
-        void playsByTag.ilike("author->>name", searchOptions.author);
-      }
-      if (affIds && affIds.length > 0) {
-        if (searchOptions.private_only === "all") {
-          void playsByMention.or(
-            `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
+          if (searchOptions.only_highlights) {
+            playsByMentionQuery = playsByMentionQuery.eq(
+              "play->>highlight",
+              true,
+            );
+            playsByTagQuery = playsByTagQuery.eq("play->>highlight", true);
+          }
+          if (searchOptions.author && searchOptions.author !== "") {
+            playsByMentionQuery = playsByMentionQuery.ilike(
+              "author->>name",
+              `%${searchOptions.author}%`,
+            );
+            playsByTagQuery = playsByTagQuery.ilike(
+              "author->>name",
+              `%${searchOptions.author}%`,
+            );
+          }
+          if (activePlay) {
+            playsByMentionQuery = playsByMentionQuery.neq(
+              "play->>id",
+              activePlay.play.id,
+            );
+            playsByTagQuery = playsByTagQuery.neq(
+              "play->>id",
+              activePlay.play.id,
+            );
+          }
+          if (searchOptions.timestamp) {
+            playsByMentionQuery = playsByMentionQuery.gte(
+              "play->>end_time_sort",
+              searchOptions.timestamp,
+            );
+            playsByTagQuery = playsByTagQuery.gte(
+              "play->>end_time_sort",
+              searchOptions.timestamp,
+            );
+          }
+          if (affIds && affIds.length > 0) {
+            if (searchOptions.private_only === "all") {
+              playsByMentionQuery = playsByMentionQuery.or(
+                `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
+              );
+              playsByTagQuery = playsByTagQuery.or(
+                `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
+              );
+            } else if (
+              searchOptions.private_only &&
+              searchOptions.private_only !== "all"
+            ) {
+              playsByMentionQuery = playsByMentionQuery.eq(
+                "play->>exclusive_to",
+                searchOptions.private_only,
+              );
+              playsByTagQuery = playsByTagQuery.eq(
+                "play->>exclusive_to",
+                searchOptions.private_only,
+              );
+            }
+          } else {
+            playsByMentionQuery = playsByMentionQuery.eq(
+              "play->>private",
+              false,
+            );
+            playsByTagQuery = playsByTagQuery.eq("play->>private", false);
+          }
+
+          const [getMentions, getTags] = await Promise.all([
+            playsByMentionQuery.range(offset, offset + itemsPerLoad - 1),
+            playsByTagQuery.range(offset, offset + itemsPerLoad - 1),
+          ]);
+
+          if (getTags.data) {
+            combinedPlays = [
+              ...combinedPlays,
+              ...getTags.data.map((row) => ({
+                play: row.play,
+                video: row.video,
+                team: row.team,
+                author: row.author,
+              })),
+            ];
+            // totalCount += getTags.count ?? 0;
+          }
+          if (getMentions.data) {
+            combinedPlays = [
+              ...combinedPlays,
+              ...getMentions.data.map((row) => ({
+                play: row.play,
+                video: row.video,
+                team: row.team,
+                author: row.author,
+              })),
+            ];
+            // totalCount += getMentions.count ?? 0;
+          }
+
+          const uniquePlays = [
+            ...new Map(combinedPlays.map((x) => [x.play.id, x])).values(),
+          ];
+          uniquePlays.sort((a, b) => a.play.start_time - b.play.start_time);
+          combinedPlays = uniquePlays;
+
+          totalCount = combinedPlays.length ?? 0;
+        } else {
+          // --- General fetch (no topic search) ---
+          let query = supabase
+            .from("play_preview")
+            .select<string, Database["public"]["Views"]["play_preview"]["Row"]>(
+              `*`,
+              { count: "exact" },
+            )
+            .order("play->>start_time_sort")
+            .eq("video->>id", videoId);
+
+          if (searchOptions.only_highlights) {
+            query = query.eq("play->>highlight", true);
+          }
+          if (searchOptions.author && searchOptions.author !== "") {
+            query = query.ilike("author->>name", `%${searchOptions.author}%`);
+          }
+          if (activePlay) {
+            query = query.neq("play->>id", activePlay.play.id);
+          }
+          if (searchOptions.timestamp) {
+            query = query.gte("play->>end_time_sort", searchOptions.timestamp);
+          }
+          if (affIds && affIds.length > 0) {
+            if (searchOptions.private_only === "all") {
+              query = query.or(
+                `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
+              );
+            } else if (
+              searchOptions.private_only &&
+              searchOptions.private_only !== "all"
+            ) {
+              query = query.eq(
+                "play->>exclusive_to",
+                searchOptions.private_only,
+              );
+            }
+          } else {
+            query = query.eq("play->>private", false);
+          }
+
+          const { data, count } = await query.range(
+            offset,
+            offset + itemsPerLoad - 1,
           );
-          void playsByTag.or(
-            `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-          );
-        } else if (
-          searchOptions.private_only &&
-          searchOptions.private_only !== "all"
-        ) {
-          void playsByMention.eq(
-            "play->>exclusive_to",
-            searchOptions.private_only,
-          );
-          void playsByTag.eq("play->>exclusive_to", searchOptions.private_only);
+
+          if (data) {
+            combinedPlays = data;
+            totalCount = count;
+          }
         }
-      } else {
-        void playsByMention.eq("play->>private", false);
-        void playsByTag.eq("play->>private", false);
+
+        setPlays((prev: PlayPreviewType[]) =>
+          append ? [...prev, ...combinedPlays] : combinedPlays,
+        );
+        setCurrentOffset(offset + combinedPlays.length);
+        setHasMore(combinedPlays.length === itemsPerLoad);
+        setPlayCount(totalCount);
+      } catch (error) {
+        console.error("Error fetching plays:", error);
+        setHasMore(false);
+        setPlays(append ? plays : []);
+        setPlayCount(0);
+      } finally {
+        setLoadingInitial(false);
       }
-      const getTags = await playsByTag;
-      const getMentions = await playsByMention;
-      let ps: PlayPreviewType[] | null = null;
-      if (getTags.data) {
-        ps = getTags.data;
-      }
-      if (getMentions.data) {
-        ps = ps ? [...ps, ...getMentions.data] : getMentions.data;
-      }
-      const uniquePlays = [...new Map(ps?.map((x) => [x.play.id, x])).values()];
-      setPlays(ps ? uniquePlays : null);
-      setPlayCount(uniquePlays.length > 0 ? uniquePlays.length : null);
+    },
+    [videoId, itemsPerLoad, searchOptions, activePlay, affIds, plays],
+  );
+
+  const debouncedFetchPlays = useDebounce(fetchPlays);
+
+  useEffect(() => {
+    setCurrentOffset(0);
+    setHasMore(true);
+    setPlays([]);
+    setPlayCount(null);
+    setLoadingInitial(true);
+
+    debouncedFetchPlays(0, false);
+  }, [searchOptions, isMobile, videoId, activePlay, debouncedFetchPlays]);
+
+  const loadMorePlays = useCallback(() => {
+    if (hasMore && !loadingInitial) {
+      void fetchPlays(currentOffset, true);
     }
-  });
+  }, [hasMore, currentOffset, loadingInitial, fetchPlays]);
 
-  const scrollToTop = () => {
-    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const getCurrentTime = useCallback(async (playerInstance: YouTubePlayer) => {
+    return Math.round(await playerInstance.getCurrentTime()) - 1;
+  }, []);
 
-  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
-    e.preventDefault();
-    setPage(value);
-    scrollToTop();
-  };
-
-  const getCurrentTime = async (player: YouTubePlayer) => {
-    return Math.round(await player.getCurrentTime()) - 1;
-  };
-
-  const setTimestamp = async () => {
+  const setTimestamp = useCallback(async () => {
     if (searchOptions.timestamp) {
-      setSearchOptions({ ...searchOptions, timestamp: null });
+      setSearchOptions((prev: PlaySearchOptions) => ({
+        ...prev,
+        timestamp: null,
+      }));
       return;
     }
     if (player && !searchOptions.timestamp) {
       void getCurrentTime(player).then((currentTime) => {
         const paddedCurrentTime = currentTime.toString().padStart(6, "0");
-        setSearchOptions({
-          ...searchOptions,
+        setSearchOptions((prev: PlaySearchOptions) => ({
+          ...prev,
           timestamp: paddedCurrentTime,
-        });
+        }));
       });
     }
-  };
+  }, [searchOptions.timestamp, player, getCurrentTime, setSearchOptions]);
 
   useEffect(() => {
     const channel = supabase
-      .channel("play_changes")
+      .channel("play_changes_video_index")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "plays" },
+        {
+          event: "*",
+          schema: "public",
+          table: "plays",
+          filter: `video_id=eq.${videoId}`,
+        },
         () => {
-          void fetchPlays();
+          debouncedFetchPlays(0, false);
         },
       )
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "play_tags" },
+        {
+          event: "*",
+          schema: "public",
+          table: "play_tags",
+          filter: `play_id->>video_id=eq.${videoId}`,
+        },
         () => {
-          void fetchPlays();
+          debouncedFetchPlays(0, false);
         },
       )
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "play_mentions" },
+        {
+          event: "*",
+          schema: "public",
+          table: "play_mentions",
+          filter: `play_id->>video_id=eq.${videoId}`,
+        },
         () => {
-          void fetchPlays();
+          debouncedFetchPlays(0, false);
         },
       )
       .subscribe();
@@ -266,24 +359,29 @@ const VideoPlayIndex = ({
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, []);
-
-  useEffect(() => {
-    if (page === 1 && searchOptions.topic !== "") {
-      void fetchPlaysBySearch();
-    } else if (page === 1 && searchOptions.topic === "") void fetchPlays();
-    else setPage(1);
-  }, [searchOptions, isMobile]);
-
-  useEffect(() => {
-    if (searchOptions.topic !== "") void fetchPlaysBySearch();
-    else void fetchPlays();
-  }, [videoId, page, activePlay]);
+  }, [videoId, debouncedFetchPlays]);
 
   return (
-    <div className="flex w-full flex-col items-center">
+    <Box
+      sx={{
+        display: "flex",
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
       {activePlay && (
-        <div className="flex w-11/12 flex-col items-center justify-center gap-2">
+        <Box
+          sx={{
+            display: "flex",
+            width: "100%",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            mb: 2,
+          }}
+        >
           <PageTitle title="Active Play" size="x-small" />
           <Play
             scrollToPlayer={scrollToPlayer}
@@ -295,18 +393,36 @@ const VideoPlayIndex = ({
             setSearchOptions={setSearchOptions}
             setSeenActivePlay={setSeenActivePlay}
             setIsFiltersOpen={setIsFiltersOpen}
+            index={0}
           />
-          <Divider sx={{ marginTop: "16px", marginBottom: "16px" }} flexItem />
-        </div>
+          <Divider sx={{ my: 2 }} flexItem />
+        </Box>
       )}
-      <div
+
+      <Box
         ref={topRef}
-        className="flex w-full flex-col items-center justify-center gap-4"
+        sx={{
+          display: "flex",
+          width: "100%",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+        }}
       >
-        <div className="flex items-center justify-center gap-2 text-lg font-bold">
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            fontSize: "1.25rem",
+            fontWeight: "bold",
+          }}
+        >
           <PageTitle
             title={`${
-              playCount
+              playCount !== null
                 ? playCount > 1
                   ? `${playCount} Plays`
                   : `${playCount} Play`
@@ -314,74 +430,141 @@ const VideoPlayIndex = ({
             }`}
             size="x-small"
           />
-          <IconButton
-            size="small"
-            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-            onMouseEnter={(e) => handlePopoverOpen(e, "a")}
-            onMouseLeave={handlePopoverClose}
-          >
-            <SortIcon />
-          </IconButton>
           <StandardPopover
-            open={open1}
-            anchorEl={anchorEl.anchor1}
-            handlePopoverClose={handlePopoverClose}
             content="Open Filters"
+            children={
+              <IconButton
+                size="small"
+                onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                aria-label="open-filters"
+                sx={{ padding: 0 }}
+                color={isFiltersOpen ? "primary" : "inherit"}
+              >
+                <SortIcon />
+              </IconButton>
+            }
           />
-          <IconButton
-            size="small"
-            onClick={setTimestamp}
-            onMouseEnter={(e) => handlePopoverOpen(e, "b")}
-            onMouseLeave={handlePopoverClose}
-          >
-            <UpdateIcon
-              color={!searchOptions.timestamp ? "action" : "primary"}
-            />
-          </IconButton>
+          {/* Updated Timestamp Filter Button */}
           <StandardPopover
-            open={open2}
-            anchorEl={anchorEl.anchor2}
-            handlePopoverClose={handlePopoverClose}
             content={`${
               !searchOptions.timestamp
-                ? "Plays found at this timestamp or later"
-                : "All plays"
+                ? "Show plays at current video time or later"
+                : "Show all plays (clear timestamp filter)"
             }`}
-          />
-        </div>
+          >
+            <Button
+              size="small"
+              onClick={setTimestamp}
+              aria-label="filter-by-timestamp"
+              variant={searchOptions.timestamp ? "contained" : "outlined"}
+              color={searchOptions.timestamp ? "primary" : "inherit"}
+              sx={{
+                fontWeight: "bold",
+                gap: 0.5, // Space between icon and text
+                minWidth: "auto", // Adjust minimum width if needed
+                px: 1, // Padding horizontal
+                py: 0.5, // Padding vertical
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: "bold", fontSize: "10px" }}
+              >
+                {!searchOptions.timestamp
+                  ? "Timestamp Filter"
+                  : `Plays > ${convertYouTubeTimestamp(
+                      parseInt(searchOptions.timestamp),
+                    )}`}
+              </Typography>
+              {searchOptions.timestamp ? (
+                <ClearIcon fontSize="small" />
+              ) : (
+                <AddIcon fontSize="small" />
+              )}
+            </Button>
+          </StandardPopover>
+        </Box>
         {isFiltersOpen && (
           <PlaySearchFilters
             searchOptions={searchOptions}
             setSearchOptions={setSearchOptions}
           />
         )}
-        <Plays
-          scrollToPlayer={scrollToPlayer}
-          player={player}
-          plays={plays}
-          setActivePlay={setActivePlay}
-          setSearchOptions={setSearchOptions}
-          searchOptions={searchOptions}
-          setSeenActivePlay={setSeenActivePlay}
-          setIsFiltersOpen={setIsFiltersOpen}
-        />
-        {playCount && (
-          <Pagination
-            siblingCount={1}
-            boundaryCount={0}
-            size={isMobile ? "small" : "medium"}
-            showFirstButton
-            showLastButton
-            sx={{ marginTop: "16px" }}
-            variant="text"
-            shape="rounded"
-            count={getNumberOfPages(itemsPerPage, playCount)}
-            page={page}
-            onChange={handlePageChange}
-          />
+        {loadingInitial && plays.length === 0 ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "200px",
+              width: "100%",
+            }}
+          >
+            <CircularProgress size={60} />
+          </Box>
+        ) : (
+          <Box sx={{ width: "100%" }}>
+            <InfiniteScroll
+              dataLength={plays.length}
+              next={loadMorePlays}
+              hasMore={hasMore}
+              scrollThreshold={0.9}
+              loader={
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    my: 2,
+                    width: "100%",
+                  }}
+                >
+                  <CircularProgress size={20} />
+                </Box>
+              }
+              endMessage={
+                plays.length > 0 &&
+                !hasMore && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: "block",
+                      color: "text.disabled",
+                      my: 1,
+                    }}
+                  >
+                    — End of Plays —
+                  </Typography>
+                )
+              }
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
+                {plays.map((play, index) => (
+                  <Play
+                    setActivePlay={setActivePlay}
+                    key={play.play.id}
+                    scrollToPlayer={scrollToPlayer}
+                    play={play}
+                    player={player}
+                    setSearchOptions={setSearchOptions}
+                    searchOptions={searchOptions}
+                    setSeenActivePlay={setSeenActivePlay}
+                    setIsFiltersOpen={setIsFiltersOpen}
+                    index={index}
+                  />
+                ))}
+              </Box>
+            </InfiniteScroll>
+          </Box>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

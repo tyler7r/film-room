@@ -1,48 +1,39 @@
-import { Popover } from "@mui/material";
-import { useIsDarkContext } from "~/pages/_app";
-
-type StandardPopoverProps = {
-  open: boolean;
-  anchorEl: HTMLElement | null;
-  handlePopoverClose: () => void;
-  content: string;
-};
+import { Tooltip } from "@mui/material";
 
 const StandardPopover = ({
-  open,
-  anchorEl,
-  handlePopoverClose,
-  content,
-}: StandardPopoverProps) => {
-  const { backgroundStyle } = useIsDarkContext();
+  content, // Renamed from 'content' to 'title' to align with Tooltip's prop
+  children,
+  ...props // Capture any additional TooltipProps
+}: {
+  content: string;
+  children: React.ReactElement;
+}) => {
+  // const { backgroundStyle } = useIsDarkContext();
 
   return (
-    <Popover
-      id="mouse-over-popover"
-      sx={{
-        pointerEvents: "none",
+    <Tooltip
+      title={content} // Tooltip uses 'title' prop for content
+      arrow // Adds a small arrow pointing to the element
+      placement="bottom" // Default placement, can be overridden by props
+      slotProps={{
+        tooltip: {
+          sx: {
+            // ...backgroundStyle, // Apply dark context background style to the tooltip content
+            p: 1, // Adjusted padding for tooltip content
+            fontSize: "0.75rem", // Smaller font for tooltips
+            fontWeight: "bold",
+            letterSpacing: "-0.01em", // A tight letter spacing
+            borderRadius: "4px", // Standard tooltip border radius
+            maxWidth: { xs: 200, sm: 250 }, // Constrain width on mobile for readability
+            textAlign: "center", // Center text within the tooltip
+            // Removed 'pointerEvents: "none"' as Tooltip is non-interactive by default
+          },
+        },
       }}
-      open={open}
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "left",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "left",
-      }}
-      onClose={handlePopoverClose}
-      disableRestoreFocus
-      className="max-h-40"
+      {...props} // Spread any other props passed to StandardTooltip
     >
-      <div
-        style={backgroundStyle}
-        className="p-2 text-sm font-bold tracking-tight"
-      >
-        {content}
-      </div>
-    </Popover>
+      {children}
+    </Tooltip>
   );
 };
 

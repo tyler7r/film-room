@@ -144,6 +144,7 @@ const AddPlayToCollection = ({ playId }: AddPlayToCollection) => {
             collections={playCollections}
             setCollections={setPlayCollections}
             allCollections={collections}
+            refetchCollections={fetchCollections}
           />
           <FormMessage message={message} />
         </div>

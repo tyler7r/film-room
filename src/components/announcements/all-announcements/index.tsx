@@ -24,17 +24,6 @@ const Announcements = ({ teamId, role }: AnnouncementsProps) => {
   );
   const [page, setPage] = useState<number>(1);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
 
   const itemsPerPage = isMobile ? 3 : 5;
 
@@ -88,20 +77,15 @@ const Announcements = ({ teamId, role }: AnnouncementsProps) => {
       <div className="flex items-center justify-center gap-2">
         <PageTitle size="medium" title="Announcements" />
         {(role === "coach" || role === "owner") && (
-          <IconButton
-            onClick={() => setIsOpen(!isOpen)}
-            size="small"
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-          >
-            <CreateIcon fontSize="large" color="primary" />
             <StandardPopover
               content="Write an announcement"
-              open={open}
-              anchorEl={anchorEl}
-              handlePopoverClose={handlePopoverClose}
+              children={<IconButton
+            onClick={() => setIsOpen(!isOpen)}
+            size="small"
+          >
+            <CreateIcon fontSize="large" color="primary" />
+          </IconButton>}
             />
-          </IconButton>
         )}
       </div>
       {!anncs && <EmptyMessage message="team announcements" />}

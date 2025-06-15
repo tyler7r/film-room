@@ -25,6 +25,7 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
         <IconButton
           size="small"
           onClick={() => void router.push("/search/users")}
+          sx={{ padding: 0 }}
         >
           <SearchIcon />
         </IconButton>
@@ -38,6 +39,7 @@ const MobileNav = ({ logout }: ChildrenNavProps) => {
             className="m-0 hover:cursor-pointer"
             onClick={() => setMenuOpen(!menuOpen)}
             size="small"
+            sx={{ padding: 0 }}
           >
             <MenuRoundedIcon fontSize="large" color="action" />
           </IconButton>

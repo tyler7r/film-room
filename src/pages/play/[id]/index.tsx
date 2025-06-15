@@ -1,7 +1,7 @@
 import LinkIcon from "@mui/icons-material/Link";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import StarIcon from "@mui/icons-material/Star";
-import { Divider, IconButton } from "@mui/material";
+import { Box, Divider, IconButton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -10,8 +10,8 @@ import CommentBtn from "~/components/interactions/comments/comment-btn";
 import LikeBtn from "~/components/interactions/likes/like-btn";
 import ExpandedPlay from "~/components/plays/expanded-play";
 import PlayActionsMenu from "~/components/plays/play-actions-menu";
-import PlayMentions from "~/components/plays/play-mentions";
-import PlayTags from "~/components/plays/play-tags";
+import PlayPreviewMentions from "~/components/plays/play-mentions";
+import PlayPreviewTags from "~/components/plays/play-tags";
 import TeamLogo from "~/components/teams/team-logo";
 import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
@@ -33,65 +33,9 @@ const Play = () => {
   const [preview, setPreview] = useState<PlayPreviewType | null>(null);
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const [commentCount, setCommentCount] = useState<number>(0);
-  const [anchorEl, setAnchorEl] = useState<{
-    anchor1: HTMLElement | null;
-    anchor2: HTMLElement | null;
-    anchor3: HTMLElement | null;
-    anchor4: HTMLElement | null;
-  }>({ anchor1: null, anchor2: null, anchor3: null, anchor4: null });
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const activeComment = useSearchParams().get("comment") ?? undefined;
-
-  const handlePopoverOpen = (
-    e: React.MouseEvent<HTMLElement>,
-    target: 1 | 2 | 3 | 4,
-  ) => {
-    if (target === 1) {
-      setAnchorEl({
-        anchor1: e.currentTarget,
-        anchor2: null,
-        anchor3: null,
-        anchor4: null,
-      });
-    } else if (target === 2) {
-      setAnchorEl({
-        anchor1: null,
-        anchor2: e.currentTarget,
-        anchor3: null,
-        anchor4: null,
-      });
-    } else if (target === 3) {
-      setAnchorEl({
-        anchor1: null,
-        anchor2: null,
-        anchor3: e.currentTarget,
-        anchor4: null,
-      });
-    } else {
-      setAnchorEl({
-        anchor1: null,
-        anchor2: null,
-        anchor3: null,
-        anchor4: e.currentTarget,
-      });
-    }
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl({
-      anchor1: null,
-      anchor2: null,
-      anchor3: null,
-      anchor4: null,
-    });
-    setIsCopied(false);
-  };
-
-  const open = Boolean(anchorEl.anchor1);
-  const open2 = Boolean(anchorEl.anchor2);
-  const open3 = Boolean(anchorEl.anchor3);
-  const open4 = Boolean(anchorEl.anchor4);
 
   const fetchPlay = async () => {
     const { data } = await supabase
@@ -187,37 +131,36 @@ const Play = () => {
           <div className="flex w-full items-center justify-between gap-2 p-2">
             <div className="flex items-center gap-2">
               {preview.team && (
-                <IconButton
-                  size="small"
-                  onClick={() =>
-                    void router.push(`/team-hub/${preview.team?.id}`)
+                <StandardPopover
+                  content={`Play is private to ${preview.team.full_name}`}
+                  children={
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        void router.push(`/team-hub/${preview.team?.id}`)
+                      }
+                    >
+                      <TeamLogo tm={preview.team} size={35} inactive={true} />
+                    </IconButton>
                   }
-                  onMouseEnter={(e) => handlePopoverOpen(e, 2)}
-                  onMouseLeave={handlePopoverClose}
-                >
-                  <TeamLogo tm={preview.team} size={35} inactive={true} />
-                  <StandardPopover
-                    open={open2}
-                    anchorEl={anchorEl.anchor2}
-                    content={`Play is private to ${preview.team.full_name}`}
-                    handlePopoverClose={handlePopoverClose}
-                  />
-                </IconButton>
+                />
               )}
               {preview.play.highlight && (
-                <div
-                  onMouseEnter={(e) => handlePopoverOpen(e, 3)}
-                  onMouseLeave={handlePopoverClose}
-                  className="flex cursor-pointer items-center justify-center"
-                >
-                  <StarIcon color="secondary" fontSize="large" />
-                  <StandardPopover
-                    open={open3}
-                    anchorEl={anchorEl.anchor3}
-                    content="Highlight!"
-                    handlePopoverClose={handlePopoverClose}
-                  />
-                </div>
+                <StandardPopover
+                  content="Highlight!"
+                  children={
+                    <Box
+                      sx={{
+                        display: "flex",
+                        cursor: "pointer",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <StarIcon color="secondary" fontSize="large" />
+                    </Box>
+                  }
+                />
               )}
               <div
                 className={`text-center text-xl font-bold tracking-tighter ${hoverText}`}
@@ -245,33 +188,21 @@ const Play = () => {
                 onGoToFilmRoom={handleVideoClick}
                 onPlayClick={restartPreview}
               />
-              <IconButton
-                onClick={copyToClipboard}
-                onMouseEnter={(e) => handlePopoverOpen(e, 4)}
-                onMouseLeave={handlePopoverClose}
-                size="small"
-              >
-                <LinkIcon fontSize="large" />
-                <StandardPopover
-                  open={open4}
-                  anchorEl={anchorEl.anchor4}
-                  content={isCopied ? "Copied!" : `Copy link to clipboard`}
-                  handlePopoverClose={handlePopoverClose}
-                />
-              </IconButton>
-              <IconButton
-                onMouseEnter={(e) => handlePopoverOpen(e, 1)}
-                onMouseLeave={handlePopoverClose}
-                onClick={handleVideoClick}
-                size="small"
-              >
-                <ShortcutIcon fontSize="large" color="primary" />
-              </IconButton>
+              <StandardPopover
+                content={isCopied ? "Copied!" : `Copy link to clipboard`}
+                children={
+                  <IconButton onClick={copyToClipboard} size="small">
+                    <LinkIcon fontSize="large" />
+                  </IconButton>
+                }
+              />
               <StandardPopover
                 content="Go to Video"
-                open={open}
-                anchorEl={anchorEl.anchor1}
-                handlePopoverClose={handlePopoverClose}
+                children={
+                  <IconButton onClick={handleVideoClick} size="small">
+                    <ShortcutIcon fontSize="large" color="primary" />
+                  </IconButton>
+                }
               />
             </div>
           </div>
@@ -308,8 +239,8 @@ const Play = () => {
             <PageTitle size="large" title="Loading Video..." />
           )}
           <div className="w-full">
-            <PlayMentions play={preview} playId={playId} />
-            <PlayTags play={preview} playId={playId} />
+            <PlayPreviewMentions play={preview} playId={playId} />
+            <PlayPreviewTags play={preview} playId={playId} />
           </div>
           <div className="flex w-full items-center gap-3 px-1">
             <div className="flex items-center justify-center gap-2">

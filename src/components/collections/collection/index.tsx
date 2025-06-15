@@ -48,6 +48,7 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
 
   const handleProfileClick = (e: React.MouseEvent) => {
     if (listItem) return; // Prevent navigation if used as a list item in a menu
+    else if (small) return;
     else {
       e.stopPropagation(); // Prevent parent handleClick
       void router.push(`/profile/${collection.collection.author_id}`);
@@ -104,7 +105,6 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
             tm={collection.team}
             size={listItem ? 20 : small ? 25 : 35} // Smaller logo for list item/small
             inactive={true}
-            popover={!listItem} // Popover only if not a listItem
           />
         ) : (
           <PublicIcon
@@ -183,7 +183,7 @@ const Collection = ({ collection, small, listItem }: CollectionProps) => {
           flexShrink: 0, // Prevent shrinking
           minWidth: listItem ? "40px" : "50px", // Ensure minimum width for count
           // Conditional background color based on theme mode
-          backgroundColor: isDark ? colors.purple[700] : colors.purple[100],
+          backgroundColor: isDark ? colors.purple[400] : colors.purple.A400,
         }}
       >
         <Typography

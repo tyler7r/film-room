@@ -10,10 +10,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  Typography, // Import Typography for text styling
+  Typography
 } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react"; // Added useCallback
+import React, { useEffect, useState } from "react"; // Added useCallback
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type { CollectionType, PlayPreviewType } from "~/utils/types";
@@ -28,11 +28,13 @@ const PlayPreviewCollections = ({ play }: PlayCollectionsProps) => {
   const [collections, setCollections] = useState<CollectionType[]>([]);
   const [openDialog, setOpenDialog] = useState<boolean>(false); // State to control the dialog
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setOpenDialog(true);
   };
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setOpenDialog(false);
   };
 
@@ -65,13 +67,12 @@ const PlayPreviewCollections = ({ play }: PlayCollectionsProps) => {
     void router.push(`/collections/${collectionId}`);
   };
 
-  if (collections.length === 0) {
+  if (!collections || collections.length === 0) {
     return null; // Don't render if no collections
   }
 
   return (
-    collections &&
-    collections.length > 0 && (
+    
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, py: 0.5 }}>
         <Chip
           icon={<CollectionsBookmarkIcon sx={{ fontSize: "14px" }} />}
@@ -142,7 +143,6 @@ const PlayPreviewCollections = ({ play }: PlayCollectionsProps) => {
         </Dialog>
       </Box>
     )
-  );
 };
 
 export default PlayPreviewCollections;

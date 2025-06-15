@@ -18,7 +18,6 @@ import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import TeamLogo from "~/components/teams/team-logo";
 import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
-import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
@@ -27,9 +26,9 @@ import LikeBtn from "../../interactions/likes/like-btn";
 import StandardPopover from "../../utils/standard-popover";
 import ExpandedPlay from "../expanded-play";
 import PlayActionsMenu from "../play-actions-menu"; // Updated import
-import PlayPreviewCollections from "./play-collections";
-import PlayPreviewMentions from "./play-mentions";
-import PlayPreviewTags from "./play-tags";
+import PlayPreviewCollections from "../play-collections";
+import PlayPreviewMentions from "../play-mentions";
+import PlayPreviewTags from "../play-tags";
 
 type PlayPreviewProps = {
   preview: PlayPreviewType;
@@ -44,22 +43,11 @@ const PlayPreview = ({
   setReload,
   collectionAuthor,
 }: PlayPreviewProps) => {
-  const { isMobile } = useMobileContext();
   const { hoverText } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [anchorEl, setAnchorEl] = useState<{
-    anchor1: HTMLElement | null; // For general menu
-    anchor2: HTMLElement | null; // For private team popover
-    anchor3: HTMLElement | null; // For highlight popover
-    // anchor4 and anchor5 removed as link/fullscreen buttons are moved/removed
-  }>({
-    anchor1: null,
-    anchor2: null,
-    anchor3: null,
-  });
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -78,29 +66,6 @@ const PlayPreview = ({
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === preview.play.exclusive_to,
   )?.team;
-
-  const handlePopoverOpen = (
-    e: React.MouseEvent<HTMLElement>,
-    target: 1 | 2 | 3, // Updated targets
-  ) => {
-    if (target === 1) {
-      setAnchorEl((prev) => ({ ...prev, anchor1: e.currentTarget }));
-    } else if (target === 2) {
-      setAnchorEl((prev) => ({ ...prev, anchor2: e.currentTarget }));
-    } else if (target === 3) {
-      setAnchorEl((prev) => ({ ...prev, anchor3: e.currentTarget }));
-    }
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl({
-      anchor1: null,
-      anchor2: null,
-      anchor3: null,
-    });
-  };
-  const open2 = Boolean(anchorEl.anchor2);
-  const open3 = Boolean(anchorEl.anchor3);
 
   const videoOnReady = async (e: YouTubeEvent) => {
     // Defensive check: ensure the target is valid before proceeding
@@ -129,8 +94,6 @@ const PlayPreview = ({
       if (!iframeElement) {
         return;
       }
-      // void player.seekTo(preview.play.start_time, true);
-      // void player.pauseVideo();
       void player.cueVideoById({
         videoId: `${preview.video.link.split("v=")[1]?.split("&")[0]}`,
         startSeconds: preview.play.start_time,
@@ -250,41 +213,42 @@ const PlayPreview = ({
   return (
     <Box className="flex w-full flex-col justify-center rounded-md">
       <Box className="flex items-center justify-between gap-2 px-1 py-2">
-        <Box className="flex items-center gap-1">
+        <Box className="flex items-center gap-1.5">
           {preview.play.private && exclusiveTeam && (
-            <IconButton
-              size="small"
-              sx={{ padding: 0 }}
-              onClick={() => void router.push(`/team-hub/${exclusiveTeam.id}`)}
-              onMouseEnter={(e) => handlePopoverOpen(e, 2)}
-              onMouseLeave={handlePopoverClose}
-            >
-              <TeamLogo tm={exclusiveTeam} size={25} inactive={true} />
-              <StandardPopover
-                open={open2}
-                anchorEl={anchorEl.anchor2}
-                content={`Play is private to ${exclusiveTeam?.full_name}`}
-                handlePopoverClose={handlePopoverClose}
-              />
-            </IconButton>
+            <StandardPopover
+              content={`Play is private to ${exclusiveTeam?.full_name}`}
+              children={
+                <IconButton
+                  size="small"
+                  sx={{ padding: 0 }}
+                  onClick={() =>
+                    void router.push(`/team-hub/${exclusiveTeam.id}`)
+                  }
+                >
+                  <TeamLogo tm={exclusiveTeam} size={25} inactive={true} />
+                </IconButton>
+              }
+            />
           )}
           {preview.play.highlight && (
-            <Box
-              onMouseEnter={(e) => handlePopoverOpen(e, 3)}
-              onMouseLeave={handlePopoverClose}
-              className="flex cursor-pointer items-center justify-center"
-            >
-              <StarIcon color="secondary" />
-              <StandardPopover
-                open={open3}
-                anchorEl={anchorEl.anchor3}
-                content="Highlight!"
-                handlePopoverClose={handlePopoverClose}
-              />
-            </Box>
+            <StandardPopover
+              content="Highlight!"
+              children={
+                <Box
+                  sx={{
+                    display: "flex",
+                    cursor: "pointer",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <StarIcon color="secondary" />
+                </Box>
+              }
+            />
           )}
           <Box
-            className={`text-center font-bold tracking-tighter md:text-xl ${hoverText}`}
+            className={`text-center font-bold tracking-tighter md:text-lg ${hoverText}`}
             onClick={() =>
               void router.push(`/profile/${preview.play.author_id}`)
             }
@@ -295,9 +259,6 @@ const PlayPreview = ({
           <Box className="text-xs font-bold leading-3 tracking-tight">
             ({preview.play.end_time - preview.play.start_time}s)
           </Box>
-          {!isMobile && (
-            <Box className="flex-wrap p-2">{preview.play.title}</Box>
-          )}
         </Box>
         <Box className="flex items-center gap-2">
           {/* Reset Clip Button */}
@@ -340,7 +301,7 @@ const PlayPreview = ({
                 disablekb: 1,
                 controls: 1, // Show controls
                 rel: 0,
-                origin: `https://www.youtube.com`,
+                origin: window.location.origin,
                 fs: 1, // Still useful for native fullscreen button on controls
               },
             }}
@@ -353,11 +314,9 @@ const PlayPreview = ({
         )}
       </Box>
       {isLoading && <PageTitle size="small" title="Loading..." />}
-      {isMobile && (
-        <Box className="flex flex-wrap p-1 text-sm md:text-base">
-          {preview.play.title}
-        </Box>
-      )}
+      <Box className="flex flex-wrap p-1 text-sm md:text-base">
+        {preview.play.title}
+      </Box>
       <Box
         sx={{
           display: "flex",

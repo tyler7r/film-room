@@ -1,5 +1,4 @@
-import { colors, useTheme } from "@mui/material";
-import { useIsDarkContext } from "~/pages/_app";
+import { Alert } from "@mui/material";
 import { type MessageType } from "~/utils/types";
 
 type FormMessageType = {
@@ -8,31 +7,7 @@ type FormMessageType = {
 
 const FormMessage = ({ message }: FormMessageType) => {
   const { text, status } = message;
-  const theme = useTheme();
-  const { isDark } = useIsDarkContext();
-
-  const errorStyle = {
-    border: `2px solid ${
-      isDark ? theme.palette.error.dark : theme.palette.error.light
-    }`,
-    color: `${theme.palette.error.main}`,
-  };
-
-  const successStyle = {
-    border: `2px solid ${colors.green[700]}`,
-    color: colors.green[700],
-  };
-
-  return (
-    text && (
-      <div
-        className="rounded-md p-1 px-2 text-center text-sm font-bold tracking-tight"
-        style={status === "error" ? errorStyle : successStyle}
-      >
-        {text}
-      </div>
-    )
-  );
+  return text ? <Alert severity={status}>{text}</Alert> : null;
 };
 
 export default FormMessage;

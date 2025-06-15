@@ -79,6 +79,14 @@ export const convertFullTimestamp = (date: string) => {
   return d.toLocaleString();
 };
 
+export const convertYouTubeTimestamp = (time: number) => {
+  let newTimestamp = "";
+  time < 3600
+    ? (newTimestamp = new Date(time * 1000).toISOString().substring(14, 19))
+    : (newTimestamp = new Date(time * 1000).toISOString().substring(11, 19));
+  return newTimestamp;
+};
+
 export const getTimeSinceNotified = (date: string) => {
   const present = new Date();
   const created = new Date(date);

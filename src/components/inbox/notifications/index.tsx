@@ -15,18 +15,7 @@ const InboxNotification = () => {
   const { unreadOnly, setUnreadOnly, notifications } = useInboxContext();
 
   const topRef = useRef<HTMLDivElement | null>(null);
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
 
   const scrollToTop = () => {
     if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -47,26 +36,20 @@ const InboxNotification = () => {
         <div>
           <PageTitle title="Notifications" size="small" />
         </div>
-        <IconButton
-          size="small"
-          onClick={() => setUnreadOnly(!unreadOnly)}
-          onMouseEnter={handlePopoverOpen}
-          onMouseLeave={handlePopoverClose}
-        >
-          {unreadOnly ? (
-            <MailIcon color="primary" />
-          ) : (
-            <MailOutlineIcon color="primary" />
-          )}
-          <StandardPopover
-            content={`${
-              unreadOnly ? "All Notifications" : "Unread Notifications"
-            }`}
-            open={open}
-            anchorEl={anchorEl}
-            handlePopoverClose={handlePopoverClose}
-          />
-        </IconButton>
+        <StandardPopover
+          content={`${
+            unreadOnly ? "All Notifications" : "Unread Notifications"
+          }`}
+          children={
+            <IconButton size="small" onClick={() => setUnreadOnly(!unreadOnly)}>
+              {unreadOnly ? (
+                <MailIcon color="primary" />
+              ) : (
+                <MailOutlineIcon color="primary" />
+              )}
+            </IconButton>
+          }
+        />
       </div>
       <div className="flex flex-col gap-2 md:px-2 lg:px-4">
         {loading && <PageTitle size="small" title="Loading..." />}

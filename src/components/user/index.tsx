@@ -90,16 +90,10 @@ const User = ({
                   key={team.id}
                   onClick={(e) => handleTeamClick(e, team.id)}
                 >
-                  <TeamLogo tm={team} size={25} popover={true} />
+                  <TeamLogo tm={team} size={25} />
                 </IconButton>
               ) : (
-                <TeamLogo
-                  key={team.id}
-                  tm={team}
-                  size={25}
-                  inactive={true}
-                  popover={false}
-                />
+                <TeamLogo key={team.id} tm={team} size={25} inactive={true} />
               ),
             )}
           </div>

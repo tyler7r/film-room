@@ -1,5 +1,5 @@
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import { Divider } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import PageTitle from "~/components/utils/page-title";
@@ -19,18 +19,7 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
   const { setIsOpen } = useInboxContext();
 
   const router = useRouter();
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [isUnread, setIsUnread] = useState<boolean>(true);
-
-  const handlePopoverOpen = (e: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
 
   const fetchIfUnread = async () => {
     const { data } = await supabase
@@ -53,7 +42,6 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
 
   const markUnread = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    handlePopoverClose();
     await supabase
       .from("comments")
       .update({ viewed: false })
@@ -80,20 +68,18 @@ const InboxComment = ({ comment }: InboxCommentProps) => {
       <div className="flex items-center justify-center gap-1">
         {isUnread && <FiberManualRecordIcon fontSize="small" color="primary" />}
         {!isUnread && (
-          <div
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-            onClick={(e) => markUnread(e)}
-            className="cursor-pointer"
-          >
-            <StandardPopover
-              content="Mark unread"
-              open={open}
-              anchorEl={anchorEl}
-              handlePopoverClose={handlePopoverClose}
-            />
-            <FiberManualRecordIcon fontSize="small" color="action" />
-          </div>
+          <StandardPopover
+            content="Mark unread"
+            children={
+              <Box
+                onClick={(e) => markUnread(e)}
+                sx={{ cursor: "pointer" }}
+                className="cursor-pointer"
+              >
+                <FiberManualRecordIcon fontSize="small" color="action" />
+              </Box>
+            }
+          />
         )}
         <div
           onClick={() => handleClick()}

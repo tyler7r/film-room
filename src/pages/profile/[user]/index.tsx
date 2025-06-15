@@ -203,9 +203,9 @@ const Profile = () => {
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", sm: "row" }, // Stack on mobile, row on tablet/desktop
-          alignItems: { xs: "center", sm: "flex-start" }, // Center items on mobile, align to start on larger
-          justifyContent: { xs: "center", sm: "space-between" }, // Center content on mobile, space between on larger
+          flexDirection: { xs: "column", sm: "column" }, // Stack on mobile, row on tablet/desktop
+          alignItems: { xs: "center", sm: "center" }, // Center items on mobile, align to start on larger
+          justifyContent: { xs: "center", sm: "center" }, // Center content on mobile, space between on larger
           width: { xs: "100%", sm: "90%", md: "70%" },
           maxWidth: "800px", // Max width for larger screens
           p: 2,
@@ -220,9 +220,9 @@ const Profile = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: { xs: "center", sm: "flex-start" }, // Center text on mobile, left-align on larger
+            alignItems: { xs: "center", sm: "center" }, // Center text on mobile, left-align on larger
             flexShrink: 0, // Prevent shrinking
-            textAlign: { xs: "center", sm: "left" },
+            textAlign: { xs: "center", sm: "center" },
           }}
         >
           <PageTitle
@@ -360,6 +360,7 @@ const Profile = () => {
         indicatorColor="primary"
         variant="fullWidth"
         sx={{
+          width: "100%",
           borderBottom: 1, // Add a subtle bottom border
           borderColor: "divider",
           "& .MuiTabs-indicator": {

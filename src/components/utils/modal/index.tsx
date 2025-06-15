@@ -2,7 +2,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import { Backdrop, Box, Fade, IconButton, Modal } from "@mui/material";
 import type { ReactNode } from "react";
-import { Logo } from "~/components/navbar/logo/logo";
 import { useIsDarkContext } from "~/pages/_app";
 import PageTitle from "../page-title";
 
@@ -43,23 +42,24 @@ const ModalSkeleton = ({
           className="relative inset-1/2 flex w-11/12 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-1 rounded-md pt-2 md:w-4/5 lg:w-1/2"
           sx={backgroundStyle}
         >
-          <div className="absolute right-0 top-0">
+          <div className="absolute left-1 top-1">
             {minimize && (
               <IconButton onClick={() => setIsOpen(false)} size="small">
                 <CloseFullscreenIcon />
               </IconButton>
             )}
+          </div>
+          <div className="absolute right-1 top-1">
             <IconButton onClick={handleClose} size="small" color="error">
               <CloseIcon sx={{ fontSize: "28px" }} />
             </IconButton>
           </div>
-          <div className="absolute left-0 top-0">
-            <Logo size="small" />
-          </div>
           <div className="flex w-4/5 items-center justify-center">
             <PageTitle title={title} size="small" />
           </div>
-          <div className="max-h-96 w-full overflow-scroll">{children}</div>
+          <Box sx={{ maxHeight: "500px", width: "100%", overflow: "scroll" }}>
+            {children}
+          </Box>
         </Box>
       </Fade>
     </Modal>

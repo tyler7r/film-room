@@ -52,6 +52,7 @@ const PrivacyStatus = ({
             name="privacy"
             id="privacy-status"
             className="w-full"
+            size="small"
           >
             <MenuItem value={video.exclusive_to}>
               <div className="flex gap-2">

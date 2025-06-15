@@ -58,6 +58,7 @@ const AddMentionsToPlayProps = ({
             />
           )}
           limitTags={3}
+          size="small"
         />
       </div>
     )
