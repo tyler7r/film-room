@@ -298,7 +298,7 @@ const PlayPreview = ({
                 end: preview.play.end_time,
                 enablejsapi: 1,
                 playsinline: 1,
-                disablekb: 1,
+                disablekb: 0,
                 controls: 1, // Show controls
                 rel: 0,
                 origin: window.location.origin,

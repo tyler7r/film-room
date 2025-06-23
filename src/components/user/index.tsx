@@ -1,11 +1,12 @@
-import { Divider, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography, // Import Typography
+} from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import { useIsDarkContext } from "~/pages/_app";
-import { supabase } from "~/utils/supabase";
-import type { TeamType, UserType } from "~/utils/types";
-import TeamLogo from "../teams/team-logo";
-import PageTitle from "../utils/page-title";
+import type { UserType } from "~/utils/types";
+import PageTitle from "../utils/page-title"; // Import the updated PageTitle
+import UserAffiliationsChip from "./user-teams";
 
 type UserProps = {
   user: UserType;
@@ -21,13 +22,11 @@ const User = ({
   goToProfile,
   small,
   number,
-  listItem,
   coach,
+  listItem,
 }: UserProps) => {
-  const { backgroundStyle, hoverText } = useIsDarkContext();
+  const { backgroundStyle, hoverBorder, isDark } = useIsDarkContext();
   const router = useRouter();
-
-  const [userTeams, setUserTeams] = useState<TeamType[] | null>(null);
 
   const handleClick = () => {
     if (goToProfile) {
@@ -35,70 +34,91 @@ const User = ({
     }
   };
 
-  const fetchUserTeams = async () => {
-    const { data } = await supabase.from("user_teams").select("*").match({
-      "affiliations->>user_id": user.id,
-      "affiliations->>verified": true,
-    });
-    if (data && data.length > 0) setUserTeams(data.map((data) => data.team));
-    else setUserTeams(null);
+  // Helper function to format the name/email for display
+  const getDisplayName = (user: UserType) => {
+    if (user.name && user.name !== "") {
+      return user.name;
+    }
+    // If no name, use the part of the email before '@'
+    if (user.email) {
+      const atIndex = user.email.indexOf("@");
+      if (atIndex !== -1) {
+        return user.email.substring(0, atIndex);
+      }
+      return user.email; // Fallback if no '@' symbol for some reason
+    }
+    return "Unknown User"; // Fallback if neither name nor email
   };
-
-  const handleTeamClick = (e: React.MouseEvent, teamId: string) => {
-    if (listItem) return;
-    e.stopPropagation();
-    void router.push(`/team-hub/${teamId}`);
-  };
-
-  useEffect(() => {
-    void fetchUserTeams();
-  }, []);
 
   return (
     (user.name !== "" || user.email) && (
-      <div
-        style={backgroundStyle}
-        className={`flex items-center justify-center ${
-          small ? "w-full gap-2" : "gap-2"
-        } rounded-sm p-1 px-2`}
+      <Box
+        sx={{
+          ...backgroundStyle,
+          display: "flex",
+          flexDirection: "row", // Stack vertically on xs, row on sm+
+          alignItems: "center",
+          justifyContent: "space-between", // Space out content and teams chip
+          gap: { xs: 1, sm: 2 }, // Responsive gap
+          width: small ? "100%" : "auto", // Small users take full width
+          borderRadius: "4px", // rounded-sm
+          p: { xs: 1, sm: 1.5 }, // Responsive padding
+          cursor: goToProfile ? "pointer" : "default", // Only cursor pointer if clickable
+          transition:
+            "border-color 0.3s ease-in-out, background-color 0.3s ease-in-out",
+          "&:hover": goToProfile
+            ? // Hover styles for non-list items
+              {
+                borderColor: hoverBorder,
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.05)"
+                  : "rgba(0,0,0,0.05)",
+              }
+            : {},
+        }}
         onClick={handleClick}
       >
-        <div
-          className={`flex items-center justify-center ${
-            !listItem && hoverText
-          } ${small ? "gap-2" : "gap-4"}`}
+        {/* User Name/Email, Number, Coach Indicator */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start", // Align to start (left)
+            gap: { xs: 1, sm: 2 }, // Responsive gap
+            flexGrow: 1, // Allow this section to grow and take available space
+            minWidth: 0, // Crucial: allows content within to shrink below its intrinsic width
+          }}
         >
+          {number && (
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: "light", flexShrink: 0 }}
+            >
+              #{number}
+            </Typography>
+          )}
+          {coach && (
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: "light", flexShrink: 0 }}
+            >
+              coach
+            </Typography>
+          )}
           <PageTitle
-            title={user.name !== "" ? user.name : user.email!}
-            size={small ? "xx-small" : "x-small"}
+            title={getDisplayName(user)} // Use the helper function here
+            size={small ? "xx-small" : "x-small"} // Adjusted PageTitle size prop
+            sx={{
+              flexShrink: 1, // Allow text to shrink
+              minWidth: 0, // Ensure it can shrink to 0 if needed (important for ellipsis)
+              // The PageTitle component now handles whiteSpace, overflow, textOverflow
+            }}
           />
-          {number && <div className="text-sm font-light">#{number}</div>}
-          {coach && <div className="text-sm font-light">coach</div>}
-        </div>
-        {userTeams && (
-          <Divider orientation="vertical" flexItem variant="middle" />
-        )}
-        <div
-          className={`flex items-center justify-center ${
-            small ? "gap-1" : "gap-2"
-          }`}
-        >
-          <div className="flex items-center justify-center gap-1">
-            {userTeams?.map((team) =>
-              !listItem ? (
-                <IconButton
-                  key={team.id}
-                  onClick={(e) => handleTeamClick(e, team.id)}
-                >
-                  <TeamLogo tm={team} size={25} />
-                </IconButton>
-              ) : (
-                <TeamLogo key={team.id} tm={team} size={25} inactive={true} />
-              ),
-            )}
-          </div>
-        </div>
-      </div>
+        </Box>
+
+        {/* User Affiliations Chip */}
+        {!listItem && <UserAffiliationsChip user={user} />}
+      </Box>
     )
   );
 };

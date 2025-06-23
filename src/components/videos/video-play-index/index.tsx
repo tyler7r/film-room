@@ -1,6 +1,6 @@
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
-import SortIcon from "@mui/icons-material/Sort";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import {
   Box,
   Button,
@@ -440,7 +440,7 @@ const VideoPlayIndex = ({
                 sx={{ padding: 0 }}
                 color={isFiltersOpen ? "primary" : "inherit"}
               >
-                <SortIcon />
+                <FilterListIcon />
               </IconButton>
             }
           />

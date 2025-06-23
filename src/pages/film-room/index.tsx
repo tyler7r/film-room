@@ -1,4 +1,4 @@
-import { Divider, Pagination } from "@mui/material";
+import { Box, Divider, Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import VideoSearchFilters from "~/components/search-filters/video-search-filters";
 import EmptyMessage from "~/components/utils/empty-msg";
@@ -112,10 +112,21 @@ const FilmRoomHome = () => {
           setSearchOptions={setSearchOptions}
         />
       </div>
-      <div className="flex w-full flex-wrap justify-center gap-6">
+      <Box
+        sx={{
+          display: "grid",
+          width: "100%",
+          gridTemplateColumns: {
+            xs: "repeat(auto-fit, minmax(280px, 1fr))", // Min width for video card
+            sm: "repeat(2, minmax(280px, 1fr))", // 2 columns on small screens
+            md: "repeat(3, minmax(280px, 1fr))", // 3 columns on medium screens
+          },
+          gap: { xs: 2, md: 3 },
+        }}
+      >
         {videos?.map((v) => <Video video={v} key={v.id} />)}
         {!videos && <EmptyMessage message="videos" />}
-      </div>
+      </Box>
       {videos && videoCount && (
         <Pagination
           siblingCount={1}
