@@ -1,12 +1,17 @@
+import CreateIcon from "@mui/icons-material/Create";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
+  Box,
   FormControl,
   IconButton,
   InputLabel,
+  ListItemIcon,
+  ListItemText,
   MenuItem,
   Select,
   TextField,
   Tooltip,
+  Typography,
   type SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -468,12 +473,21 @@ const EditVideo = ({ video }: EditVideoProps) => {
       </form>
     </ModalSkeleton>
   ) : (
-    <div
-      className="text-sm font-bold tracking-tight"
+    <Box
+      sx={{ display: "flex", alignItems: "center", cursor: "pointer" }} // Added cursor pointer
       onClick={() => setIsOpen(true)}
     >
-      EDIT VIDEO
-    </div>
+      <ListItemIcon sx={{ minWidth: "12px" }}>
+        <CreateIcon fontSize="small" />
+      </ListItemIcon>
+      <ListItemText
+        primary={
+          <Typography variant="body2" fontWeight={"bold"}>
+            Edit Video
+          </Typography>
+        }
+      />
+    </Box>
   );
 };
 

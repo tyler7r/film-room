@@ -43,11 +43,11 @@ const TeamLogo = ({ tm, size, inactive }: TeamLogoProps) => {
             width: size,
             height: size,
             fontSize:
-              size && size === 150
-                ? "72px"
-                : size === 60
+              size && size < 150 && size > 60
+                ? "48px"
+                : size && size <= 60 && size > 35
                   ? "28px"
-                  : size === 35
+                  : size && size <= 35
                     ? "16px"
                     : "12px",
             fontWeight: "bold",

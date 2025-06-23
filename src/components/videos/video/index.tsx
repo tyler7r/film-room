@@ -1,18 +1,15 @@
-import LinkIcon from "@mui/icons-material/Link";
 import PublicIcon from "@mui/icons-material/Public";
-import { Divider, IconButton } from "@mui/material";
+import { Alert, Box, IconButton, Snackbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import Team from "~/components/teams/team";
+import { useCallback, useEffect, useState } from "react"; // Import useCallback
 import TeamLogo from "~/components/teams/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { convertTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { TeamType, VideoType } from "~/utils/types";
 import PageTitle from "../../utils/page-title";
-import StandardPopover from "../../utils/standard-popover";
 import VideoActionsMenu from "../video-actions-menu";
+import VideoAffiliatedTeamsChip from "../video-teams";
 
 type VideoProps = {
   video: VideoType | null;
@@ -29,24 +26,34 @@ const Video = ({ video, startTime }: VideoProps) => {
   const [exclusiveTeam, setExclusiveTeam] = useState<
     TeamType | null | undefined
   >(null);
-  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success",
+  );
 
-  const fetchExclusiveToTeam = () => {
+  const fetchExclusiveToTeam = useCallback(() => {
     if (video?.exclusive_to) {
       const tm = affiliations?.find((t) => t.team.id === video.exclusive_to);
       setExclusiveTeam(tm?.team);
     } else setExclusiveTeam(null);
-  };
+  }, [video?.exclusive_to, affiliations]); // Dependencies for useCallback
 
-  const fetchAffiliatedTeams = async () => {
+  const fetchAffiliatedTeams = useCallback(async () => {
     if (video) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("team_video_view")
         .select("team")
         .eq("video->>id", video.id);
+      if (error) {
+        console.error("Error fetching affiliated teams:", error);
+        setAffiliatedTeams(null);
+        return;
+      }
       if (data) setAffiliatedTeams(data.map((tm) => tm.team));
+      else setAffiliatedTeams(null);
     }
-  };
+  }, [video]); // Dependencies for useCallback
 
   const handleClick = async (id: string) => {
     if (!startTime) {
@@ -65,59 +72,114 @@ const Video = ({ video, startTime }: VideoProps) => {
     }
   };
 
-  const copyToClipboard = () => {
-    if (video) {
-      const origin = window.location.origin;
-      void navigator.clipboard.writeText(`${origin}/film-room/${video.id}`);
-      setIsCopied(true);
+  const copyToClipboard = async () => {
+    if (!video) return;
+    const origin = window.location.origin;
+    const linkToCopy = `${origin}/${video.id}`;
+    try {
+      await navigator.clipboard.writeText(linkToCopy);
+      setSnackbarMessage("Link copied to clipboard!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (err) {
+      console.error("Failed to copy link: ", err);
+      setSnackbarMessage("Failed to copy link. Please try again.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
+  };
+
+  const handleSnackbarClose = (
+    _event?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   useEffect(() => {
     void fetchExclusiveToTeam();
     void fetchAffiliatedTeams();
-  }, [video]);
+  }, [video, fetchExclusiveToTeam, fetchAffiliatedTeams]); // Dependencies for useEffect
 
   return (
     video && (
-      <div
-        style={backgroundStyle}
-        key={video.id}
-        className={`${hoverBorder} flex flex-col items-center justify-center rounded-md p-1 px-2`}
+      <Box
+        sx={{
+          ...backgroundStyle,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "8px", // rounded-md
+          p: 1, // increased padding slightly
+          cursor: "pointer", // Indicate clickability
+          border: `1px solid transparent`, // Initial transparent border
+          transition:
+            "border-color 0.3s ease-in-out, background-color 0.3s ease-in-out",
+          // Hover styles for non-list items
+          "&:hover": {
+            borderColor: hoverBorder,
+            backgroundColor: isDark
+              ? "rgba(255,255,255,0.05)"
+              : "rgba(0,0,0,0.05)",
+          },
+          width: "100%",
+          gap: 1,
+        }}
         onClick={() => handleClick(video.id)}
       >
-        <div className="flex w-full items-center justify-between gap-1">
-          {!video.private && (
-            <StandardPopover
-              content="Public video"
-              children={
-                <IconButton>
-                  <PublicIcon />
-                </IconButton>
-              }
-            />
-          )}
-          {video.private && exclusiveTeam && (
-            <StandardPopover
-              content={`Private to ${exclusiveTeam.full_name}`}
-              children={
-                <IconButton>
-                  <TeamLogo tm={exclusiveTeam} size={25} inactive={true} />
-                </IconButton>
-              }
-            />
-          )}
-          <div className={`flex w-full items-center justify-center gap-2`}>
-            {
-              <div className="text-xs font-light">
-                {convertTimestamp(video.uploaded_at)}
-              </div>
-            }
-            <Divider flexItem orientation="vertical" />
-            <div
-              className={`text-center text-sm font-bold leading-5 tracking-tight lg:text-base ${
-                isDark ? "text-purple-400" : "text-purple-A400"
-              }`}
+        {/* Top bar: Privacy/Exclusive Team, Timestamp/Season Info, Action Buttons */}
+        <Box
+          sx={{
+            display: "flex",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: { xs: "wrap", sm: "nowrap" }, // Allow wrapping on small screens
+            flexGrow: 1,
+          }}
+        >
+          {/* Left: Privacy/Exclusive Icon */}
+          <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+            {!video.private && (
+              <IconButton size="small" sx={{ padding: 0 }}>
+                <PublicIcon fontSize="small" color="action" />
+              </IconButton>
+            )}
+            {video.private && exclusiveTeam && (
+              <IconButton size="small" sx={{ padding: 0 }}>
+                <TeamLogo tm={exclusiveTeam} size={25} inactive={true} />
+                {/* Popover handled by parent */}
+              </IconButton>
+            )}
+          </Box>
+
+          {/* Middle: Video Metadata (Timestamp, Season/Division) */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center", // Center content if it wraps
+              gap: 1,
+              flexGrow: 1, // Allows it to take available space
+              minWidth: 0, // Allow text to shrink/wrap
+              flexWrap: "wrap", // Allow text to wrap if too long
+              textAlign: "center", // Center text if wrapped
+            }}
+          >
+            <Typography
+              variant="caption" // Use caption for smaller, more compact info
+              sx={{
+                fontWeight: "bold",
+                letterSpacing: "-0.025em",
+                color: isDark ? "secondary.main" : "primary.main", // Dynamic color
+                flexShrink: 0, // Prevent shrinking
+                whiteSpace: "nowrap", // Prevent wrapping
+                // border: "1px solid black",
+              }}
             >
               {video.season}
               {video.week
@@ -126,30 +188,53 @@ const Video = ({ video, startTime }: VideoProps) => {
                   ? ` ${video.tournament.toLocaleUpperCase()}`
                   : null}
               {` - ${video.division}`}
-            </div>
-          </div>
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="flex items-center"
+            </Typography>
+          </Box>
+
+          {/* Right: Copy Link and Video Actions Menu */}
+          <Box
+            onClick={(e) => e.stopPropagation()} // Prevent card click when clicking this section
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexShrink: 0,
+            }}
           >
-            <StandardPopover
-              content={isCopied ? "Copied!" : `Copy video link`}
-              children={
-                <IconButton onClick={copyToClipboard}>
-                  <LinkIcon />
-                </IconButton>
-              }
-            />
-            <VideoActionsMenu video={video} />
-          </div>
-        </div>
-        <PageTitle size="x-small" title={video.title} />
-        <div className="flex w-full flex-wrap items-center justify-center gap-1">
-          {affiliatedTeams?.map((tm) => (
-            <Team team={tm} key={tm.id} small={true} onVideo={true} />
-          ))}
-        </div>
-      </div>
+            <VideoActionsMenu video={video} onCopyLink={copyToClipboard} />
+          </Box>
+        </Box>
+
+        {/* Video Title */}
+        <Box
+          sx={{
+            width: "100%",
+
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <PageTitle size="x-small" title={video.title} />
+        </Box>
+
+        {/* Affiliated Teams */}
+        <VideoAffiliatedTeamsChip affiliatedTeams={affiliatedTeams} />
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000} // Hide after 3 seconds
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleSnackbarClose}
+            severity={snackbarSeverity}
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
     )
   );
 };

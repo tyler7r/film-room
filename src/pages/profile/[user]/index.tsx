@@ -6,6 +6,7 @@ import {
   CircularProgress, // Import Tabs for navigation
   Tab, // Keep IconButton for edit
   Tabs,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -21,6 +22,7 @@ import TeamAffiliation from "~/components/teams/team-affiliation";
 import PageTitle from "~/components/utils/page-title";
 import Video from "~/components/videos/video";
 import { useAuthContext } from "~/contexts/auth";
+import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
 import type {
@@ -37,6 +39,7 @@ const Profile = () => {
   const router = useRouter();
   const { user } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
+  const { isMobile } = useMobileContext();
   const theme = useTheme();
 
   const [options, setOptions] = useState<FetchOptions>({
@@ -203,16 +206,16 @@ const Profile = () => {
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", sm: "column" }, // Stack on mobile, row on tablet/desktop
-          alignItems: { xs: "center", sm: "center" }, // Center items on mobile, align to start on larger
-          justifyContent: { xs: "center", sm: "center" }, // Center content on mobile, space between on larger
+          flexDirection: { xs: "column", sm: "column" },
+          alignItems: { xs: "center", sm: "center" },
+          justifyContent: { xs: "center", sm: "center" },
           width: { xs: "100%", sm: "90%", md: "70%" },
-          maxWidth: "800px", // Max width for larger screens
+          maxWidth: "800px",
           p: 2,
           borderRadius: "12px",
-          boxShadow: 3, // Subtle shadow for prominence
+          boxShadow: 3,
           ...backgroundStyle,
-          position: "relative", // For absolute positioning of edit button
+          position: "relative",
         }}
       >
         {/* Name, Join Date, Edit Button */}
@@ -220,15 +223,28 @@ const Profile = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: { xs: "center", sm: "center" }, // Center text on mobile, left-align on larger
-            flexShrink: 0, // Prevent shrinking
+            alignItems: { xs: "center", sm: "center" },
+            // flexShrink: 0, // <-- REMOVE or adjust this, it prevents shrinking
             textAlign: { xs: "center", sm: "center" },
+            // Add a max-width to this inner box to constrain the name
+            // For example, if the parent has maxWidth: "800px" and padding: 2,
+            // this inner box's max width should be that minus padding,
+            // or a percentage of its parent's content area.
+            width: "100%", // Take full width of its direct parent flex item
+            // Max width to ensure it doesn't push out of the parent Box
+            maxWidth: { xs: "100%", sm: "calc(100% - 48px)" }, // Example: 48px for p:2 (16px left + 16px right) + some buffer
           }}
         >
-          <PageTitle
-            size="large"
+          <Tooltip
             title={profile.name === "" ? profile.email! : profile.name}
-          />
+            arrow
+          >
+            <PageTitle
+              size={isMobile ? "medium" : "large"}
+              title={profile.name === "" ? profile.email! : profile.name}
+              // No additional sx needed here as PageTitle itself has the truncation logic
+            />
+          </Tooltip>
           <Typography
             variant="body1"
             color="text.secondary"
@@ -327,10 +343,12 @@ const Profile = () => {
             <PlayArrowIcon fontSize="large" color="primary" />
             <PageTitle size="small" title="Continue Watching" />
           </Box>
-          <Video
-            video={lastWatched.video}
-            startTime={`${lastWatched.profile.last_watched_time}`}
-          />
+          <Box sx={{ width: "100%" }}>
+            <Video
+              video={lastWatched.video}
+              startTime={`${lastWatched.profile.last_watched_time}`}
+            />
+          </Box>
         </Box>
       )}
 

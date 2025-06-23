@@ -320,7 +320,7 @@ const FilmRoom = () => {
               alignItems: "center",
               justifyContent: "center",
               gap: { xs: 2, md: 3 }, // Gap below video player
-              maxWidth: "900px", // Max width for video player area
+              maxWidth: "1200px", // Max width for video player area
             }}
           >
             {video.link && !isLoading ? (
@@ -342,7 +342,7 @@ const FilmRoom = () => {
                     playerVars: {
                       enablejsapi: 1,
                       playsinline: 1,
-                      disablekb: 1,
+                      disablekb: 0,
                       controls: 1,
                       rel: 0,
                       origin: window.location.origin, // Use current origin for security

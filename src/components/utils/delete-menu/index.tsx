@@ -27,7 +27,7 @@ const DeleteMenu = ({
   small,
 }: DeleteMenuProps) => {
   return isOpen ? (
-    <Box className="flex w-full items-center justify-around">
+    <Box className="flex w-full items-center justify-around gap-1">
       {actionMenu ? (
         <Button
           endIcon={<DeleteIcon />}

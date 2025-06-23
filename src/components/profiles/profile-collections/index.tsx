@@ -188,6 +188,7 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
                   sx={{
                     display: "block",
                     color: "text.disabled",
+                    textAlign: "center",
                     my: 1,
                     mx: 1,
                   }}
@@ -219,7 +220,11 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
         )}
 
         {collections.length === 0 && !loadingInitial && (
-          <EmptyMessage message="collections" />
+          <Box
+            sx={{ display: "flex", width: "100%", justifyContent: "center" }}
+          >
+            <EmptyMessage message="collections" />
+          </Box>
         )}
 
         {showScrollDownIndicator && (
