@@ -147,7 +147,8 @@ const ReplyIndex = ({ comment, setReplyCount }: ReplyIndexProps) => {
           gap: 1,
           width: "100%",
           borderRadius: "8px",
-          border: `1px solid ${theme.palette.divider}`,
+          border:
+            replies.length > 0 ? `1px solid ${theme.palette.divider}` : ``,
         }}
       >
         {loadingInitial && replies.length === 0 ? (

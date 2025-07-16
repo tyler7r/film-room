@@ -14,9 +14,17 @@ type PageTitleProps = {
   purple?: boolean;
   fullWidth?: boolean;
   sx?: object; // Add sx prop for custom styling
+  hideOverflow?: boolean;
 };
 
-const PageTitle = ({ title, size, purple, fullWidth, sx }: PageTitleProps) => {
+const PageTitle = ({
+  title,
+  size,
+  purple,
+  fullWidth,
+  sx,
+  hideOverflow,
+}: PageTitleProps) => {
   const { isDark } = useIsDarkContext();
   const theme = useTheme();
 
@@ -51,7 +59,7 @@ const PageTitle = ({ title, size, purple, fullWidth, sx }: PageTitleProps) => {
         fontSize: selectedFontSize,
         color: textColor,
         width: fullWidth ? "100%" : "auto",
-        whiteSpace: "nowrap", // <--- ADD THIS LINE
+        whiteSpace: hideOverflow ? "nowrap" : "normal", // <--- ADD THIS LINE
         overflow: "hidden", // Hide overflowing text
         textOverflow: "ellipsis", // Show ellipsis for overflow
         minWidth: 0, // Allow flex item to shrink (crucial when in flex containers)
