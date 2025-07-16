@@ -75,7 +75,6 @@ const AddPlayToCollection = ({ playId }: AddPlayToCollection) => {
     setIsOpen(false);
     setPlayCollections([]);
     setMessage({ text: undefined, status: "error" });
-    // handleMenuClose();
   };
 
   const handleNewCollection = async (collection: string, title: string) => {

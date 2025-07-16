@@ -38,7 +38,6 @@ const Play = () => {
   const [preview, setPreview] = useState<PlayPreviewType | null>(null);
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const [commentCount, setCommentCount] = useState<number>(0);
-  // const [isCopied, setIsCopied] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -296,8 +295,6 @@ const Play = () => {
           <Box className="flex items-center justify-center gap-2">
             <LikeBtn playId={preview.play.id} />
             <CommentBtn
-              // isOpen={isExpanded}
-              // setIsOpen={setIsExpanded}
               playId={preview.play.id}
               commentCount={commentCount}
               setCommentCount={setCommentCount}
