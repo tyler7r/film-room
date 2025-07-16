@@ -29,7 +29,7 @@ type PlayActionsMenuProps = {
   collectionAuthor?: string;
   onCopyLink: () => void; // Callback for copy link
   onGoToFilmRoom?: () => void; // Callback for go to film room
-  onPlayClick: () => void; // Callback for go to play's theatre mode
+  onPlayClick?: () => void; // Callback for go to play's theatre mode
 };
 
 const PlayActionsMenu = ({
@@ -158,25 +158,26 @@ const PlayActionsMenu = ({
             </MenuItem>
           )}
           {/* Option: Go to Play's Theatre Mode */}
-          <MenuItem
-            onClick={() => {
-              onPlayClick();
-              handleClose();
-            }} // Corrected onClick
-            sx={{ px: 1, py: 0.5, minHeight: "auto" }}
-          >
-            <ListItemIcon sx={{ minWidth: "12px" }}>
-              <ShortcutIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <Typography variant="body2" fontWeight={"bold"}>
-                  View in Theatre Mode
-                </Typography>
-              }
-            />
-          </MenuItem>
-
+          {onPlayClick && (
+            <MenuItem
+              onClick={() => {
+                onPlayClick();
+                handleClose();
+              }} // Corrected onClick
+              sx={{ px: 1, py: 0.5, minHeight: "auto" }}
+            >
+              <ListItemIcon sx={{ minWidth: "12px" }}>
+                <ShortcutIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography variant="body2" fontWeight={"bold"}>
+                    View in Theatre Mode
+                  </Typography>
+                }
+              />
+            </MenuItem>
+          )}
           {/* Option: Remove from Collection (if in a collection and user is author) */}
           {collectionId && collectionAuthor === user.userId && (
             <MenuItem sx={{ px: 1, py: 0.5, minHeight: "auto" }}>

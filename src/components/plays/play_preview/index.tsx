@@ -83,27 +83,31 @@ const PlayPreview = ({
     setHasStartedPlaying(false);
   };
 
-  const resetClip = useCallback(async () => {
-    // Defensive check: ensure player instance exists before attempting to interact with it.
-    if (!player) {
-      console.warn("resetClip: player instance is null, cannot reset.");
-      return;
-    }
-    try {
-      const iframeElement = await player.getIframe(); // Await the iframe element
-      if (!iframeElement) {
+  const resetClip = useCallback(
+    async (scrollAway: boolean) => {
+      // Defensive check: ensure player instance exists before attempting to interact with it.
+      if (!player) {
+        console.warn("resetClip: player instance is null, cannot reset.");
         return;
       }
-      void player.cueVideoById({
-        videoId: `${preview.video.link.split("v=")[1]?.split("&")[0]}`,
-        startSeconds: preview.play.start_time,
-        endSeconds: preview.play.end_time,
-      });
-      setHasStartedPlaying(false);
-    } catch (error) {
-      console.error("Error resetting clip:", error);
-    }
-  }, [player, preview.play.start_time]);
+      try {
+        const iframeElement = await player.getIframe(); // Await the iframe element
+        if (!iframeElement) {
+          return;
+        }
+        void player.cueVideoById({
+          videoId: `${preview.video.link.split("v=")[1]?.split("&")[0]}`,
+          startSeconds: preview.play.start_time,
+          endSeconds: preview.play.end_time,
+        });
+        setHasStartedPlaying(false);
+        if (scrollAway) setIsExpanded(false);
+      } catch (error) {
+        console.error("Error resetting clip:", error);
+      }
+    },
+    [player, preview.play.start_time],
+  );
 
   const onPlayerStateChange = (e: YouTubeEvent) => {
     if (typeof YT !== "undefined") {
@@ -119,7 +123,7 @@ const PlayPreview = ({
       }
 
       if (e.data === YT.PlayerState.ENDED) {
-        void resetClip();
+        void resetClip(false);
       }
     }
   };
@@ -192,7 +196,7 @@ const PlayPreview = ({
         entries.forEach((entry) => {
           if (player) {
             if (!entry.isIntersecting && hasStartedPlaying) {
-              void resetClip();
+              void resetClip(true);
             }
           }
         });
@@ -264,7 +268,7 @@ const PlayPreview = ({
           {/* Reset Clip Button */}
           <Tooltip title="Reset Clip" arrow>
             <IconButton
-              onClick={() => void resetClip()}
+              onClick={() => void resetClip(false)}
               size="small"
               color="primary" // Changed color for prominence
               sx={{ padding: 0 }}
