@@ -1,11 +1,9 @@
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   FormControl,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
-  Tooltip,
+  Typography,
   type SelectChangeEvent,
 } from "@mui/material";
 import TeamLogo from "~/components/teams/team-logo";
@@ -34,7 +32,7 @@ const PrivacyStatus = ({ newDetails, setNewDetails }: PrivacyStatusProps) => {
       sx={{ display: "flex", gap: "8px", width: "100%", textAlign: "start" }}
     >
       <InputLabel htmlFor="privacy-status">Privacy Status</InputLabel>
-      <div className="flex w-full items-center justify-center gap-2">
+      <div className="flex w-full flex-col items-center justify-center">
         <Select
           value={newDetails.exclusive_to ?? "public"}
           onChange={handlePrivacyStatus}
@@ -42,6 +40,7 @@ const PrivacyStatus = ({ newDetails, setNewDetails }: PrivacyStatusProps) => {
           name="privacy"
           id="privacy-status"
           className="w-full"
+          size="small"
         >
           <MenuItem value="public" style={{ fontSize: "14px" }}>
             Public
@@ -60,27 +59,17 @@ const PrivacyStatus = ({ newDetails, setNewDetails }: PrivacyStatusProps) => {
             </MenuItem>
           ))}
         </Select>
-        <Tooltip
-          title={
-            "Private collections are only viewable by your teammates and coaches. Public collections are viewable by all users."
-          }
-          slotProps={{
-            popper: {
-              modifiers: [
-                {
-                  name: "offset",
-                  options: {
-                    offset: [0, -14],
-                  },
-                },
-              ],
-            },
-          }}
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          fontSize={"10px"}
+          px={1}
+          py={0.25}
+          sx={{ letterSpacing: "0.025em" }}
         >
-          <IconButton size="small">
-            <InfoOutlinedIcon />
-          </IconButton>
-        </Tooltip>
+          Private collections are only viewable by teammates and coaches. Public
+          collections are viewable by all users.
+        </Typography>
       </div>
     </FormControl>
   );

@@ -56,9 +56,7 @@ const CreatedPlaysFeed = ({ profileId }: FeedProps) => {
         // Apply visibility logic similar to Home feed
         if (affIds && affIds.length > 0) {
           void playsQuery.or(
-            `play->>private.eq.false, play->>exclusive_to.in.(${affIds.join(
-              ",",
-            )})`,
+            `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
           );
         } else {
           // If no affiliations, only show truly public plays from this author

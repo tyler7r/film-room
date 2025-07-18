@@ -69,7 +69,7 @@ const SearchCollections = ({ topic }: SearchCollectionsProps) => {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4">
       {loading && <PageTitle title="Loading..." size="medium" />}
-      {!loading && <CreateCollection />}
+      {!loading && <CreateCollection standaloneTrigger={true} />}
       {collectionCount && (
         <div className="font-bold tracking-tight">
           {collectionCount} results found

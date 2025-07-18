@@ -105,7 +105,7 @@ const FilmRoomHome = () => {
     <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
       <div className="flex w-full flex-col items-center justify-center gap-4">
         <PageTitle title="The Film Room" size="large" />
-        <CreateVideo />
+        <CreateVideo standaloneTrigger={true} />
         <Divider flexItem variant="middle"></Divider>
         <VideoSearchFilters
           searchOptions={searchOptions}

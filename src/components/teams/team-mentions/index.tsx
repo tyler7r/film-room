@@ -1,6 +1,7 @@
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, Box, TextField, Typography } from "@mui/material";
 import { type SyntheticEvent } from "react";
 import type { TeamType } from "~/utils/types";
+import TeamLogo from "../team-logo";
 
 type TeamVideosProps = {
   mentions: TeamType[];
@@ -34,6 +35,24 @@ const TeamMentions = ({ setMentions, teams, mentions }: TeamVideosProps) => {
         multiple
         isOptionEqualToValue={(option, value) => option.id === value.id}
         value={mentions}
+        renderOption={(props, option) => (
+          <li {...props} key={option.id}>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Typography variant="body2">
+                <Typography
+                  component="span"
+                  sx={{
+                    fontWeight: "bold",
+                    letterSpacing: "-0.025em",
+                  }}
+                >
+                  {option.full_name}
+                </Typography>
+              </Typography>
+              <TeamLogo tm={option} size={20} />
+            </Box>
+          </li>
+        )}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -42,6 +61,7 @@ const TeamMentions = ({ setMentions, teams, mentions }: TeamVideosProps) => {
             name="teams"
           />
         )}
+        size="small"
         limitTags={3}
       />
     )

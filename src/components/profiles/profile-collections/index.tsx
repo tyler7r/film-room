@@ -140,7 +140,9 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
         }}
       >
         <PageTitle size="small" title="User Collections" />
-        {user.userId === profileId && <CreateCollection icon={true} />}
+        {user.userId === profileId && (
+          <CreateCollection icon={true} standaloneTrigger={true} />
+        )}
       </Box>
 
       <Box

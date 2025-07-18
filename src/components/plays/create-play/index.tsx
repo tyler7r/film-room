@@ -1,14 +1,12 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   Box,
   Divider,
   IconButton,
   Switch,
-  TextField,
-  Tooltip, // Import Box
-  Typography, // Import Typography for text styling
+  TextField, // Import Box
+  Typography,
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react"; // Import useCallback
@@ -38,6 +36,7 @@ type CreatePlayProps = {
   isNewPlayOpen: boolean;
   setIsNewPlayOpen: (status: boolean) => void;
   scrollToPlayer: () => void;
+  onPlayCreated: () => void;
 };
 
 export type CreateNewTagType = {
@@ -63,6 +62,7 @@ const CreatePlay = ({
   setIsNewPlayOpen,
   isNewPlayOpen,
   scrollToPlayer,
+  onPlayCreated,
 }: CreatePlayProps) => {
   const router = useRouter();
   const { user, affIds } = useAuthContext();
@@ -292,6 +292,7 @@ const CreatePlay = ({
         }
         void updateLastWatched();
         void resetPlay();
+        void onPlayCreated();
       }
     }
   };
@@ -466,7 +467,7 @@ const CreatePlay = ({
             alignItems: "center",
             justifyContent: "center",
             gap: 2,
-            p: 2,
+            px: 2,
             textAlign: "center",
           }}
         >
@@ -569,6 +570,7 @@ const CreatePlay = ({
             value={playDetails.title}
             inputProps={{ maxLength: 100 }}
             size="small"
+            multiline
           />
           <TextField
             sx={{ width: "100%" }} // Equivalent to w-full
@@ -580,6 +582,7 @@ const CreatePlay = ({
             value={playDetails.note}
             multiline
             maxRows={5}
+            size="small"
           />
           <AddTagsToPlay
             tags={playTags}
@@ -678,25 +681,6 @@ const CreatePlay = ({
                   size="small"
                 />
               </Box>
-              <Tooltip
-                title={`Indicates whether this play will be posted to your feed. If not clicked the play will be indexed to this video but will not clog your feed.`}
-                slotProps={{
-                  popper: {
-                    modifiers: [
-                      {
-                        name: "offset",
-                        options: {
-                          offset: [0, -14],
-                        },
-                      },
-                    ],
-                  },
-                }}
-              >
-                <IconButton size="small">
-                  <InfoOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
             </Box>
           </Box>
           <PrivacyStatus
@@ -705,6 +689,19 @@ const CreatePlay = ({
             setNewDetails={setPlayDetails}
           />
         </Box>
+        <Typography
+          sx={{
+            fontWeight: "bold",
+            letterSpacing: "-0.025em",
+            px: 2,
+            textAlign: "center",
+            fontSize: "10px",
+          }}
+          variant="button"
+        >
+          *Once submitted you will not be able to adjust the timestamp of the
+          clip!*
+        </Typography>
         <FormButtons
           isValid={isValidPlay}
           handleCancel={handleClose}

@@ -1,10 +1,14 @@
+// components/plays/play-actions-menu/index.tsx (NO CHANGES NEEDED)
+
 import ClearIcon from "@mui/icons-material/Clear";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy"; // New icon for 'Copy Link'
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import ShortcutIcon from "@mui/icons-material/Shortcut"; // Icon for 'Go to Play' / 'Theatre Mode'
-import VideocamIcon from "@mui/icons-material/Videocam"; // New icon for 'Go to Film Room'
+import ShortcutIcon from "@mui/icons-material/Shortcut";
+import VideocamIcon from "@mui/icons-material/Videocam";
 import {
+  Box,
   Button,
   IconButton,
   ListItemIcon,
@@ -19,17 +23,17 @@ import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
 import AddPlayToCollection from "../../collections/add-play-to-collection";
 import DeleteMenu from "../../utils/delete-menu";
-import EditPlay from "../edit-play"; // Assuming EditPlay is still relevant for the author
+import EditPlay from "../edit-play";
 
-// Add new props for actions that were previously in PlayPreview
 type PlayActionsMenuProps = {
   preview: PlayPreviewType;
   collectionId?: string;
   setReload?: (reload: boolean) => void;
   collectionAuthor?: string;
-  onCopyLink: () => void; // Callback for copy link
-  onGoToFilmRoom?: () => void; // Callback for go to film room
-  onPlayClick?: () => void; // Callback for go to play's theatre mode
+  onCopyLink: () => void;
+  onGoToFilmRoom?: () => void;
+  onPlayClick?: () => void;
+  handlePlayDeleted?: () => void;
 };
 
 const PlayActionsMenu = ({
@@ -40,11 +44,15 @@ const PlayActionsMenu = ({
   onCopyLink,
   onGoToFilmRoom,
   onPlayClick,
+  handlePlayDeleted,
 }: PlayActionsMenuProps) => {
   const { user } = useAuthContext();
 
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
+  const [isEditPlayModalOpen, setIsEditPlayModalOpen] =
+    useState<boolean>(false);
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);
@@ -66,6 +74,9 @@ const PlayActionsMenu = ({
     if (data && setReload) {
       setReload(true);
     }
+    if (handlePlayDeleted) {
+      handlePlayDeleted();
+    }
     handleClose();
   };
 
@@ -78,6 +89,11 @@ const PlayActionsMenu = ({
         .select();
       if (data && setReload) setReload(true);
     }
+    handleClose();
+  };
+
+  const handleEditPlayClick = () => {
+    setIsEditPlayModalOpen(true);
     handleClose();
   };
 
@@ -95,24 +111,21 @@ const PlayActionsMenu = ({
           anchorEl={anchorEl}
           open={open}
           onClose={handleClose}
-          // Added PaperProps for compact styling of the Menu itself
           slotProps={{
             paper: {
               sx: {
-                borderRadius: "8px", // Slightly rounded corners for the menu
-                boxShadow: 3, // Add some shadow
-                py: 0, // Reduce vertical padding inside the menu
+                borderRadius: "8px",
+                boxShadow: 3,
+                py: 0,
               },
             },
           }}
         >
           {/* Option: Add Play to Collections */}
-          <MenuItem
-            sx={{ px: 1, py: 0.5, minHeight: "auto" }} // Compact padding for MenuItem
-          >
+          <MenuItem sx={{ px: 1, py: 0.5, minHeight: "auto" }}>
             <AddPlayToCollection
               playId={preview.play.id}
-              // handleMenuClose={handleClose} // Pass handleClose to close menu and modal
+              // handleMenuClose={handleClose}
             />
           </MenuItem>
 
@@ -163,7 +176,7 @@ const PlayActionsMenu = ({
               onClick={() => {
                 onPlayClick();
                 handleClose();
-              }} // Corrected onClick
+              }}
               sx={{ px: 1, py: 0.5, minHeight: "auto" }}
             >
               <ListItemIcon sx={{ minWidth: "12px" }}>
@@ -182,14 +195,14 @@ const PlayActionsMenu = ({
           {collectionId && collectionAuthor === user.userId && (
             <MenuItem sx={{ px: 1, py: 0.5, minHeight: "auto" }}>
               {isRemoveOpen ? (
-                <div className="flex items-center gap-1">
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Button
                     color="primary"
                     onClick={handleRemoveCollection}
                     endIcon={<DeleteIcon fontSize="small" />}
                     variant="contained"
                     size="small"
-                    sx={{ textTransform: "none" }} // Keep button text case as defined
+                    sx={{ textTransform: "none" }}
                   >
                     Remove
                   </Button>
@@ -199,25 +212,43 @@ const PlayActionsMenu = ({
                   >
                     <ClearIcon fontSize="small" color="action" />
                   </IconButton>
-                </div>
+                </Box>
               ) : (
-                <div
-                  className="flex w-full items-center"
+                <Box
+                  sx={{ display: "flex", width: "100%", alignItems: "center" }}
                   onClick={() => setIsRemoveOpen(true)}
                 >
                   <ListItemIcon sx={{ minWidth: "12px" }}>
                     <DeleteIcon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText>Remove from Collection</ListItemText>
-                </div>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" fontWeight={"bold"}>
+                        Remove from Collection
+                      </Typography>
+                    }
+                  />
+                </Box>
               )}
             </MenuItem>
           )}
 
           {/* Option: Edit Play (if user is author) */}
           {preview.play.author_id === user.userId && (
-            <MenuItem sx={{ px: 1, py: 0.5, minHeight: "auto" }}>
-              <EditPlay play={preview.play} video={preview.video} />
+            <MenuItem
+              onClick={handleEditPlayClick}
+              sx={{ px: 1, py: 0.5, minHeight: "auto" }}
+            >
+              <ListItemIcon sx={{ minWidth: "12px" }}>
+                <CreateIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography variant="body2" fontWeight={"bold"}>
+                    Edit Play
+                  </Typography>
+                }
+              />
             </MenuItem>
           )}
 
@@ -234,6 +265,16 @@ const PlayActionsMenu = ({
             </MenuItem>
           )}
         </Menu>
+      )}
+
+      {/* Render the EditPlay modal component here, outside the Menu */}
+      {preview.play.author_id === user.userId && (
+        <EditPlay
+          play={preview.play}
+          video={preview.video}
+          isOpen={isEditPlayModalOpen}
+          setIsOpen={setIsEditPlayModalOpen}
+        />
       )}
     </>
   );

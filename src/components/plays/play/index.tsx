@@ -43,6 +43,7 @@ type PlayProps = {
   setSearchOptions: (options: PlaySearchOptions) => void;
   setIsFiltersOpen: (isFiltersOpen: boolean) => void;
   index: number;
+  handlePlayDeleted: () => void;
 };
 
 const Play = ({
@@ -56,6 +57,7 @@ const Play = ({
   setSeenActivePlay,
   setIsFiltersOpen,
   index,
+  handlePlayDeleted,
 }: PlayProps) => {
   const { user } = useAuthContext();
   const { isDark, hoverText, backgroundStyle } = useIsDarkContext();
@@ -292,6 +294,7 @@ const Play = ({
               preview={play}
               onCopyLink={copyToClipboard}
               onPlayClick={handlePlayClick}
+              handlePlayDeleted={handlePlayDeleted}
             />
           </Box>
         </Box>

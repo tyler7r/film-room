@@ -30,6 +30,7 @@ type VideoPlayIndexProps = {
   setActivePlay: (play: PlayPreviewType) => void;
   activePlay: PlayPreviewType | null;
   setSeenActivePlay: (seenActivePlay: boolean) => void;
+  handlePlayDeleted: () => void;
 };
 
 export type PlaySearchOptions = {
@@ -47,6 +48,7 @@ const VideoPlayIndex = ({
   setActivePlay,
   activePlay,
   setSeenActivePlay,
+  handlePlayDeleted,
 }: VideoPlayIndexProps) => {
   const { affIds } = useAuthContext();
   const { isMobile } = useMobileContext();
@@ -394,6 +396,7 @@ const VideoPlayIndex = ({
             setSeenActivePlay={setSeenActivePlay}
             setIsFiltersOpen={setIsFiltersOpen}
             index={0}
+            handlePlayDeleted={handlePlayDeleted}
           />
           <Divider sx={{ my: 2 }} flexItem />
         </Box>
@@ -471,7 +474,7 @@ const VideoPlayIndex = ({
                 sx={{ fontWeight: "bold", fontSize: "10px" }}
               >
                 {!searchOptions.timestamp
-                  ? "Timestamp Filter"
+                  ? "Time Filter"
                   : `Plays > ${convertYouTubeTimestamp(
                       parseInt(searchOptions.timestamp),
                     )}`}
@@ -557,6 +560,7 @@ const VideoPlayIndex = ({
                     setSeenActivePlay={setSeenActivePlay}
                     setIsFiltersOpen={setIsFiltersOpen}
                     index={index}
+                    handlePlayDeleted={handlePlayDeleted}
                   />
                 ))}
               </Box>
