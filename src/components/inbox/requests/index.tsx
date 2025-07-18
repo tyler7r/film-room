@@ -33,22 +33,22 @@ const PendingTeamRequests = ({ hide, setHide }: PendingTeamRequestsProps) => {
     } else setPendingRequests(null);
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("affiliation_changes")
-      .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "affiliations" },
-        () => {
-          void fetchPendingRequests();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("affiliation_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "DELETE", schema: "public", table: "affiliations" },
+  //       () => {
+  //         void fetchPendingRequests();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, []);
 
   useEffect(() => {
     void fetchPendingRequests();

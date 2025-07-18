@@ -317,51 +317,51 @@ const VideoPlayIndex = ({
     }
   }, [searchOptions.timestamp, player, getCurrentTime, setSearchOptions]);
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("play_changes_video_index")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "plays",
-          filter: `video_id=eq.${videoId}`,
-        },
-        () => {
-          debouncedFetchPlays(0, false);
-        },
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "play_tags",
-          filter: `play_id->>video_id=eq.${videoId}`,
-        },
-        () => {
-          debouncedFetchPlays(0, false);
-        },
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "play_mentions",
-          filter: `play_id->>video_id=eq.${videoId}`,
-        },
-        () => {
-          debouncedFetchPlays(0, false);
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("play_changes_video_index")
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "plays",
+  //         filter: `video_id=eq.${videoId}`,
+  //       },
+  //       () => {
+  //         debouncedFetchPlays(0, false);
+  //       },
+  //     )
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "play_tags",
+  //         filter: `play_id->>video_id=eq.${videoId}`,
+  //       },
+  //       () => {
+  //         debouncedFetchPlays(0, false);
+  //       },
+  //     )
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "play_mentions",
+  //         filter: `play_id->>video_id=eq.${videoId}`,
+  //       },
+  //       () => {
+  //         debouncedFetchPlays(0, false);
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [videoId, debouncedFetchPlays]);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [videoId, debouncedFetchPlays]);
 
   return (
     <Box

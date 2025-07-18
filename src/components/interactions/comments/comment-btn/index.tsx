@@ -38,22 +38,22 @@ const CommentBtn = ({
     else setCommentCount(0);
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("comment_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "comments" },
-        () => {
-          void fetchCommentNumber();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("comment_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "comments" },
+  //       () => {
+  //         void fetchCommentNumber();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, []);
 
   useEffect(() => {
     void fetchCommentNumber();

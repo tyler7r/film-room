@@ -45,22 +45,22 @@ const Announcements = ({ teamId, role }: AnnouncementsProps) => {
     setPage(value);
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("comment_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "announcements" },
-        () => {
-          void fetchAnnouncements();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("comment_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "announcements" },
+  //       () => {
+  //         void fetchAnnouncements();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (page === 1) void fetchAnnouncements();
@@ -77,15 +77,14 @@ const Announcements = ({ teamId, role }: AnnouncementsProps) => {
       <div className="flex items-center justify-center gap-2">
         <PageTitle size="medium" title="Announcements" />
         {(role === "coach" || role === "owner") && (
-            <StandardPopover
-              content="Write an announcement"
-              children={<IconButton
-            onClick={() => setIsOpen(!isOpen)}
-            size="small"
-          >
-            <CreateIcon fontSize="large" color="primary" />
-          </IconButton>}
-            />
+          <StandardPopover
+            content="Write an announcement"
+            children={
+              <IconButton onClick={() => setIsOpen(!isOpen)} size="small">
+                <CreateIcon fontSize="large" color="primary" />
+              </IconButton>
+            }
+          />
         )}
       </div>
       {!anncs && <EmptyMessage message="team announcements" />}

@@ -134,27 +134,27 @@ const Profile = () => {
   }, [user.userId, options.profileId]); // Added options.profileId to dependencies
 
   // Realtime subscription for profile updates
-  useEffect(() => {
-    if (!supabase) {
-      console.warn("Supabase client is not initialized for real-time.");
-      return;
-    }
+  // useEffect(() => {
+  //   if (!supabase) {
+  //     console.warn("Supabase client is not initialized for real-time.");
+  //     return;
+  //   }
 
-    const channel = supabase
-      .channel("profile_changes")
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "profiles" },
-        () => {
-          void fetchProfile(); // Re-fetch profile on update
-        },
-      )
-      .subscribe();
+  //   const channel = supabase
+  //     .channel("profile_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "UPDATE", schema: "public", table: "profiles" },
+  //       () => {
+  //         void fetchProfile(); // Re-fetch profile on update
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [fetchProfile]); // Dependency on memoized fetchProfile
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [fetchProfile]); // Dependency on memoized fetchProfile
 
   // Effect for initial fetch of last watched
   useEffect(() => {

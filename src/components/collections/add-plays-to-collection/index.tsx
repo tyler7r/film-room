@@ -175,24 +175,24 @@ const PlaysToCollectionModal = ({
     setReload(true); // Trigger reload in the parent component
   };
 
-  useEffect(() => {
-    // This channel is for real-time updates, which is good.
-    // It should also re-fetch based on the current search term.
-    const channel = supabase
-      .channel("collection_plays_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "collection_plays" },
-        () => {
-          void fetchPlays(searchTerm); // Re-fetch with current search term
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   // This channel is for real-time updates, which is good.
+  //   // It should also re-fetch based on the current search term.
+  //   const channel = supabase
+  //     .channel("collection_plays_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "collection_plays" },
+  //       () => {
+  //         void fetchPlays(searchTerm); // Re-fetch with current search term
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [fetchPlays, searchTerm]);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [fetchPlays, searchTerm]);
 
   useEffect(() => {
     // Fetch plays initially when modal opens or playIds/affIds change

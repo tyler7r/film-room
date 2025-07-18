@@ -395,29 +395,29 @@ const CreatePlay = ({
     void resetPlay();
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("tag_and_collection_changes") // Combined channel for tags and collections
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "tags" },
-        () => {
-          void fetchTags();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "collections" },
-        () => {
-          void fetchCollections();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("tag_and_collection_changes") // Combined channel for tags and collections
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "tags" },
+  //       () => {
+  //         void fetchTags();
+  //       },
+  //     )
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "collections" },
+  //       () => {
+  //         void fetchCollections();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [fetchTags, fetchCollections]); // Dependencies: memoized fetch functions
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [fetchTags, fetchCollections]); // Dependencies: memoized fetch functions
 
   useEffect(() => {
     checkValidPlay();

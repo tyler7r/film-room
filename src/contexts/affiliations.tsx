@@ -52,22 +52,22 @@ export const IsAffiliated = ({ children }: AffiliationProps) => {
     }
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("affiliation_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "affiliations" },
-        () => {
-          void fetchAffiliations(user.userId);
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("affiliation_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "affiliations" },
+  //       () => {
+  //         void fetchAffiliations(user.userId);
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, []);
 
   useEffect(() => {
     void fetchAffiliations(user.userId);

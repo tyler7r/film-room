@@ -34,22 +34,22 @@ const ReplyBtn = ({
     else setReplyCount(0);
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("reply_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "replies" },
-        () => {
-          void fetchReplyNumber();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("reply_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "replies" },
+  //       () => {
+  //         void fetchReplyNumber();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, []);
 
   useEffect(() => {
     void fetchReplyNumber();

@@ -48,39 +48,39 @@ const ProfileStats = ({ profileId }: ProfileStatsProps) => {
     }
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("play_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "plays" },
-        () => {
-          void fetchStats();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("play_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "plays" },
+  //       () => {
+  //         void fetchStats();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, []);
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("mention_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "mentions" },
-        () => {
-          void fetchStats();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("mention_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "mentions" },
+  //       () => {
+  //         void fetchStats();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, []);
 
   useEffect(() => {
     void fetchStats();

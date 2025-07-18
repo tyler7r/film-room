@@ -81,32 +81,32 @@ const ReplyIndex = ({ comment, setReplyCount }: ReplyIndexProps) => {
     void fetchReplies(0, false);
   }, [comment.comment.id, isMobile, fetchReplies]);
 
-  useEffect(() => {
-    if (!supabase) {
-      console.warn("Supabase client is not initialized for real-time.");
-      return;
-    }
+  // useEffect(() => {
+  //   if (!supabase) {
+  //     console.warn("Supabase client is not initialized for real-time.");
+  //     return;
+  //   }
 
-    const channel = supabase
-      .channel(`replies_for_comment_${comment.comment.id}_changes`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "replies",
-          filter: `comment_id=eq.${comment.comment.id}`,
-        },
-        () => {
-          void fetchReplies(0, false);
-        },
-      )
-      .subscribe();
+  //   const channel = supabase
+  //     .channel(`replies_for_comment_${comment.comment.id}_changes`)
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "replies",
+  //         filter: `comment_id=eq.${comment.comment.id}`,
+  //       },
+  //       () => {
+  //         void fetchReplies(0, false);
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [comment.comment.id, fetchReplies]);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [comment.comment.id, fetchReplies]);
 
   const loadMoreReplies = () => {
     if (!loadingInitial && hasMore) {
