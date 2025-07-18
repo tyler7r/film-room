@@ -1,24 +1,25 @@
-import LinkIcon from "@mui/icons-material/Link";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import LockIcon from "@mui/icons-material/Lock";
 import PublicIcon from "@mui/icons-material/Public";
-import { colors, Divider, IconButton, Pagination } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  colors,
+  Divider, // Divider will still be used between logo/author and the actions menu if needed, or can be removed if not.
+  Fab,
+  Typography,
+} from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
-import PlaysToCollectionModal from "~/components/collections/add-plays-to-collection";
+import { useCallback, useEffect, useRef, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import CollectionActionsMenu from "~/components/collections/collection-actions-menu";
 import PlayPreview from "~/components/plays/play_preview";
 import TeamLogo from "~/components/teams/team-logo";
 import EmptyMessage from "~/components/utils/empty-msg";
 import PageTitle from "~/components/utils/page-title";
-import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
-import {
-  convertTimestamp,
-  getNumberOfPages,
-  getToAndFrom,
-} from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { CollectionType, PlayPreviewType } from "~/utils/types";
 
@@ -29,32 +30,32 @@ const Collection = () => {
   const { hoverText, isDark } = useIsDarkContext();
 
   const id = router.query.id as string;
-  const itemsPerPage = isMobile ? 5 : 10;
+  const itemsPerLoad = isMobile ? 5 : 3;
 
   const [collection, setCollection] = useState<CollectionType | null>(null);
-  const [plays, setPlays] = useState<PlayPreviewType[] | null>(null);
-  const [playIds, setPlaysIds] = useState<string[] | null>(null);
+  const [plays, setPlays] = useState<PlayPreviewType[]>([]);
+  const [playIds, setPlaysIds] = useState<string[]>([]);
 
   const [authorName, setAuthorName] = useState<string | null>(null);
   const [userCanEdit, setUserCanEdit] = useState<boolean>(false);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [reload, setReload] = useState<boolean>(false);
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
   const [playCount, setPlayCount] = useState<number>(0);
-  const [page, setPage] = useState<number>(1);
   const [accessDenied, setAccessDenied] = useState(true);
-  const topRef = useRef<HTMLDivElement | null>(null);
+
+  // Infinite Scroll states
+  const [loading, setLoading] = useState<boolean>(true);
+  const [offset, setOffset] = useState<number>(0);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
   const exclusiveTeam = affiliations?.find(
     (aff) => aff.team.id === collection?.exclusive_to,
   )?.team;
 
-  const scrollToTop = () => {
-    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const fetchCollection = async () => {
+  const fetchCollection = useCallback(async () => {
     if (id) {
       const { data } = await supabase
         .from("collections")
@@ -68,48 +69,93 @@ const Collection = () => {
           if (!accessAllowed) {
             setAccessDenied(true);
           } else setAccessDenied(false);
-        } else setAccessDenied(false);
-      } else setCollection(null);
+        } else {
+          setAccessDenied(false);
+        }
+      } else {
+        setCollection(null);
+      }
       if (data?.profiles?.name) setAuthorName(data.profiles.name);
     }
-  };
+  }, [id, affIds]);
 
-  const fetchPlays = async () => {
-    const { from, to } = getToAndFrom(itemsPerPage, page);
-    if (id) {
-      const plays = supabase
-        .from("collection_plays_view")
-        .select("*", { count: "exact" })
-        .eq("collection->>id", id)
-        .order("play->>created_at", { ascending: false })
-        .range(from, to);
-      if (affIds && affIds.length > 0) {
-        void plays.or(
-          `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-        );
-      } else {
-        void plays.eq("play->>private", false);
+  const fetchPlays = useCallback(
+    async (currentOffset: number, append = true) => {
+      if (!supabase) {
+        console.warn("Supabase client is not initialized.");
+        if (!append) {
+          setLoading(false);
+        }
+        setHasMore(false);
+        return;
       }
-      const { data, count } = await plays;
-      if (data && data.length > 0) {
-        setPlays(data);
-        setPlaysIds(data.map((play) => play.play.id));
-      } else {
-        setPlays(null);
-        setPlaysIds(null);
+
+      if (!id) {
+        setHasMore(false);
+        setLoading(false);
+        return;
       }
-      if (count && count > 0) setPlayCount(count);
-      else setPlayCount(0);
-    }
-  };
 
-  const handlePageChange = (e: React.ChangeEvent<unknown>, value: number) => {
-    e.preventDefault();
-    scrollToTop();
-    setPage(value);
-  };
+      if (!append) {
+        setLoading(true);
+        setPlays([]);
+        setOffset(0);
+        setHasMore(true);
+      }
 
-  const checkIfUserCanEdit = () => {
+      try {
+        const playsQuery = supabase
+          .from("collection_plays_view")
+          .select("*", { count: "exact" })
+          .eq("collection->>id", id)
+          .order("play->>created_at", { ascending: false })
+          .range(currentOffset, currentOffset + itemsPerLoad - 1);
+
+        if (affIds && affIds.length > 0) {
+          void playsQuery.or(
+            `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
+          );
+        } else {
+          void playsQuery.eq("play->>private", false);
+        }
+
+        const { data, error, count } = await playsQuery;
+
+        if (error) {
+          console.error("Error fetching collection plays:", error);
+          setHasMore(false);
+          return;
+        }
+
+        if (data) {
+          setPlays((prevPlays) => {
+            const newPlays = append ? [...prevPlays, ...data] : data;
+            setPlaysIds(newPlays.map((play) => play.play.id));
+            return newPlays;
+          });
+          setOffset((prevOffset) => prevOffset + data.length);
+          setHasMore(data.length === itemsPerLoad);
+          if (count !== null) {
+            setPlayCount(count);
+          }
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.error("Unexpected error in fetchPlays:", error);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [itemsPerLoad, id, affIds],
+  );
+
+  const loadMorePlays = useCallback(() => {
+    void fetchPlays(offset, true);
+  }, [offset, fetchPlays]);
+
+  const checkIfUserCanEdit = useCallback(() => {
     if (collection) {
       const userIsAffiliated = affIds?.findIndex(
         (aff) => aff === collection.exclusive_to,
@@ -121,185 +167,222 @@ const Collection = () => {
         setUserCanEdit(false);
       }
     }
-  };
+  }, [collection, affIds, user.userId]);
 
-  const copyToClipboard = () => {
+  const copyToClipboard = useCallback(() => {
     const origin = window.location.origin;
     void navigator.clipboard.writeText(`${origin}/collections/${id}`);
     setIsCopied(true);
-  };
+    setTimeout(() => setIsCopied(false), 2000);
+  }, [id]);
 
   useEffect(() => {
-    const channel = supabase
-      .channel("collection_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "collections" },
-        () => {
-          void fetchPlays();
-          void fetchCollection();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "plays" },
-        () => {
-          void fetchPlays();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_mentions" },
-        () => {
-          void fetchPlays();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_tags" },
-        () => {
-          void fetchPlays();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    void fetchPlays();
     void fetchCollection();
-  }, [id, affIds]);
+    void fetchPlays(0, false);
+  }, [id, affIds, fetchCollection, fetchPlays]);
 
   useEffect(() => {
     if (reload) {
-      void fetchPlays();
-      void fetchCollection();
+      void fetchPlays(0, false);
       setReload(false);
-    } else return;
-  }, [reload]);
+    }
+  }, [reload, fetchPlays]);
 
   useEffect(() => {
     checkIfUserCanEdit();
-  }, [collection, user]);
+  }, [collection, user, checkIfUserCanEdit]);
 
-  useEffect(() => {
-    void fetchPlays();
-  }, [page]);
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     collection && (
-      <div className="flex flex-col items-center justify-center gap-6 p-6">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center gap-2">
-            {exclusiveTeam?.logo ? (
-              <TeamLogo tm={exclusiveTeam} size={60} />
-            ) : (
-              <PublicIcon fontSize="large" color="action" />
-            )}
-          </div>
-          <div className="flex flex-col gap-1">
-            <PageTitle title={collection.title} size="small" />
-            <div className="flex items-center justify-center gap-2">
-              <div className="text-sm font-light">
-                {convertTimestamp(collection.created_at)}
-              </div>
-              <Divider flexItem orientation="vertical" variant="middle" />
-              {authorName && (
-                <div
-                  onClick={() =>
-                    void router.push(`/profile/${collection.author_id}`)
-                  }
-                  className={`${hoverText} text-lg font-bold tracking-tight`}
-                >
-                  {authorName}
-                </div>
-              )}
-            </div>
-          </div>
-          <div
-            className="flex flex-col items-center justify-center gap-1 rounded-lg p-3"
-            style={
+      <Box className="flex w-full flex-col items-center justify-center gap-4 p-4">
+        {/* --- Header Section --- */}
+        <Box className="flex w-full flex-col items-center justify-center gap-2 px-2">
+          {/* Top Line: Play Count (Left) and Title (stretching) */}
+          <Box className="flex w-full items-center justify-center gap-2">
+            {/* Play Count Box */}
+
+            {/* Collection Title (stretches, not centered) */}
+            <Box>
+              <PageTitle
+                title={collection.title}
+                size="small"
+                sx={{
+                  whiteSpace: "normal",
+                  lineHeight: 1.5,
+                  textAlign: "left",
+                }}
+              />
+            </Box>
+          </Box>
+
+          <Box
+            className="flex items-center justify-center gap-2 rounded-lg p-1.5"
+            sx={
               isDark
-                ? { backgroundColor: `${colors.purple[200]}` }
-                : { backgroundColor: `${colors.purple[50]}` }
+                ? { backgroundColor: colors.purple[200] }
+                : { backgroundColor: colors.purple[50] }
             }
           >
-            <div className="text-3xl font-bold leading-5 tracking-tight">
+            <Typography variant="body1" sx={{ lineHeight: 1 }}>
+              PLAYS:
+            </Typography>
+            <Typography
+              variant="h5"
+              className="font-bold leading-none tracking-tight"
+              sx={{ lineHeight: 1, fontWeight: "bold" }}
+            >
               {playCount}
-            </div>
-            <div className="text-lg font-bold leading-4 tracking-tight">
-              plays
-            </div>
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            {userCanEdit && !accessDenied && (
-              <PlaysToCollectionModal
-                collectionId={collection.id}
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
+            </Typography>
+          </Box>
+
+          {/* Second Line: Team Logo (Left), Author, Actions Menu */}
+          <Box className="flex w-full flex-wrap items-center justify-center gap-2">
+            {/* Team Logo / Public Icon (smaller) */}
+            <Box className="flex-shrink-0">
+              {exclusiveTeam?.logo ? (
+                <TeamLogo tm={exclusiveTeam} size={25} />
+              ) : (
+                <PublicIcon fontSize="medium" color="action" />
+              )}
+            </Box>
+            <Divider flexItem orientation="vertical" variant="middle" />
+
+            {/* Author Name */}
+            {authorName && (
+              <Typography
+                onClick={() =>
+                  void router.push(`/profile/${collection.author_id}`)
+                }
+                className={`${hoverText} cursor-pointer text-lg font-bold tracking-tight`}
+                sx={{
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  letterSpacing: "-0.025em",
+                }}
+                variant="body2"
+              >
+                {authorName}
+              </Typography>
+            )}
+
+            {/* Actions Menu - pushed to right on larger screens */}
+            <Box>
+              <CollectionActionsMenu
+                collection={collection}
+                userIsAuthor={user.userId === collection.author_id}
+                userCanEdit={userCanEdit}
+                accessDenied={accessDenied}
                 setReload={setReload}
                 playIds={playIds}
+                copyToClipboard={copyToClipboard}
+                isCopied={isCopied}
               />
-            )}
-            {user.userId === collection.author_id && (
-              <CollectionActionsMenu collection={collection} />
-            )}
-            <StandardPopover
-              content={isCopied ? "Copied!" : `Copy collection link`}
-              children={
-                <IconButton onClick={copyToClipboard} size="small">
-                  <LinkIcon />
-                </IconButton>
-              }
-            />
-          </div>
-        </div>
+            </Box>
+          </Box>
+        </Box>
+        {/* --- End Header Section --- */}
+
         {collection.description && (
-          <div className="w-full text-center text-lg">
-            <strong className="tracking-tight">Description: </strong>
+          <Typography
+            variant="body1"
+            className="w-full px-2 text-center text-lg"
+          >
+            <Typography component="strong" className="tracking-tight">
+              Description:{" "}
+            </Typography>
             {collection.description}
-          </div>
+          </Typography>
         )}
         {accessDenied ? (
-          <div className="flex w-full flex-col items-center justify-center gap-4 p-4">
+          <Box className="flex w-full flex-col items-center justify-center gap-4 p-4">
             <LockIcon sx={{ fontSize: "96px" }} />
-            <div className="text-lg font-bold">This collection is private!</div>
-          </div>
+            <Typography variant="h6" className="text-lg font-bold">
+              This collection is private!
+            </Typography>
+          </Box>
         ) : (
-          <div className="">
-            <div ref={topRef} className="flex flex-col gap-6">
-              {plays?.map((play) => (
-                <PlayPreview
-                  preview={play}
-                  key={play.play.id}
-                  setReload={setReload}
-                  collectionId={collection.id}
-                  collectionAuthor={collection.author_id}
-                />
-              ))}
-            </div>
-            {playCount > 0 && (
-              <Pagination
-                siblingCount={1}
-                boundaryCount={0}
-                size={isMobile ? "small" : "medium"}
-                showFirstButton
-                showLastButton
-                sx={{ marginTop: "8px" }}
-                variant="text"
-                shape="rounded"
-                count={getNumberOfPages(itemsPerPage, playCount)}
-                page={page}
-                onChange={handlePageChange}
-              />
+          <Box
+            ref={scrollableContainerRef}
+            // id="collection-plays-scroll-container"
+            className="w-full"
+            sx={
+              {
+                // Add styles to make this Box the scrollable area if your layout requires it.
+                // For example: maxHeight: 'calc(100vh - 200px)', overflowY: 'auto'
+                // Adjust '200px' based on your header/footer height.
+              }
+            }
+          >
+            {loading && plays.length === 0 ? (
+              <Box className="flex h-full w-full items-center justify-center p-4">
+                <CircularProgress size={60} />
+              </Box>
+            ) : plays.length > 0 || hasMore ? (
+              <InfiniteScroll
+                dataLength={plays.length}
+                next={loadMorePlays}
+                hasMore={hasMore}
+                loader={
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", my: 2 }}
+                  >
+                    <CircularProgress />
+                  </Box>
+                }
+                endMessage={
+                  plays.length > 0 && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        textAlign: "center",
+                        color: "text.disabled",
+                        my: 2,
+                      }}
+                    >
+                      — End of the plays —
+                    </Typography>
+                  )
+                }
+                // scrollableTarget="collection-plays-scroll-container"
+              >
+                <Box className="flex flex-col gap-6">
+                  {plays.map((play) => (
+                    <PlayPreview
+                      preview={play}
+                      key={play.play.id}
+                      setReload={setReload}
+                      collectionId={collection.id}
+                      collectionAuthor={collection.author_id}
+                    />
+                  ))}
+                </Box>
+              </InfiniteScroll>
+            ) : (
+              !loading &&
+              !hasMore && <EmptyMessage message="plays in this collection" />
             )}
-            {!plays && <EmptyMessage message="plays in this collection" />}
-          </div>
+          </Box>
         )}
-      </div>
+        <Fab
+          color="primary"
+          onClick={scrollToTop}
+          size="small"
+          sx={{
+            position: "fixed",
+            bottom: "16px",
+            right: "16px",
+            zIndex: 1000,
+          }}
+          aria-label="Scroll to top"
+        >
+          <ArrowUpwardIcon />
+        </Fab>
+      </Box>
     )
   );
 };

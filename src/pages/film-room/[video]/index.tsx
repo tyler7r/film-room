@@ -1,4 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import LinkIcon from "@mui/icons-material/Link";
 import LockIcon from "@mui/icons-material/Lock";
 import {
@@ -6,11 +7,12 @@ import {
   Box,
   Button,
   CircularProgress,
+  Fab,
   IconButton,
   Snackbar,
   Typography,
   useTheme,
-} from "@mui/material"; // Added Typography, CircularProgress, Snackbar, Alert, useTheme
+} from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import {
@@ -19,11 +21,10 @@ import {
   useRef,
   useState,
   type SyntheticEvent,
-} from "react"; // Added useCallback, SyntheticEvent
+} from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import CreatePlay from "~/components/plays/create-play";
 import Team from "~/components/teams/team";
-import PageTitle from "~/components/utils/page-title";
 import VideoPlayIndex from "~/components/videos/video-play-index";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
@@ -32,7 +33,7 @@ import type { PlayPreviewType, TeamType, VideoType } from "~/utils/types";
 const FilmRoom = () => {
   const router = useRouter();
   const { user, affIds } = useAuthContext();
-  const theme = useTheme(); // Access the Material UI theme
+  const theme = useTheme();
   const playParam = useSearchParams().get("play") ?? null;
   const startParam = useSearchParams().get("start") ?? null;
   const videoId = router.query.video as string;
@@ -48,8 +49,11 @@ const FilmRoom = () => {
   const [seenActivePlay, setSeenActivePlay] = useState<boolean>(false);
 
   const [isNewPlayOpen, setIsNewPlayOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // Controls video loading
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accessDenied, setAccessDenied] = useState<boolean>(true);
+
+  // State to track if the video player is in view
+  const [isPlayerInView, setIsPlayerInView] = useState<boolean>(false);
 
   // Snackbar states for copy to clipboard feedback
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -57,6 +61,9 @@ const FilmRoom = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success",
   );
+
+  // NEW: State to trigger refresh for VideoPlayIndex
+  const [refreshPlaysKey, setRefreshPlaysKey] = useState(0);
 
   const interval = useRef<NodeJS.Timeout | null>(null);
 
@@ -72,7 +79,7 @@ const FilmRoom = () => {
     if (error) {
       console.error("Error fetching video:", error);
       setVideo(null);
-      setAccessDenied(true); // Default to access denied on error
+      setAccessDenied(true);
       setIsLoading(false);
       return;
     }
@@ -91,7 +98,7 @@ const FilmRoom = () => {
       setVideo(null);
       setAccessDenied(true);
     }
-    setIsLoading(false); // Video data fetched, stop loading indicator
+    setIsLoading(false);
   }, [videoId, affIds]);
 
   const fetchAffiliatedTeams = useCallback(async () => {
@@ -134,7 +141,6 @@ const FilmRoom = () => {
       setPlayer(videoInstance);
       const time = Number(startParam);
       if (!isNaN(time)) {
-        // Check if time is a valid number
         void videoInstance.seekTo(time, true);
         void videoInstance.playVideo();
       }
@@ -145,6 +151,10 @@ const FilmRoom = () => {
   const scrollToPlayer = useCallback(() => {
     if (playerRef.current)
       playerRef.current.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const getCurrentTime = useCallback(async (player: YouTubePlayer) => {
@@ -162,10 +172,8 @@ const FilmRoom = () => {
         interval.current = null;
         setSeenActivePlay(true);
       } else if (currentTime < endTime && !interval.current) {
-        // Re-start interval if not at end and not running
         interval.current = setInterval(() => void checkTime(), 1000);
       } else if (currentTime >= endTime && seenActivePlay) {
-        // If already seen and at end, reset
         void player.seekTo(activePlay.play.start_time, true);
         void player.pauseVideo();
         if (interval.current) {
@@ -174,7 +182,6 @@ const FilmRoom = () => {
         }
       }
     } else if (interval.current) {
-      // Clear interval if activePlay or player become null
       void clearInterval(interval.current);
       interval.current = null;
     }
@@ -182,7 +189,7 @@ const FilmRoom = () => {
 
   const copyToClipboard = useCallback(async () => {
     const origin = window.location.origin;
-    const linkToCopy = `${origin}${router.asPath}`; // Copy the current URL
+    const linkToCopy = `${origin}${router.asPath}`;
     try {
       await navigator.clipboard.writeText(linkToCopy);
       setSnackbarMessage("Link copied!");
@@ -214,37 +221,76 @@ const FilmRoom = () => {
     }
   }, [user.isLoggedIn, router]);
 
+  // NEW: Callback to increment refreshPlaysKey, triggering VideoPlayIndex refresh
+  const handlePlayCreated = useCallback(() => {
+    setRefreshPlaysKey((prev) => prev + 1);
+  }, []);
+
+  const handlePlayDeleted = useCallback(() => {
+    setRefreshPlaysKey((prev) => prev + 1);
+  }, []);
+
   useEffect(() => {
     if (router.query.video) {
       void fetchVideo();
       void fetchAffiliatedTeams();
     }
-  }, [router.query.video, affIds, fetchVideo, fetchAffiliatedTeams]); // Added fetchVideo/Teams as dependencies
+  }, [router.query.video, affIds, fetchVideo, fetchAffiliatedTeams]);
 
   useEffect(() => {
     void fetchActivePlay();
-  }, [playParam, player, fetchActivePlay]); // Added fetchActivePlay as dependency
+  }, [playParam, player, fetchActivePlay]);
 
   useEffect(() => {
-    // Clear existing interval to prevent multiple intervals
     if (interval.current) {
       clearInterval(interval.current);
       interval.current = null;
     }
-    // Start interval only if activePlay and player are available
     if (activePlay && player) {
-      // Set initial interval to check time
       interval.current = setInterval(() => void checkTime(), 1000);
     }
 
-    // Cleanup on unmount or if activePlay/player changes
     return () => {
       if (interval.current) {
         clearInterval(interval.current);
         interval.current = null;
       }
     };
-  }, [activePlay, player, checkTime]); // Dependencies for this effect
+  }, [activePlay, player, checkTime]);
+
+  // Intersection Observer to detect when playerRef is in view
+  useEffect(() => {
+    const currentRef = playerRef.current;
+
+    // Only set up observer if the element exists
+    if (!currentRef) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry) {
+          // Update state based on whether the player is intersecting
+          setIsPlayerInView(entry.isIntersecting);
+        }
+      },
+      {
+        root: null, // Default to the viewport. If your page has a specific scrollable container,
+        // you'd set this to the ref of that container (e.g., root: scrollContainerRef.current)
+        rootMargin: "0px",
+        threshold: 0.5, // NEW: Increased threshold to 50% visibility
+      },
+    );
+
+    observer.observe(currentRef);
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [playerRef, video]); // Depend on playerRef to re-run if it changes
 
   return (
     video && (
@@ -256,8 +302,8 @@ const FilmRoom = () => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 2, // Responsive gap
-          p: 2, // Responsive padding
+          gap: 2,
+          p: 2,
         }}
       >
         {/* Video Header Section */}
@@ -269,14 +315,14 @@ const FilmRoom = () => {
             justifyContent: "center",
             gap: 0.5,
             textAlign: "center",
-            maxWidth: "800px", // Constrain width for larger screens
+            maxWidth: "800px",
             width: "100%",
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <Typography
-              variant="subtitle1" // Use subtitle1 for season/week
-              color="text.secondary" // Lighter text color
+              variant="subtitle1"
+              color="text.secondary"
               sx={{ fontWeight: "bold", letterSpacing: "-0.025em" }}
             >
               {video.season} -{" "}
@@ -288,13 +334,17 @@ const FilmRoom = () => {
             </Typography>
             <IconButton
               onClick={copyToClipboard}
-              size="small" // Smaller icon button
+              size="small"
               aria-label="copy-video-link"
             >
-              <LinkIcon fontSize="small" /> {/* Smaller icon */}
+              <LinkIcon fontSize="small" />
             </IconButton>
           </Box>
-          <PageTitle title={video.title} size="small" />
+          <Typography variant="h4" component="h1" fontWeight="bold">
+            {" "}
+            {/* Changed to h4 for semantic importance */}
+            {video.title}
+          </Typography>
           <Box
             sx={{
               display: "flex",
@@ -319,8 +369,8 @@ const FilmRoom = () => {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              gap: { xs: 2, md: 3 }, // Gap below video player
-              maxWidth: "1200px", // Max width for video player area
+              gap: { xs: 2, md: 3 },
+              maxWidth: "1200px",
             }}
           >
             {video.link && !isLoading ? (
@@ -328,11 +378,11 @@ const FilmRoom = () => {
                 ref={playerRef}
                 sx={{
                   position: "relative",
-                  aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio
+                  aspectRatio: "16 / 9",
                   width: "100%",
                   overflow: "hidden",
-                  borderRadius: "8px", // Rounded corners for the player
-                  boxShadow: 3, // Subtle shadow for depth
+                  borderRadius: "8px",
+                  boxShadow: 3,
                 }}
               >
                 <YouTube
@@ -345,7 +395,7 @@ const FilmRoom = () => {
                       disablekb: 0,
                       controls: 1,
                       rel: 0,
-                      origin: window.location.origin, // Use current origin for security
+                      origin: window.location.origin,
                       fs: 1,
                     },
                   }}
@@ -371,9 +421,9 @@ const FilmRoom = () => {
                   justifyContent: "center",
                   aspectRatio: "16 / 9",
                   width: "100%",
-                  maxHeight: "400px", // Limit height when loading
+                  maxHeight: "400px",
                   borderRadius: "8px",
-                  backgroundColor: theme.palette.action.hover, // Placeholder background
+                  backgroundColor: theme.palette.action.hover,
                 }}
               >
                 <CircularProgress size={60} />
@@ -386,25 +436,45 @@ const FilmRoom = () => {
               </Box>
             )}
 
-            {/* Create Play Button (Fixed Position) */}
-            <Box sx={{ position: "fixed", bottom: 2, right: 2, zIndex: 10 }}>
-              <CreatePlay
-                player={player}
-                video={video}
-                isNewPlayOpen={isNewPlayOpen}
-                setIsNewPlayOpen={setIsNewPlayOpen}
-                scrollToPlayer={scrollToPlayer}
-              />
+            {/* Conditional Button/FAB */}
+            <Box
+              sx={{
+                position: "fixed",
+                bottom: { xs: 16, sm: 24 },
+                right: { xs: 16, sm: 24 },
+                zIndex: 10,
+              }}
+            >
+              {isPlayerInView ? (
+                <CreatePlay
+                  player={player}
+                  video={video}
+                  isNewPlayOpen={isNewPlayOpen}
+                  setIsNewPlayOpen={setIsNewPlayOpen}
+                  scrollToPlayer={scrollToPlayer}
+                  onPlayCreated={handlePlayCreated}
+                />
+              ) : (
+                <Fab
+                  color="primary"
+                  aria-label="scroll to top"
+                  onClick={scrollToTop}
+                >
+                  <ArrowUpwardIcon fontSize="large" />
+                </Fab>
+              )}
             </Box>
 
             {/* Video Play Index */}
             <VideoPlayIndex
+              key={refreshPlaysKey}
               player={player}
               videoId={video.id}
               scrollToPlayer={scrollToPlayer}
               setActivePlay={setActivePlay}
               activePlay={activePlay}
               setSeenActivePlay={setSeenActivePlay}
+              handlePlayDeleted={handlePlayDeleted}
             />
           </Box>
         ) : (
@@ -420,8 +490,8 @@ const FilmRoom = () => {
               p: 4,
               borderRadius: "12px",
               boxShadow: 3,
-              backgroundColor: theme.palette.background.paper, // Use paper background
-              maxWidth: "600px", // Constrain width for the message
+              backgroundColor: theme.palette.background.paper,
+              maxWidth: "600px",
               textAlign: "center",
             }}
           >
@@ -449,7 +519,7 @@ const FilmRoom = () => {
         )}
         <Snackbar
           open={snackbarOpen}
-          autoHideDuration={3000} // Hide after 3 seconds
+          autoHideDuration={3000}
           onClose={handleSnackbarClose}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >

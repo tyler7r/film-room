@@ -1,11 +1,9 @@
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   FormControl,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
-  Tooltip,
+  Typography,
   type SelectChangeEvent,
 } from "@mui/material";
 import TeamLogo from "~/components/teams/team-logo";
@@ -38,12 +36,9 @@ const PrivacyStatus = ({
   };
 
   return (
-    <FormControl
-      className="w-full text-start"
-      sx={{ display: "flex", gap: "8px" }}
-    >
+    <FormControl className="w-full text-start" sx={{ display: "flex" }}>
       <InputLabel htmlFor="privacy-status">Privacy Status</InputLabel>
-      <div className="flex w-full items-center justify-center gap-2">
+      <div className="flex w-full flex-col items-center justify-center gap-2">
         {video.private && video.exclusive_to && (
           <Select
             value={newDetails.exclusive_to}
@@ -94,7 +89,19 @@ const PrivacyStatus = ({
             ))}
           </Select>
         )}
-        <Tooltip
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          fontSize={"10px"}
+          px={1}
+          py={0.25}
+          sx={{ letterSpacing: "0.025em" }}
+        >
+          {video.private
+            ? `Since this is a private video, all plays are also private to just members of your team.`
+            : "Private plays are only viewable by your teammates and coaches, even on public videos. Public plays are viewable by all users."}
+        </Typography>
+        {/* <Tooltip
           title={
             video.private
               ? `Since this is a private video, all plays are also private to just members of your team.`
@@ -116,7 +123,7 @@ const PrivacyStatus = ({
           <IconButton size="small">
             <InfoOutlinedIcon />
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
       </div>
     </FormControl>
   );

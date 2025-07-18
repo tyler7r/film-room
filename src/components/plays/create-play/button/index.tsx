@@ -1,7 +1,7 @@
-import BuildCircleIcon from "@mui/icons-material/BuildCircle";
-import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
-import StopCircleIcon from "@mui/icons-material/StopCircle";
-import { Box, IconButton, Tooltip } from "@mui/material";
+import BuildIcon from "@mui/icons-material/Build";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import StopIcon from "@mui/icons-material/Stop";
+import { Box, Fab, Tooltip } from "@mui/material";
 
 type PlayModalBtnProps = {
   isPlayStarted: boolean;
@@ -44,14 +44,13 @@ const PlayModalBtn = ({
           },
         }}
       >
-        <IconButton
-          sx={{ fontWeight: "bold" }}
-          onClick={() => setIsOpen(true)}
-          size="small"
+        <Fab
           color="primary"
+          aria-label="scroll to top"
+          onClick={() => setIsOpen(true)}
         >
-          <BuildCircleIcon sx={{ fontSize: "64px", zIndex: 10 }} />
-        </IconButton>
+          <BuildIcon fontSize="large" />
+        </Fab>
       </Tooltip>
     </Box>
   ) : !isPlayStarted ? (
@@ -71,14 +70,9 @@ const PlayModalBtn = ({
           },
         }}
       >
-        <IconButton
-          sx={{ fontWeight: "bold", zIndex: 10 }}
-          onClick={handleStart}
-          size="small"
-          color="primary"
-        >
-          <PlayCircleFilledIcon sx={{ fontSize: "64px" }} />
-        </IconButton>
+        <Fab color="primary" aria-label="scroll to top" onClick={handleStart}>
+          <PlayArrowIcon sx={{ fontSize: "48px" }} />
+        </Fab>
       </Tooltip>
     </Box>
   ) : (
@@ -98,14 +92,9 @@ const PlayModalBtn = ({
           },
         }}
       >
-        <IconButton
-          sx={{ fontWeight: "bold", zIndex: 10 }}
-          onClick={handleEnd}
-          size="small"
-          color="primary"
-        >
-          <StopCircleIcon sx={{ fontSize: "64px" }} />
-        </IconButton>
+        <Fab color="primary" aria-label="scroll to top" onClick={handleEnd}>
+          <StopIcon sx={{ fontSize: "48px" }} />
+        </Fab>
       </Tooltip>
     </Box>
   );

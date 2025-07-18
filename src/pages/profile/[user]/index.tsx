@@ -6,7 +6,6 @@ import {
   CircularProgress, // Import Tabs for navigation
   Tab, // Keep IconButton for edit
   Tabs,
-  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -226,25 +225,17 @@ const Profile = () => {
             alignItems: { xs: "center", sm: "center" },
             // flexShrink: 0, // <-- REMOVE or adjust this, it prevents shrinking
             textAlign: { xs: "center", sm: "center" },
-            // Add a max-width to this inner box to constrain the name
-            // For example, if the parent has maxWidth: "800px" and padding: 2,
-            // this inner box's max width should be that minus padding,
-            // or a percentage of its parent's content area.
             width: "100%", // Take full width of its direct parent flex item
             // Max width to ensure it doesn't push out of the parent Box
             maxWidth: { xs: "100%", sm: "calc(100% - 48px)" }, // Example: 48px for p:2 (16px left + 16px right) + some buffer
           }}
         >
-          <Tooltip
+          <PageTitle
+            size={isMobile ? "medium" : "large"}
             title={profile.name === "" ? profile.email! : profile.name}
-            arrow
-          >
-            <PageTitle
-              size={isMobile ? "medium" : "large"}
-              title={profile.name === "" ? profile.email! : profile.name}
-              // No additional sx needed here as PageTitle itself has the truncation logic
-            />
-          </Tooltip>
+            // No additional sx needed here as PageTitle itself has the truncation logic
+          />
+
           <Typography
             variant="body1"
             color="text.secondary"
