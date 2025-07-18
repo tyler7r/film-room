@@ -91,7 +91,6 @@ const SearchSection = () => {
             onClick={() => handleActionBarClick("users")}
             variant={section === "users" ? "contained" : "text"}
             sx={{
-              // fontSize: "20px",
               fontWeight: "bold",
             }}
           >
@@ -101,7 +100,6 @@ const SearchSection = () => {
             onClick={() => handleActionBarClick("teams")}
             variant={section == "teams" ? "contained" : "text"}
             sx={{
-              // fontSize: "20px",
               fontWeight: "bold",
             }}
           >
@@ -111,7 +109,6 @@ const SearchSection = () => {
             onClick={() => handleActionBarClick("videos")}
             variant={section == "videos" ? "contained" : "text"}
             sx={{
-              // fontSize: "20px",
               fontWeight: "bold",
             }}
           >
@@ -121,7 +118,6 @@ const SearchSection = () => {
             onClick={() => handleActionBarClick("collections")}
             variant={section === "collections" ? "contained" : "text"}
             sx={{
-              // fontSize: "20px",
               fontWeight: "bold",
             }}
           >
