@@ -66,30 +66,30 @@ const TeamHub = () => {
     else setTeam(null);
   }, [teamId]);
 
-  useEffect(() => {
-    const channel = supabase
-      .channel(`team_hub_${team?.id}_changes`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "teams",
-          filter: `id=eq.${team?.id}`,
-        },
-        () => {
-          if (team) {
-            void fetchTeam();
-            void fetchUserRole();
-          }
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel(`team_hub_${team?.id}_changes`)
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "teams",
+  //         filter: `id=eq.${team?.id}`,
+  //       },
+  //       () => {
+  //         if (team) {
+  //           void fetchTeam();
+  //           void fetchUserRole();
+  //         }
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [team, fetchTeam, fetchUserRole]);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [team, fetchTeam, fetchUserRole]);
 
   useEffect(() => {
     if (team) {

@@ -154,27 +154,27 @@ const Roster = ({ team, role }: RosterProps) => {
     debouncedFetchRoster(0, false, searchTerm);
   }, [searchTerm, debouncedFetchRoster]);
 
-  useEffect(() => {
-    const channel = supabase
-      .channel(`team_roster_${team.id}_changes`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "affiliations",
-          filter: `team_id=eq.${team.id}`,
-        },
-        () => {
-          void fetchRoster(0, false, searchTerm);
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel(`team_roster_${team.id}_changes`)
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "affiliations",
+  //         filter: `team_id=eq.${team.id}`,
+  //       },
+  //       () => {
+  //         void fetchRoster(0, false, searchTerm);
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [team.id, fetchRoster, searchTerm]);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [team.id, fetchRoster, searchTerm]);
 
   const loadMoreRoster = () => {
     if (!loadingMore && hasMore) {

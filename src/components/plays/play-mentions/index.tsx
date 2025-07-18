@@ -11,7 +11,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  Typography
+  Typography,
 } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -72,33 +72,33 @@ const PlayPreviewMentions = ({
     }
   };
 
-  useEffect(() => {
-    // Check if the supabase client is available before subscribing
-    if (!supabase) {
-      console.warn("Supabase client is not initialized.");
-      return;
-    }
+  // useEffect(() => {
+  //   // Check if the supabase client is available before subscribing
+  //   if (!supabase) {
+  //     console.warn("Supabase client is not initialized.");
+  //     return;
+  //   }
 
-    const channel = supabase
-      .channel(`play_mentions_${play.play.id}_changes`) // Unique channel name for specific play's mentions
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "play_mentions",
-          filter: `play_id=eq.${play.play.id}`,
-        }, // Filter for relevant plays
-        () => {
-          void fetchMentions();
-        },
-      )
-      .subscribe();
+  //   const channel = supabase
+  //     .channel(`play_mentions_${play.play.id}_changes`) // Unique channel name for specific play's mentions
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "play_mentions",
+  //         filter: `play_id=eq.${play.play.id}`,
+  //       }, // Filter for relevant plays
+  //       () => {
+  //         void fetchMentions();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [play.play.id, fetchMentions]); // Add play.play.id and fetchMentions to dependencies
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [play.play.id, fetchMentions]); // Add play.play.id and fetchMentions to dependencies
 
   useEffect(() => {
     void fetchMentions();
@@ -113,83 +113,83 @@ const PlayPreviewMentions = ({
   }
 
   return (
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, py: 0.5 }}>
-        <Chip
-          icon={<PersonIcon sx={{ fontSize: "14px" }} />}
-          label={`Mentions (${mentions.length})`}
-          onClick={handleOpenDialog}
-          variant="outlined"
-          sx={{
-            cursor: "pointer",
-            fontWeight: "bold",
-            fontSize: "0.75rem", // Smaller font size
-            height: "24px", // Smaller height}}
-          }}
-        />
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          fullWidth
-          maxWidth="xs"
-        >
-          <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              Player Mentions
-            </Typography>
-            <IconButton
-              aria-label="close"
-              onClick={handleCloseDialog}
-              sx={{
-                position: "absolute",
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent dividers sx={{ p: 0.5 }}>
-            <List dense>
-              {mentions?.map((mention) => (
-                <ListItem
-                  key={mention.id}
-                  onClick={(e) =>
-                    handleClick(e, mention.receiver_name, mention.receiver_id)
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, py: 0.5 }}>
+      <Chip
+        icon={<PersonIcon sx={{ fontSize: "14px" }} />}
+        label={`Mentions (${mentions.length})`}
+        onClick={handleOpenDialog}
+        variant="outlined"
+        sx={{
+          cursor: "pointer",
+          fontWeight: "bold",
+          fontSize: "0.75rem", // Smaller font size
+          height: "24px", // Smaller height}}
+        }}
+      />
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            Player Mentions
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDialog}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ p: 0.5 }}>
+          <List dense>
+            {mentions?.map((mention) => (
+              <ListItem
+                key={mention.id}
+                onClick={(e) =>
+                  handleClick(e, mention.receiver_name, mention.receiver_id)
+                }
+                sx={{
+                  cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: "action.hover",
+                  },
+                  borderRadius: 2,
+                  mb: 0.5, // Slightly reduced margin bottom
+                  px: 1.5, // Reduced horizontal padding
+                  py: 0.5, // Reduced vertical padding
+                }}
+              >
+                <Avatar sx={{ mr: 1, width: 30, height: 30 }}>
+                  {/* You can use mention.profiles?.avatar_url if available, or fall back to first letter */}
+                  {mention.receiver_name[0] ? (
+                    mention.receiver_name[0].toLocaleUpperCase()
+                  ) : (
+                    <PersonIcon fontSize="small" />
+                  )}
+                </Avatar>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                      {mention.receiver_name}
+                    </Typography>
                   }
-                  sx={{
-                    cursor: "pointer",
-                    "&:hover": {
-                      backgroundColor: "action.hover",
-                    },
-                    borderRadius: 2,
-                    mb: 0.5, // Slightly reduced margin bottom
-                    px: 1.5, // Reduced horizontal padding
-                    py: 0.5, // Reduced vertical padding
-                  }}
-                >
-                  <Avatar sx={{ mr: 1, width: 30, height: 30 }}>
-                    {/* You can use mention.profiles?.avatar_url if available, or fall back to first letter */}
-                    {mention.receiver_name[0] ? (
-                      mention.receiver_name[0].toLocaleUpperCase()
-                    ) : (
-                      <PersonIcon fontSize="small" />
-                    )}
-                  </Avatar>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        {mention.receiver_name}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </DialogContent>
-        </Dialog>
-      </Box>
-    )
+                />
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+      </Dialog>
+    </Box>
+  );
 };
 
 export default PlayPreviewMentions;

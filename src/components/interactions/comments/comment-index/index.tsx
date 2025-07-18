@@ -135,32 +135,32 @@ const CommentIndex = ({
   }, [playId, isMobile, fetchComments, fetchActiveComm]);
 
   // Realtime subscription
-  useEffect(() => {
-    if (!supabase) {
-      console.warn("Supabase client is not initialized for real-time.");
-      return;
-    }
+  // useEffect(() => {
+  //   if (!supabase) {
+  //     console.warn("Supabase client is not initialized for real-time.");
+  //     return;
+  //   }
 
-    const channel = supabase
-      .channel(`comments_for_play_${playId}_changes`) // Unique channel name for specific play's comments
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "comments",
-          filter: `play_id=eq.${playId}`,
-        }, // Filter for relevant plays
-        () => {
-          void fetchComments(0, false); // Re-fetch all comments from start on change
-        },
-      )
-      .subscribe();
+  //   const channel = supabase
+  //     .channel(`comments_for_play_${playId}_changes`) // Unique channel name for specific play's comments
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "comments",
+  //         filter: `play_id=eq.${playId}`,
+  //       }, // Filter for relevant plays
+  //       () => {
+  //         void fetchComments(0, false); // Re-fetch all comments from start on change
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [playId, fetchComments]); // Dependencies for the effect
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [playId, fetchComments]); // Dependencies for the effect
 
   const loadMoreComments = () => {
     void fetchComments(offset, true);

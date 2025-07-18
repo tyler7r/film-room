@@ -465,29 +465,29 @@ const EditPlay = ({
     }
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("edit_play_tags_and_collections")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "tags" },
-        () => {
-          void fetchTags();
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "collections" },
-        () => {
-          void fetchCollections();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("edit_play_tags_and_collections")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "tags" },
+  //       () => {
+  //         void fetchTags();
+  //       },
+  //     )
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "collections" },
+  //       () => {
+  //         void fetchCollections();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [fetchTags, fetchCollections]);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [fetchTags, fetchCollections]);
 
   useEffect(() => {
     void fetchPlayers();

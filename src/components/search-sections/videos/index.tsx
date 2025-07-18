@@ -52,39 +52,39 @@ const SearchVideos = ({ topic }: SearchVideosProps) => {
     setPage(value);
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("team_video_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "team_videos" },
-        () => {
-          void fetchVideos();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("team_video_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "team_videos" },
+  //       () => {
+  //         void fetchVideos();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, []);
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("video_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "videos" },
-        () => {
-          void fetchVideos();
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel("video_changes")
+  //     .on(
+  //       "postgres_changes",
+  //       { event: "*", schema: "public", table: "videos" },
+  //       () => {
+  //         void fetchVideos();
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, []);
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (page === 1) void fetchVideos();

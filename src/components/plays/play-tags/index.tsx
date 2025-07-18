@@ -10,7 +10,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  Typography
+  Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react"; // Add useCallback
 import { useAuthContext } from "~/contexts/auth"; // Assuming this context exists
@@ -77,27 +77,27 @@ const PlayPreviewTags = ({
     }
   };
 
-  useEffect(() => {
-    const channel = supabase
-      .channel(`play_tags_${play.play.id}_changes`) // Unique channel name for specific play's tags
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "play_tags",
-          filter: `play_id=eq.${play.play.id}`,
-        }, // Filter for relevant plays
-        () => {
-          void fetchTags(); // Use void to explicitly ignore the promise
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel(`play_tags_${play.play.id}_changes`) // Unique channel name for specific play's tags
+  //     .on(
+  //       "postgres_changes",
+  //       {
+  //         event: "*",
+  //         schema: "public",
+  //         table: "play_tags",
+  //         filter: `play_id=eq.${play.play.id}`,
+  //       }, // Filter for relevant plays
+  //       () => {
+  //         void fetchTags(); // Use void to explicitly ignore the promise
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [play.play.id, fetchTags]); // Dependencies for the effect: play.play.id and fetchTags
+  //   return () => {
+  //     void supabase.removeChannel(channel);
+  //   };
+  // }, [play.play.id, fetchTags]); // Dependencies for the effect: play.play.id and fetchTags
 
   // Initial fetch and refetch on relevant prop changes (now including fetchTags)
   useEffect(() => {
@@ -109,81 +109,81 @@ const PlayPreviewTags = ({
   }
 
   return (
-      <Box
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 0.5,
+        py: 0.5,
+      }}
+    >
+      <Chip
+        icon={<LocalOfferIcon sx={{ fontSize: "14px" }} />}
+        label={`Tags (${tags.length})`}
+        onClick={handleOpenDialog}
+        variant="outlined"
         sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 0.5,
-          py: 0.5,
+          cursor: "pointer",
+          fontWeight: "bold",
+          fontSize: "0.75rem", // Smaller font size
+          height: "24px", // Smaller height}}
         }}
+      />
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        fullWidth
+        maxWidth="xs"
       >
-        <Chip
-          icon={<LocalOfferIcon sx={{ fontSize: "14px" }} />}
-          label={`Tags (${tags.length})`}
-          onClick={handleOpenDialog}
-          variant="outlined"
-          sx={{
-            cursor: "pointer",
-            fontWeight: "bold",
-            fontSize: "0.75rem", // Smaller font size
-            height: "24px", // Smaller height}}
-          }}
-        />
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          fullWidth
-          maxWidth="xs"
-        >
-          <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              Play Tags
-            </Typography>
-            <IconButton
-              aria-label="close"
-              onClick={handleCloseDialog}
-              sx={{
-                position: "absolute",
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent dividers sx={{ padding: 0.5 }}>
-            <List dense>
-              {tags?.map((tag) => (
-                <ListItem
-                  key={tag.id} // Use tag.id for key, as tag.title might not be unique globally
-                  onClick={(e) => handleClick(e, tag.title)}
-                  sx={{
-                    cursor: "pointer",
-                    "&:hover": {
-                      backgroundColor: "action.hover",
-                    },
-                    borderRadius: 2,
-                    mb: 0.5, // Slightly reduced margin bottom
-                    px: 1.5, // Reduced horizontal padding
-                    py: 0.5, // Reduced vertical padding
-                  }}
-                >
-                  <LocalOfferIcon sx={{ mr: 1 }} /> {/* Icon for tags */}
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        {tag.title}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </DialogContent>
-        </Dialog>
-      </Box>
-    )
+        <DialogTitle sx={{ m: 0, p: 1, px: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            Play Tags
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDialog}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ padding: 0.5 }}>
+          <List dense>
+            {tags?.map((tag) => (
+              <ListItem
+                key={tag.id} // Use tag.id for key, as tag.title might not be unique globally
+                onClick={(e) => handleClick(e, tag.title)}
+                sx={{
+                  cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: "action.hover",
+                  },
+                  borderRadius: 2,
+                  mb: 0.5, // Slightly reduced margin bottom
+                  px: 1.5, // Reduced horizontal padding
+                  py: 0.5, // Reduced vertical padding
+                }}
+              >
+                <LocalOfferIcon sx={{ mr: 1 }} /> {/* Icon for tags */}
+                <ListItemText
+                  primary={
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                      {tag.title}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+      </Dialog>
+    </Box>
+  );
 };
 
 export default PlayPreviewTags;
