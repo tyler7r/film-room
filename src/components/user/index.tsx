@@ -4,6 +4,7 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { useIsDarkContext } from "~/pages/_app";
+import { getDisplayName } from "~/utils/helpers";
 import type { UserType } from "~/utils/types";
 import PageTitle from "../utils/page-title"; // Import the updated PageTitle
 import UserAffiliationsChip from "./user-teams";
@@ -32,22 +33,6 @@ const User = ({
     if (goToProfile) {
       void router.push(`/profile/${user.id}`);
     }
-  };
-
-  // Helper function to format the name/email for display
-  const getDisplayName = (user: UserType) => {
-    if (user.name && user.name !== "") {
-      return user.name;
-    }
-    // If no name, use the part of the email before '@'
-    if (user.email) {
-      const atIndex = user.email.indexOf("@");
-      if (atIndex !== -1) {
-        return user.email.substring(0, atIndex);
-      }
-      return user.email; // Fallback if no '@' symbol for some reason
-    }
-    return "Unknown User"; // Fallback if neither name nor email
   };
 
   return (

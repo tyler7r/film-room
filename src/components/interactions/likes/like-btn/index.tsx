@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
+import LikedUsersModal from "../like-modal";
 
 type LikeBtnProps = {
   playId: string;
@@ -19,6 +20,7 @@ const LikeBtn = ({ playId, commentLike, replyLike, small }: LikeBtnProps) => {
 
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const fetchLikeCount = async () => {
     const plays = supabase
@@ -149,6 +151,16 @@ const LikeBtn = ({ playId, commentLike, replyLike, small }: LikeBtnProps) => {
     if (user.userId) void fetchIfUserLiked();
   }, [playId]);
 
+  const handleOpenModal = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent like/unlike from firing when clicking count
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent interaction from bubbling up, useful if in a clickable parent
+    setIsModalOpen(false);
+  };
+
   return (
     <div>
       <div className="flex items-center justify-center">
@@ -167,7 +179,21 @@ const LikeBtn = ({ playId, commentLike, replyLike, small }: LikeBtnProps) => {
             />
           </IconButton>
         )}
-        <div className="text-lg font-bold tracking-tight">{likeCount}</div>
+        <div
+          className="cursor-pointer text-lg font-bold tracking-tight"
+          onClick={handleOpenModal}
+          // Only show pointer if there are likes to view
+          style={{ cursor: likeCount > 0 ? "pointer" : "default" }}
+        >
+          {likeCount}
+        </div>
+        <LikedUsersModal
+          open={isModalOpen}
+          onClose={handleCloseModal}
+          playId={playId}
+          commentLike={commentLike}
+          replyLike={replyLike}
+        />
       </div>
     </div>
   );

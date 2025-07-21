@@ -23,7 +23,7 @@ import StandardPopover from "~/components/utils/standard-popover";
 import type { PlaySearchOptions } from "~/components/videos/video-play-index";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { convertYouTubeTimestamp } from "~/utils/helpers";
+import { convertYouTubeTimestamp, getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
 import ExpandedPlay from "../expanded-play";
@@ -323,7 +323,7 @@ const Play = ({
               void router.push(`/profile/${play.play.author_id}`);
             }}
           >
-            {play.author.name}:
+            {getDisplayName(play.author)}:
           </Box>{" "}
           {play.play.title}
         </Typography>
