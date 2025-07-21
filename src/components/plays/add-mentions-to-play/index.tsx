@@ -1,6 +1,7 @@
 import { Autocomplete, TextField } from "@mui/material";
 import type { SyntheticEvent } from "react";
 import User from "~/components/user";
+import { getDisplayName } from "~/utils/helpers";
 import type { UserType } from "~/utils/types";
 
 type AddMentionsToPlayProps = {
@@ -32,7 +33,7 @@ const AddMentionsToPlayProps = ({
           id="mentions"
           onChange={(event, newValue) => handleChange(event, newValue)}
           options={players}
-          getOptionLabel={(option) => `${option.name}`}
+          getOptionLabel={(option) => getDisplayName(option)}
           renderOption={(props, option) => (
             <li {...props} key={option.id}>
               <User

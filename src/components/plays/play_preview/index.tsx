@@ -19,6 +19,7 @@ import TeamLogo from "~/components/teams/team-logo";
 import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
+import { getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { PlayPreviewType } from "~/utils/types";
 import CommentBtn from "../../interactions/comments/comment-btn";
@@ -257,7 +258,7 @@ const PlayPreview = ({
               void router.push(`/profile/${preview.play.author_id}`)
             }
           >
-            {preview.author.name}
+            {getDisplayName(preview.author)}
           </Box>
           <Divider flexItem orientation="vertical" sx={{ mx: 0.5 }} />
           <Box className="text-xs font-bold leading-3 tracking-tight">

@@ -14,6 +14,7 @@ import type { YouTubePlayer } from "react-youtube";
 import ModalSkeleton from "~/components/utils/modal";
 import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
+import { getDisplayName } from "~/utils/helpers";
 import sendEmail from "~/utils/send-email";
 import { supabase } from "~/utils/supabase";
 import {
@@ -211,8 +212,8 @@ const CreatePlay = ({
       play_id: play.id,
       sender_id: `${user.userId}`,
       receiver_id: mention.id,
-      receiver_name: mention.name,
-      sender_name: user.name ? user.name : `${user.email}`,
+      receiver_name: getDisplayName(mention),
+      sender_name: getDisplayName(user),
     });
     if (mention.email !== user.email && mention.send_notifications) {
       await sendEmail({

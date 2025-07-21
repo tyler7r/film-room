@@ -10,6 +10,7 @@ import FormMessage from "~/components/utils/form-message";
 import ModalSkeleton from "~/components/utils/modal";
 import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
+import { getDisplayName } from "~/utils/helpers";
 import sendEmail from "~/utils/send-email";
 import { supabase } from "~/utils/supabase";
 import {
@@ -247,8 +248,8 @@ const EditPlay = ({
       play_id: currentPlay.id,
       sender_id: `${user.userId}`,
       receiver_id: mention.id,
-      receiver_name: mention.name,
-      sender_name: user.name ? user.name : `${user.email}`,
+      receiver_name: getDisplayName(mention),
+      sender_name: getDisplayName(user),
     });
     const alreadyEmailed = initialMentions.find((v) => v.id === mention.id);
     if (

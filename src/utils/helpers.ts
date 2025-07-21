@@ -1,3 +1,5 @@
+import type { UserSession, UserType } from "./types";
+
 export const validateEmail = (email: string) => {
   const regex = new RegExp(/^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/);
   if (regex.test(email)) {
@@ -143,3 +145,18 @@ export const proDivWeeks = [
   "Playoffs",
   "Championship Weekend",
 ];
+
+export const getDisplayName = (user: UserType | UserSession) => {
+  if (user.name && user.name !== "") {
+    return user.name;
+  }
+  // If no name, use the part of the email before '@'
+  if (user.email) {
+    const atIndex = user.email.indexOf("@");
+    if (atIndex !== -1) {
+      return user.email.substring(0, atIndex);
+    }
+    return user.email; // Fallback if no '@' symbol for some reason
+  }
+  return "Unknown User"; // Fallback if neither name nor email
+};

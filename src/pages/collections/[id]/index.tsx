@@ -20,8 +20,9 @@ import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
+import { getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { CollectionType, PlayPreviewType } from "~/utils/types";
+import type { CollectionType, PlayPreviewType, UserType } from "~/utils/types";
 
 const Collection = () => {
   const { affIds, affiliations, user } = useAuthContext();
@@ -36,7 +37,7 @@ const Collection = () => {
   const [plays, setPlays] = useState<PlayPreviewType[]>([]);
   const [playIds, setPlaysIds] = useState<string[]>([]);
 
-  const [authorName, setAuthorName] = useState<string | null>(null);
+  const [authorProfile, setAuthorProfile] = useState<UserType | null>(null);
   const [userCanEdit, setUserCanEdit] = useState<boolean>(false);
   const [reload, setReload] = useState<boolean>(false);
   const [isCopied, setIsCopied] = useState<boolean>(false);
@@ -59,7 +60,7 @@ const Collection = () => {
     if (id) {
       const { data } = await supabase
         .from("collections")
-        .select("*, profiles(name)")
+        .select("*, profiles(*)")
         .eq("id", id)
         .single();
       if (data) {
@@ -75,7 +76,7 @@ const Collection = () => {
       } else {
         setCollection(null);
       }
-      if (data?.profiles?.name) setAuthorName(data.profiles.name);
+      if (data?.profiles) setAuthorProfile(data.profiles);
     }
   }, [id, affIds]);
 
@@ -252,7 +253,7 @@ const Collection = () => {
             <Divider flexItem orientation="vertical" variant="middle" />
 
             {/* Author Name */}
-            {authorName && (
+            {authorProfile && (
               <Typography
                 onClick={() =>
                   void router.push(`/profile/${collection.author_id}`)
@@ -265,7 +266,7 @@ const Collection = () => {
                 }}
                 variant="body2"
               >
-                {authorName}
+                {getDisplayName(authorProfile)}
               </Typography>
             )}
 

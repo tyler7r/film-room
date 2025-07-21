@@ -23,6 +23,7 @@ import Video from "~/components/videos/video";
 import { useAuthContext } from "~/contexts/auth";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
+import { getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type {
   LastWatchedType, // Will adapt this or create new state for tabs
@@ -232,7 +233,7 @@ const Profile = () => {
         >
           <PageTitle
             size={isMobile ? "medium" : "large"}
-            title={profile.name === "" ? profile.email! : profile.name}
+            title={getDisplayName(profile)}
             // No additional sx needed here as PageTitle itself has the truncation logic
           />
 
@@ -378,11 +379,7 @@ const Profile = () => {
           },
         }}
       >
-        <Tab
-          value="created"
-          label="Created Plays"
-          sx={{ fontWeight: "bold" }}
-        />
+        <Tab value="created" label="Created" sx={{ fontWeight: "bold" }} />
         <Tab value="mentions" label="Mentions" sx={{ fontWeight: "bold" }} />
         <Tab
           value="highlights"
