@@ -1,4 +1,4 @@
-import { Divider } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import { useRouter } from "next/router";
 import { useIsDarkContext } from "~/pages/_app";
 import type { TeamType } from "~/utils/types";
@@ -21,23 +21,24 @@ const Team = ({ team, small, onVideo }: TeamProps) => {
   };
 
   return (
-    <div
-      className={`flex items-center justify-center ${
-        small ? "gap-1" : "gap-4"
-      } ${onVideo ? hoverText : hoverBorder} p-2`}
+    <Box
+      className={`flex items-center ${small ? "gap-1" : "gap-4"} ${
+        onVideo ? hoverText : hoverBorder
+      } p-2`}
       key={team.id}
       style={small ? {} : backgroundStyle}
       onClick={handleTeamClick}
     >
       <TeamLogo tm={team} size={small ? 25 : 35} />
       <Divider variant="middle" orientation="vertical" flexItem />
-      <div className="flex flex-col items-center justify-center">
+      <Box className="flex flex-col items-center justify-center">
         <PageTitle
           title={team.full_name}
           size={small ? "xxx-small" : onVideo ? "xxx-small" : "x-small"}
+          sx={{ textAlign: "start" }}
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
