@@ -310,13 +310,10 @@ const Collection = () => {
             ref={scrollableContainerRef}
             // id="collection-plays-scroll-container"
             className="w-full"
-            sx={
-              {
-                // Add styles to make this Box the scrollable area if your layout requires it.
-                // For example: maxHeight: 'calc(100vh - 200px)', overflowY: 'auto'
-                // Adjust '200px' based on your header/footer height.
-              }
-            }
+            sx={{
+              width: `${isMobile ? "100%" : "80%"}`,
+              px: 1,
+            }}
           >
             {loading && plays.length === 0 ? (
               <Box className="flex h-full w-full items-center justify-center p-4">

@@ -13,7 +13,6 @@ import type { MessageType, NewCollectionType } from "~/utils/types";
 import PrivacyStatus from "./privacy-status";
 
 type CreateCollectionProps = {
-  small?: boolean; // Keep if you still use a 'small' button variant
   icon?: boolean; // Keep if you still use an 'icon' button variant
   isOpen?: boolean;
   setIsOpen?: (open: boolean) => void;
@@ -25,7 +24,7 @@ export interface CreateCollectionRef {
 }
 
 const CreateCollection = forwardRef<CreateCollectionRef, CreateCollectionProps>(
-  ({ small, icon, isOpen, setIsOpen, standaloneTrigger = false }, ref) => {
+  ({ icon, isOpen, setIsOpen, standaloneTrigger = false }, ref) => {
     const { user } = useAuthContext();
     const router = useRouter();
 
@@ -133,9 +132,19 @@ const CreateCollection = forwardRef<CreateCollectionRef, CreateCollectionProps>(
         <Button
           onClick={handleOpenModalTrigger}
           variant="contained"
-          size={small ? "medium" : "large"}
           endIcon={<AddIcon />}
-          sx={{ fontWeight: "bold", textTransform: "none" }}
+          sx={{
+            backgroundColor: "primary.main",
+            color: "primary.contrastText",
+            "&:hover": {
+              backgroundColor: "primary.dark",
+            },
+            borderRadius: "8px",
+            fontWeight: "bold",
+            minWidth: "auto",
+            boxShadow: 2,
+            letterSpacing: "0.025em",
+          }}
         >
           Create New Collection
         </Button>
