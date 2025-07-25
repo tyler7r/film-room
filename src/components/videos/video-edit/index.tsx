@@ -117,11 +117,6 @@ const EditVideo = forwardRef<EditVideoRef, EditVideoProps>(
       return found ? found.role : null;
     };
 
-    const findPrivatedTeam = (arr: TeamType[] | null, id: string) => {
-      const team = arr?.find((item) => item.id === id);
-      return team ? team : null;
-    };
-
     const handlePrivacyStatus = (e: SelectChangeEvent) => {
       const status = e.target.value;
       if (status === "public" || status === "") {
@@ -132,26 +127,14 @@ const EditVideo = forwardRef<EditVideoRef, EditVideoProps>(
         }));
       } else {
         const isCoachVideo = getRoleByTeamId(affiliations, status);
-        const addPrivateTeamToMentions = findPrivatedTeam(teams, status);
-        // Only add if not already present to avoid duplicates
-        if (
-          addPrivateTeamToMentions &&
-          !teamMentions.find((tm) => tm.id === addPrivateTeamToMentions.id)
-        ) {
-          setTeamMentions((prev) => [...prev, addPrivateTeamToMentions]);
-        }
         if (isCoachVideo === "coach") {
           setVideoData((prev) => ({
             ...prev,
-            private: true,
-            exclusive_to: status,
             coach_video: true,
           }));
         } else {
           setVideoData((prev) => ({
             ...prev,
-            private: true,
-            exclusive_to: status,
             coach_video: false,
           }));
         }
@@ -260,19 +243,11 @@ const EditVideo = forwardRef<EditVideoRef, EditVideoProps>(
 
     const handleTeamMention = async (teamId: string, videoId: string) => {
       // Check if the team is already linked to the video to prevent duplicates
-      const { data: existingLink, error: existingLinkError } = await supabase
+      const { data: existingLink } = await supabase
         .from("team_videos")
         .select("id")
         .match({ team_id: teamId, video_id: videoId })
         .maybeSingle();
-
-      if (existingLinkError) {
-        console.error(
-          "Error checking existing team video link:",
-          existingLinkError,
-        );
-        return;
-      }
 
       if (!existingLink) {
         // Only insert if no existing link is found
@@ -286,6 +261,8 @@ const EditVideo = forwardRef<EditVideoRef, EditVideoProps>(
         if (error) {
           console.error("Error linking team to video:", error);
         }
+      } else {
+        console.error("There is already a private video with this link!");
       }
     };
 
@@ -497,11 +474,6 @@ const EditVideo = forwardRef<EditVideoRef, EditVideoProps>(
                 size="small"
               />
             )}
-            <TeamMentions
-              mentions={teamMentions}
-              setMentions={setTeamMentions}
-              teams={teams}
-            />
             <FormControl
               sx={{ width: "100%", display: "flex" }} // Combined w-full and gap-2
             >
@@ -561,6 +533,11 @@ const EditVideo = forwardRef<EditVideoRef, EditVideoProps>(
                 </Typography>
               </Box>
             </FormControl>
+            <TeamMentions
+              mentions={teamMentions}
+              setMentions={setTeamMentions}
+              teams={teams}
+            />
           </Box>
           <FormMessage message={message} />
           <FormButtons
