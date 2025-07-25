@@ -123,11 +123,6 @@ const CreateVideo = forwardRef<CreateVideoRef, CreateVideoProps>(
       return found ? found.role : null;
     };
 
-    const findPrivatedTeam = (arr: TeamType[] | null, id: string) => {
-      const team = arr?.find((item) => item.id === id);
-      return team ? team : null;
-    };
-
     const handlePrivacyStatus = (e: SelectChangeEvent) => {
       const status = e.target.value;
       if (status === "public" || status === "") {
@@ -142,17 +137,8 @@ const CreateVideo = forwardRef<CreateVideoRef, CreateVideoProps>(
         );
       } else {
         const isCoachVideo = getRoleByTeamId(affiliations, status);
-        const addPrivateTeamToMentions = findPrivatedTeam(teams, status);
-        if (
-          addPrivateTeamToMentions &&
-          !teamMentions.some((tm) => tm.id === addPrivateTeamToMentions.id)
-        ) {
-          setTeamMentions((prev) => [...prev, addPrivateTeamToMentions]);
-        }
         setVideoData((prev) => ({
           ...prev,
-          private: true,
-          exclusive_to: status,
           coach_video: isCoachVideo === "coach",
         }));
       }
@@ -227,19 +213,11 @@ const CreateVideo = forwardRef<CreateVideoRef, CreateVideoProps>(
     }, [videoData]);
 
     const handleTeamMention = async (teamId: string, videoId: string) => {
-      const { data: existingLink, error: existingLinkError } = await supabase
+      const { data: existingLink } = await supabase
         .from("team_videos")
         .select("id")
         .match({ team_id: teamId, video_id: videoId })
         .maybeSingle();
-
-      if (existingLinkError) {
-        console.error(
-          "Error checking existing team video link:",
-          existingLinkError,
-        );
-        return;
-      }
 
       if (!existingLink) {
         const { error } = await supabase.from("team_videos").insert({
@@ -470,11 +448,6 @@ const CreateVideo = forwardRef<CreateVideoRef, CreateVideoProps>(
                 size="small"
               />
             )}
-            <TeamMentions
-              mentions={teamMentions}
-              setMentions={setTeamMentions}
-              teams={teams}
-            />
             <FormControl sx={{ width: "100%", display: "flex" }}>
               <InputLabel htmlFor="privacy-status">Privacy Status</InputLabel>
               <Box
@@ -532,6 +505,11 @@ const CreateVideo = forwardRef<CreateVideoRef, CreateVideoProps>(
                 </Typography>
               </Box>
             </FormControl>
+            <TeamMentions
+              mentions={teamMentions}
+              setMentions={setTeamMentions}
+              teams={teams}
+            />
           </Box>
           <FormMessage message={message} />
           <FormButtons
