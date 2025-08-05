@@ -127,17 +127,12 @@ const EditVideo = forwardRef<EditVideoRef, EditVideoProps>(
         }));
       } else {
         const isCoachVideo = getRoleByTeamId(affiliations, status);
-        if (isCoachVideo === "coach") {
-          setVideoData((prev) => ({
-            ...prev,
-            coach_video: true,
-          }));
-        } else {
-          setVideoData((prev) => ({
-            ...prev,
-            coach_video: false,
-          }));
-        }
+        setVideoData((prev) => ({
+          ...prev,
+          coach_video: isCoachVideo === "coach",
+          private: true,
+          exclusive_to: status,
+        }));
       }
     };
 
