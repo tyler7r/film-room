@@ -140,6 +140,8 @@ const CreateVideo = forwardRef<CreateVideoRef, CreateVideoProps>(
         setVideoData((prev) => ({
           ...prev,
           coach_video: isCoachVideo === "coach",
+          private: true,
+          exclusive_to: status,
         }));
       }
     };
