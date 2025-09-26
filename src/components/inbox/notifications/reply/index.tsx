@@ -162,8 +162,12 @@ const InboxReply = ({ notification }: InboxReplyProps) => {
           >
             {notification.actor_name}
           </Box>{" "}
-          replied to your comment:{" "}
+          replied to this comment:{" "}
           <Box component="strong">{notification.related_comment_title}</Box>
+          <br />
+          <Typography variant="caption" color="text.secondary">
+            "{notification.content_preview?.slice(0, 100)}..."
+          </Typography>
         </Typography>
       </Box>
     </Box>
