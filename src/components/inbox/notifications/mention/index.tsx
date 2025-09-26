@@ -1,120 +1,171 @@
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import PublicIcon from "@mui/icons-material/Public";
-import { Box, Divider, IconButton } from "@mui/material";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"; // Re-added for completeness
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked"; // Re-added for read status
+import { Box, Divider, IconButton, Typography } from "@mui/material"; // Added IconButton
+import { formatDistanceToNowStrict } from "date-fns";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import TeamLogo from "~/components/teams/team-logo";
-import PageTitle from "~/components/utils/page-title";
-import StandardPopover from "~/components/utils/standard-popover";
+import React from "react";
 import { useInboxContext } from "~/contexts/inbox";
-import { useIsDarkContext } from "~/pages/_app";
-import { getTimeSinceNotified } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { MentionNotificationType } from "~/utils/types";
+import { type UnifiedNotificationType } from "~/utils/types";
 
 type InboxMentionProps = {
-  mention: MentionNotificationType;
+  notification: UnifiedNotificationType;
 };
 
-const InboxMention = ({ mention }: InboxMentionProps) => {
-  const { hoverText, hoverBorder, backgroundStyle } = useIsDarkContext();
-  const { setIsOpen } = useInboxContext();
-
+const InboxMention = ({ notification }: InboxMentionProps) => {
+  const { setIsOpen, updateSingleNotificationViewStatus } = useInboxContext();
   const router = useRouter();
-  const [isUnread, setIsUnread] = useState<boolean>(false);
 
-  const fetchIfUnread = async () => {
-    const { data } = await supabase
-      .from("play_mentions")
-      .select("viewed")
-      .eq("id", mention.mention.id)
-      .single();
-    if (data) {
-      setIsUnread(data.viewed ? false : true);
+  // ✅ FIX: Force the prop value to a strict boolean for reliable logic.
+  // This handles the case where notification.viewed is the string "false" or "true".
+  const isViewedBoolean =
+    typeof notification.viewed === "string"
+      ? notification.viewed.toLowerCase() === "true"
+      : !!notification.viewed; // Fallback for standard boolean or null/undefined
+
+  // Use the strictly-typed boolean for calculations
+  const isUnread = !isViewedBoolean;
+
+  const handleUpdate = async (isViewed: boolean) => {
+    try {
+      // Logic for updating the database table specific to mentions
+      const { data, error } = await supabase
+        .from("play_mentions")
+        .update({ viewed: isViewed })
+        .eq("id", notification.source_id)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+
+      // CRITICAL: Update the local context state immediately
+      if (data && data.length > 0) {
+        // We use source_id here, which is stable, and rely on the context to update the list item.
+        updateSingleNotificationViewStatus(
+          notification.source_id,
+          isViewed.toString(),
+        );
+        // We no longer need to update local state here as we rely on context/prop updates.
+      }
+    } catch (error) {
+      console.error("Error updating mention status:", error);
     }
   };
 
-  const updateMention = async () => {
-    await supabase
-      .from("play_mentions")
-      .update({ viewed: true })
-      .eq("id", mention.mention.id);
-    void fetchIfUnread();
-  };
-
-  const markUnread = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    await supabase
-      .from("play_mentions")
-      .update({ viewed: false })
-      .eq("id", mention.mention.id);
-    void fetchIfUnread();
-  };
-
-  const handleClick = async () => {
-    const { mention: mntn, play } = mention;
-    if (!mntn.viewed) void updateMention();
-    void router.push(`/play/${play.id}`);
+  const handleCardClick = async () => {
+    // ✅ FIX 1: Only mark as viewed (true) if it is currently UNREAD.
+    if (isUnread) {
+      await handleUpdate(true);
+    }
+    void router.push(`/play/${notification.related_play_id}`);
     setIsOpen(false);
   };
 
-  useEffect(() => {
-    void fetchIfUnread();
-  }, []);
+  const handleActorClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    void router.push(`/profile/${notification.actor_id}`);
+    setIsOpen(false);
+  };
+
+  const handleMarkAsUnread = async (e: React.MouseEvent, status: boolean) => {
+    e.stopPropagation();
+    // Logic for updating the database table specific to mentions
+    await handleUpdate(status);
+  };
 
   return (
-    <div key={mention.mention.id}>
-      <div className="flex items-center justify-end gap-1 text-right text-xs font-light italic leading-4">
-        {getTimeSinceNotified(mention.play.created_at)}
-      </div>
-      <div className="flex items-center justify-center gap-1">
-        {isUnread && <FiberManualRecordIcon fontSize="small" color="primary" />}
-        {!isUnread && (
-          <StandardPopover
-            content="Mark unread"
-            children={
-              <Box sx={{ cursor: "pointer" }} onClick={(e) => markUnread(e)}>
-                <FiberManualRecordIcon fontSize="small" color="action" />
-              </Box>
-            }
-          />
+    <Box
+      onClick={handleCardClick}
+      // All styling moved here to the sx prop
+      sx={(t) => ({
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        gap: t.spacing(1),
+        padding: t.spacing(1),
+        // ✅ FIX 2: Apply conditional background styling to the whole card when unread.
+        backgroundColor: isUnread
+          ? t.palette.action.hover // Use a subtle color for unread
+          : t.palette.background.paper,
+        borderRadius: "4px",
+        border: `1px solid ${t.palette.divider}`,
+        transition: "all 0.2s ease-in-out",
+        cursor: "pointer",
+        "&:hover": {
+          borderColor: t.palette.primary.main,
+          boxShadow: t.shadows[2],
+          transform: "translateY(-2px)",
+        },
+      })}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        {isUnread ? (
+          // UNREAD: Filled dot
+          <IconButton
+            size="small"
+            onClick={(e) => handleMarkAsUnread(e, true)}
+            aria-label="Mark as read"
+            sx={{ p: 0 }}
+          >
+            <FiberManualRecordIcon
+              fontSize="small"
+              color="primary"
+              aria-label="Unread indicator"
+            />
+          </IconButton>
+        ) : (
+          // READ: Hollow dot/Mark as Unread button
+          <IconButton
+            size="small"
+            onClick={(e) => handleMarkAsUnread(e, false)}
+            aria-label="Mark as unread"
+            sx={{ p: 0 }}
+          >
+            <RadioButtonUncheckedIcon fontSize="small" color="action" />
+          </IconButton>
         )}
-        <div
-          onClick={handleClick}
-          className={`flex w-full flex-col gap-1 ${hoverBorder}`}
-          style={backgroundStyle}
+
+        <Typography variant="caption" color="text.secondary" fontStyle="italic">
+          {formatDistanceToNowStrict(new Date(notification.created_at), {
+            addSuffix: true,
+          })}
+        </Typography>
+      </Box>
+      <Divider />
+      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, px: 0.5 }}>
+        <Typography
+          variant="body2"
+          sx={{ flex: 1, overflowWrap: "break-word" }}
         >
-          <div className="flex w-full flex-col">
-            <PageTitle size="xx-small" title={mention.video.title} />
-          </div>
-          <Divider flexItem variant="middle"></Divider>
-          <div className="flex items-center gap-1 text-sm">
-            {mention.team && (
-              <IconButton size="small">
-                <TeamLogo tm={mention.team} size={25} />
-              </IconButton>
-            )}
-            {!mention.team && <PublicIcon fontSize="small" />}
-            <div>
-              <strong
-                className={`${hoverText} text-sm tracking-tight`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsOpen(false);
-                  void router.push(`/profile/${mention.play.author_id}`);
-                }}
-              >
-                {mention.author.name}
-              </strong>{" "}
-              mentioned you:{" "}
-              {mention.play.title.length > 50
-                ? `${mention.play.title.slice(0, 50)}...`
-                : mention.play.title}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          <Box
+            component="strong"
+            sx={(t) => ({
+              cursor: "pointer",
+              transition: "color 0.1s ease-in-out",
+              color: t.palette.text.primary,
+              "&:hover": {
+                color:
+                  t.palette.mode === "dark"
+                    ? t.palette.primary.dark
+                    : t.palette.primary.light,
+              },
+            })}
+            onClick={handleActorClick}
+          >
+            {notification.actor_name}
+          </Box>{" "}
+          mentioned you in{" "}
+          <Box component="strong">{notification.related_play_title}</Box>
+        </Typography>
+      </Box>
+    </Box>
   );
 };
 

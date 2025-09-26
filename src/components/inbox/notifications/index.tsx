@@ -1,44 +1,80 @@
-import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import MailIcon from "@mui/icons-material/Mail";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import { Button, IconButton } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import {
+  Box,
+  CircularProgress,
+  Fab,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import InfiniteScroll from "react-infinite-scroll-component";
 import EmptyMessage from "~/components/utils/empty-msg";
 import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
 import { useInboxContext } from "~/contexts/inbox";
+// Assuming you have separate components for each notification type
+import { type UnifiedNotificationType } from "~/utils/types";
 import InboxComment from "./comment";
 import InboxMention from "./mention";
 import InboxReply from "./reply";
 
 const InboxNotification = () => {
-  const { unreadOnly, setUnreadOnly, notifications } = useInboxContext();
-
-  const topRef = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const {
+    notifications,
+    notificationCount,
+    unreadOnly,
+    setUnreadOnly,
+    isLoadingInitial,
+    isLoadingMore,
+    hasMoreNotifications,
+    loadMoreNotifications,
+    inboxScrollableRef,
+  } = useInboxContext();
 
   const scrollToTop = () => {
-    if (topRef) topRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (inboxScrollableRef.current) {
+      inboxScrollableRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
-  useEffect(() => {
-    if (notifications && notifications.length > 0) setLoading(false);
-    else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
+  const renderNotification = (notification: UnifiedNotificationType) => {
+    if (!notification) return null;
+    switch (notification.notification_type) {
+      case "mention":
+        return <InboxMention notification={notification} />;
+      case "comment":
+        return <InboxComment notification={notification} />;
+      case "reply":
+        return <InboxReply notification={notification} />;
+      default:
+        return null;
     }
-  }, [notifications]);
+  };
 
   return (
-    <div className="flex flex-col gap-2">
-      <div ref={topRef} className="flex items-center justify-center gap-4">
-        <div>
-          <PageTitle title="Notifications" size="small" />
-        </div>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
+        pb: 4,
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+          py: 1,
+        }}
+      >
+        <PageTitle title="Notifications" size="small" />
         <StandardPopover
           content={`${
-            unreadOnly ? "All Notifications" : "Unread Notifications"
+            unreadOnly ? "Show All Notifications" : "Show Unread Only"
           }`}
           children={
             <IconButton size="small" onClick={() => setUnreadOnly(!unreadOnly)}>
@@ -50,76 +86,109 @@ const InboxNotification = () => {
             </IconButton>
           }
         />
-      </div>
-      <div className="flex flex-col gap-2 md:px-2 lg:px-4">
-        {loading && <PageTitle size="small" title="Loading..." />}
-        {notifications?.map((notification) => (
-          <div
-            key={
-              notification.comment
-                ? notification.comment.id
-                : notification.mention
-                  ? notification.mention.id
-                  : notification.play.id
-            }
-          >
-            {notification.mention && (
-              <InboxMention
-                mention={{
-                  team: notification.team,
-                  mention: notification.mention,
-                  play: notification.play,
-                  video: notification.video,
-                  author: notification.author,
-                }}
-              />
-            )}
-            {notification.comment && !notification.reply && (
-              <InboxComment
-                comment={{
-                  comment: notification.comment,
-                  play: notification.play,
-                  video: notification.video,
-                  author: notification.author,
-                }}
-              />
-            )}
-            {notification.reply &&
-              notification.comment_author &&
-              notification.comment && (
-                <InboxReply
-                  reply={{
-                    comment: notification.comment,
-                    reply: notification.reply,
-                    comment_author: notification.comment_author,
-                    video: notification.video,
-                    author: notification.author,
-                    play: notification.play,
-                  }}
-                />
-              )}
-          </div>
-        ))}
-        {notifications && notifications.length > 0 && !loading && (
-          <div className="mt-2 flex w-full items-center justify-center">
-            <Button
-              startIcon={<KeyboardDoubleArrowUpIcon />}
-              endIcon={<KeyboardDoubleArrowUpIcon />}
-              variant="outlined"
-              size="small"
-              onClick={scrollToTop}
+      </Box>
+
+      {notificationCount !== null && (
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: "bold", textAlign: "center" }}
+        >
+          {notificationCount} results found
+        </Typography>
+      )}
+      {notifications && (
+        <Box ref={inboxScrollableRef} sx={{}}>
+          {isLoadingInitial ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexGrow: 1,
+              }}
             >
-              Jump to Top
-            </Button>
-          </div>
-        )}
-      </div>
-      <div className="flex flex-col items-center justify-center">
-        {(!notifications || notifications.length === 0) && !loading && (
-          <EmptyMessage message="notifications" />
-        )}
-      </div>
-    </div>
+              <CircularProgress />
+            </Box>
+          ) : notifications.length === 0 ? (
+            <Box
+              sx={{ display: "flex", width: "100%", justifyContent: "center" }}
+            >
+              <EmptyMessage message="notifications" />
+            </Box>
+          ) : (
+            <InfiniteScroll
+              dataLength={notifications.length}
+              next={loadMoreNotifications}
+              hasMore={hasMoreNotifications}
+              loader={
+                isLoadingMore ? (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      my: 2,
+                    }}
+                  >
+                    <CircularProgress size={24} />
+                  </Box>
+                ) : null
+              }
+              endMessage={
+                !hasMoreNotifications &&
+                notifications.length > 0 && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: "block",
+                      textAlign: "center",
+                      color: "text.disabled",
+                      my: 2,
+                    }}
+                  >
+                    — End of notifications —
+                  </Typography>
+                )
+              }
+              scrollableTarget="inbox-scrollable-container"
+              scrollThreshold={0.9}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  px: { md: 2, lg: 4 },
+                  py: 1,
+                }}
+              >
+                {notifications.map((notification) => (
+                  <Box key={notification.source_id}>
+                    {renderNotification(notification)}
+                  </Box>
+                ))}
+              </Box>
+            </InfiniteScroll>
+          )}
+        </Box>
+      )}
+
+      {notifications && notifications.length > 0 && (
+        <Fab
+          color="primary"
+          onClick={scrollToTop}
+          size="small"
+          sx={{
+            position: "fixed",
+            bottom: "16px",
+            right: "16px",
+            zIndex: 1000,
+          }}
+          aria-label="Scroll to top"
+        >
+          <ArrowUpwardIcon />
+        </Fab>
+      )}
+    </Box>
   );
 };
 

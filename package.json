@@ -34,6 +34,7 @@
     "@trpc/server": "^10.43.6",
     "@types/nodemailer": "^6.4.15",
     "@types/youtube": "^0.0.50",
+    "date-fns": "^4.1.0",
     "next": "^14.0.3",
     "nodemailer": "^6.9.14",
     "react": "18.2.0",

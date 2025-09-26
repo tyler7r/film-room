@@ -1,112 +1,178 @@
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import { Box, Divider } from "@mui/material";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked"; // Added for read status icon
+import { Box, Divider, IconButton, Typography } from "@mui/material"; // Added useTheme
+import { formatDistanceToNowStrict } from "date-fns";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import PageTitle from "~/components/utils/page-title";
-import StandardPopover from "~/components/utils/standard-popover";
+import React from "react";
 import { useInboxContext } from "~/contexts/inbox";
-import { useIsDarkContext } from "~/pages/_app";
-import { getTimeSinceNotified } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { CommentNotificationType } from "~/utils/types";
+import { type UnifiedNotificationType } from "~/utils/types";
 
 type InboxCommentProps = {
-  comment: CommentNotificationType;
+  notification: UnifiedNotificationType;
 };
 
-const InboxComment = ({ comment }: InboxCommentProps) => {
-  const { hoverText, backgroundStyle, hoverBorder } = useIsDarkContext();
-  const { setIsOpen } = useInboxContext();
-
+// Removed styled component definition and replaced with inline Box/sx
+const InboxComment = ({ notification }: InboxCommentProps) => {
+  // Destructuring updateSingleNotificationViewStatus from context
+  const { setIsOpen, updateSingleNotificationViewStatus } = useInboxContext();
   const router = useRouter();
-  const [isUnread, setIsUnread] = useState<boolean>(true);
 
-  const fetchIfUnread = async () => {
-    const { data } = await supabase
-      .from("comments")
-      .select("viewed")
-      .eq("id", comment.comment.id)
-      .single();
-    if (data) {
-      setIsUnread(data.viewed ? false : true);
+  // ✅ FIX 1: Force the prop value to a strict boolean for reliable logic. (Copied from InboxMention)
+  const isViewedBoolean =
+    typeof notification.viewed === "string"
+      ? notification.viewed.toLowerCase() === "true"
+      : !!notification.viewed; // Fallback for standard boolean or null/undefined
+
+  // Use the strictly-typed boolean for calculations
+  const isUnread = !isViewedBoolean;
+
+  const handleUpdate = async (isViewed: boolean) => {
+    try {
+      const { data, error } = await supabase
+        .from("comments") // Target table is 'comments'
+        .update({ viewed: isViewed })
+        .eq("id", notification.source_id)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+
+      // ✅ FIX 2: Update local context state immediately (Copied from InboxMention)
+      if (data && data.length > 0) {
+        updateSingleNotificationViewStatus(
+          notification.source_id,
+          isViewed.toString(), // Pass boolean directly
+        );
+      }
+    } catch (error) {
+      console.error("Error updating comment status:", error);
     }
   };
 
-  const updateComment = async () => {
-    await supabase
-      .from("comments")
-      .update({ viewed: true })
-      .eq("id", comment.comment.id);
-    void fetchIfUnread();
-  };
-
-  const markUnread = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    await supabase
-      .from("comments")
-      .update({ viewed: false })
-      .eq("id", comment.comment.id);
-    void fetchIfUnread();
-  };
-
-  const handleClick = async () => {
-    const { comment: cmt, play } = comment;
-    if (!cmt.viewed) void updateComment();
-    void router.push(`/play/${play.id}?comment=${cmt.id}`);
+  const handleCardClick = async () => {
+    // ✅ FIX 3: Only mark as viewed (true) if it is currently UNREAD. (Copied from InboxMention)
+    if (isUnread) {
+      await handleUpdate(true);
+    }
+    // Note: The comment ID is passed as a query parameter for deep linking
+    void router.push(
+      `/play/${notification.related_play_id}?comment=${notification.source_id}`,
+    );
     setIsOpen(false);
   };
 
-  useEffect(() => {
-    void fetchIfUnread();
-  }, []);
+  const handleActorClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    void router.push(`/profile/${notification.actor_id}`);
+    setIsOpen(false);
+  };
+
+  const handleMarkAsUnread = async (e: React.MouseEvent, status: boolean) => {
+    e.stopPropagation();
+    await handleUpdate(status);
+  };
 
   return (
-    <div key={comment.play.id + comment.comment.created_at}>
-      <div className="flex items-center justify-end gap-1 text-right text-xs font-light italic leading-4">
-        {getTimeSinceNotified(comment.comment.created_at)}
-      </div>
-      <div className="flex items-center justify-center gap-1">
-        {isUnread && <FiberManualRecordIcon fontSize="small" color="primary" />}
-        {!isUnread && (
-          <StandardPopover
-            content="Mark unread"
-            children={
-              <Box
-                onClick={(e) => markUnread(e)}
-                sx={{ cursor: "pointer" }}
-                className="cursor-pointer"
-              >
-                <FiberManualRecordIcon fontSize="small" color="action" />
-              </Box>
-            }
-          />
+    <Box
+      onClick={handleCardClick}
+      sx={(t) => ({
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        gap: t.spacing(1),
+        padding: t.spacing(1),
+        // ✅ FIX 4: Apply conditional background styling (Copied from InboxMention)
+        backgroundColor: isUnread
+          ? t.palette.action.hover // Use a subtle color for unread
+          : t.palette.background.paper,
+        borderRadius: "4px",
+        border: `1px solid ${t.palette.divider}`,
+        transition: "all 0.2s ease-in-out",
+        cursor: "pointer",
+        "&:hover": {
+          borderColor: t.palette.primary.main,
+          boxShadow: t.shadows[2],
+          transform: "translateY(-2px)",
+        },
+      })}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        {/* ✅ FIX 5: Icon logic (Copied from InboxMention) */}
+        {isUnread ? (
+          // UNREAD: Filled dot
+          <IconButton
+            size="small"
+            onClick={(e) => handleMarkAsUnread(e, true)}
+            aria-label="Mark as read"
+            sx={{ p: 0 }}
+          >
+            <FiberManualRecordIcon
+              fontSize="small"
+              color="primary"
+              aria-label="Unread indicator"
+            />
+          </IconButton>
+        ) : (
+          // READ: Hollow dot/Mark as Unread button
+          <IconButton
+            size="small"
+            onClick={(e) => handleMarkAsUnread(e, false)}
+            aria-label="Mark as unread"
+            sx={{ p: 0 }}
+          >
+            <RadioButtonUncheckedIcon fontSize="small" color="action" />
+          </IconButton>
         )}
-        <div
-          onClick={() => handleClick()}
-          className={`flex w-full flex-col gap-1 ${hoverBorder}`}
-          style={backgroundStyle}
+
+        <Typography variant="caption" color="text.secondary" fontStyle="italic">
+          {formatDistanceToNowStrict(new Date(notification.created_at), {
+            addSuffix: true,
+          })}
+        </Typography>
+      </Box>
+      <Divider />
+      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, px: 0.5 }}>
+        <Typography
+          variant="body2"
+          sx={{ flex: 1, overflowWrap: "break-word" }}
         >
-          <PageTitle size="xx-small" title={comment.video.title} />
-          <Divider variant="middle" flexItem></Divider>
-          <div className="text-sm">
-            <strong
-              className={`${hoverText} tracking-tight`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(false);
-                void router.push(`/profile/${comment.comment.comment_author}`);
-              }}
-            >
-              {comment.author.name}
-            </strong>{" "}
-            commented:{" "}
-            {comment.comment.comment.length > 50
-              ? `${comment.comment.comment.slice(0, 50)}...`
-              : comment.comment.comment}
-          </div>
-        </div>
-      </div>
-    </div>
+          {/* ✅ FIX 6: Apply actor name hover style (Copied from InboxMention) */}
+          <Box
+            component="strong"
+            onClick={handleActorClick}
+            sx={(t) => ({
+              cursor: "pointer",
+              transition: "color 0.1s ease-in-out",
+              color: t.palette.text.primary,
+              "&:hover": {
+                color:
+                  t.palette.mode === "dark"
+                    ? t.palette.primary.dark
+                    : t.palette.primary.light,
+              },
+            })}
+          >
+            {notification.actor_name}
+          </Box>{" "}
+          commented on
+          <Box component="strong" sx={{ p: 0.5 }}>
+            {notification.related_play_title}
+          </Box>
+          <br />
+          <Typography variant="caption" color="text.secondary">
+            "{notification.content_preview?.slice(0, 100)}..."
+          </Typography>
+        </Typography>
+      </Box>
+    </Box>
   );
 };
 

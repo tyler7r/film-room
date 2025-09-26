@@ -128,6 +128,21 @@ export type Database = MergeDeep<
             author: UserType;
           };
         };
+        user_notifications_view: {
+          Row: {
+            notification_id: string;
+            notification_type: "comment" | "mention" | "reply";
+            source_id: string; // ID of the actual comment/mention/reply
+            created_at: string; // ISO string for sorting
+            viewed: string;
+            related_play_id: string | null;
+            related_play_title: string | null;
+            actor_id: string; // User who initiated the notification
+            actor_name: string;
+            receiver_id: string; // User who receives the notification
+            content_preview: string | null; // A short text snippet
+          };
+        };
       };
     };
   }
@@ -452,4 +467,22 @@ export type ReplyNotificationType = {
   comment_author: UserType;
   author: UserType;
   video: VideoType;
+};
+
+export type UnifiedNotificationType = {
+  notification_id: string;
+  notification_type: "comment" | "mention" | "reply";
+  source_id: string; // ID of the actual comment/mention/reply
+  created_at: string; // ISO string for sorting
+  viewed: string;
+  related_play_id: string | null;
+  related_play_title: string | null;
+  related_comment_id: string | null;
+  related_comment_title: string | null;
+  actor_id: string; // User who initiated the notification
+  actor_name: string;
+  receiver_id: string; // User who receives the notification
+  content_preview: string | null; // A short text snippet
+  exclusive_to: string | null;
+  // Add other fields relevant to displaying each notification type
 };

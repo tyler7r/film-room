@@ -10,14 +10,27 @@ import PendingTeamRequests from "./requests";
 import TeamHeader from "./team-header";
 
 const Inbox = () => {
-  const { isOpen, setIsOpen } = useInboxContext();
+  const { isOpen, setIsOpen, inboxScrollableRef } = useInboxContext();
   const { user } = useAuthContext();
   const { screenWidth, isMobile } = useMobileContext();
   const router = useRouter();
   const [hideRequests, setHideRequests] = useState<boolean>(false);
 
   return (
-    <Drawer open={isOpen} anchor="right" onClose={() => setIsOpen(false)}>
+    <Drawer
+      open={isOpen}
+      anchor="right"
+      onClose={() => setIsOpen(false)}
+      // This is the key change: apply the ref directly to the Drawer's paper component
+      PaperProps={{
+        style: {
+          width: isMobile ? screenWidth * 0.75 : screenWidth * 0.5,
+          overflowY: "auto", // Ensure the drawer itself is scrollable
+        },
+        ref: inboxScrollableRef,
+        id: "inbox-scrollable-container", // Add ID for InfiniteScroll
+      }}
+    >
       <div
         className="flex flex-col gap-2 p-2"
         style={{ width: isMobile ? screenWidth * 0.75 : screenWidth * 0.5 }}
