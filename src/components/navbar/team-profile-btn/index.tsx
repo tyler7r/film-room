@@ -1,16 +1,15 @@
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Button, Menu, MenuItem, Typography } from "@mui/material";
+import { Button, Menu, MenuItem, Typography, useTheme } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import TeamAffiliation from "~/components/teams/team-affiliation";
 import { useAuthContext } from "~/contexts/auth";
-import { useMobileContext } from "~/contexts/mobile";
 
 const TeamPageButton = () => {
   const { affiliations } = useAuthContext();
-  const { screenWidth } = useMobileContext();
   const router = useRouter();
+  const theme = useTheme(); // Added theme access for subtle separation styling
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -28,23 +27,43 @@ const TeamPageButton = () => {
       <Button
         onClick={handleClick}
         endIcon={
-          <ExpandMoreIcon fontSize={screenWidth < 750 ? "small" : "large"} />
+          // Changed icon size to "small" for a more compact look
+          <ExpandMoreIcon fontSize="small" />
         }
         sx={{
           fontWeight: "bold",
           wordSpacing: "-1px",
+          // 🎯 FIX: Reduce padding significantly for a compressed look
+          padding: theme.spacing(0.5, 1),
+          minHeight: "auto", // Allows height to shrink based on content
         }}
-        size="large"
+        // Removed size="large" to allow sx padding to control the size
       >
         Team Hub
       </Button>
-      <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
+      <Menu
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: "8px",
+              boxShadow: 3,
+              py: 0,
+            },
+          },
+        }}
+      >
         {affiliations?.map((aff) => (
           <MenuItem
             sx={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              // 🎯 FIX: Compressed menu item padding
+              p: 0,
+              minHeight: "auto",
             }}
             key={aff.affId}
           >
@@ -62,14 +81,21 @@ const TeamPageButton = () => {
             alignItems: "center",
             justifyContent: "center",
             gap: "8px",
+            // 🎯 FIX: Compressed menu item padding
+            px: 1,
+            py: 0.5,
+            minHeight: "auto",
+            // Add a subtle border to separate from the list of teams
+            borderTop: `1px solid ${theme.palette.divider}`,
+            marginTop: theme.spacing(0.5),
           }}
           onClick={() => {
             handleClose();
             void router.push(`/team-select`);
           }}
         >
-          <AddIcon />
-          <Typography variant="overline" fontWeight="bold" fontSize="small">
+          <AddIcon fontSize="small" />
+          <Typography variant="body2" fontWeight="bold">
             Join a New Team
           </Typography>
         </MenuItem>

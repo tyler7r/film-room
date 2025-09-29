@@ -75,7 +75,7 @@ const Video = ({ video, startTime }: VideoProps) => {
   const copyToClipboard = async () => {
     if (!video) return;
     const origin = window.location.origin;
-    const linkToCopy = `${origin}/${video.id}`;
+    const linkToCopy = `${origin}/film-room/${video.id}`;
     try {
       await navigator.clipboard.writeText(linkToCopy);
       setSnackbarMessage("Link copied to clipboard!");
