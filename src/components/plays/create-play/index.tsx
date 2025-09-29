@@ -956,7 +956,6 @@ const CreatePlay = ({
           sx={{
             p: 2,
             textAlign: "center",
-            maxWidth: "500px",
             width: "100%",
           }}
         >
