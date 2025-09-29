@@ -1,6 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import LinkIcon from "@mui/icons-material/Link";
 import LockIcon from "@mui/icons-material/Lock";
 import {
   Alert,
@@ -8,7 +7,6 @@ import {
   Button,
   CircularProgress,
   Fab,
-  IconButton,
   Snackbar,
   Typography,
   useTheme,
@@ -25,6 +23,8 @@ import {
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import CreatePlay from "~/components/plays/create-play";
 import Team from "~/components/teams/team";
+import PageTitle from "~/components/utils/page-title";
+import VideoActionsMenu from "~/components/videos/video-actions-menu";
 import VideoPlayIndex from "~/components/videos/video-play-index";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
@@ -187,22 +187,6 @@ const FilmRoom = () => {
     }
   }, [player, activePlay, seenActivePlay, getCurrentTime]);
 
-  const copyToClipboard = useCallback(async () => {
-    const origin = window.location.origin;
-    const linkToCopy = `${origin}${router.asPath}`;
-    try {
-      await navigator.clipboard.writeText(linkToCopy);
-      setSnackbarMessage("Link copied!");
-      setSnackbarSeverity("success");
-    } catch (err) {
-      console.error("Failed to copy link:", err);
-      setSnackbarMessage("Failed to copy link.");
-      setSnackbarSeverity("error");
-    } finally {
-      setSnackbarOpen(true);
-    }
-  }, [router.asPath]);
-
   const handleSnackbarClose = useCallback(
     (_event?: SyntheticEvent | Event, reason?: string) => {
       if (reason === "clickaway") {
@@ -229,6 +213,23 @@ const FilmRoom = () => {
   const handlePlayDeleted = useCallback(() => {
     setRefreshPlaysKey((prev) => prev + 1);
   }, []);
+
+  const copyToClipboard = async () => {
+    if (!video) return;
+    const origin = window.location.origin;
+    const linkToCopy = `${origin}/film-room/${video.id}`;
+    try {
+      await navigator.clipboard.writeText(linkToCopy);
+      setSnackbarMessage("Link copied to clipboard!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (err) {
+      console.error("Failed to copy link: ", err);
+      setSnackbarMessage("Failed to copy link. Please try again.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
 
   useEffect(() => {
     if (router.query.video) {
@@ -332,19 +333,9 @@ const FilmRoom = () => {
                   ? video.tournament.toLocaleUpperCase()
                   : null}
             </Typography>
-            <IconButton
-              onClick={copyToClipboard}
-              size="small"
-              aria-label="copy-video-link"
-            >
-              <LinkIcon fontSize="small" />
-            </IconButton>
+            <VideoActionsMenu video={video} onCopyLink={copyToClipboard} />
           </Box>
-          <Typography variant="h4" component="h1" fontWeight="bold">
-            {" "}
-            {/* Changed to h4 for semantic importance */}
-            {video.title}
-          </Typography>
+          <PageTitle title={video.title} size="small" />
           <Box
             sx={{
               display: "flex",
@@ -453,6 +444,7 @@ const FilmRoom = () => {
                   setIsNewPlayOpen={setIsNewPlayOpen}
                   scrollToPlayer={scrollToPlayer}
                   onPlayCreated={handlePlayCreated}
+                  setActivePlay={setActivePlay}
                 />
               ) : (
                 <Fab
