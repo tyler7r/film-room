@@ -69,7 +69,6 @@ const ModalSkeleton: React.FC<ModalSkeletonProps> = ({
       open={isOpen}
       onClose={handleClose} // Default close action is Discard
       fullWidth
-      maxWidth="sm"
       aria-labelledby="modal-title"
       sx={{
         "& .MuiBackdrop-root": { backdropFilter: "blur(3px)" },
