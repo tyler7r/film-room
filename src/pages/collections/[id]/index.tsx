@@ -214,7 +214,7 @@ const Collection = () => {
                 sx={{
                   whiteSpace: "normal",
                   lineHeight: 1.5,
-                  textAlign: "left",
+                  textAlign: isMobile ? "center" : "left",
                 }}
               />
             </Box>
