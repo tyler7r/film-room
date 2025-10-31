@@ -52,6 +52,7 @@ export const IsAuth = ({ children }: AuthProps) => {
   const [affIds, setAffIds] = useState<string[] | null>(null);
   const [affReload, setAffReload] = useState<boolean>(false);
 
+  // NOTE: This function is safe because it only runs when explicitly called.
   const fetchAffiliations = async (profileId?: string) => {
     if (profileId) {
       const { data } = await supabase
@@ -90,6 +91,7 @@ export const IsAuth = ({ children }: AuthProps) => {
             email: session.user.email,
             name: session.user.user_metadata.name as string,
           });
+          // ✅ Data fetch triggered ONLY on successful sign-in
           void fetchAffiliations(session.user.id);
         } else {
           setUser({
@@ -108,6 +110,7 @@ export const IsAuth = ({ children }: AuthProps) => {
     };
   }, []);
 
+  // Your Realtime listener block (commented out, but safe)
   // useEffect(() => {
   //   const channel = supabase
   //     .channel("affiliation_changes")
@@ -115,6 +118,8 @@ export const IsAuth = ({ children }: AuthProps) => {
   //       "postgres_changes",
   //       { event: "*", schema: "public", table: "affiliations" },
   //       () => {
+  //         // This is a safe place to call fetchAffiliations as it is only
+  //         // triggered by the Realtime socket, not by renders.
   //         void fetchAffiliations(user.userId);
   //       },
   //     )
@@ -125,15 +130,18 @@ export const IsAuth = ({ children }: AuthProps) => {
   //   };
   // }, []);
 
-  useEffect(() => {
-    void fetchAffiliations(user.userId);
-  }, [user.userId]);
+  // ❌ REMOVED: THE LIKELY CULPRIT!
+  // useEffect(() => {
+  //   void fetchAffiliations(user.userId);
+  // }, [user.userId]);
 
+  // ✅ This remains the intended way to manually refresh data
   useEffect(() => {
     if (affReload) {
       void fetchAffiliations(user.userId);
       setAffReload(false);
-    } else return;
+    }
+    // The 'else return' is redundant and has been removed for clarity
   }, [affReload]);
 
   return (
@@ -149,6 +157,10 @@ export const IsAuth = ({ children }: AuthProps) => {
         setAffReload,
       }}
     >
+      {/* NOTE: This condition {affIds && children} causes a re-render 
+        when affIds changes, but since we removed the looping useEffect,
+        it should now be safe.
+      */}
       {affIds && children}
     </isAuthContext.Provider>
   );
