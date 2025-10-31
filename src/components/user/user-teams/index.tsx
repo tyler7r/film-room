@@ -29,21 +29,7 @@ const UserAffiliationsChip = ({ user }: UserAffiliationsChipProps) => {
   >(null);
   const [showTeamsDialog, setShowTeamsDialog] = useState<boolean>(false);
 
-  const fetchUserTeams = async () => {
-    const { data } = await supabase.from("user_view").select("*").match({
-      "profile->>id": user.id,
-      "affiliation->>verified": true,
-    });
-    if (data && data.length > 0) {
-      const formattedAffs: TeamAffiliationType[] = data.map((data) => ({
-        team: data.team,
-        affId: data.affiliation.id,
-        number: data.affiliation.number,
-        role: data.affiliation.role,
-      }));
-      setUserAffiliations(formattedAffs);
-    } else setUserAffiliations(null);
-  };
+  // ❌ REMOVED: The previous definition of fetchUserTeams was here.
 
   const handleTeamChipClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent any parent click handlers
@@ -62,8 +48,27 @@ const UserAffiliationsChip = ({ user }: UserAffiliationsChipProps) => {
   };
 
   useEffect(() => {
+    // ✅ Data fetching function defined INSIDE useEffect
+    const fetchUserTeams = async () => {
+      const { data } = await supabase.from("user_view").select("*").match({
+        "profile->>id": user.id, // Accesses user.id directly
+        "affiliation->>verified": true,
+      });
+      if (data && data.length > 0) {
+        const formattedAffs: TeamAffiliationType[] = data.map((data) => ({
+          team: data.team,
+          affId: data.affiliation.id,
+          number: data.affiliation.number,
+          role: data.affiliation.role,
+        }));
+        setUserAffiliations(formattedAffs);
+      } else setUserAffiliations(null);
+    };
+
     void fetchUserTeams();
-  }, [fetchUserTeams]);
+    // ✅ Dependency array is now [user.id]. The effect only re-runs if the user prop changes,
+    // NOT on every render caused by setUserAffiliations.
+  }, [user.id]);
 
   if (!userAffiliations || userAffiliations.length === 0) {
     return null; // Don't render anything if no affiliations
