@@ -113,42 +113,44 @@ const CreateTeam = () => {
     e.preventDefault();
     setIsValidForm(false);
 
-    const { data, error } = await supabase
-      .from("teams")
-      .insert({
-        id: details.id,
-        name: details.name,
-        city: details.city,
-        division: details.division,
-        logo: pubURL,
-        owner: user.userId,
-        full_name: `${details.city} ${details.name}`,
-      })
-      .select()
-      .single();
-    if (data) {
-      await supabase
-        .from("affiliations")
+    if (user.userId) {
+      const { data, error } = await supabase
+        .from("teams")
         .insert({
-          team_id: details.id,
-          user_id: `${user.userId}`,
-          verified: true,
-          role: details.role,
-          number: details.role === "coach" ? null : details.num,
+          id: details.id,
+          name: details.name,
+          city: details.city,
+          division: details.division,
+          logo: pubURL,
+          owner: user.userId,
+          full_name: `${details.city} ${details.name}`,
         })
         .select()
         .single();
-      setMessage({ text: "Team successfully created!", status: "success" });
-      setTimeout(() => {
-        void router.push("/");
-        setAffReload(true);
-      }, 500);
-    } else {
-      setMessage({
-        text: `There was a problem creating the team account: "${error.message}"`,
-        status: "error",
-      });
-      setIsValidForm(true);
+      if (data) {
+        await supabase
+          .from("affiliations")
+          .insert({
+            team_id: details.id,
+            user_id: `${user.userId}`,
+            verified: true,
+            role: details.role,
+            number: details.role === "coach" ? null : details.num,
+          })
+          .select()
+          .single();
+        setMessage({ text: "Team successfully created!", status: "success" });
+        setTimeout(() => {
+          void router.push("/");
+          setAffReload(true);
+        }, 500);
+      } else {
+        setMessage({
+          text: `There was a problem creating the team account: "${error.message}"`,
+          status: "error",
+        });
+        setIsValidForm(true);
+      }
     }
   };
 
