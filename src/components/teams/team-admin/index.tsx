@@ -1,20 +1,20 @@
 // components/teams/team-admin/index.tsx
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import { useCallback, useState } from "react"; // Add useState and useCallback
+import { useCallback, useState } from "react";
 import Requests from "~/components/requests";
 import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type { TeamType } from "~/utils/types";
-import TransferTeamOwnershipModal from "../transfer-team-ownership"; // Adjust import path as needed
+import TransferTeamOwnershipModal from "../transfer-team-ownership";
 
 type TeamAdminProps = {
   team: TeamType;
   role: string;
   requestCount: number;
   setRequestCount: (count: number) => void;
-  setRole: (role: string) => void; // Prop to update role in TeamHub after ownership transfer
+  setRole: (role: string) => void; // Prop to update role after ownership transfer
 };
 
 const TeamAdmin = ({
@@ -61,11 +61,11 @@ const TeamAdmin = ({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: { xs: 2, md: 4 }, // Spacing between sections
+        gap: { xs: 2, md: 4 },
         width: "100%",
-        maxWidth: "800px", // Optional: limit width for better readability on large screens
-        mx: "auto", // Center the content
-        p: { xs: 1, md: 2 }, // Padding inside the admin section
+        maxWidth: "800px",
+        mx: "auto",
+        p: { xs: 1, md: 2 },
       }}
     >
       {/* Join Requests Section */}
@@ -95,7 +95,7 @@ const TeamAdmin = ({
             flexDirection: "column",
             alignItems: "center",
             gap: 2,
-            mt: { xs: 2, md: 4 }, // Margin top to separate from requests
+            mt: { xs: 2, md: 4 },
           }}
         >
           {/* Coach/Owner actions */}
@@ -169,7 +169,7 @@ const TeamAdmin = ({
               setIsOpen={openTransferTeamModal}
               team={team}
               isOpen={isTransferOwnerModalOpen}
-              setRole={setRole} // Pass setRole to update TeamHub's role state
+              setRole={setRole}
             />
           )}
         </Box>
