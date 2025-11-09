@@ -165,7 +165,7 @@ export type TeamAffiliationType = {
     division: string;
     logo: string | null;
     full_name: string;
-    owner: string | null;
+    owner: string;
   };
   affId: string;
   role: string;
