@@ -253,7 +253,7 @@ const EditPlay = ({
     });
     const alreadyEmailed = initialMentions.find((v) => v.id === mention.id);
     if (
-      mention.email !== user.email &&
+      // mention.email !== user.email &&
       mention.send_notifications &&
       !alreadyEmailed
     ) {

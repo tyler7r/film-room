@@ -159,8 +159,6 @@ export const TheInbox = ({ children }: InboxProps) => {
           return;
         }
 
-        console.log("run", data);
-
         if (data) {
           setNotifications((prevNotifs) =>
             append ? [...prevNotifs, ...data] : data,

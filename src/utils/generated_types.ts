@@ -509,6 +509,7 @@ export type Database = {
           email: string | null
           id: string
           join_date: string
+          last_notified: string
           last_watched: string | null
           last_watched_time: number | null
           name: string
@@ -518,6 +519,7 @@ export type Database = {
           email?: string | null
           id: string
           join_date?: string
+          last_notified?: string
           last_watched?: string | null
           last_watched_time?: number | null
           name?: string
@@ -527,6 +529,7 @@ export type Database = {
           email?: string | null
           id?: string
           join_date?: string
+          last_notified?: string
           last_watched?: string | null
           last_watched_time?: number | null
           name?: string
@@ -676,7 +679,7 @@ export type Database = {
           id: string
           logo: string | null
           name: string
-          owner: string | null
+          owner: string
         }
         Insert: {
           city: string
@@ -685,7 +688,7 @@ export type Database = {
           id?: string
           logo?: string | null
           name: string
-          owner?: string | null
+          owner: string
         }
         Update: {
           city?: string
@@ -694,7 +697,7 @@ export type Database = {
           id?: string
           logo?: string | null
           name?: string
-          owner?: string | null
+          owner?: string
         }
         Relationships: [
           {

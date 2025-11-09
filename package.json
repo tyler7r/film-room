@@ -14,6 +14,7 @@
     "gen-types": "npx supabase gen types --lang=typescript --project-id tqyavwqbewvvgoizsipl --schema public > ./src/utils/generated_types.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.922.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fontsource/lexend": "^5.0.20",

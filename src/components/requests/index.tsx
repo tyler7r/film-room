@@ -1,6 +1,4 @@
-// components/requests/index.tsx (UPDATED)
-
-import { Box, Button, Typography } from "@mui/material"; // Import Box and Typography for MUI styling
+import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
@@ -11,6 +9,49 @@ type RequestsProps = {
   team: TeamType;
   setRequestCount: (count: number) => void;
 };
+
+// --- HELPER FUNCTION TO SEND DECISION EMAIL ---
+const sendDecisionEmail = async (
+  team: TeamType,
+  player: PlayerType,
+  isAccepted: boolean,
+) => {
+  const type = isAccepted ? "acceptance" : "rejection";
+  const subject = isAccepted
+    ? `✅ Request Accepted for ${team.full_name}`
+    : `❌ Request Rejected for ${team.full_name}`;
+
+  try {
+    const response = await fetch("/api/team-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: type,
+        title: subject,
+        team: {
+          id: team.id,
+          full_name: team.full_name,
+        },
+        player: {
+          id: player.profile.id,
+          name: player.profile.name,
+        },
+        recipient: {
+          id: player.profile.id,
+          email: player.profile.email,
+        },
+      }),
+    });
+    if (!response.ok) {
+      console.error("Team decision email API failed:", await response.json());
+    }
+  } catch (error) {
+    console.error("Failed to send team decision email:", error);
+  }
+};
+// --- END HELPER FUNCTION ---
 
 const Requests = ({ team, setRequestCount }: RequestsProps) => {
   const { setAffReload } = useAuthContext();
@@ -35,79 +76,81 @@ const Requests = ({ team, setRequestCount }: RequestsProps) => {
     }
   };
 
-  const handleAccept = async (id: string) => {
+  const handleAccept = async (req: PlayerType) => {
     const { data, error } = await supabase
       .from("affiliations")
       .update({
         verified: true,
       })
-      .eq("id", id)
+      .eq("id", req.affiliation.id)
       .select();
+
     if (error) {
       console.error("Error accepting request:", error.message);
-      // Handle error (e.g., show a toast message)
       return;
     }
+
     if (data) {
-      void fetchRequests(); // Re-fetch requests after update
-      setAffReload(true); // Trigger affiliation reload
+      // 1. Send acceptance notification to the player
+      void sendDecisionEmail(team, req, true);
+
+      // 2. Re-fetch and trigger reload
+      void fetchRequests();
+      setAffReload(true);
     }
   };
 
-  const handleReject = async (id: string) => {
-    const { error } = await supabase.from("affiliations").delete().eq("id", id);
+  const handleReject = async (req: PlayerType) => {
+    const { error } = await supabase
+      .from("affiliations")
+      .delete()
+      .eq("id", req.affiliation.id);
+
     if (error) {
       console.error("Error rejecting request:", error.message);
-      // Handle error
       return;
     }
-    void fetchRequests(); // Re-fetch requests after deletion
-    setAffReload(true); // Trigger affiliation reload
+
+    // 1. Send rejection notification to the player
+    void sendDecisionEmail(team, req, false);
+
+    // 2. Re-fetch and trigger reload
+    void fetchRequests();
+    setAffReload(true);
   };
 
   useEffect(() => {
-    void fetchRequests(); // Initial fetch when component mounts
-    // Consider adding a realtime listener here if requests can change externally frequently
-  }, [team.id]); // Add team.id as a dependency to refetch if team changes
+    void fetchRequests();
+  }, [team.id]);
 
-  // Always render the content, as visibility is now controlled by TeamAdmin
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        width: "100%", // Take full width of parent
-        alignItems: "center", // Center items
-        p: { xs: 1, sm: 2 }, // Add some padding
+        width: "100%",
+        alignItems: "center",
+        p: { xs: 1, sm: 2 },
         borderRadius: "8px",
-        // Removed fixed backgroundStyle for better theming with MUI Box
-        // If specific background is needed, use bgcolor prop
-        bgcolor: "background.paper", // Example background color
-        boxShadow: 1, // Example shadow
+        bgcolor: "background.paper",
+        boxShadow: 1,
       }}
     >
-      {/* PageTitle is now handled by the TeamAdmin component itself,
-          or it can be kept here if each section needs its own sub-title within TeamAdmin.
-          For consistency with TeamAdmin's `PageTitle` for "Join Requests", I'll remove it here.
-      */}
-      {/* <PageTitle title="Join Requests" size="small" /> */}
-
       {!requests && <EmptyMessage message="requests" />}
       {requests?.map((req) => (
         <Box
           key={req.affiliation.id}
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" }, // Stack on mobile, row on desktop
+            flexDirection: { xs: "column", sm: "row" },
             alignItems: "center",
             justifyContent: { xs: "center", sm: "space-between" },
-            gap: { xs: 1, sm: 2 }, // Responsive gap
+            gap: { xs: 1, sm: 2 },
             width: "100%",
             p: { xs: 2, sm: 1 },
             borderRadius: "4px",
-            // Use MUI theme colors/props instead of `backgroundStyle`
-            bgcolor: "action.hover", // Light background for each request item
+            bgcolor: "action.hover",
           }}
         >
           <Box
@@ -117,7 +160,7 @@ const Requests = ({ team, setRequestCount }: RequestsProps) => {
               alignItems: { xs: "center", sm: "flex-start" },
               justifyContent: "center",
               textAlign: { xs: "center", sm: "left" },
-              flexGrow: 1, // Allow text content to grow
+              flexGrow: 1,
             }}
           >
             <Typography
@@ -136,14 +179,14 @@ const Requests = ({ team, setRequestCount }: RequestsProps) => {
           <Box
             sx={{
               display: "flex",
-              gap: 1, // Gap between buttons
-              flexShrink: 0, // Prevent buttons from shrinking
+              gap: 1,
+              flexShrink: 0,
             }}
           >
             <Button
-              variant="outlined" // Outlined for less prominence than contained
+              variant="outlined"
               color="success"
-              onClick={() => handleAccept(req.affiliation.id)}
+              onClick={() => handleAccept(req)}
               size="small"
             >
               Accept
@@ -151,7 +194,7 @@ const Requests = ({ team, setRequestCount }: RequestsProps) => {
             <Button
               variant="outlined"
               color="error"
-              onClick={() => handleReject(req.affiliation.id)}
+              onClick={() => handleReject(req)}
               size="small"
             >
               Reject
