@@ -13,7 +13,6 @@ import { supabase } from "~/utils/supabase";
 import { type MessageType } from "~/utils/types";
 
 type DetailsType = {
-  name: string;
   password: string;
   confirmPwd: string;
 };
@@ -28,7 +27,6 @@ const SignupDetails = () => {
     text: undefined,
   });
   const [data, setData] = useState<DetailsType>({
-    name: "",
     password: "",
     confirmPwd: "",
   });
@@ -42,39 +40,6 @@ const SignupDetails = () => {
       ...data,
       [name]: value,
     });
-  };
-
-  const updateUserData = async () => {
-    const { error } = await supabase.auth.updateUser({
-      data: {
-        name: `${data.name}`,
-      },
-    });
-    if (error) {
-      setMessage({
-        text: `There was an error updating your user data. ${error.message}`,
-        status: "error",
-      });
-      setIsValidForm(true);
-      return false;
-    } else return true;
-  };
-
-  const updateUserName = async () => {
-    if (user.userId) {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ name: data.name })
-        .eq("id", user.userId);
-      if (error) {
-        setMessage({
-          status: "error",
-          text: `There was a problem adding your details. ${error.message}`,
-        });
-        setIsValidForm(true);
-        return false;
-      } else return true;
-    } else return false;
   };
 
   const updatePassword = async () => {
@@ -100,14 +65,12 @@ const SignupDetails = () => {
       return;
     }
 
-    const ensureUpdate = await updateUserData();
-    const checkValidName = await updateUserName();
     const checkValidPassword = await updatePassword();
 
-    if (ensureUpdate && checkValidName && checkValidPassword) {
+    if (checkValidPassword) {
       setMessage({
         status: "success",
-        text: "Successfully updated your profile!",
+        text: "Successfully updated your password!",
       });
       setTimeout(() => {
         void router.push("/team-select");
@@ -116,12 +79,10 @@ const SignupDetails = () => {
   };
 
   useEffect(() => {
-    const { name, password, confirmPwd } = data;
+    const { password, confirmPwd } = data;
     const pwdMatch = validatePwdMatch(password, confirmPwd);
 
-    if (name === "") {
-      setIsValidForm(false);
-    } else if (password === "" || password.length < 8) {
+    if (password === "" || password.length < 8) {
       setIsValidForm(false);
     } else if (!pwdMatch) {
       setMessage({
@@ -142,18 +103,6 @@ const SignupDetails = () => {
         onSubmit={handleSubmit}
         className="flex w-4/5 max-w-screen-md flex-col items-center justify-center gap-6 text-center"
       >
-        <TextField
-          className="w-full md:w-4/5 lg:w-3/5"
-          name="name"
-          autoComplete="full-name"
-          required
-          id="full-name"
-          label="Name"
-          type="text"
-          autoFocus
-          onChange={handleInput}
-          value={data.name}
-        />
         <TextField
           className="w-full md:w-4/5 lg:w-3/5"
           name="password"

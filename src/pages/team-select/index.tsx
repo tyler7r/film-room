@@ -1,6 +1,6 @@
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import SendIcon from "@mui/icons-material/Send";
-import { Autocomplete, Button, Checkbox, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, Checkbox, TextField } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState, type SyntheticEvent } from "react";
 import TeamLogo from "~/components/teams/team-logo";
@@ -22,7 +22,7 @@ const sendRequestEmail = async (team: TeamType, requesterName: string) => {
   // 1. Fetch the team owner's profile
   const { data: ownerProfile, error: ownerError } = await supabase
     .from("profiles")
-    .select("id, email")
+    .select("id, email, name")
     .eq("id", team.owner)
     .single();
 
@@ -81,8 +81,6 @@ const TeamSelect = () => {
     status: "error",
   });
 
-  // (handleChange, fetchTeams, useEffects omitted for brevity - no changes here)
-
   const handleChange = (
     event: SyntheticEvent<Element, Event>,
     newValue: TeamType[],
@@ -103,21 +101,30 @@ const TeamSelect = () => {
     } else if (newValue.length === 0) {
       setTeamSelect(null);
     } else {
-      const tms: TeamSelectType[] = newValue.map((tm) => ({
-        team: tm,
-        isCoach: false,
-        num: null,
-      }));
+      // Handles removal of items
+      const tms: TeamSelectType[] = newValue.map((tm) => {
+        // Find existing state to preserve isCoach/num if possible
+        const existing = teamSelect?.find(
+          (selected) => selected.team.id === tm.id,
+        );
+        return existing ?? { team: tm, isCoach: false, num: null };
+      });
       setTeamSelect(tms);
     }
   };
 
   const fetchTeams = async () => {
-    const teams = supabase.from("teams").select();
+    // Fetch all teams
+    const teamsQuery = supabase.from("teams").select();
+
+    // Filter out teams the user is already affiliated with
     if (affIds && affIds.length > 0) {
-      void teams.not("id", "in", `(${affIds})`);
+      // Supabase supports not equal to array value 'not'('id', 'in', '(id1, id2, ...)')
+      // Since affIds is a string array, we join them for the 'in' clause.
+      void teamsQuery.not("id", "in", `(${affIds.join(",")})`);
     }
-    const { data } = await teams;
+
+    const { data } = await teamsQuery;
     if (data && data.length > 0) setTeams(data as TeamType[]);
     else setTeams(null);
   };
@@ -144,9 +151,9 @@ const TeamSelect = () => {
           status: "success",
         });
 
-        // --- NEW: Notify the team owner ---
+        // --- Notify the team owner ---
         void sendRequestEmail(team, user.name ?? user.email!);
-        // ---------------------------------
+        // -----------------------------
       }
       if (error)
         setMessage({
@@ -159,37 +166,43 @@ const TeamSelect = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (teamSelect && teamSelect.length > 0) {
-      teamSelect?.forEach((tm) => {
-        void handleNewAffiliation(
-          tm.team, // Pass the full team object
-          tm.isCoach,
-          tm.num,
-        );
-      });
+      // Process all selected teams concurrently
+      await Promise.all(
+        teamSelect.map((tm) =>
+          handleNewAffiliation(tm.team, tm.isCoach, tm.num),
+        ),
+      );
     }
+    // Redirect after a short delay to allow the message to show
     setTimeout(() => {
       void router.push("/");
-      setAffReload(true);
-    }, 2000);
+      setAffReload(true); // Trigger a reload of affiliations on the next page
+    }, 1000);
   };
 
   useEffect(() => {
     void fetchTeams();
-  }, []);
+    // Only run once on mount, or when affIds change (to update available teams)
+  }, [affIds]);
 
   useEffect(() => {
-    if (!user.userId) void router.push("/login");
+    if (!user.userId) {
+      // Redirect if user somehow lands here without a userId
+      void router.push("/login");
+    }
   }, [user.userId]);
 
   return (
-    <div className="mt-10 flex w-full flex-col items-center justify-center gap-2 p-4">
+    // Replaced outer div with Box
+    <Box className="mt-10 flex w-full flex-col items-center justify-center gap-2 p-4">
       <PageTitle size="large" title="Team Select" />
       {teams && (
         <form
           onSubmit={handleSubmit}
           className="flex w-full flex-col items-center justify-center gap-6 p-4"
         >
-          <div className="flex w-full flex-col items-center justify-center gap-4">
+          {/* Autocomplete Section */}
+          <Box className="flex w-full flex-col items-center justify-center gap-4">
             <Autocomplete
               className="w-4/5"
               id="teams"
@@ -204,27 +217,36 @@ const TeamSelect = () => {
                 <TextField
                   {...params}
                   label="Teams"
-                  placeholder="Teams..."
+                  placeholder="Select teams to join..."
                   id="teams"
                   name="teams"
                 />
               )}
               limitTags={3}
+              // Set value to currently selected TeamType objects based on teamSelect
+              value={teamSelect ? teamSelect.map((ts) => ts.team) : []}
             />
-          </div>
+          </Box>
+
+          {/* Role/Number Select Section */}
           {teamSelect && (
-            <div className="flex w-4/5 flex-col items-center justify-center gap-4 md:w-3/5 lg:w-1/2">
-              <PageTitle title="Adjust Your Team Roles" size="small" />
-              {teamSelect.map((team) => (
-                <div
+            <Box
+              className="flex w-4/5 flex-col items-center justify-center gap-4 rounded-xl p-6 shadow-xl md:w-3/5 lg:w-1/2"
+              style={backgroundStyle}
+            >
+              <PageTitle title="Adjust Your Roles" size="small" />
+              {teamSelect.map((team, index) => (
+                <Box
                   key={team.team.id}
-                  className="flex flex-col items-center justify-center gap-4 rounded-md p-4"
-                  style={backgroundStyle}
+                  className="flex w-full flex-col items-center justify-center gap-4 rounded-md border-2 p-4"
+                  style={{ borderColor: backgroundStyle.backgroundColor }}
                 >
-                  <div className="flex items-center justify-center gap-4">
+                  <Box className="flex w-full items-center justify-between gap-4">
                     <TeamLogo tm={team.team} size={35} />
                     <PageTitle size="x-small" title={team.team.full_name} />
-                    <div className="flex flex-col items-center justify-center">
+
+                    {/* Coach Checkbox */}
+                    <Box className="flex flex-col items-center justify-center">
                       <div className="-mb-2 text-sm font-bold tracking-tight">
                         COACH?
                       </div>
@@ -232,94 +254,105 @@ const TeamSelect = () => {
                         value={team.isCoach}
                         onChange={() => {
                           const copy = [...teamSelect];
-                          const find = copy.findIndex(
-                            (val) => val.team.id === team.team.id,
-                          );
-                          const tm = copy[find];
+                          const tm = copy[index];
                           if (tm) tm.isCoach = !tm.isCoach;
                           setTeamSelect(copy);
                         }}
                         checked={team.isCoach}
                         className="w-full text-start"
-                        id="user-role"
+                        id={`user-role-${team.team.id}`}
                         name="role"
                         size="small"
                       />
-                    </div>
-                  </div>
+                    </Box>
+                  </Box>
+
+                  {/* Player Number Input */}
                   {!team.isCoach && (
                     <TextField
                       size="small"
                       name="num"
                       autoComplete="num"
-                      id="num"
+                      id={`num-${team.team.id}`}
                       label="Player Number"
                       type="number"
+                      // Ensure value is controlled; default to empty string if null
                       value={team.num ?? ""}
                       onChange={(e) => {
                         const { value } = e.target;
                         const copy = [...teamSelect];
-                        const find = copy.findIndex(
-                          (val) => val.team.id === team.team.id,
-                        );
-                        const tm = copy[find];
+                        const tm = copy[index];
                         if (tm) tm.num = value === "" ? null : Number(value);
                         setTeamSelect(copy);
                       }}
+                      className="w-full max-w-xs"
+                      inputProps={{ min: 0 }}
                     />
                   )}
-                </div>
+                </Box>
               ))}
-            </div>
+            </Box>
           )}
+
+          {/* Form Status Message */}
           <FormMessage message={message} />
-          {teamSelect ? (
+
+          {/* Submit/Continue Button */}
+          {teamSelect && teamSelect.length > 0 ? (
             <Button
               type="submit"
               variant="contained"
               endIcon={<SendIcon fontSize="small" />}
+              color="primary"
             >
-              Send Join Requests
+              Send Join Requests ({teamSelect.length})
             </Button>
           ) : (
             <Button
               type="submit"
               variant="contained"
               endIcon={<KeyboardDoubleArrowRightIcon fontSize="small" />}
+              color="primary"
             >
               Continue w/ no affiliations
             </Button>
           )}
         </form>
       )}
+
+      {/* No Teams Available Section */}
       {!teams && (
-        <div className="flex flex-col items-center justify-center gap-4">
-          <div className={`text-2xl font-bold`}>
-            {affIds
-              ? "You have joined all active team accounts."
-              : `No teams in the database!`}
+        <Box className="flex flex-col items-center justify-center gap-4 p-4">
+          <div className={`text-center text-2xl font-bold`}>
+            {/* Check if affIds is null/undefined or an empty array */}
+            {affIds && affIds.length > 0
+              ? "You are affiliated with all active teams."
+              : `No teams are currently in the database!`}
           </div>
           <Button
             onClick={() => void router.push("/")}
             variant="contained"
             endIcon={<KeyboardDoubleArrowRightIcon fontSize="small" />}
+            color="secondary"
           >
-            {affIds ? "Continue" : "Continue w/ no affiliations"}
+            Go to Home
           </Button>
-        </div>
+        </Box>
       )}
-      <div className="items-center justify-center text-xl">
+
+      {/* Create Team Link */}
+      <Box className="items-center justify-center pt-4 text-xl">
         <div className="text-center">
           Don't see your team?{" "}
           <strong
             onClick={() => void router.push("/create-team")}
-            className={`${hoverText} tracking-tight`}
+            className={`${hoverText} cursor-pointer tracking-tight`}
           >
             Create It!
           </strong>
         </div>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

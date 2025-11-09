@@ -3,7 +3,7 @@ import { useState } from "react";
 import DeleteMenu from "~/components/utils/delete-menu";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { getTimeSinceNotified } from "~/utils/helpers";
+import { getDisplayName, getTimeSinceNotified } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { CommentNotificationType } from "~/utils/types";
 import LikeBtn from "../../likes/like-btn";
@@ -44,7 +44,7 @@ const Comment = ({ cmt, autoOpen, refetchComments }: CommentProps) => {
               <div
                 className={`${hoverText} text-sm font-bold tracking-tight`}
                 onClick={() => handleAuthorClick(comment.comment_author)}
-              >{`${cmt.author.name} `}</div>
+              >{`${getDisplayName(cmt.author)} `}</div>
               <div className="text-xs font-light">
                 {getTimeSinceNotified(comment.created_at)}
               </div>
