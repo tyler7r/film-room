@@ -169,7 +169,7 @@ const LikedUsersModal = ({
                 <ListItemText
                   primary={
                     <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                      {user.name}
+                      {getDisplayName(user)}
                     </Typography>
                   }
                 />

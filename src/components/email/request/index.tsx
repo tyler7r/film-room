@@ -32,7 +32,7 @@ const RequestNotificationEmail = ({
       <Tailwind>
         <Body className="bg-white font-sans">
           <Container className="mx-auto my-[40px] rounded border border-solid border-[#eaeaea] p-[20px]">
-            <Heading className="text-[24px] font-normal text-black">
+            <Heading className="text-[18px] font-bold text-black">
               New Join Request{isBatched ? "s" : ""}
             </Heading>
             <Text className="text-[14px] leading-[24px] text-black">

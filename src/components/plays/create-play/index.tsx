@@ -87,7 +87,6 @@ const ModalSkeleton: React.FC<ModalSkeletonProps> = ({
           alignItems: "center",
           p: 2,
           borderBottom: "1px solid #e0eeef",
-          backgroundColor: "#f7f9fa",
         }}
       >
         <Typography variant="h6" component="div" sx={{ fontWeight: "600" }}>
@@ -99,6 +98,7 @@ const ModalSkeleton: React.FC<ModalSkeletonProps> = ({
             alignItems: "center",
             gap: 1,
             justifyContent: "center",
+            // backgroundColor: `${isDark ? colors.grey[800] : colors.grey[100]}`,
           }}
         >
           {/* Minimize Button: Saves as Draft */}
@@ -468,12 +468,15 @@ const CreatePlay = ({
       if (typeof checkStart !== "number" || typeof checkEnd !== "number")
         return [];
 
+      const paddedStart = checkStart.toString().padStart(6, "0");
+      const paddedEnd = checkEnd.toString().padStart(6, "0");
+
       const { data } = await supabase
         .from("play_preview")
         .select("*")
         .eq("video->>id", video.id)
-        .lt("play->>start_time", checkEnd) // Existing play starts before new play ends
-        .gt("play->>end_time", checkStart); // Existing play ends after new play starts
+        .lt("play->>start_time_sort", paddedEnd) // Existing play starts before new play ends
+        .gt("play->>end_time_sort", paddedStart); // Existing play ends after new play starts
 
       return data ?? [];
     },

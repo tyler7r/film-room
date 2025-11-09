@@ -85,11 +85,14 @@ export const IsAuth = ({ children }: AuthProps) => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event: string, session) => {
         if (event !== "SIGNED_OUT" && session) {
+          console.log(session.user);
           setUser({
             isLoggedIn: true,
             userId: session.user.id,
             email: session.user.email,
-            name: session.user.user_metadata.name as string,
+            name:
+              (session.user.user_metadata.full_name as string) ||
+              (session.user.user_metadata.name as string),
           });
           // ✅ Data fetch triggered ONLY on successful sign-in
           void fetchAffiliations(session.user.id);

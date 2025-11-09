@@ -3,7 +3,7 @@ import { useState } from "react";
 import DeleteMenu from "~/components/utils/delete-menu";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { getTimeSinceNotified } from "~/utils/helpers";
+import { getDisplayName, getTimeSinceNotified } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { ReplyNotificationType } from "~/utils/types";
 import LikeBtn from "../../likes/like-btn";
@@ -42,7 +42,7 @@ const Reply = ({ reply, setReload }: ReplyProps) => {
             <div
               className={`${hoverText} text-sm font-bold tracking-tight`}
               onClick={() => handleAuthorClick(reply.author.id)}
-            >{`${reply.author.name} `}</div>
+            >{`${getDisplayName(reply.author)} `}</div>
             <div className="text-xs font-light">
               {getTimeSinceNotified(rep.created_at)}
             </div>
