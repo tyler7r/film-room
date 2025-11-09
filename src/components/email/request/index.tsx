@@ -55,7 +55,7 @@ const RequestNotificationEmail = ({
             <Section className="my-[30px] text-center">
               <Button
                 className="rounded bg-[#000000] p-2 text-center text-[12px] font-semibold text-white no-underline"
-                href={`https://www.inside-break.com/team-hub/${team.id}`}
+                href={`https://www.inside-break.com/team-hub/${team.id}/admin`}
               >
                 Review Requests
               </Button>
