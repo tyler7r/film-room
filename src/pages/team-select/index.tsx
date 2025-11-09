@@ -17,6 +17,59 @@ type TeamSelectType = {
   num: number | null;
 };
 
+// --- HELPER FUNCTION TO SEND REQUEST EMAIL ---
+const sendRequestEmail = async (team: TeamType, requesterName: string) => {
+  // 1. Fetch the team owner's profile
+  const { data: ownerProfile, error: ownerError } = await supabase
+    .from("profiles")
+    .select("id, email")
+    .eq("id", team.owner)
+    .single();
+
+  if (ownerError ?? !ownerProfile) {
+    console.error("Failed to fetch team owner for notification:", ownerError);
+    return;
+  }
+
+  // 2. Count current pending requests (including the one just sent)
+  const { count } = await supabase
+    .from("affiliations")
+    .select("*", { count: "exact" })
+    .match({ team_id: team.id, verified: false });
+
+  // 3. Send notification to the owner
+  try {
+    const response = await fetch("/api/team-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: "new_request",
+        title: `⭐ New Join Request for ${team.full_name}`,
+        team: {
+          id: team.id,
+          full_name: team.full_name,
+        },
+        latestRequester: {
+          name: requesterName,
+        },
+        requestCount: count ?? 1, // At least 1 (the current one)
+        recipient: {
+          id: ownerProfile.id,
+          email: ownerProfile.email,
+        },
+      }),
+    });
+    if (!response.ok) {
+      console.error("Team request email API failed:", await response.json());
+    }
+  } catch (error) {
+    console.error("Failed to send team request email:", error);
+  }
+};
+// --- END HELPER FUNCTION ---
+
 const TeamSelect = () => {
   const router = useRouter();
   const { backgroundStyle, hoverText } = useIsDarkContext();
@@ -27,6 +80,8 @@ const TeamSelect = () => {
     text: undefined,
     status: "error",
   });
+
+  // (handleChange, fetchTeams, useEffects omitted for brevity - no changes here)
 
   const handleChange = (
     event: SyntheticEvent<Element, Event>,
@@ -63,13 +118,12 @@ const TeamSelect = () => {
       void teams.not("id", "in", `(${affIds})`);
     }
     const { data } = await teams;
-    if (data && data.length > 0) setTeams(data);
+    if (data && data.length > 0) setTeams(data as TeamType[]);
     else setTeams(null);
   };
 
   const handleNewAffiliation = async (
-    teamName: string,
-    teamId: string,
+    team: TeamType, // Passed the full team object now
     isCoach: boolean,
     num: number | null,
   ) => {
@@ -77,7 +131,7 @@ const TeamSelect = () => {
       const { data, error } = await supabase
         .from("affiliations")
         .insert({
-          team_id: teamId,
+          team_id: team.id,
           user_id: user.userId,
           role: isCoach ? "coach" : "player",
           verified: false,
@@ -86,13 +140,17 @@ const TeamSelect = () => {
         .select();
       if (data) {
         setMessage({
-          text: `You successfully sent your request to join: ${teamName}.`,
+          text: `You successfully sent your request to join: ${team.full_name}.`,
           status: "success",
         });
+
+        // --- NEW: Notify the team owner ---
+        void sendRequestEmail(team, user.name ?? user.email!);
+        // ---------------------------------
       }
       if (error)
         setMessage({
-          text: `There was a problem sending your join request to ${teamName}: ${error.message}`,
+          text: `There was a problem sending your join request to ${team.full_name}: ${error.message}`,
           status: "error",
         });
     }
@@ -103,8 +161,7 @@ const TeamSelect = () => {
     if (teamSelect && teamSelect.length > 0) {
       teamSelect?.forEach((tm) => {
         void handleNewAffiliation(
-          tm.team.full_name,
-          tm.team.id,
+          tm.team, // Pass the full team object
           tm.isCoach,
           tm.num,
         );

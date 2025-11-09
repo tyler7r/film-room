@@ -149,7 +149,7 @@ const Play = ({
   const copyToClipboard = useCallback(async () => {
     const origin = window.location.origin;
     const linkToCopy = `${origin}/play/${play.play.id}`;
-    console.log(linkToCopy);
+
     try {
       await navigator.clipboard.writeText(linkToCopy);
       setSnackbarMessage("Link copied!");

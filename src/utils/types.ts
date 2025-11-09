@@ -165,7 +165,7 @@ export type TeamAffiliationType = {
     division: string;
     logo: string | null;
     full_name: string;
-    owner: string | null;
+    owner: string;
   };
   affId: string;
   role: string;
@@ -185,7 +185,7 @@ export type TeamType = {
   id: string;
   logo: string | null;
   name: string;
-  owner: string | null;
+  owner: string;
   full_name: string;
 };
 
@@ -293,6 +293,7 @@ export type UserType = {
   name: string;
   join_date: string;
   send_notifications: boolean;
+  last_notified: string;
 };
 
 export type AnnouncementType = {
@@ -486,3 +487,48 @@ export type UnifiedNotificationType = {
   exclusive_to: string | null;
   // Add other fields relevant to displaying each notification type
 };
+
+// --- NEW TEAM EMAIL NOTIFICATION TYPES ---
+
+/**
+ * Minimal recipient info required for the SES call.
+ */
+export type ProfileRecipient = Pick<UserType, "id" | "email">;
+
+/**
+ * Minimal player/requester info required for the email content.
+ */
+export type PlayerInfo = Pick<UserType, "id" | "name">;
+
+// Base structure common to all team notification types
+interface NotificationBase {
+  title: string;
+  team: TeamType;
+  recipient: ProfileRecipient;
+}
+
+/**
+ * 1. Payload structure for notifying the Team Owner about a new request (new_request).
+ * Requires batching details (latestRequester and requestCount).
+ */
+interface NewRequestNotification extends NotificationBase {
+  type: "new_request";
+  latestRequester: PlayerInfo;
+  requestCount: number;
+}
+
+/**
+ * 2. Payload structure for notifying the Player about a decision (acceptance/rejection).
+ * Requires the player's info.
+ */
+interface DecisionNotification extends NotificationBase {
+  type: "acceptance" | "rejection";
+  player: PlayerInfo;
+}
+
+/**
+ * The full discriminated union type for the team email API payload (`/api/team-email`).
+ */
+export type TeamEmailNotificationType =
+  | NewRequestNotification
+  | DecisionNotification;
