@@ -104,8 +104,9 @@ const ReplyEmailTemplate = ({
 
             <Hr className="my-[26px] w-full border border-solid border-[#eaeaea]" />
             <Text className="text-[12px] leading-[24px] text-[#666666]">
-              This notification was sent because {author.name} replied to a
-              comment you wrote.
+              You received this email because you have notifications turned on
+              for Inside Break. To turn them off navigate to your profile and
+              click the settings icon.
             </Text>
           </Container>
         </Body>

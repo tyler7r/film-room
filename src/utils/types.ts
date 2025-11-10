@@ -472,7 +472,12 @@ export type ReplyNotificationType = {
 
 export type UnifiedNotificationType = {
   notification_id: string;
-  notification_type: "comment" | "mention" | "reply";
+  notification_type:
+    | "comment"
+    | "mention"
+    | "reply"
+    | "comment_mention"
+    | "reply_mention";
   source_id: string; // ID of the actual comment/mention/reply
   created_at: string; // ISO string for sorting
   viewed: string;

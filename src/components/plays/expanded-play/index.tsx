@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import React from "react"; // Removed useCallback for fetchCollections
-import AddComment from "~/components/interactions/comments/add-comment";
 import CommentIndex from "~/components/interactions/comments/comment-index";
 import { useIsDarkContext } from "~/pages/_app";
 import { convertFullTimestamp } from "~/utils/helpers";
@@ -78,9 +77,8 @@ const ExpandedPlay = ({
           gap: 2,
         }}
       >
-        <AddComment play={play} />
         <CommentIndex
-          playId={play.play.id}
+          play={play}
           setCommentCount={setCommentCount}
           activeComment={activeComment}
         />

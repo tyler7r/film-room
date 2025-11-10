@@ -5,17 +5,18 @@ import EmptyMessage from "~/components/utils/empty-msg";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { CommentNotificationType } from "~/utils/types";
+import type { CommentNotificationType, PlayPreviewType } from "~/utils/types";
+import AddComment from "../add-comment";
 import Comment from "../comment";
 
 type CommentIndexProps = {
-  playId: string;
+  play: PlayPreviewType;
   setCommentCount: (count: number) => void;
   activeComment?: string | undefined;
 };
 
 const CommentIndex = ({
-  playId,
+  play,
   setCommentCount,
   activeComment,
 }: CommentIndexProps) => {
@@ -59,7 +60,7 @@ const CommentIndex = ({
         const commentsQuery = supabase
           .from("comment_notification")
           .select("*", { count: "exact" })
-          .eq("play->>id", playId)
+          .eq("play->>id", play.play.id)
           .order("comment->>created_at")
           .range(currentOffset, currentOffset + itemsPerLoad - 1);
 
@@ -104,12 +105,8 @@ const CommentIndex = ({
         setLoadingInitial(false);
       }
     },
-    [itemsPerLoad, playId, activeComment, setCommentCount],
+    [itemsPerLoad, play.play.id, activeComment, setCommentCount],
   ); // Removed handleScroll from dependencies
-
-  const refetchComments = () => {
-    void fetchComments(offset);
-  };
 
   const fetchActiveComm = useCallback(async () => {
     if (activeComment) {
@@ -132,7 +129,7 @@ const CommentIndex = ({
   useEffect(() => {
     void fetchComments(0, false);
     void fetchActiveComm();
-  }, [playId, isMobile, fetchComments, fetchActiveComm]);
+  }, [play.play.id, isMobile, fetchComments, fetchActiveComm]);
 
   // Realtime subscription
   // useEffect(() => {
@@ -194,7 +191,7 @@ const CommentIndex = ({
             key={activeCom.comment.id}
             cmt={activeCom}
             autoOpen={true}
-            refetchComments={refetchComments}
+            setReload={() => void fetchComments(0, false)}
           />
         </Box>
       )}
@@ -218,6 +215,10 @@ const CommentIndex = ({
           width: "100%",
         }}
       >
+        <AddComment
+          play={play}
+          setReload={() => void fetchComments(0, false)}
+        />
         {loadingInitial && index.length === 0 ? (
           <Box
             sx={{
@@ -269,7 +270,7 @@ const CommentIndex = ({
                   <Comment
                     key={comment.comment.id}
                     cmt={comment}
-                    refetchComments={refetchComments}
+                    setReload={() => void fetchComments(0, false)}
                   />
                 ))}
               </Box>

@@ -1,9 +1,11 @@
+import { Typography } from "@mui/material";
+import { formatDistanceToNowStrict } from "date-fns";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import DeleteMenu from "~/components/utils/delete-menu";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
-import { getDisplayName, getTimeSinceNotified } from "~/utils/helpers";
+import { getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
 import type { CommentNotificationType } from "~/utils/types";
 import LikeBtn from "../../likes/like-btn";
@@ -13,10 +15,10 @@ import ReplyIndex from "../../replies/reply-index";
 type CommentProps = {
   cmt: CommentNotificationType;
   autoOpen?: boolean;
-  refetchComments: () => void;
+  setReload: (reload: boolean) => void;
 };
 
-const Comment = ({ cmt, autoOpen, refetchComments }: CommentProps) => {
+const Comment = ({ cmt, autoOpen, setReload }: CommentProps) => {
   const comment = cmt.comment;
   const { user } = useAuthContext();
   const { hoverText } = useIsDarkContext();
@@ -32,7 +34,7 @@ const Comment = ({ cmt, autoOpen, refetchComments }: CommentProps) => {
 
   const handleDelete = async () => {
     await supabase.from("comments").delete().eq("id", comment.id);
-    refetchComments();
+    setReload(true);
   };
 
   return (
@@ -45,9 +47,16 @@ const Comment = ({ cmt, autoOpen, refetchComments }: CommentProps) => {
                 className={`${hoverText} text-sm font-bold tracking-tight`}
                 onClick={() => handleAuthorClick(comment.comment_author)}
               >{`${getDisplayName(cmt.author)} `}</div>
-              <div className="text-xs font-light">
-                {getTimeSinceNotified(comment.created_at)}
-              </div>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                fontStyle="italic"
+                fontSize={10}
+              >
+                {formatDistanceToNowStrict(new Date(comment.created_at), {
+                  addSuffix: true,
+                })}
+              </Typography>
             </div>
             <div className="flex items-center">
               <ReplyBtn

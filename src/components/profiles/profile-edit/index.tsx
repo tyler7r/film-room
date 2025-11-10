@@ -101,7 +101,7 @@ const ProfileEdit = ({ profile }: ProfileEditProps) => {
             inputProps={{ maxLength: 100 }}
           />
           <div className="flex items-center justify-center gap-2">
-            <div className="text-lg font-bold">Allow Email Notifications</div>
+            <div className="text-lg font-bold">Allow Notifications?</div>
             <Switch
               checked={enabled}
               className="items-center justify-center"

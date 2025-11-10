@@ -300,7 +300,6 @@ const Profile = () => {
                 px: 2,
                 borderRadius: "8px",
                 fontWeight: "bold",
-                textTransform: "none",
                 border: `1px solid ${theme.palette.divider}`,
                 "&:hover": {
                   borderColor: theme.palette.primary.main,

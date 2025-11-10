@@ -16,8 +16,10 @@ import { useInboxContext } from "~/contexts/inbox";
 // Assuming you have separate components for each notification type
 import { type UnifiedNotificationType } from "~/utils/types";
 import InboxComment from "./comment";
+import InboxCommentMention from "./comment-mention";
 import InboxMention from "./mention";
 import InboxReply from "./reply";
+import InboxReplyMention from "./reply-mention";
 
 const InboxNotification = () => {
   const {
@@ -47,6 +49,10 @@ const InboxNotification = () => {
         return <InboxComment notification={notification} />;
       case "reply":
         return <InboxReply notification={notification} />;
+      case "comment_mention":
+        return <InboxCommentMention notification={notification} />;
+      case "reply_mention":
+        return <InboxReplyMention notification={notification} />;
       default:
         return null;
     }

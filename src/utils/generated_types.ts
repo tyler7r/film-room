@@ -292,6 +292,54 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          is_read: boolean
+          message: string
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          is_read?: boolean
+          message: string
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       play_likes: {
         Row: {
           created_at: string
@@ -1120,7 +1168,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      notification_category: "comment" | "mention" | "reply"
+      notification_category:
+        | "comment"
+        | "mention"
+        | "reply"
+        | "comment_mention"
+        | "reply_mention"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1248,7 +1301,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      notification_category: ["comment", "mention", "reply"],
+      notification_category: [
+        "comment",
+        "mention",
+        "reply",
+        "comment_mention",
+        "reply_mention",
+      ],
     },
   },
 } as const

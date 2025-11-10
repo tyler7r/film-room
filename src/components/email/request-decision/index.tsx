@@ -60,7 +60,9 @@ const DecisionNotificationEmail = ({
 
             <Hr className="my-[26px] w-full border border-solid border-[#eaeaea]" />
             <Text className="text-[12px] leading-[24px] text-[#666666]">
-              This is an automated notification from the team management system.
+              You received this email because you have notifications turned on
+              for Inside Break. To turn them off navigate to your profile and
+              click the settings icon.
             </Text>
           </Container>
         </Body>

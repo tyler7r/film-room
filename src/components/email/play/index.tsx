@@ -86,10 +86,11 @@ const PlayEmailTemplate = ({
 
             <Hr className="my-[26px] w-full border border-solid border-[#eaeaea]" />
             <Text className="text-[12px] leading-[24px] text-[#666666]">
-              This notification was sent to you because {author.name} mentioned
-              you in a play.
               {isPrivate &&
-                " Note: This play is set to private and may only be viewable when you are logged in."}
+                " Note: This play is set to private and may only be viewable when you are logged in."}{" "}
+              You received this email because you have notifications turned on
+              for Inside Break. To turn them off navigate to your profile and
+              click the settings icon.
             </Text>
           </Container>
         </Body>
