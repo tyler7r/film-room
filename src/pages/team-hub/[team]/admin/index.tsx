@@ -21,12 +21,12 @@ const AccessDenied = ({ teamName }: { teamName: string }) => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 4,
+        gap: 2,
         p: 4,
         textAlign: "center",
       }}
     >
-      <LockIcon sx={{ fontSize: "96px", color: "error.main" }} />
+      <LockIcon sx={{ fontSize: "96px", color: "primary" }} />
       <Typography
         variant="h5"
         sx={{ fontWeight: "bold", color: "text.primary" }}
@@ -34,8 +34,7 @@ const AccessDenied = ({ teamName }: { teamName: string }) => {
         Access Restricted for {teamName}
       </Typography>
       <Typography variant="body1" color="text.secondary">
-        You must be an **Owner** or **Coach** to access these administration
-        tools.
+        You must be an *Owner* or *Coach* to access these administration tools.
       </Typography>
     </Box>
   );

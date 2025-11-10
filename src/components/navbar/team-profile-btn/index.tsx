@@ -34,7 +34,7 @@ const TeamPageButton = () => {
           fontWeight: "bold",
           wordSpacing: "-1px",
           // 🎯 FIX: Reduce padding significantly for a compressed look
-          padding: theme.spacing(0.5, 1),
+          padding: theme.spacing(0.25, 0),
           minHeight: "auto", // Allows height to shrink based on content
         }}
         // Removed size="large" to allow sx padding to control the size
@@ -86,8 +86,10 @@ const TeamPageButton = () => {
             py: 0.5,
             minHeight: "auto",
             // Add a subtle border to separate from the list of teams
-            borderTop: `1px solid ${theme.palette.divider}`,
-            marginTop: theme.spacing(0.5),
+            borderTop: affiliations?.length
+              ? `1px solid ${theme.palette.divider}`
+              : "",
+            marginTop: theme.spacing(0),
           }}
           onClick={() => {
             handleClose();

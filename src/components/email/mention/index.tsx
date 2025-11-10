@@ -14,26 +14,49 @@ import type {
   CommentType,
   EmailAuthorType,
   PlayType,
+  ReplyType,
   VideoType,
-} from "~/utils/types";
+} from "~/utils/types"; // Assuming ReplyType is available
 
-type EmailProps = {
-  author: EmailAuthorType;
+// Defines the props required for the Mention Email Template
+export type MentionEmailContent = {
+  // Required data from the original notification
+  entityType: "comment" | "reply";
+
+  // Contextual data
+  author: EmailAuthorType; // The user who did the mentioning (sender)
+  recipientName: string; // The user who was mentioned (for personalization)
   play: PlayType;
   video: VideoType;
-  comment: CommentType;
-  // NEW: Number of other unread notifications
+
+  // Source content (only one will be present depending on entityType)
+  sourceComment: CommentType | null;
+  sourceReply: ReplyType | null;
+
+  // Common tracking
   unreadNotificationCount: number;
 };
 
-const CommentEmailTemplate = ({
+const MentionEmailTemplate = ({
   author,
-  comment,
-  video,
+  entityType,
   play,
+  video,
+  sourceComment,
+  sourceReply,
   unreadNotificationCount,
-}: EmailProps) => {
-  const commentLink = `https://www.inside-break.com/play/${comment.play_id}?comment=${comment.id}`;
+}: MentionEmailContent) => {
+  // Determine the content and link based on whether it's a comment or a reply
+  const isCommentMention = entityType === "comment" && sourceComment;
+  const sourceContent = isCommentMention
+    ? sourceComment.comment
+    : sourceReply?.reply ?? "View post for details.";
+
+  const sourceId = isCommentMention ? sourceComment?.id : sourceReply?.id;
+  const playId = play.id;
+
+  // Construct a link that points directly to the comment/reply for context
+  const mentionLink = `https://www.inside-break.com/play/${playId}?comment=${sourceId}`;
   const homepageLink = `https://inside-break.com/`;
 
   const otherNotificationsText =
@@ -48,28 +71,27 @@ const CommentEmailTemplate = ({
         <Body className="bg-white font-sans">
           <Container className="mx-auto my-[40px] rounded border border-solid border-[#eaeaea] p-[20px]">
             <Heading className="text-[18px] font-bold text-black">
-              New Comment on Your Play
+              You were mentioned in a{" "}
+              {entityType === "comment" ? "comment" : "reply"}!
             </Heading>
 
             <Text className="text-[14px] leading-[24px] text-black">
-              **{author.name}** just left a new comment on your play, "
-              {play.title}" (from video: *{video.title}*).
+              **{author.name}** just mentioned you in a {entityType} on the
+              play, "{play.title}" (from video: *{video.title}*).
             </Text>
 
-            <Section className="my-[15px] border-l-4 border-purple-500 bg-gray-50 p-3">
+            <Section className="my-[15px] border-l-4 border-blue-500 bg-gray-50 p-3">
               <Text className="m-0 text-[14px] italic leading-[20px] text-black">
-                "{comment.comment}"
+                "{sourceContent}"
               </Text>
             </Section>
 
-            {/* NEW: Conditional message about other notifications */}
-
             <Section className="my-[30px] text-center">
               <Button
-                className="rounded bg-[#000000] p-2 text-center text-[12px] font-semibold text-white no-underline"
-                href={commentLink}
+                className="rounded bg-[#000000] p-2 text-center text-[10px] font-semibold text-white no-underline"
+                href={mentionLink}
               >
-                Review Comment
+                View Mention
               </Button>
             </Section>
 
@@ -100,4 +122,4 @@ const CommentEmailTemplate = ({
   );
 };
 
-export default CommentEmailTemplate;
+export default MentionEmailTemplate;

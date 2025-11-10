@@ -300,7 +300,7 @@ const Collection = () => {
         )}
         {accessDenied ? (
           <Box className="flex w-full flex-col items-center justify-center gap-4 p-4">
-            <LockIcon sx={{ fontSize: "96px" }} />
+            <LockIcon sx={{ fontSize: "96px", color: "primary" }} />
             <Typography variant="h6" className="text-lg font-bold">
               This collection is private!
             </Typography>

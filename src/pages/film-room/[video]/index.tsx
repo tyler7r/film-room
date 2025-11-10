@@ -478,7 +478,7 @@ const FilmRoom = () => {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              gap: 4,
+              gap: 2,
               p: 4,
               borderRadius: "12px",
               boxShadow: 3,
@@ -487,7 +487,7 @@ const FilmRoom = () => {
               textAlign: "center",
             }}
           >
-            <LockIcon sx={{ fontSize: "96px", color: "error.main" }} />
+            <LockIcon sx={{ fontSize: "96px", color: "GrayText" }} />
             <Typography
               variant="h5"
               sx={{ fontWeight: "bold", color: "text.primary" }}
@@ -498,12 +498,6 @@ const FilmRoom = () => {
               variant="contained"
               endIcon={<AddIcon />}
               onClick={handleNewTeamClick}
-              sx={{
-                textTransform: "none",
-                px: 3,
-                py: 1.5,
-                borderRadius: "8px",
-              }}
             >
               Join a new team
             </Button>
