@@ -1,12 +1,17 @@
+import AddIcon from "@mui/icons-material/Add";
+import LockIcon from "@mui/icons-material/Lock";
 import SettingsIcon from "@mui/icons-material/Settings";
 import {
   Badge,
   Box,
+  Button,
   CircularProgress,
   IconButton,
   Tab,
   Tabs,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState, type SyntheticEvent } from "react";
@@ -23,9 +28,11 @@ import type { TeamType } from "~/utils/types";
 
 const TeamHub = () => {
   const router = useRouter();
+  const theme = useTheme();
   const { user, affiliations } = useAuthContext();
   const { isDark } = useIsDarkContext();
   const { isMobile } = useMobileContext();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
   const teamId = router.query.team as string;
 
@@ -288,13 +295,40 @@ const TeamHub = () => {
             <Box sx={{ width: "100%" }}>
               {role !== "guest" && <TeamCollections teamId={team.id} />}
               {role === "guest" && (
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  sx={{ textAlign: "center", mt: 4 }}
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column",
+                  }}
                 >
-                  Join the team to view collections!
-                </Typography>
+                  <LockIcon fontSize="large" color="info" />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: "block",
+                      color: "text.disabled",
+                      my: 1,
+                    }}
+                  >
+                    — Private to members of {team.full_name} —
+                  </Typography>
+                  <Button
+                    onClick={() => void router.push("/team-select")}
+                    variant="contained" // Made this 'contained' to distinguish it as the primary action
+                    size="small"
+                    startIcon={<AddIcon />}
+                    sx={{
+                      fontSize: isDesktop ? 14 : 10,
+                      fontWeight: "bold",
+                      mt: 1,
+                    }}
+                  >
+                    JOIN NEW TEAM
+                  </Button>
+                </Box>
               )}
             </Box>
           )}

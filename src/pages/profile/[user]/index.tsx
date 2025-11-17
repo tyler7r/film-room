@@ -1,11 +1,13 @@
-import AddIcon from "@mui/icons-material/Add";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
+  Badge,
   Box, // Added Typography for text styling
   Button,
+  Card,
   CircularProgress, // Import Tabs for navigation
   Tab, // Keep IconButton for edit
   Tabs,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -19,17 +21,13 @@ import MentionsFeed from "~/components/profiles/profile-feed/mentions";
 import ProfileStats from "~/components/profiles/profile-stats";
 import TeamAffiliation from "~/components/teams/team-affiliation";
 import PageTitle from "~/components/utils/page-title";
-import Video from "~/components/videos/video";
 import { useAuthContext } from "~/contexts/auth";
+import { useInboxContext } from "~/contexts/inbox";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type {
-  LastWatchedType, // Will adapt this or create new state for tabs
-  TeamAffiliationType,
-  UserType,
-} from "~/utils/types";
+import type { TeamAffiliationType, UserType } from "~/utils/types";
 
 type FetchOptions = {
   profileId: string;
@@ -41,6 +39,7 @@ const Profile = () => {
   const { backgroundStyle } = useIsDarkContext();
   const { isMobile } = useMobileContext();
   const theme = useTheme();
+  const { unreadCount, toggleOpen } = useInboxContext();
 
   const [options, setOptions] = useState<FetchOptions>({
     profileId: router.query.user as string,
@@ -50,7 +49,7 @@ const Profile = () => {
     TeamAffiliationType[] | null
   >(null);
 
-  const [lastWatched, setLastWatched] = useState<LastWatchedType | null>(null);
+  // const [lastWatched, setLastWatched] = useState<LastWatchedType | null>(null);
   // Replaced actionBarStatus with selectedTab for Material UI Tabs
   const [selectedTab, setSelectedTab] = useState<
     "created" | "mentions" | "highlights"
@@ -117,50 +116,27 @@ const Profile = () => {
     [router.query.user],
   ); // Added router.query.user to dependencies
 
-  const fetchLastWatched = useCallback(async () => {
-    if (user.userId && user.userId === options.profileId) {
-      const { data, error } = await supabase
-        .from("last_watched_view")
-        .select()
-        .eq("profile->>id", `${user.userId}`)
-        .single();
-      if (error) {
-        console.error("Error fetching last watched:", error);
-        setLastWatched(null);
-        return;
-      }
-      if (data?.video) setLastWatched(data);
-      else setLastWatched(null);
-    }
-  }, [user.userId, options.profileId]); // Added options.profileId to dependencies
-
-  // Realtime subscription for profile updates
-  // useEffect(() => {
-  //   if (!supabase) {
-  //     console.warn("Supabase client is not initialized for real-time.");
-  //     return;
+  // const fetchLastWatched = useCallback(async () => {
+  //   if (user.userId && user.userId === options.profileId) {
+  //     const { data, error } = await supabase
+  //       .from("last_watched_view")
+  //       .select()
+  //       .eq("profile->>id", `${user.userId}`)
+  //       .single();
+  //     if (error) {
+  //       console.error("Error fetching last watched:", error);
+  //       setLastWatched(null);
+  //       return;
+  //     }
+  //     if (data?.video) setLastWatched(data);
+  //     else setLastWatched(null);
   //   }
-
-  //   const channel = supabase
-  //     .channel("profile_changes")
-  //     .on(
-  //       "postgres_changes",
-  //       { event: "UPDATE", schema: "public", table: "profiles" },
-  //       () => {
-  //         void fetchProfile(); // Re-fetch profile on update
-  //       },
-  //     )
-  //     .subscribe();
-
-  //   return () => {
-  //     void supabase.removeChannel(channel);
-  //   };
-  // }, [fetchProfile]); // Dependency on memoized fetchProfile
+  // }, [user.userId, options.profileId]); // Added options.profileId to dependencies
 
   // Effect for initial fetch of last watched
-  useEffect(() => {
-    if (user.userId) void fetchLastWatched();
-  }, [user, fetchLastWatched]); // Dependencies on user and memoized fetchLastWatched
+  // useEffect(() => {
+  //   if (user.userId) void fetchLastWatched();
+  // }, [user, fetchLastWatched]); // Dependencies on user and memoized fetchLastWatched
 
   // Effect to update options state when router query changes
   useEffect(() => {
@@ -200,15 +176,16 @@ const Profile = () => {
         justifyContent: "center",
         gap: 2, // Increased gap for overall spacing between major sections
         p: 2, // Responsive padding for the whole page
+        pb: 8,
       }}
     >
-      {/* 1. Unified Profile Header */}
-      <Box
+      <Card
+        elevation={4}
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", sm: "column" },
-          alignItems: { xs: "center", sm: "center" },
-          justifyContent: { xs: "center", sm: "center" },
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
           width: { xs: "100%", sm: "90%", md: "70%" },
           maxWidth: "800px",
           p: 2,
@@ -216,25 +193,23 @@ const Profile = () => {
           boxShadow: 3,
           ...backgroundStyle,
           position: "relative",
+          border: `3px solid ${theme.palette.divider}`, // Strong border
         }}
       >
-        {/* Name, Join Date, Edit Button */}
+        {/* Name, Join Date, Notifications, Edit Button */}
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: { xs: "center", sm: "center" },
-            // flexShrink: 0, // <-- REMOVE or adjust this, it prevents shrinking
-            textAlign: { xs: "center", sm: "center" },
-            width: "100%", // Take full width of its direct parent flex item
-            // Max width to ensure it doesn't push out of the parent Box
-            maxWidth: { xs: "100%", sm: "calc(100% - 48px)" }, // Example: 48px for p:2 (16px left + 16px right) + some buffer
+            alignItems: "center",
+            textAlign: "center",
+            width: "100%",
+            justifyContent: "center",
           }}
         >
           <PageTitle
             size={isMobile ? "medium" : "large"}
             title={getDisplayName(profile)}
-            // No additional sx needed here as PageTitle itself has the truncation logic
           />
 
           <Typography
@@ -244,6 +219,33 @@ const Profile = () => {
           >
             Member since {profile.join_date.substring(0, 4)}
           </Typography>
+
+          {/* New Notification Badge (Option A) */}
+          {user.userId === router.query.user && (
+            <Tooltip title="View Inbox">
+              <Button
+                onClick={toggleOpen}
+                sx={{
+                  position: "absolute",
+                  top: 5,
+                  left: 5,
+                  p: 1,
+                  minWidth: "auto",
+                  borderRadius: "50%",
+                }}
+              >
+                <Badge
+                  badgeContent={unreadCount}
+                  color="error"
+                  overlap="circular"
+                >
+                  <NotificationsIcon color="action" />
+                </Badge>
+              </Button>
+            </Tooltip>
+          )}
+
+          {/* Profile Edit Button */}
           {user.userId === router.query.user && (
             <Box
               sx={{
@@ -257,109 +259,59 @@ const Profile = () => {
           )}
         </Box>
 
-        {/* Profile Stats */}
-        <ProfileStats profileId={options.profileId} />
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center", // Center content vertically within this section
-          gap: 1,
-          p: 2,
-          borderRadius: "12px",
-          boxShadow: 2,
-          ...backgroundStyle,
-          width: { xs: "100%", sm: "90%", md: "70%" },
-          maxWidth: "800px",
-        }}
-      >
-        <PageTitle title="Team Affiliations" size="small" />
-        {profileAffiliations && profileAffiliations.length > 0 ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center", // Always center affiliations for better mobile look
-              width: "100%",
-            }}
-          >
-            {profileAffiliations.map((aff) => (
-              <TeamAffiliation key={aff.affId} aff={aff} />
-            ))}
-          </Box>
-        ) : (
-          router.query.user === user.userId && (
-            <Button
-              onClick={() => void router.push("/team-select")}
-              variant="outlined"
-              startIcon={<AddIcon />}
-              sx={{
-                ...backgroundStyle,
-                py: 1,
-                px: 2,
-                borderRadius: "8px",
-                fontWeight: "bold",
-                border: `1px solid ${theme.palette.divider}`,
-                "&:hover": {
-                  borderColor: theme.palette.primary.main,
-                  boxShadow: 1,
-                },
-              }}
-            >
-              JOIN A NEW TEAM!
-            </Button>
-          )
-        )}
-      </Box>
-      {/* </Box> */}
+        <Box
+          sx={{
+            width: "100%",
+            mb: 2,
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <ProfileStats profileId={profile.id} />
+        </Box>
 
-      {/* 5. Optional: Continue Watching (Personalized) */}
-      {router.query.user === user.userId && lastWatched && (
+        {/* 2. Team Affiliations (Restyled to be clean/unboxed) */}
         <Box
           sx={{
             display: "flex",
-            width: { xs: "100%", sm: "90%", md: "70%" },
-            maxWidth: "800px",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
-            p: 2,
-            borderRadius: "12px",
-            boxShadow: 2,
-            ...backgroundStyle,
+            width: "100%",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <PlayArrowIcon fontSize="large" color="primary" />
-            <PageTitle size="small" title="Continue Watching" />
-          </Box>
-          <Box sx={{ width: "100%" }}>
-            <Video
-              video={lastWatched.video}
-              startTime={`${lastWatched.profile.last_watched_time}`}
-            />
-          </Box>
+          {profileAffiliations && profileAffiliations.length > 0 && (
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: 0.25,
+                width: "100%",
+                borderTop: `1px solid ${theme.palette.primary.main}`,
+                pt: 1,
+              }}
+            >
+              {profileAffiliations.map((aff) => (
+                <TeamAffiliation key={aff.affId} aff={aff} />
+              ))}
+            </Box>
+          )}
         </Box>
-      )}
+      </Card>
 
       {/* 4. Collections Section */}
-      <Box
+      <Card
+        elevation={4}
         sx={{
           width: { xs: "100%", sm: "90%", md: "70%" },
           maxWidth: "800px",
-          p: 2,
-          borderRadius: "12px",
-          boxShadow: 2,
-          ...backgroundStyle,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 2,
+          borderRadius: "16px",
+          backgroundColor: theme.palette.background.paper, // Use paper color
+          p: 0, // Padding is handled inside ProfileCollections mock
         }}
       >
         <ProfileCollections profileId={profile.id} />
-      </Box>
+      </Card>
 
       {/* 3. Tabbed Activity Feeds */}
       <Tabs

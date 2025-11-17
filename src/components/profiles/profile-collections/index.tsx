@@ -1,4 +1,11 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CircularProgress,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Collection from "~/components/collections/collection";
@@ -19,6 +26,7 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
   const { isMobile } = useMobileContext();
   const { isDark } = useIsDarkContext();
   const { user } = useAuthContext();
+  const theme = useTheme();
 
   const [collections, setCollections] = useState<CollectionViewType[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -28,8 +36,9 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
   const [showScrollDownIndicator, setShowScrollDownIndicator] = useState(false);
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
-  const itemsPerPage = isMobile ? 5 : 10;
+  const itemsPerPage = !isDesktop ? 8 : 10;
 
   const checkScrollPosition = useCallback(() => {
     if (scrollableContainerRef.current) {
@@ -119,14 +128,15 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
   }, [checkScrollPosition, collections.length, hasMore]);
 
   return (
-    <Box
+    <Card
+      elevation={4}
       sx={{
         display: "flex",
         width: "100%",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 1,
+        // gap: 1,
         p: 1,
       }}
     >
@@ -152,7 +162,7 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
           flexGrow: 1,
           position: "relative",
           overflowY: "auto",
-          maxHeight: { xs: "300px", md: "400px" },
+          maxHeight: { xs: "400px", md: "600px" },
           p: 0.5,
           display: "flex",
           flexDirection: "column",
@@ -223,7 +233,11 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
 
         {collections.length === 0 && !loadingInitial && (
           <Box
-            sx={{ display: "flex", width: "100%", justifyContent: "center" }}
+            sx={{
+              display: "flex",
+              width: "100%",
+              justifyContent: "center",
+            }}
           >
             <EmptyMessage message="collections" />
           </Box>
@@ -260,7 +274,7 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
           </Box>
         )}
       </Box>
-    </Box>
+    </Card>
   );
 };
 

@@ -493,6 +493,18 @@ export type UnifiedNotificationType = {
   // Add other fields relevant to displaying each notification type
 };
 
+export type TeamNotificationType = {
+  entity_id: string;
+  entity_type: "play" | "video" | "collection";
+  entity_title: string;
+  created_at: string;
+  actor_name: string;
+  actor_id: string;
+  team_id: string;
+  team_logo: string | null;
+  team_name: string;
+};
+
 // --- NEW TEAM EMAIL NOTIFICATION TYPES ---
 
 /**

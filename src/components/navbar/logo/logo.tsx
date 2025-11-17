@@ -8,7 +8,7 @@ import SmallDarkLogoEffect from "../../../../public/logos/Small Dark Icon - Effe
 import SmallLightLogoEffect from "../../../../public/logos/Small Light Icon - Effect.png";
 
 type LogoProps = {
-  size: "small" | "medium" | "large";
+  size: "small" | "medium" | "large" | "small-full" | "mobile-drawer";
 };
 
 export const Logo = ({ size, ...props }: LogoProps) => {
@@ -23,8 +23,32 @@ export const Logo = ({ size, ...props }: LogoProps) => {
       fill={false}
       src={isDark ? SmallDarkLogoEffect : SmallLightLogoEffect}
       alt="Site logo"
-      height={35}
-      width={49}
+      height={40}
+      width={56}
+      priority={true}
+      {...props}
+    />
+  ) : size === "small-full" ? (
+    <Image
+      className="cursor-pointer"
+      onClick={() => void router.push("/")}
+      fill={false}
+      src={isDark ? SmallDarkLogoEffect : SmallLightLogoEffect}
+      alt="Site logo"
+      height={50}
+      width={70}
+      priority={true}
+      {...props}
+    />
+  ) : size === "mobile-drawer" ? (
+    <Image
+      className="cursor-pointer"
+      onClick={() => void router.push("/")}
+      fill={false}
+      src={isDark ? LargeDarkLogoEffect : LargeLightLogoEffect}
+      alt="Site logo"
+      height={72}
+      width={225}
       priority={true}
       {...props}
     />

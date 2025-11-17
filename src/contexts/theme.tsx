@@ -12,6 +12,9 @@ export const darkTheme = createTheme({
     secondary: {
       main: colors.yellow.A700,
     },
+    info: {
+      main: colors.grey[50],
+    },
   },
 });
 
@@ -26,6 +29,9 @@ export const lightTheme = createTheme({
     },
     secondary: {
       main: colors.yellow.A700,
+    },
+    info: {
+      main: "#222222",
     },
   },
 });

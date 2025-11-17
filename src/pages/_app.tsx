@@ -10,8 +10,8 @@ import { CssBaseline, ThemeProvider, colors } from "@mui/material";
 import { type AppType } from "next/app";
 import Head from "next/head";
 import { createContext, useContext, useState } from "react";
+import AppNavbar from "~/components/navbar";
 
-import { Navbar } from "~/components/navbar";
 import { IsAuth } from "~/contexts/auth";
 import { TheInbox } from "~/contexts/inbox";
 import { IsMobile } from "~/contexts/mobile";
@@ -47,6 +47,11 @@ export const IsDarkContext = createContext<isDarkContextType>({
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const [isDark, setIsDark] = useState<boolean>(false);
+
+  const toggleTheme = () => {
+    setIsDark((prev) => !prev);
+  };
+
   const backgroundStyle = {
     backgroundColor: `${isDark ? colors.grey[800] : colors.grey[100]}`,
   };
@@ -105,7 +110,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             </Head>
             <TheInbox>
               <GlobalSearch>
-                <Navbar />
+                <AppNavbar isDarkMode={isDark} toggleTheme={toggleTheme} />
                 <Component {...pageProps} />
               </GlobalSearch>
             </TheInbox>

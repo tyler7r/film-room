@@ -92,11 +92,7 @@ const MentionedPlaysFeed = ({ profileId }: MentionedPlaysFeedProps) => {
           return;
         }
 
-        if (playsData) {
-          // It's possible that some playIds didn't return data due to RLS or other filters.
-          // Filter out plays that might not have been returned by the second query
-          // And explicitly handle the 'team' property to convert 'undefined' to 'null'
-          // This workaround is needed if PlayPreviewType expects 'TeamType | null' but not 'undefined'.
+        if (playsData && playsData.length > 0) {
           const filteredPlays = mentionsData
             .map((mention) => {
               const foundPlay = playsData.find(

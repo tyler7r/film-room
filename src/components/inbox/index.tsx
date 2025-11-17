@@ -1,4 +1,10 @@
-import { Button, Divider, Drawer } from "@mui/material";
+import {
+  Button,
+  Divider,
+  Drawer,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
@@ -7,14 +13,16 @@ import { useMobileContext } from "~/contexts/mobile";
 import PageTitle from "../utils/page-title";
 import InboxNotification from "./notifications";
 import PendingTeamRequests from "./requests";
-import TeamHeader from "./team-header";
 
 const Inbox = () => {
   const { isOpen, setIsOpen, inboxScrollableRef } = useInboxContext();
   const { user } = useAuthContext();
-  const { screenWidth, isMobile } = useMobileContext();
+  const { screenWidth } = useMobileContext();
   const router = useRouter();
   const [hideRequests, setHideRequests] = useState<boolean>(false);
+  const theme = useTheme();
+
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
   return (
     <Drawer
@@ -24,7 +32,7 @@ const Inbox = () => {
       // This is the key change: apply the ref directly to the Drawer's paper component
       PaperProps={{
         style: {
-          width: isMobile ? screenWidth * 0.75 : screenWidth * 0.5,
+          width: !isDesktop ? screenWidth * 0.75 : screenWidth * 0.5,
           overflowY: "auto", // Ensure the drawer itself is scrollable
         },
         ref: inboxScrollableRef,
@@ -33,7 +41,7 @@ const Inbox = () => {
     >
       <div
         className="flex flex-col gap-2 p-2"
-        style={{ width: isMobile ? screenWidth * 0.75 : screenWidth * 0.5 }}
+        style={{ width: !isDesktop ? screenWidth * 0.75 : screenWidth * 0.5 }}
       >
         <PageTitle size="large" title="Inbox" />
         {!user.isLoggedIn && (
@@ -64,7 +72,7 @@ const Inbox = () => {
           </div>
         )}
         <div className="flex flex-col gap-2">
-          <TeamHeader />
+          {/* <TeamHeader /> */}
           <Divider></Divider>
           <PendingTeamRequests hide={hideRequests} setHide={setHideRequests} />
           <InboxNotification />
