@@ -3,10 +3,11 @@ import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import {
   Box,
-  IconButton,
+  Fab,
   ListItemIcon,
   Menu,
   MenuItem,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useRef, useState } from "react";
@@ -54,17 +55,30 @@ const AddContentBtn = () => {
   };
 
   return (
-    <Box>
-      <IconButton
-        onClick={handleClick}
-        sx={{
-          fontWeight: "bold",
-          padding: 0,
-        }}
-        size="small"
-      >
-        <AddIcon color="primary" />
-      </IconButton>
+    <Box
+      sx={{
+        position: "fixed",
+        bottom: 16,
+        right: 16,
+        zIndex: 1000,
+        display: "flex",
+        flexDirection: "column",
+        gap: 1.5,
+      }}
+    >
+      <Tooltip title={"Add Content"}>
+        <Fab
+          onClick={handleClick}
+          sx={{
+            fontWeight: "bold",
+            padding: 0,
+          }}
+          size="small"
+          color="primary"
+        >
+          <AddIcon />
+        </Fab>
+      </Tooltip>
       <Menu
         open={open}
         anchorEl={anchorEl}

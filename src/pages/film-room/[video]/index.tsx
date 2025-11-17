@@ -361,7 +361,7 @@ const FilmRoom = () => {
               alignItems: "center",
               justifyContent: "center",
               gap: { xs: 2, md: 3 },
-              maxWidth: "1200px",
+              maxWidth: "1000px",
             }}
           >
             {video.link && !isLoading ? (

@@ -962,6 +962,20 @@ export type Database = {
         }
         Relationships: []
       }
+      team_notification_feed: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string | null
+          entity_id: string | null
+          entity_title: string | null
+          entity_type: string | null
+          team_id: string | null
+          team_logo: string | null
+          team_name: string | null
+        }
+        Relationships: []
+      }
       team_video_view: {
         Row: {
           team: Json | null

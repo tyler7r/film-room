@@ -6,7 +6,7 @@ import { useIsDarkContext } from "~/pages/_app";
 import type { TeamType } from "~/utils/types";
 
 type TeamLogoProps = {
-  tm: TeamType;
+  tm: TeamType | { id: string; logo: string | null; name: string };
   size?: number;
   inactive?: boolean;
 };
@@ -48,13 +48,13 @@ const TeamLogo = ({ tm, size, inactive }: TeamLogoProps) => {
                 : size && size <= 60 && size > 35
                   ? "28px"
                   : size && size <= 35
-                    ? "10px"
-                    : "10px",
+                    ? "18px"
+                    : "18px",
             fontWeight: "bold",
             fontStyle: "italic",
             fontFamily: "serif",
           }}
-        >{`${tm.city.slice(0, 1)}${tm.name.slice(0, 1)}`}</Avatar>
+        >{`${tm.name.slice(0, 1)}`}</Avatar>
       )}
     </Box>
   );

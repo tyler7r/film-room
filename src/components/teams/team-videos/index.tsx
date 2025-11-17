@@ -336,7 +336,11 @@ const TeamVideos = ({ teamId }: TeamVideosProps) => {
             <CircularProgress size={40} />
           </Box>
         ) : !videos || videos.length === 0 ? (
-          <EmptyMessage message="team videos matching your criteria" />
+          <Box
+            sx={{ width: "100%", display: "flex", justifyContent: "center" }}
+          >
+            <EmptyMessage message="team videos matching your criteria" />
+          </Box>
         ) : (
           <InfiniteScroll
             dataLength={videos.length}

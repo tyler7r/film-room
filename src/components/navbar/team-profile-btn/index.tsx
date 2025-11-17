@@ -1,12 +1,19 @@
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Button, Menu, MenuItem, Typography, useTheme } from "@mui/material";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import {
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import TeamAffiliation from "~/components/teams/team-affiliation";
 import { useAuthContext } from "~/contexts/auth";
 
-const TeamPageButton = () => {
+const TeamProfileBtn = () => {
   const { affiliations } = useAuthContext();
   const router = useRouter();
   const theme = useTheme(); // Added theme access for subtle separation styling
@@ -24,23 +31,18 @@ const TeamPageButton = () => {
 
   return (
     <div>
-      <Button
-        onClick={handleClick}
-        endIcon={
-          // Changed icon size to "small" for a more compact look
-          <ExpandMoreIcon fontSize="small" />
-        }
+      <IconButton
+        onClick={(e) => handleClick(e)}
+        color="info"
         sx={{
           fontWeight: "bold",
-          wordSpacing: "-1px",
-          // 🎯 FIX: Reduce padding significantly for a compressed look
-          padding: theme.spacing(0.25, 0),
-          minHeight: "auto", // Allows height to shrink based on content
+          padding: 0.5,
         }}
         // Removed size="large" to allow sx padding to control the size
       >
-        Team Hub
-      </Button>
+        <GroupsOutlinedIcon />
+        <ExpandMoreIcon />
+      </IconButton>
       <Menu
         open={open}
         anchorEl={anchorEl}
@@ -106,4 +108,4 @@ const TeamPageButton = () => {
   );
 };
 
-export default TeamPageButton;
+export default TeamProfileBtn;

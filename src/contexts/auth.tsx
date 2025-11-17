@@ -112,31 +112,6 @@ export const IsAuth = ({ children }: AuthProps) => {
     };
   }, []);
 
-  // Your Realtime listener block (commented out, but safe)
-  // useEffect(() => {
-  //   const channel = supabase
-  //     .channel("affiliation_changes")
-  //     .on(
-  //       "postgres_changes",
-  //       { event: "*", schema: "public", table: "affiliations" },
-  //       () => {
-  //         // This is a safe place to call fetchAffiliations as it is only
-  //         // triggered by the Realtime socket, not by renders.
-  //         void fetchAffiliations(user.userId);
-  //       },
-  //     )
-  //     .subscribe();
-
-  //   return () => {
-  //     void supabase.removeChannel(channel);
-  //   };
-  // }, []);
-
-  // ❌ REMOVED: THE LIKELY CULPRIT!
-  // useEffect(() => {
-  //   void fetchAffiliations(user.userId);
-  // }, [user.userId]);
-
   // ✅ This remains the intended way to manually refresh data
   useEffect(() => {
     if (affReload) {

@@ -15,6 +15,7 @@ import { useMobileContext } from "./mobile";
 type InboxContextType = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  toggleOpen: () => void;
   notifications: UnifiedNotificationType[] | null; // Changed type
   setNotifications: (notifications: UnifiedNotificationType[]) => void;
   notificationCount: number;
@@ -36,6 +37,7 @@ type InboxContextType = {
 export const InboxContext = createContext<InboxContextType>({
   isOpen: false,
   setIsOpen: () => null,
+  toggleOpen: () => null,
   notifications: null,
   setNotifications: () => null,
   notificationCount: 0,
@@ -81,6 +83,10 @@ export const TheInbox = ({ children }: InboxProps) => {
   const itemsPerLoad = isMobile ? 15 : 30; // Adjust batch size as needed
 
   // Fetch notifications using the new unified view
+
+  const toggleOpen = () => {
+    setIsOpen((prev) => !prev);
+  };
 
   const fetchGlobalUnreadCount = useCallback(async () => {
     if (!user.userId) return 0;
@@ -251,6 +257,7 @@ export const TheInbox = ({ children }: InboxProps) => {
       value={{
         isOpen,
         setIsOpen,
+        toggleOpen,
         notifications,
         setNotifications,
         notificationCount,

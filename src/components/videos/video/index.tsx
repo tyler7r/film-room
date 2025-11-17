@@ -14,9 +14,10 @@ import VideoAffiliatedTeamsChip from "../video-teams";
 type VideoProps = {
   video: VideoType | null;
   startTime?: string | null;
+  disableHover?: boolean;
 };
 
-const Video = ({ video, startTime }: VideoProps) => {
+const Video = ({ video, startTime, disableHover }: VideoProps) => {
   const { backgroundStyle, isDark, hoverBorder } = useIsDarkContext();
   const { user, affiliations } = useAuthContext();
   const router = useRouter();
@@ -120,12 +121,14 @@ const Video = ({ video, startTime }: VideoProps) => {
           transition:
             "border-color 0.3s ease-in-out, background-color 0.3s ease-in-out",
           // Hover styles for non-list items
-          "&:hover": {
-            borderColor: hoverBorder,
-            backgroundColor: isDark
-              ? "rgba(255,255,255,0.05)"
-              : "rgba(0,0,0,0.05)",
-          },
+          ...(!disableHover && {
+            "&:hover": {
+              borderColor: hoverBorder,
+              backgroundColor: isDark
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(0,0,0,0.05)",
+            },
+          }),
           width: "100%",
           gap: 1,
         }}
