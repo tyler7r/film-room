@@ -191,19 +191,12 @@ const AppNavbar: React.FC<AppNavbarProps> = ({ isDarkMode, toggleTheme }) => {
                   onClick={() => handleNavigation(`/team-hub/${aff.team.id}`)}
                   sx={{
                     display: "flex",
-                    // alignItems: "start",
-                    // justifyContent: "start",
                     width: "100%",
-                    // border: "1px solid black",
                     flexWrap: "wrap",
-                    // gap: 1, // Slightly increased gap for better spacing
-                    // Conditional styling for hover effect, only if not in listItem mode
                     cursor: "pointer",
                     borderRadius: "8px", // Apply some border radius
-                    // p: 0.5, // Add padding for visual comfort
                     transition:
                       "background-color 0.3s ease-in-out, border-color 0.3s ease-in-out", // Smooth transition
-                    // border: `1px solid transparent`, // Initial transparent border
                     "&:hover": {
                       borderColor: hoverBorder, // Apply hover border color
                       backgroundColor: "action.hover", // Subtle background on hover
@@ -448,7 +441,7 @@ const AppNavbar: React.FC<AppNavbarProps> = ({ isDarkMode, toggleTheme }) => {
               <Tooltip title="Public Feed">
                 <IconButton
                   onClick={() => handleNavigation("/public")}
-                  color="info"
+                  // color="info"
                 >
                   <PublicOutlinedIcon />
                 </IconButton>
@@ -456,7 +449,10 @@ const AppNavbar: React.FC<AppNavbarProps> = ({ isDarkMode, toggleTheme }) => {
               {/* Core Links */}
               {isLoggedIn && (
                 // Inbox Toggle (Primary placement for logged-in desktop)
-                <IconButton onClick={toggleOpen} color="info">
+                <IconButton
+                  onClick={toggleOpen}
+                  // color="info"
+                >
                   <MailOutlineIcon />
                   <Badge
                     badgeContent={unreadCount}
@@ -466,7 +462,12 @@ const AppNavbar: React.FC<AppNavbarProps> = ({ isDarkMode, toggleTheme }) => {
                 </IconButton>
               )}
               <TeamProfileBtn />
-              <Divider orientation="vertical" variant="middle" flexItem />
+              <Divider
+                orientation="vertical"
+                variant="middle"
+                flexItem
+                sx={{ mx: 1 }}
+              />
               <Tooltip title="Film Room">
                 <IconButton
                   color="primary"
@@ -491,12 +492,17 @@ const AppNavbar: React.FC<AppNavbarProps> = ({ isDarkMode, toggleTheme }) => {
                   <AccountCircleIcon />
                 </IconButton>
               </Tooltip>
-              <Divider flexItem orientation="vertical" variant="middle" />
-              <IconButton onClick={openSupportModal} color="info">
+              <Divider
+                flexItem
+                orientation="vertical"
+                variant="middle"
+                sx={{ mx: 1 }}
+              />
+              <IconButton onClick={openSupportModal}>
                 <HelpOutlineIcon />
               </IconButton>
               {/* Theme Toggle */}
-              <IconButton onClick={toggleTheme} color="info">
+              <IconButton onClick={toggleTheme}>
                 {isDarkMode ? (
                   <LightModeOutlinedIcon />
                 ) : (
@@ -550,7 +556,7 @@ const AppNavbar: React.FC<AppNavbarProps> = ({ isDarkMode, toggleTheme }) => {
               }}
             >
               {isLoggedIn && (
-                <IconButton size="medium" color="info" onClick={toggleOpen}>
+                <IconButton size="medium" onClick={toggleOpen}>
                   <MailOutlineIcon />
                   <Badge
                     badgeContent={unreadCount}
@@ -565,10 +571,10 @@ const AppNavbar: React.FC<AppNavbarProps> = ({ isDarkMode, toggleTheme }) => {
               >
                 <SearchIcon />
               </IconButton>
-              <IconButton color="info" onClick={openSupportModal}>
+              <IconButton onClick={openSupportModal}>
                 <HelpOutlineIcon />
               </IconButton>
-              <IconButton onClick={toggleTheme} color="info">
+              <IconButton onClick={toggleTheme}>
                 {isDarkMode ? (
                   <LightModeOutlinedIcon />
                 ) : (

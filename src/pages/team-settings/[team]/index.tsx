@@ -1,13 +1,16 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import LockIcon from "@mui/icons-material/Lock";
 import {
+  Box,
   Button,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   TextField,
+  Typography,
   type SelectChangeEvent,
 } from "@mui/material";
 import {
@@ -17,12 +20,45 @@ import {
 } from "next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import FormMessage from "~/components/utils/form-message";
 import PageTitle from "~/components/utils/page-title";
+import { useAuthContext } from "~/contexts/auth";
 import { divisions } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import { type MessageType, type TeamType } from "~/utils/types";
+import {
+  type MessageType,
+  type TeamAffiliationType,
+  type TeamType,
+} from "~/utils/types";
+
+const AccessDenied = ({ teamName }: { teamName: string }) => {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2,
+        p: 4,
+        textAlign: "center",
+      }}
+    >
+      <LockIcon sx={{ fontSize: "96px", color: "primary" }} />
+      <Typography
+        variant="h5"
+        sx={{ fontWeight: "bold", color: "text.primary" }}
+      >
+        Access Restricted for {teamName}
+      </Typography>
+      <Typography variant="body1" color="text.secondary">
+        You must be an *Owner* or *Coach* to access these administration tools.
+      </Typography>
+    </Box>
+  );
+};
 
 export const getServerSideProps = (async (
   context: GetServerSidePropsContext,
@@ -39,6 +75,7 @@ export const getServerSideProps = (async (
 const TeamSettings = ({
   team,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { user, affiliations } = useAuthContext();
   const router = useRouter();
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
@@ -48,6 +85,28 @@ const TeamSettings = ({
   const [details, setDetails] = useState<TeamType | null | undefined>(team);
   const [imagePreview, setImagePreview] = useState<string>(team?.logo ?? "");
   const [pubURL, setPubURL] = useState<string | null>(team?.logo ?? null);
+  const [role, setRole] = useState<string | null>(null);
+
+  const fetchTeamAndRole = useCallback(async () => {
+    if (team) {
+      // 2. Determine Role
+      let determinedRole = "guest";
+      const affiliation: TeamAffiliationType | undefined = affiliations?.find(
+        (aff) => aff.team.id === team.id,
+      );
+
+      if (team.owner === user.userId) {
+        determinedRole = "owner";
+      } else if (affiliation?.role) {
+        determinedRole = affiliation.role;
+      }
+      setRole(determinedRole);
+    }
+  }, [team, user?.userId, affiliations]);
+
+  useEffect(() => {
+    void fetchTeamAndRole();
+  }, [fetchTeamAndRole]);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -146,6 +205,25 @@ const TeamSettings = ({
       }
     }
   };
+
+  const isAuthorized = role === "owner" || role === "coach";
+
+  if (!team || !isAuthorized) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "calc(100vh - 64px)",
+          width: "100%",
+          p: 2,
+        }}
+      >
+        <AccessDenied teamName={team?.full_name ?? "Team"} />
+      </Box>
+    );
+  }
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-8 p-4 text-center">

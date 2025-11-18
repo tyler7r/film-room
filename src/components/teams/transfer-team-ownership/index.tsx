@@ -126,7 +126,7 @@ const TransferTeamOwnershipModal = ({
           </div>
         )}
         <form
-          className="flex w-full flex-col items-center justify-center gap-2"
+          className="mt-4 flex w-full flex-col items-center justify-center gap-2"
           onSubmit={handleSubmit}
         >
           <FormControl className="flex w-4/5 flex-col p-2">
