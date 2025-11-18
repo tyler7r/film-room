@@ -33,7 +33,6 @@ const TeamProfileBtn = () => {
     <div>
       <IconButton
         onClick={(e) => handleClick(e)}
-        color="info"
         sx={{
           fontWeight: "bold",
           padding: 0.5,
