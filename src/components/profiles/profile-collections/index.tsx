@@ -25,7 +25,7 @@ type ProfileCollectionsProps = {
 const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
   const { isMobile } = useMobileContext();
   const { isDark } = useIsDarkContext();
-  const { user } = useAuthContext();
+  const { user, affIds } = useAuthContext();
   const theme = useTheme();
 
   const [collections, setCollections] = useState<CollectionViewType[]>([]);
@@ -69,12 +69,24 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
       }
 
       try {
-        const { data, error } = await supabase
+        const collectionsData = supabase
           .from("collection_view")
           .select("*", { count: "exact" })
           .eq("collection->>author_id", profileId)
           .order("collection->>created_at", { ascending: false })
           .range(offsetToFetch, offsetToFetch + itemsPerPage - 1);
+
+        if (affIds && affIds.length > 0) {
+          void collectionsData.or(
+            `collection->>private.eq.false, collection->>exclusive_to.in.(${affIds.join(
+              ",",
+            )})`,
+          );
+        } else {
+          void collectionsData.eq("collection->>private", false);
+        }
+
+        const { data, error } = await collectionsData;
 
         if (error) {
           console.error("Error fetching collections:", error);
