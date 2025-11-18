@@ -484,14 +484,16 @@ const AppNavbar: React.FC<AppNavbarProps> = ({ isDarkMode, toggleTheme }) => {
               >
                 <SearchIcon />
               </IconButton>
-              <Tooltip title="Profile">
-                <IconButton
-                  color="primary"
-                  onClick={() => handleNavigation(`/profile/${user.userId}`)}
-                >
-                  <AccountCircleIcon />
-                </IconButton>
-              </Tooltip>
+              {isLoggedIn && (
+                <Tooltip title="Profile">
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleNavigation(`/profile/${user.userId}`)}
+                  >
+                    <AccountCircleIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
               <Divider
                 flexItem
                 orientation="vertical"
