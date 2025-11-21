@@ -27,7 +27,7 @@ import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { TeamAffiliationType, UserType } from "~/utils/types";
+import type { UserType } from "~/utils/types";
 
 type FetchOptions = {
   profileId: string;
@@ -35,7 +35,7 @@ type FetchOptions = {
 
 const Profile = () => {
   const router = useRouter();
-  const { user } = useAuthContext();
+  const { user, affiliations } = useAuthContext();
   const { backgroundStyle } = useIsDarkContext();
   const { isMobile } = useMobileContext();
   const theme = useTheme();
@@ -45,12 +45,6 @@ const Profile = () => {
     profileId: router.query.user as string,
   });
   const [profile, setProfile] = useState<UserType | null>(null);
-  const [profileAffiliations, setProfileAffiliations] = useState<
-    TeamAffiliationType[] | null
-  >(null);
-
-  // const [lastWatched, setLastWatched] = useState<LastWatchedType | null>(null);
-  // Replaced actionBarStatus with selectedTab for Material UI Tabs
   const [selectedTab, setSelectedTab] = useState<
     "created" | "mentions" | "highlights"
   >("created");
@@ -77,7 +71,6 @@ const Profile = () => {
         if (profileError) {
           console.error("Error fetching profile:", profileError);
           setProfile(null);
-          setProfileAffiliations(null);
           return;
         }
 
@@ -86,35 +79,6 @@ const Profile = () => {
         }
       }
     },
-
-    //   const { data: userData, error: userError } = await supabase
-    //     .from("user_view")
-    //     .select("*")
-    //     .eq("profile->>id", profileIdToFetch);
-
-    //   if (userError) {
-    //     console.error("Error fetching user affiliations:", userError);
-    //     setProfileAffiliations(null);
-    //     return;
-    //   }
-
-    //   if (userData) {
-    //     const typedAffiliations: TeamAffiliationType[] = userData
-    //       .filter((aff) => aff.affiliation.verified)
-    //       .map((aff) => ({
-    //         team: aff.team,
-    //         role: aff.affiliation.role,
-    //         number: aff.affiliation.number,
-    //         affId: aff.affiliation.id,
-    //       }));
-    //     setProfileAffiliations(
-    //       typedAffiliations.length > 0 ? typedAffiliations : null,
-    //     );
-    //   } else {
-    //     setProfileAffiliations(null);
-    //   }
-    // }
-    // }
     [router.query.user],
   ); // Added router.query.user to dependencies
 
@@ -259,7 +223,7 @@ const Profile = () => {
             width: "100%",
           }}
         >
-          {profileAffiliations && profileAffiliations.length > 0 && (
+          {affiliations && affiliations.length > 0 && (
             <Box
               sx={{
                 display: "flex",
@@ -271,7 +235,7 @@ const Profile = () => {
                 pt: 1,
               }}
             >
-              {profileAffiliations.map((aff) => (
+              {affiliations.map((aff) => (
                 <TeamAffiliation key={aff.affId} aff={aff} />
               ))}
             </Box>
