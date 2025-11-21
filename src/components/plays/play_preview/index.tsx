@@ -26,7 +26,7 @@ import CommentBtn from "../../interactions/comments/comment-btn";
 import LikeBtn from "../../interactions/likes/like-btn";
 import StandardPopover from "../../utils/standard-popover";
 import ExpandedPlay from "../expanded-play";
-import PlayActionsMenu from "../play-actions-menu"; // Updated import
+import PlayActionsMenu from "../play-actions-menu";
 import PlayPreviewCollections from "../play-collections";
 import PlayPreviewMentions from "../play-mentions";
 import PlayPreviewTags from "../play-tags";
@@ -216,7 +216,10 @@ const PlayPreview = ({
   }, [player, resetClip, hasStartedPlaying]); // Dependencies: player and resetClip
 
   return (
-    <Box className="flex w-full flex-col justify-center rounded-md">
+    <Box
+      className="flex w-full flex-col justify-center rounded-md"
+      sx={{ maxWidth: "1000px" }}
+    >
       <Box className="flex items-center justify-between gap-2 px-1 py-2">
         <Box className="flex items-center gap-1.5">
           {preview.play.private && exclusiveTeam && (
@@ -293,6 +296,7 @@ const PlayPreview = ({
       <Box
         ref={videoPlayerRef}
         className="relative aspect-video w-full overflow-hidden rounded-md"
+        sx={{ maxWidth: "1000px" }}
       >
         {!isLoading && (
           <YouTube
@@ -330,9 +334,9 @@ const PlayPreview = ({
           gap: 1,
         }}
       >
-        <PlayPreviewMentions play={preview} />
-        <PlayPreviewTags play={preview} />
-        <PlayPreviewCollections play={preview} />
+        <PlayPreviewMentions play={preview.play.id} />
+        <PlayPreviewTags play={preview.play.id} />
+        <PlayPreviewCollections play={preview.play.id} />
       </Box>
       {/* New PlayCollections component */}
       <Box className="mt-1 flex w-full items-center">

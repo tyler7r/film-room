@@ -6,7 +6,6 @@ import {
   Typography,
   type SelectChangeEvent,
 } from "@mui/material";
-import TeamLogo from "~/components/teams/team-logo";
 import { useAuthContext } from "~/contexts/auth";
 import type { NewCollectionType } from "~/utils/types";
 
@@ -46,16 +45,30 @@ const PrivacyStatus = ({ newDetails, setNewDetails }: PrivacyStatusProps) => {
             Public
           </MenuItem>
           {affiliations?.map((div) => (
-            <MenuItem key={div.team.id} value={div.team.id}>
-              <div className="flex gap-2">
-                <div className="text-sm">
-                  Private to:{" "}
-                  <strong className="tracking-tight">
-                    {div.team.full_name}
-                  </strong>
-                </div>
-                <TeamLogo tm={div.team} size={25} />
-              </div>
+            <MenuItem
+              key={div.team.id}
+              value={div.team.id}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                // 🎯 FIX: Compressed menu item padding
+                p: 1,
+                pl: 2,
+                minHeight: "auto",
+                gap: 0.5,
+              }}
+            >
+              <Typography variant="caption">Plays private to: </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: "bold",
+                  lineHeight: 1,
+                  letterSpacing: -0.25,
+                }}
+              >
+                {div.team.full_name}
+              </Typography>
             </MenuItem>
           ))}
         </Select>

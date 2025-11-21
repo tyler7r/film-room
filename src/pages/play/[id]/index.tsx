@@ -15,29 +15,29 @@ import { useCallback, useEffect, useState } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
 import CommentBtn from "~/components/interactions/comments/comment-btn";
 import LikeBtn from "~/components/interactions/likes/like-btn";
-import ExpandedPlay from "~/components/plays/expanded-play";
-import PlayActionsMenu from "~/components/plays/play-actions-menu";
-import PlayPreviewCollections from "~/components/plays/play-collections";
-import PlayPreviewMentions from "~/components/plays/play-mentions";
+import PlayIndexExpanded from "~/components/plays/expanded-play/play-index";
+import PlayActionsMenu from "~/components/plays/play-actions-menu/play-index";
+import PlayPreviewCollections2 from "~/components/plays/play-collections";
+import PlayPreviewMentions2 from "~/components/plays/play-mentions";
 import PlayPreviewTags from "~/components/plays/play-tags";
+
 import TeamLogo from "~/components/teams/team-logo";
 import PageTitle from "~/components/utils/page-title";
 import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
-import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
+import { getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { PlayPreviewType } from "~/utils/types";
+import type { UnifiedPlayIndexType } from "~/utils/types";
 
 const Play = () => {
   const router = useRouter();
-  const { user, affiliations } = useAuthContext();
+  const { user } = useAuthContext();
   const { hoverText } = useIsDarkContext();
-  const { isMobile } = useMobileContext();
   const searchParams = useSearchParams();
   const playId = router.query.id as string;
 
-  const [preview, setPreview] = useState<PlayPreviewType | null>(null);
+  const [preview, setPreview] = useState<UnifiedPlayIndexType | null>(null);
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const [commentCount, setCommentCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -49,15 +49,11 @@ const Play = () => {
 
   const activeComment = useSearchParams().get("comment") ?? undefined;
 
-  const exclusiveTeam = affiliations?.find(
-    (aff) => aff.team.id === preview?.play.exclusive_to,
-  )?.team;
-
   const fetchPlay = async () => {
     const { data } = await supabase
-      .from("play_preview")
+      .from("unified_play_index")
       .select()
-      .eq("play->>id", playId)
+      .eq("play_id", playId)
       .single();
     if (data) {
       setPreview(data);
@@ -74,9 +70,9 @@ const Play = () => {
     setPlayer(video);
     if (preview) {
       void video.cueVideoById({
-        videoId: `${preview.video.link.split("v=")[1]?.split("&")[0]}`,
-        startSeconds: preview.play.start_time,
-        endSeconds: preview.play.end_time,
+        videoId: `${preview.video_link.split("v=")[1]?.split("&")[0]}`,
+        startSeconds: preview.play_start_time,
+        endSeconds: preview.play_end_time,
       });
       setIsLoading(false);
     }
@@ -94,14 +90,14 @@ const Play = () => {
         return;
       }
       void player.cueVideoById({
-        videoId: `${preview.video.link.split("v=")[1]?.split("&")[0]}`,
-        startSeconds: preview.play.start_time,
-        endSeconds: preview.play.end_time,
+        videoId: `${preview.video_link.split("v=")[1]?.split("&")[0]}`,
+        startSeconds: preview.play_start_time,
+        endSeconds: preview.play_end_time,
       });
     } catch (error) {
       console.error("Error resetting clip:", error);
     }
-  }, [player, preview?.play.start_time]);
+  }, [player, preview?.play_start_time]);
 
   const onPlayerStateChange = (e: YouTubeEvent) => {
     if (typeof YT !== "undefined") {
@@ -129,9 +125,9 @@ const Play = () => {
 
   const handleVideoClick = () => {
     if (preview) {
-      const videoId = preview.video.id;
-      const playId = preview.play.id;
-      const playStart = preview.play.start_time;
+      const videoId = preview.video_id;
+      const playId = preview.play_id;
+      const playStart = preview.play_start_time;
 
       const params = new URLSearchParams(searchParams);
       params.set("play", playId);
@@ -148,7 +144,7 @@ const Play = () => {
       return;
     }
     const origin = window.location.origin;
-    const linkToCopy = `${origin}/play/${preview.play.id}`;
+    const linkToCopy = `${origin}/play/${preview.play_id}`;
     try {
       await navigator.clipboard.writeText(linkToCopy);
       setSnackbarMessage("Link copied to clipboard!");
@@ -186,31 +182,45 @@ const Play = () => {
           width: "100%",
           display: "flex",
           justifyContent: "center",
+          flexDirection: "column",
+          alignItems: "center",
+          my: 2,
         }}
       >
         <Box
           className="flex w-full flex-col justify-center rounded-md p-2"
-          sx={{ width: isMobile ? "100%" : "80%" }}
+          sx={{ maxWidth: "1000px" }}
         >
           <Box className="flex items-center justify-between gap-2 px-1 py-3">
             <Box className="flex items-center gap-1.5">
-              {preview.play.private && exclusiveTeam && (
-                <StandardPopover
-                  content={`Play is private to ${exclusiveTeam?.full_name}`}
-                  children={
-                    <IconButton
-                      size="small"
-                      sx={{ padding: 0 }}
-                      onClick={() =>
-                        void router.push(`/team-hub/${exclusiveTeam.id}`)
-                      }
-                    >
-                      <TeamLogo tm={exclusiveTeam} size={25} inactive={true} />
-                    </IconButton>
-                  }
-                />
-              )}
-              {preview.play.highlight && (
+              {preview.private &&
+                preview.exclusive_to &&
+                preview.team_id &&
+                preview.team_full_name && (
+                  <StandardPopover
+                    content={`Play is private to ${preview.team_full_name}`}
+                    children={
+                      <IconButton
+                        size="small"
+                        sx={{ padding: 0 }}
+                        onClick={() =>
+                          void router.push(`/team-hub/${preview.exclusive_to}`)
+                        }
+                      >
+                        <TeamLogo
+                          tm={{
+                            id: preview.team_id,
+                            name: preview.team_full_name,
+                            logo: preview.team_logo,
+                          }}
+                          size={25}
+                          inactive={true}
+                        />
+                      </IconButton>
+                    }
+                  />
+                )}
+              {preview.highlight && (
                 <StandardPopover
                   content="Highlight!"
                   children={
@@ -230,14 +240,17 @@ const Play = () => {
               <Box
                 className={`text-center font-bold tracking-tighter md:text-lg ${hoverText}`}
                 onClick={() =>
-                  void router.push(`/profile/${preview.play.author_id}`)
+                  void router.push(`/profile/${preview.author_id}`)
                 }
               >
-                {preview.author.name}
+                {getDisplayName({
+                  name: preview.author_name,
+                  email: preview.author_email,
+                })}
               </Box>
               <Divider flexItem orientation="vertical" sx={{ mx: 0.5 }} />
               <Box className="text-xs font-bold leading-3 tracking-tight">
-                ({preview.play.end_time - preview.play.start_time}s)
+                ({preview.play_end_time - preview.play_start_time}s)
               </Box>
             </Box>
             <Box className="flex items-center gap-2">
@@ -261,14 +274,24 @@ const Play = () => {
               />
             </Box>
           </Box>
-          <Box className="relative aspect-video w-full overflow-hidden rounded-md">
+          <Box
+            sx={{
+              position: "relative",
+              aspectRatio: "16 / 9",
+              width: "100%",
+              overflow: "hidden",
+              borderRadius: "8px",
+              boxShadow: 3,
+              maxWidth: "1000px",
+            }}
+          >
             {!isLoading && (
               <YouTube
                 opts={{
                   width: "100%",
                   height: "100%",
                   playerVars: {
-                    end: preview.play.end_time,
+                    end: preview.play_end_time,
                     enablejsapi: 1,
                     playsinline: 1,
                     disablekb: 0,
@@ -281,13 +304,13 @@ const Play = () => {
                 onReady={videoOnReady}
                 onStateChange={onPlayerStateChange}
                 id="player"
-                videoId={preview.video.link.split("v=")[1]?.split("&")[0]}
+                videoId={preview.video_link.split("v=")[1]?.split("&")[0]}
                 className="absolute left-0 top-0 h-full w-full"
               />
             )}
           </Box>
           <Box className="flex flex-wrap" sx={{ p: 0.5 }}>
-            <Typography variant="body1">{preview.play.title}</Typography>
+            <Typography variant="body1">{preview.play_title}</Typography>
           </Box>
           {isLoading && <PageTitle size="small" title="Loading..." />}
           <Box
@@ -298,16 +321,16 @@ const Play = () => {
               gap: 1,
             }}
           >
-            <PlayPreviewMentions play={preview} />
-            <PlayPreviewTags play={preview} />
-            <PlayPreviewCollections play={preview} />
+            <PlayPreviewMentions2 play={preview.play_id} />
+            <PlayPreviewTags play={preview.play_id} />
+            <PlayPreviewCollections2 play={preview.play_id} />
           </Box>
           {/* New PlayCollections component */}
           <Box className="mt-1 flex w-full items-center">
             <Box className="flex items-center justify-center gap-2">
-              <LikeBtn playId={preview.play.id} />
+              <LikeBtn playId={preview.play_id} />
               <CommentBtn
-                playId={preview.play.id}
+                playId={preview.play_id}
                 commentCount={commentCount}
                 setCommentCount={setCommentCount}
                 activePlay={null}
@@ -321,7 +344,7 @@ const Play = () => {
             sx={{ my: 2, mx: 0.5 }}
           />
           <Box sx={{ display: "flex", width: "100%", p: 0.5 }}>
-            <ExpandedPlay
+            <PlayIndexExpanded
               play={preview}
               setCommentCount={setCommentCount}
               activeComment={activeComment}

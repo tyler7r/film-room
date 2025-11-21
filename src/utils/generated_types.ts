@@ -48,11 +48,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "affiliations_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "affiliations_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
+          },
+          {
             foreignKeyName: "affiliations_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "affiliations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
           },
         ]
       }
@@ -87,6 +115,20 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "public_announcement_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "public_announcement_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
         ]
       }
       announcements: {
@@ -120,11 +162,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "announcements_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "announcements_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
             foreignKeyName: "announcements_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcements_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "announcements_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
           },
         ]
       }
@@ -161,6 +231,20 @@ export type Database = {
             columns: ["play_id"]
             isOneToOne: false
             referencedRelation: "transition_mention_view"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "collection_plays_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "collection_plays_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
             referencedColumns: ["play_id"]
           },
         ]
@@ -202,11 +286,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "collections_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "collections_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
             foreignKeyName: "collections_exclusive_to_fkey"
             columns: ["exclusive_to"]
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collections_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "collections_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
           },
         ]
       }
@@ -240,6 +352,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_comment_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "public_comment_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
           },
         ]
       }
@@ -277,6 +403,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "comments_comment_author_fkey"
+            columns: ["comment_author"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "comments_comment_author_fkey"
+            columns: ["comment_author"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
             foreignKeyName: "comments_play_id_fkey"
             columns: ["play_id"]
             isOneToOne: false
@@ -288,6 +428,20 @@ export type Database = {
             columns: ["play_id"]
             isOneToOne: false
             referencedRelation: "transition_mention_view"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
             referencedColumns: ["play_id"]
           },
         ]
@@ -332,11 +486,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
             foreignKeyName: "notifications_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "notifications_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
           },
         ]
       }
@@ -372,11 +554,39 @@ export type Database = {
             referencedColumns: ["play_id"]
           },
           {
+            foreignKeyName: "public_play_likes_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_likes_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["play_id"]
+          },
+          {
             foreignKeyName: "public_play_likes_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_play_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "public_play_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
           },
         ]
       }
@@ -420,11 +630,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "play_mentions_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "play_mentions_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
             foreignKeyName: "play_mentions_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "play_mentions_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "play_mentions_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
           },
           {
             foreignKeyName: "public_play_mentions2_play_id_fkey"
@@ -438,6 +676,20 @@ export type Database = {
             columns: ["play_id"]
             isOneToOne: false
             referencedRelation: "transition_mention_view"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_mentions2_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_mentions2_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
             referencedColumns: ["play_id"]
           },
         ]
@@ -468,6 +720,20 @@ export type Database = {
             columns: ["play_id"]
             isOneToOne: false
             referencedRelation: "transition_mention_view"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "public_play_tags_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
             referencedColumns: ["play_id"]
           },
           {
@@ -537,6 +803,34 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["video_id"]
+          },
+          {
             foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
@@ -549,6 +843,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
           },
         ]
       }
@@ -619,6 +927,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "replies_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "replies_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
             foreignKeyName: "replies_comment_id_fkey"
             columns: ["comment_id"]
             isOneToOne: false
@@ -658,6 +980,20 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reply_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "reply_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
         ]
       }
       tags: {
@@ -687,6 +1023,20 @@ export type Database = {
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "public_tags_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "public_tags_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
+          },
         ]
       }
       team_videos: {
@@ -709,6 +1059,34 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_team_videos_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "public_team_videos_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "team_videos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "team_videos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["video_id"]
           },
           {
             foreignKeyName: "team_videos_video_id_fkey"
@@ -754,6 +1132,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teams_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "teams_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
           },
         ]
       }
@@ -815,11 +1207,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "videos_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "videos_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
             foreignKeyName: "videos_exclusive_to_fkey"
             columns: ["exclusive_to"]
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "videos_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "videos_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
           },
         ]
       }
@@ -875,6 +1295,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "comments_comment_author_fkey"
+            columns: ["comment_author_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "comments_comment_author_fkey"
+            columns: ["comment_author_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
             foreignKeyName: "comments_play_id_fkey"
             columns: ["play_id"]
             isOneToOne: false
@@ -889,11 +1323,39 @@ export type Database = {
             referencedColumns: ["play_id"]
           },
           {
+            foreignKeyName: "comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["play_id"]
+          },
+          {
+            foreignKeyName: "comments_play_id_fkey"
+            columns: ["play_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["play_id"]
+          },
+          {
             foreignKeyName: "replies_author_id_fkey"
             columns: ["author"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "replies_author_id_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "replies_author_id_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
           },
         ]
       }
@@ -995,6 +1457,20 @@ export type Database = {
             foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
             referencedRelation: "videos"
             referencedColumns: ["id"]
           },
@@ -1024,11 +1500,53 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "play_mentions_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "play_mentions_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
             foreignKeyName: "plays_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["video_id"]
           },
           {
             foreignKeyName: "plays_video_id_fkey"
@@ -1053,6 +1571,34 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["video_id"]
           },
           {
             foreignKeyName: "plays_video_id_fkey"
@@ -1080,6 +1626,34 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["video_id"]
+          },
+          {
             foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
@@ -1092,6 +1666,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
           },
         ]
       }
@@ -1108,6 +1696,20 @@ export type Database = {
             foreignKeyName: "plays_video_id_fkey"
             columns: ["video_id"]
             isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
             referencedRelation: "videos"
             referencedColumns: ["id"]
           },
@@ -1117,6 +1719,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
           },
         ]
       }
@@ -1134,8 +1750,224 @@ export type Database = {
             foreignKeyName: "plays_video_id_fkey"
             columns: ["video"]
             isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["video_id"]
+          },
+          {
+            foreignKeyName: "plays_video_id_fkey"
+            columns: ["video"]
+            isOneToOne: false
             referencedRelation: "videos"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      unified_play_index: {
+        Row: {
+          author_email: string | null
+          author_id: string | null
+          author_name: string | null
+          author_send_notifications: boolean | null
+          exclusive_to: string | null
+          highlight: boolean | null
+          play_created_at: string | null
+          play_end_time: number | null
+          play_end_time_sort: string | null
+          play_id: string | null
+          play_note: string | null
+          play_post_to_feed: boolean | null
+          play_start_time: number | null
+          play_start_time_sort: string | null
+          play_title: string | null
+          private: boolean | null
+          team_full_name: string | null
+          team_id: string | null
+          team_logo: string | null
+          topic_searchable_text: string | null
+          video_exclusive_to: string | null
+          video_id: string | null
+          video_link: string | null
+          video_title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "videos_exclusive_to_fkey"
+            columns: ["video_exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "videos_exclusive_to_fkey"
+            columns: ["video_exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "videos_exclusive_to_fkey"
+            columns: ["video_exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
+          },
+        ]
+      }
+      updated_play_preview: {
+        Row: {
+          author_email: string | null
+          author_id: string | null
+          author_join_date: string | null
+          author_last_notified: string | null
+          author_last_watched: string | null
+          author_last_watched_time: number | null
+          author_name: string | null
+          author_send_notifications: boolean | null
+          play_author_id: string | null
+          play_created_at: string | null
+          play_end_time: number | null
+          play_end_time_sort: string | null
+          play_exclusive_to: string | null
+          play_highlight: boolean | null
+          play_id: string | null
+          play_note: string | null
+          play_post_to_feed: boolean | null
+          play_private: boolean | null
+          play_start_time: number | null
+          play_start_time_sort: string | null
+          play_title: string | null
+          team_city: string | null
+          team_division: string | null
+          team_full_name: string | null
+          team_id: string | null
+          team_logo: string | null
+          team_name: string | null
+          team_owner: string | null
+          video_coach_video: boolean | null
+          video_division: string | null
+          video_duplicate_check: string | null
+          video_exclusive_to: string | null
+          video_id: string | null
+          video_keywords: string | null
+          video_link: string | null
+          video_season: string | null
+          video_title: string | null
+          video_tournament: string | null
+          video_uploaded_at: string | null
+          video_week: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["play_author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["play_author_id"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "plays_author_id_fkey"
+            columns: ["play_author_id"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["play_exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["play_exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "public_plays_exclusive_to_fkey"
+            columns: ["play_exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "teams_owner_fkey"
+            columns: ["team_owner"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teams_owner_fkey"
+            columns: ["team_owner"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "teams_owner_fkey"
+            columns: ["team_owner"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["author_id"]
+          },
+          {
+            foreignKeyName: "videos_exclusive_to_fkey"
+            columns: ["video_exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "videos_exclusive_to_fkey"
+            columns: ["video_exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "unified_play_index"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "videos_exclusive_to_fkey"
+            columns: ["video_exclusive_to"]
+            isOneToOne: false
+            referencedRelation: "updated_play_preview"
+            referencedColumns: ["team_id"]
           },
         ]
       }

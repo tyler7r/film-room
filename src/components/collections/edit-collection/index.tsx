@@ -16,9 +16,6 @@ type EditCollectionProps = {
   collection: CollectionType;
   isEditOpen: boolean;
   setIsEditOpen: (isEditOpen: boolean) => void;
-  // Optional: If you need to trigger a reload in the parent Collection component
-  // after a successful edit, you can add a prop like:
-  // setReload?: (reload: boolean) => void;
 };
 
 const EditCollection = ({

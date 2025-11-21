@@ -83,60 +83,40 @@ const Profile = () => {
 
         if (profileData) {
           setProfile(profileData);
-
-          const { data: userData, error: userError } = await supabase
-            .from("user_view")
-            .select("*")
-            .eq("profile->>id", profileIdToFetch);
-
-          if (userError) {
-            console.error("Error fetching user affiliations:", userError);
-            setProfileAffiliations(null);
-            return;
-          }
-
-          if (userData) {
-            const typedAffiliations: TeamAffiliationType[] = userData
-              .filter((aff) => aff.affiliation.verified)
-              .map((aff) => ({
-                team: aff.team,
-                role: aff.affiliation.role,
-                number: aff.affiliation.number,
-                affId: aff.affiliation.id,
-              }));
-            setProfileAffiliations(
-              typedAffiliations.length > 0 ? typedAffiliations : null,
-            );
-          } else {
-            setProfileAffiliations(null);
-          }
         }
       }
     },
+
+    //   const { data: userData, error: userError } = await supabase
+    //     .from("user_view")
+    //     .select("*")
+    //     .eq("profile->>id", profileIdToFetch);
+
+    //   if (userError) {
+    //     console.error("Error fetching user affiliations:", userError);
+    //     setProfileAffiliations(null);
+    //     return;
+    //   }
+
+    //   if (userData) {
+    //     const typedAffiliations: TeamAffiliationType[] = userData
+    //       .filter((aff) => aff.affiliation.verified)
+    //       .map((aff) => ({
+    //         team: aff.team,
+    //         role: aff.affiliation.role,
+    //         number: aff.affiliation.number,
+    //         affId: aff.affiliation.id,
+    //       }));
+    //     setProfileAffiliations(
+    //       typedAffiliations.length > 0 ? typedAffiliations : null,
+    //     );
+    //   } else {
+    //     setProfileAffiliations(null);
+    //   }
+    // }
+    // }
     [router.query.user],
   ); // Added router.query.user to dependencies
-
-  // const fetchLastWatched = useCallback(async () => {
-  //   if (user.userId && user.userId === options.profileId) {
-  //     const { data, error } = await supabase
-  //       .from("last_watched_view")
-  //       .select()
-  //       .eq("profile->>id", `${user.userId}`)
-  //       .single();
-  //     if (error) {
-  //       console.error("Error fetching last watched:", error);
-  //       setLastWatched(null);
-  //       return;
-  //     }
-  //     if (data?.video) setLastWatched(data);
-  //     else setLastWatched(null);
-  //   }
-  // }, [user.userId, options.profileId]); // Added options.profileId to dependencies
-
-  // Effect for initial fetch of last watched
-  // useEffect(() => {
-  //   if (user.userId) void fetchLastWatched();
-  // }, [user, fetchLastWatched]); // Dependencies on user and memoized fetchLastWatched
 
   // Effect to update options state when router query changes
   useEffect(() => {

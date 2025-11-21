@@ -10,13 +10,19 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import type { EmailAuthorType, PlayType, VideoType } from "~/utils/types";
+import type {
+  CondensedVideoType,
+  EmailAuthorType,
+  EmailPlayType,
+  PlayType,
+  VideoType,
+} from "~/utils/types";
 
 // Note: The EmailProps type definition is updated to include the new prop.
 type EmailProps = {
   author: EmailAuthorType;
-  video: VideoType;
-  play: PlayType;
+  video: VideoType | CondensedVideoType;
+  play: PlayType | EmailPlayType;
   // NEW: Number of other unread notifications
   unreadNotificationCount: number;
 };

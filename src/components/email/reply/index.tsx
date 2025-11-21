@@ -12,7 +12,9 @@ import {
 } from "@react-email/components";
 import type {
   CommentType,
+  CondensedVideoType,
   EmailAuthorType,
+  EmailPlayType,
   PlayType,
   ReplyType,
   VideoType,
@@ -20,10 +22,10 @@ import type {
 
 type EmailProps = {
   author: EmailAuthorType;
-  video: VideoType;
+  video: VideoType | CondensedVideoType;
   reply: ReplyType;
   comment: CommentType;
-  play: PlayType;
+  play: PlayType | EmailPlayType;
   // NEW: Number of other unread notifications
   unreadNotificationCount: number;
 };

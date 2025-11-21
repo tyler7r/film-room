@@ -15,11 +15,11 @@ import {
 import React, { useCallback, useEffect, useState } from "react"; // Add useCallback
 import { useAuthContext } from "~/contexts/auth"; // Assuming this context exists
 import { supabase } from "~/utils/supabase"; // Assuming Supabase client is initialized here
-import type { PlayPreviewType, TagType } from "~/utils/types"; // Assuming these types exist
+import type { TagType, UnifiedPlayIndexType } from "~/utils/types"; // Assuming these types exist
 
 type PlayPreviewTagProps = {
-  play: PlayPreviewType;
-  activePlay?: PlayPreviewType;
+  play: string;
+  activePlay?: UnifiedPlayIndexType | null;
   handleMentionAndTagClick?: (e: React.MouseEvent, topic: string) => void;
   playId?: string;
 };
@@ -50,7 +50,7 @@ const PlayPreviewTags = ({
     const tags = supabase
       .from("plays_via_tag")
       .select("*")
-      .eq("play->>id", play.play.id);
+      .eq("play->>id", play);
     if (affIds && affIds.length > 0) {
       void tags.or(`tag->>private.eq.false, tag->>exclusive_to.in.(${affIds})`);
     } else {
@@ -61,7 +61,7 @@ const PlayPreviewTags = ({
       const tags: TagType[] = data.map((tag) => tag.tag);
       setTags(tags);
     } else setTags(null);
-  }, [play.play.id, affIds]); // Dependencies for useCallback: play.play.id and affIds
+  }, [play, affIds]); // Dependencies for useCallback: play.play.id and affIds
 
   const handleClick = (
     e: React.MouseEvent,
@@ -76,28 +76,6 @@ const PlayPreviewTags = ({
       handleCloseDialog(e);
     }
   };
-
-  // useEffect(() => {
-  //   const channel = supabase
-  //     .channel(`play_tags_${play.play.id}_changes`) // Unique channel name for specific play's tags
-  //     .on(
-  //       "postgres_changes",
-  //       {
-  //         event: "*",
-  //         schema: "public",
-  //         table: "play_tags",
-  //         filter: `play_id=eq.${play.play.id}`,
-  //       }, // Filter for relevant plays
-  //       () => {
-  //         void fetchTags(); // Use void to explicitly ignore the promise
-  //       },
-  //     )
-  //     .subscribe();
-
-  //   return () => {
-  //     void supabase.removeChannel(channel);
-  //   };
-  // }, [play.play.id, fetchTags]); // Dependencies for the effect: play.play.id and fetchTags
 
   // Initial fetch and refetch on relevant prop changes (now including fetchTags)
   useEffect(() => {

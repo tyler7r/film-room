@@ -8,10 +8,15 @@ import {
 } from "@mui/material";
 import TeamLogo from "~/components/teams/team-logo";
 import { useAuthContext } from "~/contexts/auth";
-import type { NewPlayType, TeamType, VideoType } from "~/utils/types";
+import type {
+  CondensedVideoType,
+  NewPlayType,
+  TeamType,
+  VideoType,
+} from "~/utils/types";
 
 type PrivacyStatusProps = {
-  video: VideoType;
+  video: VideoType | CondensedVideoType;
   newDetails: NewPlayType;
   setNewDetails: (newDetails: NewPlayType) => void;
 };
@@ -70,21 +75,46 @@ const PrivacyStatus = ({
             name="privacy"
             id="privacy-status"
             className="w-full"
+            size="small"
           >
-            <MenuItem value="public" style={{ fontSize: "14px" }}>
-              Public
+            <MenuItem
+              value="public"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                // 🎯 FIX: Compressed menu item padding
+                p: 1,
+                pl: 2,
+                minHeight: "auto",
+              }}
+            >
+              <Typography variant="caption">Public</Typography>
             </MenuItem>
             {affiliations?.map((div) => (
-              <MenuItem key={div.team.id} value={div.team.id}>
-                <div className="flex gap-2">
-                  <div className="text-sm">
-                    Private to:{" "}
-                    <strong className="tracking-tight">
-                      {div.team.full_name}
-                    </strong>
-                  </div>
-                  <TeamLogo tm={div.team} size={25} />
-                </div>
+              <MenuItem
+                key={div.team.id}
+                value={div.team.id}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  // 🎯 FIX: Compressed menu item padding
+                  p: 1,
+                  pl: 2,
+                  minHeight: "auto",
+                  gap: 0.5,
+                }}
+              >
+                <Typography variant="caption">Plays private to: </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: "bold",
+                    lineHeight: 1,
+                    letterSpacing: -0.25,
+                  }}
+                >
+                  {div.team.full_name}
+                </Typography>
               </MenuItem>
             ))}
           </Select>
@@ -101,29 +131,6 @@ const PrivacyStatus = ({
             ? `Since this is a private video, all plays are also private to just members of your team.`
             : "Private plays are only viewable by your teammates and coaches, even on public videos. Public plays are viewable by all users."}
         </Typography>
-        {/* <Tooltip
-          title={
-            video.private
-              ? `Since this is a private video, all plays are also private to just members of your team.`
-              : "Private plays are only viewable by your teammates and coaches, even on public videos. Public plays are viewable by all users."
-          }
-          slotProps={{
-            popper: {
-              modifiers: [
-                {
-                  name: "offset",
-                  options: {
-                    offset: [0, -14],
-                  },
-                },
-              ],
-            },
-          }}
-        >
-          <IconButton size="small">
-            <InfoOutlinedIcon />
-          </IconButton>
-        </Tooltip> */}
       </div>
     </FormControl>
   );

@@ -21,14 +21,14 @@ import {
   type SyntheticEvent,
 } from "react";
 import YouTube, { type YouTubeEvent, type YouTubePlayer } from "react-youtube";
-import CreatePlay from "~/components/plays/create-play";
+import CreatePlay2 from "~/components/plays/create-play";
 import Team from "~/components/teams/team";
 import PageTitle from "~/components/utils/page-title";
 import VideoActionsMenu from "~/components/videos/video-actions-menu";
-import VideoPlayIndex from "~/components/videos/video-play-index";
+import VideoPlayIndex2 from "~/components/videos/video-play-index";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import type { PlayPreviewType, TeamType, VideoType } from "~/utils/types";
+import type { TeamType, UnifiedPlayIndexType, VideoType } from "~/utils/types";
 
 const FilmRoom = () => {
   const router = useRouter();
@@ -45,7 +45,10 @@ const FilmRoom = () => {
 
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const playerRef = useRef<HTMLDivElement | null>(null);
-  const [activePlay, setActivePlay] = useState<PlayPreviewType | null>(null);
+  // const [activePlay, setActivePlay] = useState<PlayPreviewType | null>(null);
+  const [activePlay, setActivePlay] = useState<UnifiedPlayIndexType | null>(
+    null,
+  );
   const [seenActivePlay, setSeenActivePlay] = useState<boolean>(false);
 
   const [isNewPlayOpen, setIsNewPlayOpen] = useState<boolean>(false);
@@ -119,11 +122,11 @@ const FilmRoom = () => {
   const fetchActivePlay = useCallback(async () => {
     if (playParam) {
       const { data, error } = await supabase
-        .from("play_preview")
+        .from("unified_play_index")
         .select(`*`, {
           count: "exact",
         })
-        .eq("play->>id", playParam)
+        .eq("play_id", playParam)
         .single();
       if (error) {
         console.error("Error fetching active play:", error);
@@ -164,7 +167,7 @@ const FilmRoom = () => {
   const checkTime = useCallback(async () => {
     if (player && activePlay) {
       const currentTime = await getCurrentTime(player);
-      const endTime = activePlay.play.end_time;
+      const endTime = activePlay.play_end_time;
 
       if (currentTime >= endTime && interval.current && !seenActivePlay) {
         void player.pauseVideo();
@@ -174,7 +177,7 @@ const FilmRoom = () => {
       } else if (currentTime < endTime && !interval.current) {
         interval.current = setInterval(() => void checkTime(), 1000);
       } else if (currentTime >= endTime && seenActivePlay) {
-        void player.seekTo(activePlay.play.start_time, true);
+        void player.seekTo(activePlay.play_start_time, true);
         void player.pauseVideo();
         if (interval.current) {
           void clearInterval(interval.current);
@@ -437,7 +440,7 @@ const FilmRoom = () => {
               }}
             >
               {isPlayerInView ? (
-                <CreatePlay
+                <CreatePlay2
                   player={player}
                   video={video}
                   isNewPlayOpen={isNewPlayOpen}
@@ -458,7 +461,7 @@ const FilmRoom = () => {
             </Box>
 
             {/* Video Play Index */}
-            <VideoPlayIndex
+            <VideoPlayIndex2
               key={refreshPlaysKey}
               player={player}
               videoId={video.id}
@@ -468,6 +471,16 @@ const FilmRoom = () => {
               setSeenActivePlay={setSeenActivePlay}
               handlePlayDeleted={handlePlayDeleted}
             />
+            {/* <VideoPlayIndex
+              key={refreshPlaysKey}
+              player={player}
+              videoId={video.id}
+              scrollToPlayer={scrollToPlayer}
+              setActivePlay={setActivePlay}
+              activePlay={activePlay}
+              setSeenActivePlay={setSeenActivePlay}
+              handlePlayDeleted={handlePlayDeleted}
+            /> */}
           </Box>
         ) : (
           /* Access Denied Message */

@@ -1,6 +1,7 @@
-import AddIcon from "@mui/icons-material/Add";
-import ClearIcon from "@mui/icons-material/Clear";
+// import AddIcon from "@mui/icons-material/Add";
+// import ClearIcon from "@mui/icons-material/Clear";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import TimelapseIcon from "@mui/icons-material/Timelapse";
 import {
   Box,
   Button,
@@ -9,26 +10,25 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { useCallback, useEffect, useRef, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+// InfiniteScroll is removed per requirement 1
 import type { YouTubePlayer } from "react-youtube";
 import Play from "~/components/plays/play";
+import PlaySearchFilters2 from "~/components/search-filters/play-search-filters";
 import StandardPopover from "~/components/utils/standard-popover";
 import { useAuthContext } from "~/contexts/auth";
-import { useMobileContext } from "~/contexts/mobile";
 import useDebounce from "~/utils/debounce"; // Assuming useDebounce is correctly implemented
 import { convertYouTubeTimestamp } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { Database, PlayPreviewType } from "~/utils/types"; // Import PlayPreviewType and Database type
-import PlaySearchFilters from "../../search-filters/play-search-filters";
+import type { UnifiedPlayIndexType } from "~/utils/types";
 import PageTitle from "../../utils/page-title";
 
 type VideoPlayIndexProps = {
   player: YouTubePlayer | null;
   videoId: string;
   scrollToPlayer: () => void;
-  setActivePlay: (play: PlayPreviewType) => void;
-  activePlay: PlayPreviewType | null;
+  setActivePlay: (play: UnifiedPlayIndexType | null) => void;
+  activePlay: UnifiedPlayIndexType | undefined | null;
   setSeenActivePlay: (seenActivePlay: boolean) => void;
   handlePlayDeleted: () => void;
 };
@@ -41,6 +41,9 @@ export type PlaySearchOptions = {
   timestamp: string | null;
 };
 
+// Define the grace period after a play ends before it rolls off.
+const ROLL_OFF_GRACE_SECONDS = 3;
+
 const VideoPlayIndex = ({
   player,
   videoId,
@@ -51,17 +54,18 @@ const VideoPlayIndex = ({
   handlePlayDeleted,
 }: VideoPlayIndexProps) => {
   const { affIds } = useAuthContext();
-  const { isMobile } = useMobileContext();
+  //   const { isMobile } = useMobileContext();
 
-  const [plays, setPlays] = useState<PlayPreviewType[]>([]);
+  // State to hold ALL fetched plays (no pagination)
+  const [allPlays, setAllPlays] = useState<UnifiedPlayIndexType[]>([]);
   const [playCount, setPlayCount] = useState<number | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
-
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [currentOffset, setCurrentOffset] = useState<number>(0);
   const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
 
-  const itemsPerLoad = isMobile ? 5 : 10;
+  // New state for auto-roll-off feature (Requirement 3)
+  const [isAutoRollOffEnabled, setIsAutoRollOffEnabled] =
+    useState<boolean>(true);
+  const [currentVideoTime, setCurrentVideoTime] = useState<number>(0); // Requirement 2 tracking
 
   const [searchOptions, setSearchOptions] = useState<PlaySearchOptions>({
     only_highlights: false,
@@ -73,249 +77,157 @@ const VideoPlayIndex = ({
 
   const topRef = useRef<HTMLDivElement | null>(null);
 
+  // Determine if any filter is manually active (Requirement 4)
+  const isFilterActive = useMemo(() => {
+    return (
+      !!searchOptions.topic ||
+      !!searchOptions.only_highlights ||
+      !!searchOptions.timestamp ||
+      (searchOptions.private_only && searchOptions.private_only !== "all")
+    );
+  }, [searchOptions]);
+
+  // Modified fetchPlays: Always fetches ALL results that match the current search filters.
   const fetchPlays = useCallback(
-    async (offset: number, append = true) => {
-      setLoadingInitial(!append);
+    async (shouldClearPlays = true) => {
+      setLoadingInitial(shouldClearPlays);
 
       try {
-        let combinedPlays: PlayPreviewType[] = [];
-        let totalCount: number | null = 0;
+        let playsQuery = supabase
+          .from("unified_play_index")
+          .select("*", { count: "exact" }) // Fetch all columns, but still get the count
+          .eq("video_id", videoId)
+          .order("play_start_time_sort");
 
-        if (searchOptions.topic && searchOptions.topic !== "") {
-          // --- Fetch by mention and tag (topic search) ---
-          let playsByMentionQuery = supabase
-            .from("plays_via_user_mention")
-            .select<
-              string,
-              Database["public"]["Views"]["plays_via_user_mention"]["Row"]
-            >("*", { count: "exact" })
-            .eq("video->>id", videoId)
-            .order("play->>start_time_sort")
-            .ilike("mention->>receiver_name", `%${searchOptions.topic}%`);
-
-          let playsByTagQuery = supabase
-            .from("plays_via_tag")
-            .select<
-              string,
-              Database["public"]["Views"]["plays_via_tag"]["Row"]
-            >("*", { count: "exact" })
-            .eq("video->>id", videoId)
-            .order("play->>start_time_sort")
-            .ilike("tag->>title", `%${searchOptions.topic}%`);
-
-          if (searchOptions.only_highlights) {
-            playsByMentionQuery = playsByMentionQuery.eq(
-              "play->>highlight",
-              true,
-            );
-            playsByTagQuery = playsByTagQuery.eq("play->>highlight", true);
-          }
-          if (searchOptions.author && searchOptions.author !== "") {
-            playsByMentionQuery = playsByMentionQuery.ilike(
-              "author->>name",
-              `%${searchOptions.author}%`,
-            );
-            playsByTagQuery = playsByTagQuery.ilike(
-              "author->>name",
-              `%${searchOptions.author}%`,
-            );
-          }
-          if (activePlay) {
-            playsByMentionQuery = playsByMentionQuery.neq(
-              "play->>id",
-              activePlay.play.id,
-            );
-            playsByTagQuery = playsByTagQuery.neq(
-              "play->>id",
-              activePlay.play.id,
-            );
-          }
-          if (searchOptions.timestamp) {
-            playsByMentionQuery = playsByMentionQuery.gte(
-              "play->>end_time_sort",
-              searchOptions.timestamp,
-            );
-            playsByTagQuery = playsByTagQuery.gte(
-              "play->>end_time_sort",
-              searchOptions.timestamp,
-            );
-          }
-          if (affIds && affIds.length > 0) {
-            if (searchOptions.private_only === "all") {
-              playsByMentionQuery = playsByMentionQuery.or(
-                `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-              );
-              playsByTagQuery = playsByTagQuery.or(
-                `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-              );
-            } else if (
-              searchOptions.private_only &&
-              searchOptions.private_only !== "all"
-            ) {
-              playsByMentionQuery = playsByMentionQuery.eq(
-                "play->>exclusive_to",
-                searchOptions.private_only,
-              );
-              playsByTagQuery = playsByTagQuery.eq(
-                "play->>exclusive_to",
-                searchOptions.private_only,
-              );
-            }
-          } else {
-            playsByMentionQuery = playsByMentionQuery.eq(
-              "play->>private",
-              false,
-            );
-            playsByTagQuery = playsByTagQuery.eq("play->>private", false);
-          }
-
-          const [getMentions, getTags] = await Promise.all([
-            playsByMentionQuery.range(offset, offset + itemsPerLoad - 1),
-            playsByTagQuery.range(offset, offset + itemsPerLoad - 1),
-          ]);
-
-          if (getTags.data) {
-            combinedPlays = [
-              ...combinedPlays,
-              ...getTags.data.map((row) => ({
-                play: row.play,
-                video: row.video,
-                team: row.team,
-                author: row.author,
-              })),
-            ];
-            // totalCount += getTags.count ?? 0;
-          }
-          if (getMentions.data) {
-            combinedPlays = [
-              ...combinedPlays,
-              ...getMentions.data.map((row) => ({
-                play: row.play,
-                video: row.video,
-                team: row.team,
-                author: row.author,
-              })),
-            ];
-            // totalCount += getMentions.count ?? 0;
-          }
-
-          const uniquePlays = [
-            ...new Map(combinedPlays.map((x) => [x.play.id, x])).values(),
-          ];
-          uniquePlays.sort((a, b) => a.play.start_time - b.play.start_time);
-          combinedPlays = uniquePlays;
-
-          totalCount = combinedPlays.length ?? 0;
-        } else {
-          // --- General fetch (no topic search) ---
-          let query = supabase
-            .from("play_preview")
-            .select<string, Database["public"]["Views"]["play_preview"]["Row"]>(
-              `*`,
-              { count: "exact" },
-            )
-            .order("play->>start_time_sort")
-            .eq("video->>id", videoId);
-
-          if (searchOptions.only_highlights) {
-            query = query.eq("play->>highlight", true);
-          }
-          if (searchOptions.author && searchOptions.author !== "") {
-            query = query.ilike("author->>name", `%${searchOptions.author}%`);
-          }
-          if (activePlay) {
-            query = query.neq("play->>id", activePlay.play.id);
-          }
-          if (searchOptions.timestamp) {
-            query = query.gte("play->>end_time_sort", searchOptions.timestamp);
-          }
-          if (affIds && affIds.length > 0) {
-            if (searchOptions.private_only === "all") {
-              query = query.or(
-                `play->>private.eq.false, play->>exclusive_to.in.(${affIds})`,
-              );
-            } else if (
-              searchOptions.private_only &&
-              searchOptions.private_only !== "all"
-            ) {
-              query = query.eq(
-                "play->>exclusive_to",
-                searchOptions.private_only,
-              );
-            }
-          } else {
-            query = query.eq("play->>private", false);
-          }
-
-          const { data, count } = await query.range(
-            offset,
-            offset + itemsPerLoad - 1,
+        if (searchOptions.topic) {
+          playsQuery = playsQuery.ilike(
+            "topic_searchable_text",
+            `%${searchOptions.topic}%`,
           );
-
-          if (data) {
-            combinedPlays = data;
-            totalCount = count;
-          }
         }
 
-        setPlays((prev: PlayPreviewType[]) =>
-          append ? [...prev, ...combinedPlays] : combinedPlays,
-        );
-        setCurrentOffset(offset + combinedPlays.length);
-        setHasMore(combinedPlays.length === itemsPerLoad);
-        setPlayCount(totalCount);
+        if (searchOptions.only_highlights) {
+          playsQuery = playsQuery.eq("highlight", true);
+        }
+
+        // Manual Timestamp Filter applies regardless of auto-roll-off state (Requirement 4)
+        if (searchOptions.timestamp) {
+          playsQuery = playsQuery.gte(
+            "play_end_time_sort",
+            searchOptions.timestamp,
+          );
+        }
+
+        if (affIds && affIds.length > 0) {
+          if (searchOptions.private_only === "all") {
+            playsQuery = playsQuery.or(
+              `private.eq.false, exclusive_to.in.(${affIds})`,
+            );
+          } else if (
+            searchOptions.private_only &&
+            searchOptions.private_only !== "all"
+          ) {
+            playsQuery = playsQuery.eq(
+              "exclusive_to",
+              searchOptions.private_only,
+            );
+          }
+        } else {
+          // If no affiliations, only fetch public plays
+          playsQuery = playsQuery.eq("private", false);
+        }
+
+        // Fetch ALL results matching the filters (removed range/limit)
+        const { data, count } = await playsQuery;
+
+        if (data) {
+          setAllPlays(data); // Store ALL results
+          setPlayCount(count ?? 0);
+        } else {
+          setAllPlays([]);
+          setPlayCount(0);
+        }
       } catch (error) {
         console.error("Error fetching plays:", error);
-        setHasMore(false);
-        setPlays(append ? plays : []);
+        setAllPlays([]);
         setPlayCount(0);
       } finally {
         setLoadingInitial(false);
       }
     },
-    [videoId, itemsPerLoad, searchOptions, activePlay, affIds, plays],
+    [videoId, searchOptions, affIds],
   );
 
-  const debouncedFetchPlays = useDebounce(fetchPlays);
+  const debouncedFetchPlays = useDebounce(fetchPlays, 300);
 
+  // Effect to trigger fetching of ALL plays whenever search options change
   useEffect(() => {
-    setCurrentOffset(0);
-    setHasMore(true);
-    setPlays([]);
+    setAllPlays([]);
     setPlayCount(null);
     setLoadingInitial(true);
+    // Since we are fetching ALL, we don't need to pass offset, only clear state
+    debouncedFetchPlays(true);
+  }, [searchOptions, videoId, debouncedFetchPlays]);
 
-    debouncedFetchPlays(0, false);
-  }, [searchOptions, isMobile, videoId, activePlay, debouncedFetchPlays]);
-
-  const loadMorePlays = useCallback(() => {
-    if (hasMore && !loadingInitial) {
-      void fetchPlays(currentOffset, true);
-    }
-  }, [hasMore, currentOffset, loadingInitial, fetchPlays]);
-
-  const getCurrentTime = useCallback(async (playerInstance: YouTubePlayer) => {
-    return Math.round(await playerInstance.getCurrentTime()) - 1;
-  }, []);
-
-  const setTimestamp = useCallback(async () => {
-    if (searchOptions.timestamp) {
-      setSearchOptions((prev: PlaySearchOptions) => ({
-        ...prev,
-        timestamp: null,
-      }));
+  // Video Time Polling (Requirement 2)
+  useEffect(() => {
+    if (!player || !isAutoRollOffEnabled || isFilterActive) {
+      setCurrentVideoTime(0);
       return;
     }
-    if (player && !searchOptions.timestamp) {
-      void getCurrentTime(player).then((currentTime) => {
-        const paddedCurrentTime = currentTime.toString().padStart(6, "0");
-        setSearchOptions((prev: PlaySearchOptions) => ({
-          ...prev,
-          timestamp: paddedCurrentTime,
-        }));
-      });
+
+    const pollTime = async () => {
+      if (!player) return;
+      try {
+        // FIX: Await both getCurrentTime() and getPlayerState()
+        const currentTime = await player.getCurrentTime();
+        // const playerState = await player.getPlayerState();
+
+        if (typeof currentTime === "number") {
+          setCurrentVideoTime(Math.round(currentTime));
+        }
+      } catch (e) {
+        console.warn("Could not get current time or state from player:", e);
+      }
+    };
+
+    const intervalId = setInterval(() => {
+      void pollTime();
+    }, 1000);
+
+    // Cleanup function
+    return () => clearInterval(intervalId);
+  }, [player, isAutoRollOffEnabled, isFilterActive]);
+
+  // Dynamic Play Filtering (Roll-Off/Roll-On logic)
+  const displayedPlays = useMemo(() => {
+    const currentVideoTimePadded = currentVideoTime.toString().padStart(6, "0");
+    if (!isAutoRollOffEnabled || isFilterActive) {
+      setPlayCount(allPlays.length);
+      return allPlays;
     }
-  }, [searchOptions.timestamp, player, getCurrentTime, setSearchOptions]);
+
+    const filteredPlays = allPlays.filter((play) => {
+      // Show play if its end time + grace period is greater than or equal to the current video time.
+      return (
+        play.play_end_time_sort + ROLL_OFF_GRACE_SECONDS >=
+          currentVideoTimePadded && play.play_id !== activePlay?.play_id
+      );
+    });
+    setPlayCount(filteredPlays.length);
+    return filteredPlays;
+  }, [
+    allPlays,
+    currentVideoTime,
+    isAutoRollOffEnabled,
+    isFilterActive,
+    activePlay,
+  ]);
+
+  // Toggle for auto-roll-off
+  const toggleAutoRollOff = useCallback(() => {
+    setIsAutoRollOffEnabled((prev) => !prev);
+  }, []);
 
   return (
     <Box
@@ -375,6 +287,7 @@ const VideoPlayIndex = ({
             gap: 2,
             fontSize: "1.25rem",
             fontWeight: "bold",
+            flexWrap: "wrap",
           }}
         >
           <PageTitle
@@ -395,59 +308,69 @@ const VideoPlayIndex = ({
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
                 aria-label="open-filters"
                 sx={{ padding: 0 }}
-                color={isFiltersOpen ? "primary" : "inherit"}
+                color={isFiltersOpen || isFilterActive ? "primary" : "inherit"}
               >
                 <FilterListIcon />
               </IconButton>
             }
           />
-          {/* Updated Timestamp Filter Button */}
+
+          {/* Auto Roll-Off Toggle Button (Requirement 3) */}
           <StandardPopover
-            content={`${
-              !searchOptions.timestamp
-                ? "Show plays at current video time or later"
-                : "Show all plays (clear timestamp filter)"
-            }`}
+            content={
+              isAutoRollOffEnabled
+                ? `Auto-Roll-Off is ON. Plays roll off ${ROLL_OFF_GRACE_SECONDS}s after they end. Click to disable.`
+                : "Auto-Roll-Off is OFF. Click to enable."
+            }
           >
             <Button
               size="small"
-              onClick={setTimestamp}
-              aria-label="filter-by-timestamp"
-              variant={searchOptions.timestamp ? "contained" : "outlined"}
-              color={searchOptions.timestamp ? "primary" : "inherit"}
+              onClick={toggleAutoRollOff}
+              aria-label="toggle-auto-roll-off"
+              variant={
+                isAutoRollOffEnabled && !isFilterActive
+                  ? "contained"
+                  : "outlined"
+              }
+              color={
+                "secondary"
+                // isAutoRollOffEnabled && !isFilterActive
+                //   ? "secondary"
+                //   : "inherit"
+              }
               sx={{
                 fontWeight: "bold",
-                gap: 0.5, // Space between icon and text
-                minWidth: "auto", // Adjust minimum width if needed
-                px: 1, // Padding horizontal
-                py: 0.5, // Padding vertical
+                gap: 0.5,
+                minWidth: "auto",
+                px: 1,
+                py: 0.5,
+                borderColor: isFilterActive ? "red" : undefined, // Visual cue if disabled by filter
+                "&:hover": {
+                  borderColor: isFilterActive ? "red" : undefined,
+                },
               }}
             >
               <Typography
                 variant="caption"
                 sx={{ fontWeight: "bold", fontSize: "10px" }}
               >
-                {!searchOptions.timestamp
-                  ? "Time Filter"
-                  : `Plays > ${convertYouTubeTimestamp(
-                      parseInt(searchOptions.timestamp),
-                    )}`}
+                {isAutoRollOffEnabled ? "Auto-Index: ON" : "Auto-Index: OFF"}
+                {isFilterActive && " (Filter Active)"}
               </Typography>
-              {searchOptions.timestamp ? (
-                <ClearIcon fontSize="small" />
-              ) : (
-                <AddIcon fontSize="small" />
-              )}
+              <TimelapseIcon fontSize="small" />
             </Button>
           </StandardPopover>
+          {/* Manual Timestamp Filter Button (preserved) */}
         </Box>
+
         {isFiltersOpen && (
-          <PlaySearchFilters
+          <PlaySearchFilters2
             searchOptions={searchOptions}
             setSearchOptions={setSearchOptions}
           />
         )}
-        {loadingInitial && plays.length === 0 ? (
+
+        {loadingInitial ? (
           <Box
             sx={{
               display: "flex",
@@ -460,40 +383,29 @@ const VideoPlayIndex = ({
             <CircularProgress size={60} />
           </Box>
         ) : (
+          // Display the dynamically filtered plays (displayedPlays)
           <Box sx={{ width: "100%" }}>
-            <InfiniteScroll
-              dataLength={plays.length}
-              next={loadMorePlays}
-              hasMore={hasMore}
-              scrollThreshold={0.9}
-              loader={
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    my: 2,
-                    width: "100%",
-                  }}
-                >
-                  <CircularProgress size={20} />
-                </Box>
-              }
-              endMessage={
-                plays.length > 0 &&
-                !hasMore && (
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      display: "block",
-                      color: "text.disabled",
-                      my: 1,
-                    }}
-                  >
-                    — End of Plays —
-                  </Typography>
-                )
-              }
-            >
+            {displayedPlays.length === 0 &&
+            allPlays.length > 0 &&
+            isAutoRollOffEnabled &&
+            !isFilterActive ? (
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                sx={{ display: "block", textAlign: "center", mt: 2 }}
+              >
+                All plays have rolled off (Current Time:{" "}
+                {convertYouTubeTimestamp(currentVideoTime)}).
+              </Typography>
+            ) : displayedPlays.length === 0 && allPlays.length === 0 ? (
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                sx={{ display: "block", textAlign: "center", mt: 2 }}
+              >
+                No plays found matching the current criteria.
+              </Typography>
+            ) : (
               <Box
                 sx={{
                   width: "100%",
@@ -502,10 +414,10 @@ const VideoPlayIndex = ({
                   gap: 2,
                 }}
               >
-                {plays.map((play, index) => (
+                {displayedPlays.map((play, index) => (
                   <Play
                     setActivePlay={setActivePlay}
-                    key={play.play.id}
+                    key={play.play_id}
                     scrollToPlayer={scrollToPlayer}
                     play={play}
                     player={player}
@@ -515,10 +427,11 @@ const VideoPlayIndex = ({
                     setIsFiltersOpen={setIsFiltersOpen}
                     index={index}
                     handlePlayDeleted={handlePlayDeleted}
+                    activePlay={activePlay}
                   />
                 ))}
               </Box>
-            </InfiniteScroll>
+            )}
           </Box>
         )}
       </Box>

@@ -1,14 +1,14 @@
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import { Box, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import AddCollectionsToPlay from "~/components/plays/add-collections-to-play";
+import { type CreateNewCollectionType } from "~/components/plays/create-play";
 import ModalSkeleton from "~/components/utils/modal";
 import FormButtons from "~/components/utils/modal/form-buttons";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
 import type { MessageType } from "~/utils/types";
-import AddCollectionsToPlay from "../../plays/add-collections-to-play";
-import type { CreateNewCollectionType } from "../../plays/create-play";
 import FormMessage from "../../utils/form-message";
 
 type AddPlayToCollection = {
@@ -23,45 +23,57 @@ const AddPlayToCollection = ({ playId }: AddPlayToCollection) => {
   const [playCollections, setPlayCollections] = useState<
     CreateNewCollectionType[]
   >([]);
-  const [collections, setCollections] = useState<
-    CreateNewCollectionType[] | null
-  >(null);
+  // const [collections, setCollections] = useState<
+  //   CreateNewCollectionType[] | null
+  // >(null);
   const [isValidForm, setIsValidForm] = useState<boolean>(false);
-  const [collectionIds, setCollectionIds] = useState<string[] | null>(null);
+  // const [collectionIds, setCollectionIds] = useState<string[] | null>(null);
 
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
     status: "error",
   });
 
-  const fetchCollections = async () => {
-    if (user.userId) {
-      const collections = supabase
+  const searchCollections = useCallback(
+    async (query: string): Promise<CreateNewCollectionType[]> => {
+      if (!user.userId || query.length < 2) return [];
+
+      const collectionsQuery = supabase
         .from("collection_view")
-        .select("*, id:collection->>id, title:collection->>title");
-      if (collectionIds) {
-        void collections.not("collection->>id", "in", `(${collectionIds})`);
-      }
+        .select(
+          "*, id:collection->>id, title:collection->>title, private:collection->>private, exclusive_to:collection->>exclusive_to",
+        )
+        .ilike("collection->>title", `%${query}%`);
+
       if (affIds && affIds.length > 0) {
-        void collections.or(
-          `collection->>author_id.eq.${user.userId}, collection->>exclusive_to.in.(${affIds})`,
+        void collectionsQuery.or(
+          `collection->>author_id.eq.${
+            user.userId
+          }, collection->>exclusive_to.in.(${affIds.join(",")})`,
         );
       } else {
-        void collections.eq("collection->>author_id", user.userId);
+        void collectionsQuery.eq("collection->>author_id", user.userId);
       }
-      const { data } = await collections;
-      if (data) setCollections(data);
-    }
-  };
+
+      const { data } = await collectionsQuery.limit(20);
+      return data ?? [];
+    },
+    [user.userId, affIds],
+  );
 
   const fetchPlayCollections = async () => {
     const { data } = await supabase
       .from("collection_plays")
-      .select()
+      .select("collections!inner(id, title)")
       .eq("play_id", playId);
     if (data && data.length > 0)
-      setCollectionIds(data.map((col) => col.collection_id));
-    else setCollectionIds(null);
+      setPlayCollections(
+        data.map((col) => ({
+          id: col.collections.id,
+          title: col.collections.title,
+        })),
+      );
+    else setPlayCollections([]);
   };
 
   const handleOpen = (e: React.MouseEvent) => {
@@ -113,10 +125,6 @@ const AddPlayToCollection = ({ playId }: AddPlayToCollection) => {
     void fetchPlayCollections();
   }, []);
 
-  useEffect(() => {
-    void fetchCollections();
-  }, [collectionIds]);
-
   return !isOpen ? (
     <Box sx={{ display: "flex", alignItems: "center" }} onClick={handleOpen}>
       <ListItemIcon sx={{ minWidth: "12px" }}>
@@ -142,8 +150,7 @@ const AddPlayToCollection = ({ playId }: AddPlayToCollection) => {
           <AddCollectionsToPlay
             collections={playCollections}
             setCollections={setPlayCollections}
-            allCollections={collections}
-            refetchCollections={fetchCollections}
+            searchCollections={searchCollections}
           />
           <FormMessage message={message} />
         </div>

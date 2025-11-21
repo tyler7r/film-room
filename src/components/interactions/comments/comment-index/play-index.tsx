@@ -5,12 +5,15 @@ import EmptyMessage from "~/components/utils/empty-msg";
 import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { supabase } from "~/utils/supabase";
-import type { CommentNotificationType, PlayPreviewType } from "~/utils/types";
-import AddComment from "../add-comment";
+import type {
+  CommentNotificationType,
+  UnifiedPlayIndexType,
+} from "~/utils/types";
+import AddComment from "../add-comment/play-index";
 import Comment from "../comment";
 
 type CommentIndexProps = {
-  play: PlayPreviewType;
+  play: UnifiedPlayIndexType;
   setCommentCount: (count: number) => void;
   activeComment?: string | undefined;
 };
@@ -60,7 +63,7 @@ const CommentIndex = ({
         const commentsQuery = supabase
           .from("comment_notification")
           .select("*", { count: "exact" })
-          .eq("play->>id", play.play.id)
+          .eq("play->>id", play.play_id)
           .order("comment->>created_at")
           .range(currentOffset, currentOffset + itemsPerLoad - 1);
 
@@ -105,7 +108,7 @@ const CommentIndex = ({
         setLoadingInitial(false);
       }
     },
-    [itemsPerLoad, play.play.id, activeComment, setCommentCount],
+    [itemsPerLoad, play.play_id, activeComment, setCommentCount],
   ); // Removed handleScroll from dependencies
 
   const fetchActiveComm = useCallback(async () => {
@@ -129,7 +132,7 @@ const CommentIndex = ({
   useEffect(() => {
     void fetchComments(0, false);
     void fetchActiveComm();
-  }, [play.play.id, isMobile, fetchComments, fetchActiveComm]);
+  }, [play.play_id, isMobile, fetchComments, fetchActiveComm]);
 
   const loadMoreComments = () => {
     void fetchComments(offset, true);

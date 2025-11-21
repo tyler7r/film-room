@@ -1,4 +1,3 @@
-import AddIcon from "@mui/icons-material/Add"; // For 'Add Plays'
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"; // For 'Copy Link'
 import EditIcon from "@mui/icons-material/Create"; // Using CreateIcon as EditIcon from PlayActionsMenu
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -67,10 +66,10 @@ const CollectionActionsMenu = ({
     handleClose(); // Close the main menu
   };
 
-  const handleAddPlaysClick = () => {
-    setIsAddPlaysOpen(true); // Open the PlaysToCollectionModal in the parent (Collection.tsx)
-    handleClose(); // Close the CollectionActionsMenu
-  };
+  // const handleAddPlaysClick = () => {
+  //   setIsAddPlaysOpen(true); // Open the PlaysToCollectionModal in the parent (Collection.tsx)
+  //   handleClose(); // Close the CollectionActionsMenu
+  // };
 
   const handleCopyLinkClick = () => {
     copyToClipboard(); // Call the passed function to copy the link
@@ -107,7 +106,7 @@ const CollectionActionsMenu = ({
           }}
         >
           {/* Option: Add Plays to Collection */}
-          {userCanEdit && !accessDenied && (
+          {/* {userCanEdit && !accessDenied && (
             <MenuItem
               onClick={handleAddPlaysClick}
               sx={{ px: 1, py: 0.5, minHeight: "auto" }}
@@ -123,7 +122,7 @@ const CollectionActionsMenu = ({
                 }
               />
             </MenuItem>
-          )}
+          )} */}
 
           {/* Option: Copy Collection Link */}
           <MenuItem

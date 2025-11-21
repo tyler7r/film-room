@@ -12,7 +12,9 @@ import {
 } from "@react-email/components";
 import type {
   CommentType,
+  CondensedVideoType,
   EmailAuthorType,
+  EmailPlayType,
   PlayType,
   ReplyType,
   VideoType,
@@ -26,8 +28,8 @@ export type MentionEmailContent = {
   // Contextual data
   author: EmailAuthorType; // The user who did the mentioning (sender)
   recipientName: string; // The user who was mentioned (for personalization)
-  play: PlayType;
-  video: VideoType;
+  play: PlayType | EmailPlayType;
+  video: VideoType | CondensedVideoType;
 
   // Source content (only one will be present depending on entityType)
   sourceComment: CommentType | null;
