@@ -17,6 +17,7 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
@@ -49,6 +50,8 @@ const PlayActionsMenu = ({
   handlePauseVideo,
 }: PlayActionsMenuProps) => {
   const { user } = useAuthContext();
+  const router = useRouter();
+  const playId = router.query.id;
 
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [isRemoveOpen, setIsRemoveOpen] = useState<boolean>(false);
@@ -81,6 +84,9 @@ const PlayActionsMenu = ({
       handlePlayDeleted();
     }
     handleClose();
+    if (playId) {
+      void router.push("/");
+    }
   };
 
   const handleRemoveCollection = async () => {
