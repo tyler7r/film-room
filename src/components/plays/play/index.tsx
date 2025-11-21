@@ -1,3 +1,4 @@
+import CheckIcon from "@mui/icons-material/Check";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import PublicIcon from "@mui/icons-material/Public";
@@ -20,25 +21,25 @@ import CommentBtn from "~/components/interactions/comments/comment-btn";
 import LikeBtn from "~/components/interactions/likes/like-btn";
 import TeamLogo from "~/components/teams/team-logo";
 import StandardPopover from "~/components/utils/standard-popover";
-import type { PlaySearchOptions } from "~/components/videos/video-play-index";
+import { type PlaySearchOptions } from "~/components/videos/video-play-index";
 import { useAuthContext } from "~/contexts/auth";
 import { useIsDarkContext } from "~/pages/_app";
 import { convertYouTubeTimestamp, getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { PlayPreviewType } from "~/utils/types";
-import ExpandedPlay from "../expanded-play";
-import PlayActionsMenu from "../play-actions-menu";
+import type { UnifiedPlayIndexType } from "~/utils/types";
+import PlayIndexExpanded from "../expanded-play/play-index";
+import PlayActionsMenu from "../play-actions-menu/play-index";
 import PlayPreviewCollections from "../play-collections";
 import PlayPreviewMentions from "../play-mentions";
 import PlayPreviewTags from "../play-tags";
 
 type PlayProps = {
   player: YouTubePlayer | null;
-  play: PlayPreviewType;
+  play: UnifiedPlayIndexType;
   scrollToPlayer: () => void;
-  activePlay?: PlayPreviewType;
+  activePlay?: UnifiedPlayIndexType | null;
   setSeenActivePlay: (seenActivePlay: boolean) => void;
-  setActivePlay: (play: PlayPreviewType) => void;
+  setActivePlay: (play: UnifiedPlayIndexType | null) => void;
   searchOptions: PlaySearchOptions;
   setSearchOptions: (options: PlaySearchOptions) => void;
   setIsFiltersOpen: (isFiltersOpen: boolean) => void;
@@ -75,30 +76,28 @@ const Play = ({
     "success",
   );
 
-  const exclusiveTeam = play.team; // Renamed from exclusiveTeam to match usage pattern
-
   const updateLastWatched = useCallback(
     async (time: number) => {
       if (user.userId) {
         await supabase
           .from("profiles")
           .update({
-            last_watched: play.video.id,
+            last_watched: play.video_id,
             last_watched_time: time,
           })
           .eq("id", user.userId);
       }
     },
-    [play.video.id, user.userId],
+    [play.video_id, user.userId],
   );
 
   const handleClick = useCallback(async () => {
     scrollToPlayer();
     setSeenActivePlay(false);
     setActivePlay(play);
-    void player?.seekTo(play.play.start_time, true);
+    void player?.seekTo(play.play_start_time, true);
     void player?.playVideo();
-    void updateLastWatched(play.play.start_time);
+    void updateLastWatched(play.play_start_time);
   }, [
     play,
     player,
@@ -135,20 +134,20 @@ const Play = ({
       setIsFiltersOpen(true);
       setSearchOptions({
         ...searchOptions,
-        private_only: exclusiveTeam?.id ? exclusiveTeam.id : "all",
+        private_only: play.exclusive_to ? play.exclusive_to : "all",
       });
     },
-    [setIsFiltersOpen, setSearchOptions, exclusiveTeam?.id],
+    [setIsFiltersOpen, setSearchOptions, play.exclusive_to],
   );
 
   const handlePlayClick = useCallback(() => {
-    const playId = play.play.id;
+    const playId = play.play_id;
     void router.push(`/play/${playId}`);
-  }, [play.play.id, router]);
+  }, [play.play_id, router]);
 
   const copyToClipboard = useCallback(async () => {
     const origin = window.location.origin;
-    const linkToCopy = `${origin}/play/${play.play.id}`;
+    const linkToCopy = `${origin}/play/${play.play_id}`;
 
     try {
       await navigator.clipboard.writeText(linkToCopy);
@@ -161,7 +160,7 @@ const Play = ({
     } finally {
       setSnackbarOpen(true); // Always open snackbar on copy attempt
     }
-  }, [play.play.id]);
+  }, [play.play_id]);
 
   const handleSnackbarClose = useCallback(
     (_event?: SyntheticEvent | Event, reason?: string) => {
@@ -174,7 +173,7 @@ const Play = ({
   );
 
   const getBackgroundColor = () => {
-    if (activePlay && activePlay.play.id === play.play.id) {
+    if (activePlay && activePlay.play_id === play.play_id) {
       return backgroundStyle.backgroundColor; // Use provided active background color
     }
     if (typeof index === "number") {
@@ -189,6 +188,38 @@ const Play = ({
     }
     return "transparent"; // Default transparent if no index
   };
+
+  const handlePauseVideo = useCallback(async () => {
+    void player?.pauseVideo();
+  }, [player]);
+
+  const handleExpandClick = async () => {
+    void player?.pauseVideo();
+    setIsExpanded((prev) => !prev);
+  };
+
+  const handleClearActivePlay = useCallback(() => {
+    const newQuery = { ...router.query };
+    setActivePlay(null);
+    if (newQuery.play) {
+      // 1. Clear the local state
+
+      // 2. Update the URL params without reloading
+      // We create a copy of the current query and remove specific keys
+      delete newQuery.play;
+      delete newQuery.start;
+
+      // Use router.replace with shallow: true to update URL without running getStaticProps/getServerSideProps
+      void router.replace(
+        {
+          pathname: router.pathname,
+          query: newQuery,
+        },
+        undefined,
+        { shallow: true },
+      );
+    }
+  }, [router, setActivePlay]);
 
   return (
     <Box
@@ -224,7 +255,7 @@ const Play = ({
         >
           {/* Left Group: Highlight, Privacy/Team, Timestamp */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {play.play.highlight && (
+            {play.highlight && (
               <StandardPopover
                 content="Highlight"
                 children={
@@ -241,19 +272,27 @@ const Play = ({
             )}
             <StandardPopover
               content={
-                play.team
-                  ? `Play is private to ${play.team.full_name}`
+                play.exclusive_to
+                  ? `Play is private to ${play.team_full_name}`
                   : "Public Play"
               }
               children={
-                play.team ? (
+                play.team_id && play.team_full_name ? (
                   <IconButton
                     size="small"
                     onClick={handlePrivateClick}
                     aria-label="team-privacy"
                     sx={{ padding: 0 }}
                   >
-                    <TeamLogo size={20} tm={play.team} inactive={true} />
+                    <TeamLogo
+                      size={20}
+                      tm={{
+                        id: play.team_id,
+                        name: play.team_full_name,
+                        logo: play.team_logo,
+                      }}
+                      inactive={true}
+                    />
                     {/* Adjusted size */}
                   </IconButton>
                 ) : (
@@ -266,13 +305,13 @@ const Play = ({
               variant="body2"
               sx={{ fontWeight: "bold", lineHeight: 1 }}
             >
-              {convertYouTubeTimestamp(play.play.start_time)}
+              {convertYouTubeTimestamp(play.play_start_time)}
             </Typography>
             <Typography
               variant="caption"
               sx={{ fontWeight: "light", lineHeight: 1 }}
             >
-              ({play.play.end_time - play.play.start_time}s)
+              ({play.play_end_time - play.play_start_time}s)
             </Typography>
           </Box>
 
@@ -290,11 +329,17 @@ const Play = ({
                 <ReplayIcon color="primary" />
               </IconButton>
             )}
+            {activePlay?.play_id === play.play_id && (
+              <IconButton size="small" onClick={handleClearActivePlay}>
+                <CheckIcon color="success" />
+              </IconButton>
+            )}
             <PlayActionsMenu
               preview={play}
               onCopyLink={copyToClipboard}
               onPlayClick={handlePlayClick}
               handlePlayDeleted={handlePlayDeleted}
+              handlePauseVideo={handlePauseVideo}
             />
           </Box>
         </Box>
@@ -320,12 +365,16 @@ const Play = ({
             component="strong"
             onClick={(e: React.MouseEvent) => {
               e.stopPropagation();
-              void router.push(`/profile/${play.play.author_id}`);
+              void router.push(`/profile/${play.author_id}`);
             }}
           >
-            {getDisplayName(play.author)}:
+            {getDisplayName({
+              email: play.author_email,
+              name: play.author_name,
+            })}
+            :
           </Box>{" "}
-          {play.play.title}
+          {play.play_title}
         </Typography>
 
         {/* Mentions, Tags, Collections */}
@@ -339,15 +388,15 @@ const Play = ({
         >
           <PlayPreviewMentions
             activePlay={activePlay}
-            play={play}
+            play={play.play_id}
             handleMentionAndTagClick={handleMentionAndTagClick}
           />
           <PlayPreviewTags
             activePlay={activePlay}
-            play={play}
+            play={play.play_id}
             handleMentionAndTagClick={handleMentionAndTagClick}
           />
-          <PlayPreviewCollections play={play} />
+          <PlayPreviewCollections play={play.play_id} />
         </Box>
       </Box>
 
@@ -356,11 +405,11 @@ const Play = ({
         sx={{ display: "flex", alignItems: "center", gap: 1 }}
         onClick={(e: React.MouseEvent) => e.stopPropagation()} // Prevent triggering main play click
       >
-        <LikeBtn playId={play.play.id} />
+        <LikeBtn playId={play.play_id} />
         <CommentBtn
           isOpen={isExpanded}
           setIsOpen={setIsExpanded}
-          playId={play.play.id}
+          playId={play.play_id}
           commentCount={commentCount}
           setCommentCount={setCommentCount}
           activePlay={null}
@@ -368,16 +417,16 @@ const Play = ({
         {isExpanded ? (
           <IconButton
             size="small"
-            onClick={() => setIsExpanded(false)}
+            onClick={handleExpandClick}
             aria-label="collapse-comments"
           >
             <KeyboardArrowUpIcon color="primary" fontSize="small" />
           </IconButton>
-        ) : play.play.note ? (
+        ) : play.play_note ? (
           <Button
             size="small"
             variant="text"
-            onClick={() => setIsExpanded(true)}
+            onClick={handleExpandClick}
             endIcon={<KeyboardArrowDownIcon color="primary" fontSize="small" />}
             sx={{ fontWeight: "bold" }}
           >
@@ -386,7 +435,7 @@ const Play = ({
         ) : (
           <IconButton
             size="small"
-            onClick={() => setIsExpanded(true)}
+            onClick={handleExpandClick}
             aria-label="expand-comments"
           >
             <KeyboardArrowDownIcon color="primary" fontSize="small" />
@@ -395,7 +444,7 @@ const Play = ({
       </Box>
 
       {isExpanded && (
-        <ExpandedPlay
+        <PlayIndexExpanded
           play={play}
           handleMentionAndTagClick={handleMentionAndTagClick}
           setCommentCount={setCommentCount}

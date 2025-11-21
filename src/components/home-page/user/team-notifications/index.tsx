@@ -164,14 +164,14 @@ const TeamActivitySection = ({
                 </Box>
               </Button>
             ))}
-            <Button
+            {/* <Button
               size="small"
               variant="text"
               sx={{ justifyContent: "flex-start" }}
               // onClick={() => router.push("/team/notifications")}
             >
               View More Team Updates
-            </Button>
+            </Button> */}
           </>
         ) : (
           <Box

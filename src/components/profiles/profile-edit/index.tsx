@@ -15,12 +15,12 @@ const ProfileEdit = ({ profile }: ProfileEditProps) => {
   const { user } = useAuthContext();
   const [isProfileEditOpen, setIsProfileEditOpen] = useState<boolean>(false);
 
-  const [name, setName] = useState<string>(user.name ?? "");
+  const [name, setName] = useState<string>(profile.name ?? "");
   const [enabled, setEnabled] = useState<boolean>(profile.send_notifications);
   const [isValidName, setIsValidName] = useState<boolean>(false);
 
   const resetProfile = () => {
-    setName(user.name ?? "");
+    setName(profile.name ?? "");
     setEnabled(profile.send_notifications);
     setIsProfileEditOpen(false);
   };

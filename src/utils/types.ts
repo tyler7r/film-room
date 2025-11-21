@@ -143,6 +143,78 @@ export type Database = MergeDeep<
             content_preview: string | null; // A short text snippet
           };
         };
+        updated_play_preview: {
+          Row: {
+            author_email: string;
+            author_id: string;
+            author_join_date: string;
+            author_last_notified: string;
+            author_last_watched: string | null;
+            author_last_watched_time: number | null;
+            author_name: string | null;
+            author_send_notifications: boolean;
+            play_author_id: string;
+            play_created_at: string;
+            play_end_time: number;
+            play_end_time_sort: string;
+            play_exclusive_to: string | null;
+            play_highlight: boolean;
+            play_id: string;
+            play_note: string | null;
+            play_post_to_feed: boolean;
+            play_private: boolean;
+            play_start_time: number;
+            play_start_time_sort: string;
+            play_title: string;
+            team_city: string;
+            team_division: string;
+            team_full_name: string;
+            team_id: string;
+            team_logo: string | null;
+            team_name: string;
+            team_owner: string;
+            video_coach_video: boolean;
+            video_division: string;
+            video_duplicate_check: string | null;
+            video_exclusive_to: string | null;
+            video_id: string;
+            video_keywords: string | null;
+            video_link: string;
+            video_season: string;
+            video_title: string | null;
+            video_tournament: string | null;
+            video_uploaded_at: string;
+            video_week: string | null;
+          };
+        };
+        unified_play_index: {
+          Row: {
+            author_email: string;
+            author_name: string;
+            exclusive_to: string | null;
+            highlight: boolean;
+            play_end_time: number;
+            play_id: string;
+            play_note: string | null;
+            play_start_time: number;
+            play_title: string;
+            private: boolean;
+            team_full_name: string;
+            team_id: string | null;
+            team_logo: string | null;
+            topic_searchable_text: string;
+            video_id: string;
+            video_title: string;
+            author_id: string;
+            play_start_time_sort: string;
+            play_end_time_sort: string;
+            play_post_to_feed: boolean;
+            play_created_at: string;
+            video_exclusive_to: string | null;
+            author_send_notifications: boolean;
+            video_link: string;
+          };
+        };
       };
     };
   }
@@ -438,13 +510,25 @@ export type PlayMentionViewType = {
 };
 
 export type EmailNotificationType = {
-  video: VideoType;
-  recipient: UserType;
+  video: VideoType | CondensedVideoType;
+  recipient: UserType | EmailRecipientType;
   title: string;
   author: EmailAuthorType;
-  play?: PlayType;
+  play?: PlayType | EmailPlayType;
   comment?: CommentType;
   reply?: ReplyType;
+};
+
+export type EmailRecipientType = {
+  email: string;
+  id: string;
+};
+
+export type EmailPlayType = {
+  private: boolean;
+  title: string;
+  id: string;
+  note: string | null;
 };
 
 export type EmailAuthorType = {
@@ -503,6 +587,40 @@ export type TeamNotificationType = {
   team_id: string;
   team_logo: string | null;
   team_name: string;
+};
+
+export type UnifiedPlayIndexType = {
+  play_id: string;
+  video_id: string;
+  play_start_time: number;
+  play_end_time: number;
+  play_title: string;
+  highlight: boolean;
+  private: boolean;
+  exclusive_to: string | null;
+  author_name: string;
+  topic_searchable_text: string;
+  team_full_name: string | null;
+  author_email: string;
+  play_note: string | null;
+  play_start_time_sort: string;
+  play_end_time_sort: string;
+  team_logo: string | null;
+  team_id: string | null;
+  author_id: string;
+  play_post_to_feed: boolean;
+  play_created_at: string;
+  video_exclusive_to: string | null;
+  video_title: string;
+  author_send_notifications: boolean;
+  video_link: string;
+};
+
+export type CondensedVideoType = {
+  id: string;
+  exclusive_to: string | null;
+  private: boolean;
+  title: string;
 };
 
 // --- NEW TEAM EMAIL NOTIFICATION TYPES ---

@@ -20,17 +20,20 @@ import {
   type PlayType,
   type TeamType,
   type UserType,
-  type VideoType,
 } from "~/utils/types";
-import AddCollectionsToPlay from "../add-collections-to-play";
-import AddMentionsToPlayProps from "../add-mentions-to-play";
-import AddTagsToPlay from "../add-tags-to-play";
+import AddCollectionsToPlay2 from "../add-collections-to-play";
+import AddMentionsToPlay2 from "../add-mentions-to-play";
+import AddTagsToPlay2 from "../add-tags-to-play";
 import PrivacyStatus from "../create-play/privacy-status";
 
 type EditPlayProps = {
-  video: VideoType;
+  video: {
+    id: string;
+    exclusive_to: string | null;
+    private: boolean;
+    title: string;
+  };
   play: PlayType;
-  // These props are now mandatory as EditPlay is always controlled by PlayActionsMenu
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 };
@@ -52,7 +55,7 @@ export type CreateNewCollectionType = {
   profile?: UserType;
 };
 
-const EditPlay = ({
+const EditPlay2 = ({
   play,
   video,
   isOpen, // Mandatory prop
@@ -72,13 +75,11 @@ const EditPlay = ({
   });
   const [mentions, setMentions] = useState<UserType[]>([]);
   const [initialMentions, setInitialMentions] = useState<UserType[]>([]);
-  const [players, setPlayers] = useState<UserType[] | null>(null);
 
   const [playTags, setPlayTags] = useState<CreateNewTagType[]>([]);
   const [initialPlayTags, setInitialPlayTags] = useState<CreateNewTagType[]>(
     [],
   );
-  const [tags, setTags] = useState<CreateNewTagType[] | null>(null);
 
   const [playCollections, setPlayCollections] = useState<
     CreateNewCollectionType[]
@@ -86,9 +87,6 @@ const EditPlay = ({
   const [initialPlayCollections, setInitialPlayCollections] = useState<
     CreateNewCollectionType[]
   >([]);
-  const [collections, setCollections] = useState<
-    CreateNewCollectionType[] | null
-  >(null);
 
   const [message, setMessage] = useState<MessageType>({
     text: undefined,
@@ -112,29 +110,68 @@ const EditPlay = ({
     }
   }, [play]);
 
-  const fetchPlayers = useCallback(async () => {
-    const playersQuery = supabase.from("user_view").select("profile").match({
-      "team->>id": video.exclusive_to,
-      "affiliation->>role": "player",
-      "affiliation->>verified": true,
-    });
-    const allPlayersQuery = supabase.from("profiles").select();
-    if (video.exclusive_to) {
+  const searchPlayers = useCallback(
+    async (query: string): Promise<UserType[]> => {
+      // Condition: Is this a private team video?
+      const isPrivateTeamVideo = !!video.exclusive_to;
+
+      // If Public: Enforce 2 char limit.
+      // If Private: Allow empty query (to fetch full roster).
+      if (!isPrivateTeamVideo && query.length < 2) return [];
+
+      let playersQuery = supabase
+        .from("user_view")
+        .select("profile")
+        .ilike("profile->>name", `%${query}%`);
+
+      if (isPrivateTeamVideo) {
+        // Only fetch verified team members
+        playersQuery = playersQuery.match({
+          "team->>id": video.exclusive_to,
+          "affiliation->>verified": true,
+        });
+        // Increase limit for team rosters so users can see everyone
+        playersQuery = playersQuery.limit(100);
+      } else {
+        // Global search limit
+        playersQuery = playersQuery.limit(20);
+      }
+
       const { data } = await playersQuery;
+
       if (data) {
         const uniquePlayers = [
           ...new Map(data.map((x) => [x.profile.id, x])).values(),
         ];
-        setPlayers(uniquePlayers.map((p) => p.profile));
+        return uniquePlayers.map((p) => p.profile);
       }
-    } else {
-      const { data } = await allPlayersQuery;
-      if (data) {
-        const uniquePlayers = [...new Map(data.map((x) => [x.id, x])).values()];
-        setPlayers(uniquePlayers);
+      return [];
+    },
+    [video.exclusive_to],
+  );
+
+  const searchTags = useCallback(
+    async (query: string): Promise<CreateNewTagType[]> => {
+      if (query.length < 2) return [];
+
+      const tagsQuery = supabase
+        .from("tags")
+        .select("title, id, private, exclusive_to")
+        .ilike("title", `%${query}%`);
+
+      if (affIds && affIds.length > 0) {
+        void tagsQuery.or(
+          `private.eq.false, exclusive_to.in.(${affIds.join(",")})`,
+        );
+      } else {
+        void tagsQuery.eq("private", false);
       }
-    }
-  }, [video.exclusive_to]);
+
+      const { data } = await tagsQuery.limit(20);
+      return data ?? [];
+    },
+    [affIds],
+  );
 
   const fetchInitialTags = useCallback(async () => {
     if (play) {
@@ -151,20 +188,6 @@ const EditPlay = ({
       }
     }
   }, [play]);
-
-  const fetchTags = useCallback(async () => {
-    const tagsQuery = supabase.from("tags").select("title, id");
-    if (affIds && affIds.length > 0) {
-      void tagsQuery.or(
-        `private.eq.false, exclusive_to.in.(${affIds.join(",")})`,
-      );
-    } else {
-      void tagsQuery.eq("private", false);
-    }
-
-    const { data } = await tagsQuery;
-    if (data) setTags(data);
-  }, [affIds]);
 
   const fetchInitialCollections = useCallback(async () => {
     if (play) {
@@ -192,11 +215,17 @@ const EditPlay = ({
     }
   }, [play]);
 
-  const fetchCollections = useCallback(async () => {
-    if (user.userId) {
+  const searchCollections = useCallback(
+    async (query: string): Promise<CreateNewCollectionType[]> => {
+      if (!user.userId || query.length < 2) return [];
+
       const collectionsQuery = supabase
         .from("collection_view")
-        .select("*, id:collection->>id, title:collection->>title");
+        .select(
+          "*, id:collection->>id, title:collection->>title, private:collection->>private, exclusive_to:collection->>exclusive_to",
+        )
+        .ilike("collection->>title", `%${query}%`);
+
       if (affIds && affIds.length > 0) {
         void collectionsQuery.or(
           `collection->>author_id.eq.${
@@ -206,10 +235,12 @@ const EditPlay = ({
       } else {
         void collectionsQuery.eq("collection->>author_id", user.userId);
       }
-      const { data } = await collectionsQuery;
-      if (data) setCollections(data);
-    }
-  }, [user.userId, affIds]);
+
+      const { data } = await collectionsQuery.limit(20);
+      return data ?? [];
+    },
+    [user.userId, affIds],
+  );
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -466,35 +497,11 @@ const EditPlay = ({
     }
   };
 
-  // useEffect(() => {
-  //   const channel = supabase
-  //     .channel("edit_play_tags_and_collections")
-  //     .on(
-  //       "postgres_changes",
-  //       { event: "*", schema: "public", table: "tags" },
-  //       () => {
-  //         void fetchTags();
-  //       },
-  //     )
-  //     .on(
-  //       "postgres_changes",
-  //       { event: "*", schema: "public", table: "collections" },
-  //       () => {
-  //         void fetchCollections();
-  //       },
-  //     )
-  //     .subscribe();
-
-  //   return () => {
-  //     void supabase.removeChannel(channel);
-  //   };
-  // }, [fetchTags, fetchCollections]);
-
   useEffect(() => {
-    void fetchPlayers();
-    void fetchTags();
-    void fetchCollections();
-  }, [video, fetchPlayers, fetchTags, fetchCollections]);
+    // void fetchPlayers();
+    // void fetchTags();
+    // void fetchCollections();
+  }, [video]);
 
   useEffect(() => {
     // Only fetch initial data when modal opens
@@ -577,22 +584,21 @@ const EditPlay = ({
             multiline
             maxRows={5}
           />
-          <AddTagsToPlay
+          <AddTagsToPlay2
             tags={playTags}
             setTags={setPlayTags}
-            allTags={tags}
-            refetchTags={fetchTags}
+            searchTags={searchTags}
           />
-          <AddMentionsToPlayProps
-            players={players}
+          <AddMentionsToPlay2
             setMentions={setMentions}
             mentions={mentions}
+            searchPlayers={searchPlayers}
+            isPrivateContext={!!video.exclusive_to}
           />
-          <AddCollectionsToPlay
+          <AddCollectionsToPlay2
             collections={playCollections}
             setCollections={setPlayCollections}
-            allCollections={collections}
-            refetchCollections={fetchCollections}
+            searchCollections={searchCollections}
           />
           <Box
             sx={{
@@ -693,4 +699,4 @@ const EditPlay = ({
   );
 };
 
-export default EditPlay;
+export default EditPlay2;

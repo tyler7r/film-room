@@ -1,15 +1,10 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import CloseIcon from "@mui/icons-material/Close";
-import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import LaunchIcon from "@mui/icons-material/Launch";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
   Divider,
   IconButton,
   List,
@@ -31,113 +26,18 @@ import { supabase } from "~/utils/supabase";
 import {
   type CollectionType,
   type NewPlayType,
-  type PlayPreviewType,
   type PlayType,
   type TeamType,
+  type UnifiedPlayIndexType,
   type UserType,
   type VideoType,
 } from "~/utils/types";
-import AddCollectionsToPlay from "../add-collections-to-play";
-import AddMentionsToPlayProps from "../add-mentions-to-play";
-import AddTagsToPlay from "../add-tags-to-play";
+import AddCollectionsToPlay2 from "../add-collections-to-play";
+import AddMentionsToPlay2 from "../add-mentions-to-play";
+import AddTagsToPlay2 from "../add-tags-to-play";
+import OverlappingPlaysModal from "../overlapping-plays";
 import PlayModalBtn from "./button";
 import PrivacyStatus from "./privacy-status";
-
-// --- REUSABLE MODAL SKELETON COMPONENT ---
-
-type ModalSkeletonProps = {
-  isOpen: boolean;
-  setIsOpen: (status: boolean) => void;
-  handleClose?: () => void; // Discard action (X button)
-  handleMinimize?: () => void; // Save Draft action (Minimize button)
-  title: string;
-  children: React.ReactNode;
-};
-
-/**
- * A reusable modal component using Material UI Dialog.
- */
-const ModalSkeleton: React.FC<ModalSkeletonProps> = ({
-  isOpen,
-  handleClose, // Discard action (X button)
-  handleMinimize, // Save Draft action (Minimize button)
-  title,
-  children,
-}) => {
-  return (
-    <Dialog
-      open={isOpen}
-      onClose={handleClose} // Default close action is Discard
-      fullWidth
-      aria-labelledby="modal-title"
-      sx={{
-        "& .MuiBackdrop-root": { backdropFilter: "blur(3px)" },
-        "& .MuiDialog-paper": {
-          borderRadius: "12px",
-          margin: { xs: "16px", sm: "32px" },
-          width: { xs: "95%", sm: "100%" },
-        },
-      }}
-    >
-      <DialogTitle
-        id="modal-title"
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          p: 2,
-          borderBottom: "1px solid #e0eeef",
-        }}
-      >
-        <Typography variant="h6" component="div" sx={{ fontWeight: "600" }}>
-          {title}
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            justifyContent: "center",
-            // backgroundColor: `${isDark ? colors.grey[800] : colors.grey[100]}`,
-          }}
-        >
-          {/* Minimize Button: Saves as Draft */}
-          {handleMinimize && (
-            <IconButton
-              aria-label="minimize"
-              onClick={handleMinimize}
-              size="small"
-              sx={{
-                "&:hover": { color: "info.main" },
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <CloseFullscreenIcon fontSize="small" />
-            </IconButton>
-          )}
-          {/* Close Button: Discards Progress */}
-          {handleClose && (
-            <IconButton
-              aria-label="close"
-              onClick={handleClose} // Discards progress and closes
-              size="small"
-              sx={{ "&:hover": { color: "error.main" } }}
-            >
-              <CloseIcon />
-            </IconButton>
-          )}
-        </Box>
-      </DialogTitle>
-      <DialogContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
-        {children}
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-// --- END MODAL SKELETON COMPONENT ---
 
 type CreatePlayProps = {
   player: YouTubePlayer | null;
@@ -146,7 +46,7 @@ type CreatePlayProps = {
   setIsNewPlayOpen: (status: boolean) => void;
   scrollToPlayer: () => void;
   onPlayCreated: () => void;
-  setActivePlay: (play: PlayPreviewType) => void;
+  setActivePlay: (play: UnifiedPlayIndexType) => void;
 };
 
 export type CreateNewTagType = {
@@ -166,7 +66,7 @@ export type CreateNewCollectionType = {
   profile?: UserType;
 };
 
-const CreatePlay = ({
+const CreatePlay2 = ({
   player,
   video,
   setIsNewPlayOpen,
@@ -193,75 +93,98 @@ const CreatePlay = ({
   // State for Overlap Detection Feature
   const [isOverlapModalOpen, setIsOverlapModalOpen] = useState(false);
   const [overlappingPlays, setOverlappingPlays] = useState<
-    PlayPreviewType[] | null
+    UnifiedPlayIndexType[] | null
   >(null);
   const [overlapCheckMessage, setOverlapCheckMessage] = useState("");
 
   const [mentions, setMentions] = useState<UserType[]>([]);
-  const [players, setPlayers] = useState<UserType[] | null>(null);
+  // const [players, setPlayers] = useState<UserType[] | null>(null);
   const [playTags, setPlayTags] = useState<CreateNewTagType[]>([]);
-  const [tags, setTags] = useState<CreateNewTagType[] | null>(null);
+  // const [tags, setTags] = useState<CreateNewTagType[] | null>(null);
   const [playCollections, setPlayCollections] = useState<
     CreateNewCollectionType[]
   >([]);
-  const [collections, setCollections] = useState<
-    CreateNewCollectionType[] | null
-  >(null);
+  // const [collections, setCollections] = useState<
+  //   CreateNewCollectionType[] | null
+  // >(null);
 
   const [draftedPlay, setDraftedPlay] = useState<boolean>(false);
   const [isValidPlay, setIsValidPlay] = useState<boolean>(false);
 
   // Memoized fetch functions remain the same...
 
-  const fetchPlayers = useCallback(async () => {
-    // ... (fetchPlayers implementation omitted for brevity, remains unchanged)
-    const playersQuery = supabase.from("user_view").select("profile").match({
-      "team->>id": video.exclusive_to,
-      "affiliation->>verified": true,
-    });
-    const allPlayersQuery = supabase.from("profiles").select();
+  const searchPlayers = useCallback(
+    async (query: string): Promise<UserType[]> => {
+      // Condition: Is this a private team video?
+      const isPrivateTeamVideo = !!video.exclusive_to;
 
-    if (video.exclusive_to) {
+      if (!isPrivateTeamVideo && query.length < 2) return [];
+
+      let playersQuery = supabase
+        .from("user_view")
+        .select("profile")
+        .ilike("profile->>name", `%${query}%`);
+
+      if (isPrivateTeamVideo) {
+        // Only fetch verified team members
+        playersQuery = playersQuery.match({
+          "team->>id": video.exclusive_to,
+          "affiliation->>verified": true,
+        });
+        // Increase limit for team rosters so users can see everyone
+        playersQuery = playersQuery.limit(100);
+      } else {
+        // Global search limit
+        playersQuery = playersQuery.limit(20);
+      }
+
       const { data } = await playersQuery;
+
       if (data) {
         const uniquePlayers = [
           ...new Map(data.map((x) => [x.profile.id, x])).values(),
         ];
-        setPlayers(uniquePlayers.map((p) => p.profile));
+        return uniquePlayers.map((p) => p.profile);
       }
-    } else {
-      const { data } = await allPlayersQuery;
-      if (data) {
-        const uniquePlayers = [...new Map(data.map((x) => [x.id, x])).values()];
-        setPlayers(uniquePlayers);
+      return [];
+    },
+    [video.exclusive_to],
+  );
+
+  const searchTags = useCallback(
+    async (query: string): Promise<CreateNewTagType[]> => {
+      if (query.length < 2) return [];
+
+      const tagsQuery = supabase
+        .from("tags")
+        .select("title, id, private, exclusive_to")
+        .ilike("title", `%${query}%`);
+
+      if (affIds && affIds.length > 0) {
+        void tagsQuery.or(
+          `private.eq.false, exclusive_to.in.(${affIds.join(",")})`,
+        );
+      } else {
+        void tagsQuery.eq("private", false);
       }
-    }
-  }, [video.exclusive_to]);
 
-  const fetchTags = useCallback(async () => {
-    // ... (fetchTags implementation omitted for brevity, remains unchanged)
-    const tagsQuery = supabase
-      .from("tags")
-      .select("title, id, private, exclusive_to"); // Select needed fields
-    if (affIds && affIds.length > 0) {
-      void tagsQuery.or(
-        `private.eq.false, exclusive_to.in.(${affIds.join(",")})`,
-      );
-    } else {
-      void tagsQuery.eq("private", false);
-    }
-    const { data } = await tagsQuery;
-    if (data) setTags(data);
-  }, [affIds]);
+      const { data } = await tagsQuery.limit(20);
+      return data ?? [];
+    },
+    [affIds],
+  );
 
-  const fetchCollections = useCallback(async () => {
-    // ... (fetchCollections implementation omitted for brevity, remains unchanged)
-    if (user.userId) {
+  const searchCollections = useCallback(
+    async (query: string): Promise<CreateNewCollectionType[]> => {
+      if (!user.userId || query.length < 2) return [];
+
       const collectionsQuery = supabase
         .from("collection_view")
         .select(
           "*, id:collection->>id, title:collection->>title, private:collection->>private, exclusive_to:collection->>exclusive_to",
-        ); // Select needed fields
+        )
+        .ilike("collection->>title", `%${query}%`);
+
       if (affIds && affIds.length > 0) {
         void collectionsQuery.or(
           `collection->>author_id.eq.${
@@ -271,10 +194,12 @@ const CreatePlay = ({
       } else {
         void collectionsQuery.eq("collection->>author_id", user.userId);
       }
-      const { data } = await collectionsQuery;
-      if (data) setCollections(data);
-    }
-  }, [user.userId, affIds]);
+
+      const { data } = await collectionsQuery.limit(20);
+      return data ?? [];
+    },
+    [user.userId, affIds],
+  );
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -297,9 +222,6 @@ const CreatePlay = ({
     void player?.playVideo();
   };
 
-  /**
-   * Check overlap immediately after ending the play.
-   */
   const endPlay = async () => {
     setIsPlayStarted(false);
     const time = await player?.getCurrentTime();
@@ -325,9 +247,6 @@ const CreatePlay = ({
     }
   };
 
-  /**
-   * Resets all state (clears draft) - Used by 'X' button and Discard/Cancel
-   */
   const resetPlay = async () => {
     setIsNewPlayOpen(false);
     setPlayDetails({
@@ -347,16 +266,10 @@ const CreatePlay = ({
     setIsOverlapModalOpen(false);
   };
 
-  /**
-   * Action to discard the current draft and reset the form. (Used by 'X' button and Cancel button)
-   */
   const handleDiscard = () => {
     void resetPlay();
   };
 
-  /**
-   * Action to close the modal while preserving the current state (save as draft). (Used by Minimize button)
-   */
   const handleMinimize = () => {
     setIsNewPlayOpen(false); // Closes modal, state is preserved (drafted)
   };
@@ -412,9 +325,6 @@ const CreatePlay = ({
     }
   };
 
-  /**
-   * Core function to create the play.
-   */
   const createPlay = async (isPrivate: boolean) => {
     if (user.userId) {
       const { data } = await supabase
@@ -457,9 +367,6 @@ const CreatePlay = ({
     }
   };
 
-  /**
-   * Core Overlap Detection
-   */
   const checkOverlap = useCallback(
     async (
       checkStart: number | null | undefined = playDetails.start,
@@ -472,20 +379,17 @@ const CreatePlay = ({
       const paddedEnd = checkEnd.toString().padStart(6, "0");
 
       const { data } = await supabase
-        .from("play_preview")
+        .from("unified_play_index")
         .select("*")
-        .eq("video->>id", video.id)
-        .lt("play->>start_time_sort", paddedEnd) // Existing play starts before new play ends
-        .gt("play->>end_time_sort", paddedStart); // Existing play ends after new play starts
+        .eq("video_id", video.id)
+        .lt("play_start_time_sort", paddedEnd) // Existing play starts before new play ends
+        .gt("play_end_time_sort", paddedStart); // Existing play ends after new play starts
 
       return data ?? [];
     },
     [video.id, playDetails.start, playDetails.end],
   );
 
-  /**
-   * Final submission: No overlap check here, as it was done upfront.
-   */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -495,23 +399,13 @@ const CreatePlay = ({
     else {
       void createPlay(false);
     }
-    // After creating a play, ensure all dropdowns are refreshed
-    void fetchTags();
-    void fetchCollections();
-    // resetPlay is called inside createPlay
   };
 
-  /**
-   * Action to continue from overlap modal to the main creation modal.
-   */
   const handleContinueToDetails = () => {
     setIsOverlapModalOpen(false); // Close overlap warning
     setIsNewPlayOpen(true); // Open main play creation form
   };
 
-  /**
-   * Action to manually re-run the check from the main creation modal.
-   */
   const handleRecheckOverlap = async () => {
     if (!playDetails.start || !playDetails.end) {
       setOverlapCheckMessage("Please set both a start and end time first.");
@@ -532,20 +426,14 @@ const CreatePlay = ({
     }
   };
 
-  /**
-   * NEW: Action when clicking an overlapping play.
-   * 1. Closes modals (saving draft via minimize).
-   * 2. Seeks video.
-   * 3. Calls onSetActivePlay to update film room state.
-   */
-  const handleViewOverlap = (play: PlayPreviewType) => {
+  const handleViewOverlap = (play: UnifiedPlayIndexType) => {
     // 1. Close both modals (preserves the current playDetails as a draft)
     handleMinimize(); // Use minimize logic to close and save draft
     setIsOverlapModalOpen(false);
 
     // 2. Seek and Play to the overlapping play's start time
     if (player) {
-      void player.seekTo(play.play.start_time, true);
+      void player.seekTo(play.play_start_time, true);
       void player.playVideo();
     }
     scrollToPlayer();
@@ -646,12 +534,6 @@ const CreatePlay = ({
     checkDraftedPlay();
   }, [playDetails, checkValidPlay, checkDraftedPlay]);
 
-  useEffect(() => {
-    void fetchPlayers();
-    void fetchTags();
-    void fetchCollections();
-  }, [video, fetchPlayers, fetchTags, fetchCollections]);
-
   // Helper function to format seconds to time string
   const formatTime = (seconds: number) => {
     const date = new Date(seconds * 1000).toISOString();
@@ -660,9 +542,6 @@ const CreatePlay = ({
 
   return (
     <>
-      {/* ---------------------------------------------------- */}
-      {/* Main Create Play Modal */}
-      {/* ---------------------------------------------------- */}
       {!isNewPlayOpen && !isOverlapModalOpen ? (
         <PlayModalBtn
           isPlayStarted={isPlayStarted}
@@ -674,7 +553,7 @@ const CreatePlay = ({
         />
       ) : (
         isNewPlayOpen && ( // Only render the main modal if it's explicitly open
-          <ModalSkeleton
+          <OverlappingPlaysModal
             isOpen={isNewPlayOpen}
             setIsOpen={setIsNewPlayOpen}
             handleClose={handleDiscard} // X button discards progress
@@ -818,22 +697,21 @@ const CreatePlay = ({
                   maxRows={5}
                   size="small"
                 />
-                <AddTagsToPlay
+                <AddTagsToPlay2
                   tags={playTags}
                   setTags={setPlayTags}
-                  allTags={tags}
-                  refetchTags={fetchTags}
+                  searchTags={searchTags}
                 />
-                <AddMentionsToPlayProps
-                  players={players}
-                  setMentions={setMentions}
+                <AddMentionsToPlay2
                   mentions={mentions}
+                  setMentions={setMentions}
+                  searchPlayers={searchPlayers} // NEW PROP
+                  isPrivateContext={!!video.exclusive_to} // True if private to a team
                 />
-                <AddCollectionsToPlay
+                <AddCollectionsToPlay2
                   collections={playCollections}
                   setCollections={setPlayCollections}
-                  allCollections={collections}
-                  refetchCollections={fetchCollections}
+                  searchCollections={searchCollections}
                 />
                 <Box
                   sx={{
@@ -942,14 +820,14 @@ const CreatePlay = ({
                 submitTitle="SUBMIT"
               />
             </Box>
-          </ModalSkeleton>
+          </OverlappingPlaysModal>
         )
       )}
 
       {/* ---------------------------------------------------- */}
       {/* Overlap Warning Modal */}
       {/* ---------------------------------------------------- */}
-      <ModalSkeleton
+      <OverlappingPlaysModal
         isOpen={isOverlapModalOpen}
         setIsOpen={setIsOverlapModalOpen}
         title="Potential Overlap Detected!"
@@ -985,7 +863,7 @@ const CreatePlay = ({
           >
             {overlappingPlays?.map((play) => (
               <ListItem
-                key={play.play.id}
+                key={play.play_id}
                 sx={{ borderBottom: "1px solid #f0f0f0" }}
                 secondaryAction={
                   <IconButton
@@ -1001,16 +879,16 @@ const CreatePlay = ({
                   primary={
                     <Box>
                       <Typography variant="body2" fontWeight="bold">
-                        {play.play.title}
+                        {play.play_title}
                       </Typography>
                       <Typography variant="body2">
-                        {play.author.name}
+                        {play.author_name}
                       </Typography>
                     </Box>
                   }
                   secondary={`Times: ${formatTime(
-                    play.play.start_time,
-                  )} - ${formatTime(play.play.end_time)}`}
+                    play.play_start_time,
+                  )} - ${formatTime(play.play_end_time)}`}
                 />
               </ListItem>
             ))}
@@ -1041,7 +919,7 @@ const CreatePlay = ({
             </Button>
           </Box>
         </Box>
-      </ModalSkeleton>
+      </OverlappingPlaysModal>
 
       {/* Simple Snackbar for non-alert messages */}
       <Snackbar
@@ -1055,4 +933,4 @@ const CreatePlay = ({
   );
 };
 
-export default CreatePlay;
+export default CreatePlay2;

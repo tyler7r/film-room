@@ -1,6 +1,8 @@
 import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import {
   Box,
   Button,
@@ -15,14 +17,7 @@ import {
   Typography,
   type SelectChangeEvent,
 } from "@mui/material";
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
-import TeamLogo from "~/components/teams/team-logo";
+import React, { useCallback, type Dispatch, type SetStateAction } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import StandardPopover from "../../utils/standard-popover"; // Using StandardPopover as provided
 import type { PlaySearchOptions } from "../../videos/video-play-index";
@@ -37,36 +32,13 @@ const PlaySearchFilters = ({
   setSearchOptions,
 }: PlaySearchFilterProps) => {
   const { affiliations } = useAuthContext();
-  const [searchType, setSearchType] = useState<"topic" | "author">(
-    searchOptions.author !== "" ? "author" : "topic",
-  );
-
-  // Removed anchorEl state, handlePopoverOpen, handlePopoverClose, open1, open2
-  // as StandardPopover (Tooltip internally) manages its own visibility
-
-  const handleSearchTypeChange = useCallback(
-    (event: SelectChangeEvent<"topic" | "author">) => {
-      const newSearchType = event.target.value as "topic" | "author";
-      setSearchType(newSearchType);
-      if (newSearchType === "topic") {
-        setSearchOptions((prev) => ({ ...prev, author: "" }));
-      } else {
-        setSearchOptions((prev) => ({ ...prev, topic: "" }));
-      }
-    },
-    [setSearchOptions],
-  );
 
   const changeHandler = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
-      if (searchType === "author") {
-        setSearchOptions((prev) => ({ ...prev, author: value }));
-      } else {
-        setSearchOptions((prev) => ({ ...prev, topic: value }));
-      }
+      setSearchOptions((prev) => ({ ...prev, topic: value }));
     },
-    [searchType, setSearchOptions],
+    [setSearchOptions],
   );
 
   const handlePrivacyStatus = useCallback(
@@ -85,23 +57,12 @@ const PlaySearchFilters = ({
       private_only: "all",
       timestamp: null,
     });
-    setSearchType("topic");
+    // setSearchType("topic");
   }, [setSearchOptions]);
 
   const clearCurrentSearchInput = useCallback(() => {
-    if (searchType === "author") {
-      setSearchOptions((prev) => ({ ...prev, author: "" }));
-    } else {
-      setSearchOptions((prev) => ({ ...prev, topic: "" }));
-    }
-  }, [searchType, setSearchOptions]);
-
-  useEffect(() => {
-    if (searchType === "author" && searchOptions.topic !== "") {
-      setSearchType("topic");
-      setSearchOptions((prev) => ({ ...prev, author: "" }));
-    }
-  }, [searchOptions.topic, searchType, setSearchOptions]);
+    setSearchOptions((prev) => ({ ...prev, topic: "" }));
+  }, [setSearchOptions]);
 
   return (
     <Box
@@ -140,27 +101,6 @@ const PlaySearchFilters = ({
           }}
         >
           {/* StandardPopover wraps FormControl for "Search By" Select */}
-          <StandardPopover
-            content="Choose search mode" // Passed content prop
-          >
-            <FormControl
-              variant="outlined"
-              sx={{ width: { xs: "100%", sm: "auto" }, minWidth: 120 }}
-              size="small"
-            >
-              <InputLabel id="search-type-label">Search By</InputLabel>
-              <Select
-                labelId="search-type-label"
-                value={searchType}
-                onChange={handleSearchTypeChange}
-                label="Search By"
-                id="search-type-select"
-              >
-                <MenuItem value="topic">Mentions/Tags</MenuItem>
-                <MenuItem value="author">Play Author</MenuItem>
-              </Select>
-            </FormControl>
-          </StandardPopover>
           <TextField
             InputProps={{
               startAdornment: (
@@ -179,21 +119,13 @@ const PlaySearchFilters = ({
               ),
             }}
             fullWidth
-            placeholder={
-              searchType === "author"
-                ? "Search by author name"
-                : "Search by mention or tag"
-            }
+            placeholder={"Search by topic (author, title, etc.)"}
             name="search"
             autoComplete="off"
             id="search-input"
             onChange={changeHandler}
-            value={
-              searchType === "author"
-                ? searchOptions.author
-                : searchOptions.topic
-            }
-            sx={{ flexGrow: 1 }}
+            value={searchOptions.topic}
+            sx={{ flexGrow: 1, fontSize: 10 }}
             size="small"
           />
         </Box>
@@ -228,8 +160,18 @@ const PlaySearchFilters = ({
                 id="privacy-status"
                 size="small"
               >
-                <MenuItem value="all">
-                  <Typography variant="body2">All Plays</Typography>
+                <MenuItem
+                  value="all"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    // 🎯 FIX: Compressed menu item padding
+                    p: 1,
+                    pl: 2,
+                    minHeight: "auto",
+                  }}
+                >
+                  <Typography variant="caption">All Plays</Typography>
                 </MenuItem>
                 {affiliations?.map((div) => (
                   <MenuItem
@@ -238,17 +180,21 @@ const PlaySearchFilters = ({
                     sx={{
                       display: "flex",
                       alignItems: "center",
+                      // 🎯 FIX: Compressed menu item padding
+                      p: 1,
+                      pl: 2,
+                      minHeight: "auto",
                       gap: 0.5,
                     }}
                   >
-                    <Typography variant="body2">Plays private to:</Typography>
+                    <Typography variant="caption">Plays private to:</Typography>
                     <Typography
-                      variant="body2"
+                      variant="caption"
                       sx={{ fontWeight: "bold", lineHeight: 1 }}
                     >
                       {div.team.full_name}
                     </Typography>
-                    <TeamLogo tm={div.team} size={20} inactive={true} />
+                    {/* <TeamLogo tm={div.team} size={20} inactive={true} /> */}
                   </MenuItem>
                 ))}
               </Select>
@@ -272,7 +218,9 @@ const PlaySearchFilters = ({
                     only_highlights: !prev.only_highlights,
                   }));
                 }}
-                size="medium"
+                icon={<StarBorderIcon />}
+                checkedIcon={<StarIcon />}
+                size="small"
                 id="highlights-only-checkbox"
                 name="highlights-only-checkbox"
                 color="secondary"

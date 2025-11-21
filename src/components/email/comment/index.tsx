@@ -12,15 +12,17 @@ import {
 } from "@react-email/components";
 import type {
   CommentType,
+  CondensedVideoType,
   EmailAuthorType,
+  EmailPlayType,
   PlayType,
   VideoType,
 } from "~/utils/types";
 
 type EmailProps = {
   author: EmailAuthorType;
-  play: PlayType;
-  video: VideoType;
+  play: PlayType | EmailPlayType;
+  video: VideoType | CondensedVideoType;
   comment: CommentType;
   // NEW: Number of other unread notifications
   unreadNotificationCount: number;

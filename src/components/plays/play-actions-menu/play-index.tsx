@@ -20,13 +20,13 @@ import {
 import { useState } from "react";
 import { useAuthContext } from "~/contexts/auth";
 import { supabase } from "~/utils/supabase";
-import type { PlayPreviewType } from "~/utils/types";
+import type { UnifiedPlayIndexType } from "~/utils/types";
 import AddPlayToCollection from "../../collections/add-play-to-collection";
 import DeleteMenu from "../../utils/delete-menu";
 import EditPlay2 from "../edit-play";
 
 type PlayActionsMenuProps = {
-  preview: PlayPreviewType;
+  preview: UnifiedPlayIndexType;
   collectionId?: string;
   setReload?: (reload: boolean) => void;
   collectionAuthor?: string;
@@ -72,7 +72,7 @@ const PlayActionsMenu = ({
     const { data } = await supabase
       .from("plays")
       .delete()
-      .eq("id", preview.play.id)
+      .eq("id", preview.play_id)
       .select();
     if (data && setReload) {
       setReload(true);
@@ -88,7 +88,7 @@ const PlayActionsMenu = ({
       const { data } = await supabase
         .from("collection_plays")
         .delete()
-        .match({ collection_id: collectionId, play_id: preview.play.id })
+        .match({ collection_id: collectionId, play_id: preview.play_id })
         .select();
       if (data && setReload) setReload(true);
     }
@@ -127,7 +127,7 @@ const PlayActionsMenu = ({
           {/* Option: Add Play to Collections */}
           <MenuItem sx={{ px: 1, py: 0.5, minHeight: "auto" }}>
             <AddPlayToCollection
-              playId={preview.play.id}
+              playId={preview.play_id}
               // handleMenuClose={handleClose}
             />
           </MenuItem>
@@ -237,7 +237,7 @@ const PlayActionsMenu = ({
           )}
 
           {/* Option: Edit Play (if user is author) */}
-          {preview.author.id === user.userId && (
+          {preview.author_id === user.userId && (
             <MenuItem
               onClick={handleEditPlayClick}
               sx={{ px: 1, py: 0.5, minHeight: "auto" }}
@@ -256,7 +256,7 @@ const PlayActionsMenu = ({
           )}
 
           {/* Option: Delete Play (if user is author) */}
-          {preview.author.id === user.userId && (
+          {preview.author_id === user.userId && (
             <MenuItem sx={{ px: 1, py: 0.5, minHeight: "auto" }}>
               <DeleteMenu
                 isOpen={isDeleteOpen}
@@ -271,29 +271,29 @@ const PlayActionsMenu = ({
       )}
 
       {/* Render the EditPlay modal component here, outside the Menu */}
-      {preview.author.id === user.userId && (
+      {preview.author_id === user.userId && (
         <EditPlay2
           play={{
-            id: preview.play.id,
-            note: preview.play.note,
-            title: preview.play.title,
-            author_id: preview.author.id,
-            highlight: preview.play.highlight,
-            exclusive_to: preview.play.exclusive_to,
-            start_time: preview.play.start_time,
-            end_time: preview.play.end_time,
-            video_id: preview.video.id,
-            private: preview.play.private,
-            created_at: preview.play.created_at,
-            end_time_sort: preview.play.end_time_sort,
-            start_time_sort: preview.play.start_time_sort,
-            post_to_feed: preview.play.post_to_feed,
+            id: preview.play_id,
+            note: preview.play_note,
+            title: preview.play_title,
+            author_id: preview.author_id,
+            highlight: preview.highlight,
+            exclusive_to: preview.exclusive_to,
+            start_time: preview.play_start_time,
+            end_time: preview.play_end_time,
+            video_id: preview.video_id,
+            private: preview.private,
+            created_at: preview.play_created_at,
+            end_time_sort: preview.play_end_time_sort,
+            start_time_sort: preview.play_start_time_sort,
+            post_to_feed: preview.play_post_to_feed,
           }}
           video={{
-            id: preview.video.id,
-            exclusive_to: preview.video.exclusive_to,
-            private: preview.video.exclusive_to ? true : false,
-            title: preview.video.title,
+            id: preview.video_id,
+            exclusive_to: preview.video_exclusive_to,
+            private: preview.video_exclusive_to ? true : false,
+            title: preview.video_title,
           }}
           isOpen={isEditPlayModalOpen}
           setIsOpen={setIsEditPlayModalOpen}

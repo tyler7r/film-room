@@ -16,11 +16,11 @@ import {
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { supabase } from "~/utils/supabase"; // Assuming Supabase client is initialized here
-import type { MentionType, PlayPreviewType } from "~/utils/types"; // Assuming these types exist
+import type { MentionType, UnifiedPlayIndexType } from "~/utils/types"; // Assuming these types exist
 
 type PlayPreviewMentionsProps = {
-  play: PlayPreviewType;
-  activePlay?: PlayPreviewType;
+  play: string;
+  activePlay?: UnifiedPlayIndexType | null;
   handleMentionAndTagClick?: (e: React.MouseEvent, topic: string) => void;
   playId?: string;
 };
@@ -49,7 +49,7 @@ const PlayPreviewMentions = ({
     const { data } = await supabase
       .from("plays_via_user_mention")
       .select("*")
-      .eq("play->>id", play.play.id);
+      .eq("play->>id", play);
     if (data && data.length > 0) {
       const mentions: MentionType[] = data.map((mention) => mention.mention);
       setMentions(mentions);
@@ -72,41 +72,9 @@ const PlayPreviewMentions = ({
     }
   };
 
-  // useEffect(() => {
-  //   // Check if the supabase client is available before subscribing
-  //   if (!supabase) {
-  //     console.warn("Supabase client is not initialized.");
-  //     return;
-  //   }
-
-  //   const channel = supabase
-  //     .channel(`play_mentions_${play.play.id}_changes`) // Unique channel name for specific play's mentions
-  //     .on(
-  //       "postgres_changes",
-  //       {
-  //         event: "*",
-  //         schema: "public",
-  //         table: "play_mentions",
-  //         filter: `play_id=eq.${play.play.id}`,
-  //       }, // Filter for relevant plays
-  //       () => {
-  //         void fetchMentions();
-  //       },
-  //     )
-  //     .subscribe();
-
-  //   return () => {
-  //     void supabase.removeChannel(channel);
-  //   };
-  // }, [play.play.id, fetchMentions]); // Add play.play.id and fetchMentions to dependencies
-
   useEffect(() => {
     void fetchMentions();
   }, [activePlay, play, playId]); // Initial fetch and refetch on relevant prop changes
-
-  // Memoize `fetchMentions` to prevent infinite loop if it's a dependency of `useEffect`
-  // and `play.play.id` is stable.
-  // const fetchMentionsMemoized = useCallback(fetchMentions, [play.play.id]); // Uncomment and use if needed
 
   if (!mentions || mentions.length === 0) {
     return null; // Don't render if no collections

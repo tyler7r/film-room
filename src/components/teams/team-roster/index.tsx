@@ -109,6 +109,8 @@ const Roster = ({ team, role }: RosterProps) => {
           return;
         }
 
+        console.log(data);
+
         if (data) {
           setRoster((prevRoster) => (append ? [...prevRoster, ...data] : data));
           const newOffset = currentOffset + data.length;

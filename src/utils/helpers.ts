@@ -146,7 +146,14 @@ export const proDivWeeks = [
   "Championship Weekend",
 ];
 
-export const getDisplayName = (user: UserType | UserSession) => {
+type CondensedUserDetails = {
+  email: string;
+  name: string | null;
+};
+
+export const getDisplayName = (
+  user: UserType | UserSession | CondensedUserDetails,
+) => {
   if (user.name && user.name !== "") {
     return user.name;
   }
