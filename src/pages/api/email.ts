@@ -26,7 +26,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
 // --- END SUPABASE SETUP ---
 
 // Cooldown Period: 1 hour in milliseconds (60 minutes * 60 seconds * 1000 milliseconds)
-const NOTIFICATION_COOLDOWN_MS = 36;
+const NOTIFICATION_COOLDOWN_MS = 3600000;
 
 interface ExtendedNextApiRequest extends NextApiRequest {
   body: EmailNotificationType;
