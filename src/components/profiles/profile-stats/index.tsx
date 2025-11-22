@@ -147,8 +147,6 @@ const ProfileStats = ({ profileId }: ProfileStatsProps) => {
           .eq("play->>author_id", profileId),
       ]);
 
-      console.log(getHighlights.data);
-
       setStats({
         mentionCount: getMentions.count ?? 0,
         highlightCount: getHighlights.count ?? 0,

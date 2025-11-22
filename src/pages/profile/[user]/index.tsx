@@ -74,7 +74,7 @@ const Profile = () => {
             "profile->>id": profileId,
             "affiliation->>verified": true,
           });
-          console.log(data);
+
           if (data) {
             const typedAffiliations: TeamAffiliationType[] = data.map(
               (aff) => ({
@@ -84,7 +84,7 @@ const Profile = () => {
                 affId: aff.affiliation.id,
               }),
             );
-            console.log(typedAffiliations);
+
             if (typedAffiliations && typedAffiliations.length > 0) {
               setTeamAffiliations(typedAffiliations);
             } else {
