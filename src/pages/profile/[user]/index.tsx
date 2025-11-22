@@ -27,11 +27,7 @@ import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
 import { getDisplayName } from "~/utils/helpers";
 import { supabase } from "~/utils/supabase";
-import type { UserType } from "~/utils/types";
-
-type FetchOptions = {
-  profileId: string;
-};
+import type { TeamAffiliationType, UserType } from "~/utils/types";
 
 const Profile = () => {
   const router = useRouter();
@@ -41,10 +37,14 @@ const Profile = () => {
   const theme = useTheme();
   const { unreadCount, toggleOpen } = useInboxContext();
 
-  const [options, setOptions] = useState<FetchOptions>({
-    profileId: router.query.user as string,
-  });
+  // const [options, setOptions] = useState<FetchOptions>({
+  //   profileId: router.query.user as string,
+  // });
+  const profileId = router.query.user as string;
   const [profile, setProfile] = useState<UserType | null>(null);
+  const [teamAffiliations, setTeamAffiliations] = useState<
+    TeamAffiliationType[] | null
+  >(null);
   const [selectedTab, setSelectedTab] = useState<
     "created" | "mentions" | "highlights"
   >("created");
@@ -57,43 +57,54 @@ const Profile = () => {
   };
 
   const fetchProfile = useCallback(
-    async (currentOptions?: FetchOptions) => {
-      const profileIdToFetch =
-        currentOptions?.profileId ?? (router.query.user as string);
-
-      if (profileIdToFetch) {
-        const { data: profileData, error: profileError } = await supabase
+    async (pId: string | null) => {
+      if (pId) {
+        const { data } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", profileIdToFetch)
+          .eq("id", pId)
           .single();
-
-        if (profileError) {
-          console.error("Error fetching profile:", profileError);
+        if (data) {
+          setProfile(data);
+        } else {
           setProfile(null);
-          return;
         }
-
-        if (profileData) {
-          setProfile(profileData);
+        if (pId !== user.userId) {
+          const { data } = await supabase.from("user_view").select("*").match({
+            "profile->>id": profileId,
+            "affiliation->>verified": true,
+          });
+          console.log(data);
+          if (data) {
+            const typedAffiliations: TeamAffiliationType[] = data.map(
+              (aff) => ({
+                team: aff.team,
+                role: aff.affiliation.role,
+                number: aff.affiliation.number,
+                affId: aff.affiliation.id,
+              }),
+            );
+            console.log(typedAffiliations);
+            if (typedAffiliations && typedAffiliations.length > 0) {
+              setTeamAffiliations(typedAffiliations);
+            } else {
+              setTeamAffiliations(null);
+            }
+          }
+        } else if (pId === user.userId) {
+          setTeamAffiliations(affiliations);
         }
+      } else {
+        setTeamAffiliations(null);
       }
     },
-    [router.query.user],
+    [profileId],
   ); // Added router.query.user to dependencies
-
-  // Effect to update options state when router query changes
-  useEffect(() => {
-    setOptions({
-      ...options,
-      profileId: router.query.user as string,
-    });
-  }, [router.query.user]); // Only depends on router.query.user
 
   // Effect to fetch profile when options change
   useEffect(() => {
-    void fetchProfile(options);
-  }, [options, fetchProfile]); // Depends on options and memoized fetchProfile
+    void fetchProfile(profileId);
+  }, [profileId, fetchProfile]); // Depends on options and memoized fetchProfile
 
   if (!profile) {
     return (
@@ -223,7 +234,7 @@ const Profile = () => {
             width: "100%",
           }}
         >
-          {affiliations && affiliations.length > 0 && (
+          {teamAffiliations && teamAffiliations.length > 0 && (
             <Box
               sx={{
                 display: "flex",
@@ -235,7 +246,7 @@ const Profile = () => {
                 pt: 1,
               }}
             >
-              {affiliations.map((aff) => (
+              {teamAffiliations.map((aff) => (
                 <TeamAffiliation key={aff.affId} aff={aff} />
               ))}
             </Box>
@@ -283,15 +294,11 @@ const Profile = () => {
         />
       </Tabs>
 
-      {selectedTab === "created" && (
-        <CreatedFeed profileId={options.profileId} />
-      )}
+      {selectedTab === "created" && <CreatedFeed profileId={profileId} />}
       {selectedTab === "mentions" && (
-        <MentionsFeed profileId={options.profileId} /> // Pass mentionedUserId prop
+        <MentionsFeed profileId={profileId} /> // Pass mentionedUserId prop
       )}
-      {selectedTab === "highlights" && (
-        <HighlightsFeed profileId={options.profileId} />
-      )}
+      {selectedTab === "highlights" && <HighlightsFeed profileId={profileId} />}
     </Box>
   );
 };

@@ -49,7 +49,6 @@ const HighlightedPlaysFeed = ({ profileId }: HighlightedPlaysFeedProps) => {
           .select("*", { count: "exact" })
           .eq("play->>highlight", true) // Filter for highlights
           .eq("mention->>receiver_id", profileId)
-          .eq("play->>post_to_feed", true) // Only show plays meant for feed
           .order("play->>created_at", { ascending: false })
           .range(currentOffset, currentOffset + itemsPerLoad - 1);
 
