@@ -178,7 +178,7 @@ const CreateTeam = () => {
           autoComplete="city"
           required
           id="city"
-          label="City"
+          label="City/School"
           type="text"
           autoFocus
           onChange={handleInput}

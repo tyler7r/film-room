@@ -13,6 +13,7 @@ import React, { useState } from "react";
 // Icons
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
+import { useRouter } from "next/navigation";
 import { useAuthContext } from "~/contexts/auth";
 import { type SupportEmailApiPayload } from "~/pages/api/send-support-email";
 import { validateEmail } from "~/utils/helpers";
@@ -32,11 +33,6 @@ interface FormData {
   message: string;
 }
 
-/**
- * Mocks the API call to send a support email.
- * NOTE: In a real application, you must create the /api/support-email
- * route to handle SES sending.
- */
 const sendSupportEmail = async (data: FormData): Promise<void> => {
   const SUPPORT_EMAIL_API_URL = "/api/send-support-email"; // New dedicated API endpoint
 
@@ -76,6 +72,7 @@ const SupportModal: React.FC<SupportModalProps> = ({
 }) => {
   const { user } = useAuthContext();
   const defaultEmail = userEmail ?? user.email;
+  const router = useRouter();
 
   const [formData, setFormData] = useState<FormData>({
     subject: "",
@@ -217,24 +214,45 @@ const SupportModal: React.FC<SupportModalProps> = ({
               value={formData.message}
               onChange={handleChange}
             />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="large"
-              fullWidth
-              startIcon={
-                isLoading ? (
-                  <CircularProgress size={20} color="inherit" />
-                ) : (
-                  <SendIcon />
-                )
-              }
-              disabled={isLoading || status === "success" || !isValid}
-              sx={{ mt: 3, fontWeight: "bold" }}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "100%",
+              }}
             >
-              {isLoading ? "Sending..." : "Send Ticket"}
-            </Button>
+              <Button
+                onClick={() =>
+                  void router.push(
+                    "https://docs.google.com/document/d/1gtX8PoVhk4h7tLvIHVtz-p6np1GPwnyoD9faZFrM1zw/edit?tab=t.0",
+                  )
+                }
+                variant="outlined"
+                size="small"
+                fullWidth
+              >
+                Inside Break Manual / FAQ
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+                fullWidth
+                startIcon={
+                  isLoading ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <SendIcon />
+                  )
+                }
+                disabled={isLoading || status === "success" || !isValid}
+                sx={{ mt: 1, fontWeight: "bold" }}
+              >
+                {isLoading ? "Sending..." : "Send Ticket"}
+              </Button>
+            </Box>
           </Stack>
         </Box>
       </Box>
