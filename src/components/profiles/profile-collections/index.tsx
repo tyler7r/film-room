@@ -1,7 +1,13 @@
+import ClearIcon from "@mui/icons-material/Clear";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   Card,
   CircularProgress,
+  IconButton,
+  InputAdornment,
+  TextField,
   Typography,
   useMediaQuery,
   useTheme,
@@ -9,12 +15,11 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Collection from "~/components/collections/collection";
-import CreateCollection from "~/components/collections/create-collection";
 import EmptyMessage from "~/components/utils/empty-msg";
 import PageTitle from "~/components/utils/page-title";
 import { useAuthContext } from "~/contexts/auth";
-import { useMobileContext } from "~/contexts/mobile";
 import { useIsDarkContext } from "~/pages/_app";
+import useDebounce from "~/utils/debounce";
 import { supabase } from "~/utils/supabase";
 import type { CollectionViewType } from "~/utils/types";
 
@@ -23,19 +28,26 @@ type ProfileCollectionsProps = {
 };
 
 const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
-  const { isMobile } = useMobileContext();
+  const { affIds } = useAuthContext();
   const { isDark } = useIsDarkContext();
-  const { user, affIds } = useAuthContext();
   const theme = useTheme();
 
-  const [collections, setCollections] = useState<CollectionViewType[]>([]);
+  const [collections, setCollections] = useState<CollectionViewType[]>([]); // Initialize as empty array
+  const [loadingInitial, setLoadingInitial] = useState<boolean>(true); // State for initial/new search loading
+  const [offset, setOffset] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const [currentOffset, setCurrentOffset] = useState<number>(0);
-  const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
+  const [totalCollectionCount, setTotalCollectionCount] = useState<
+    number | null
+  >(null);
 
+  // Search/Filter states
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [showFilterBox, setShowFilterBox] = useState<boolean>(false); // For filter box visibility
+
+  // Ref for the scrollable container
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollDownIndicator, setShowScrollDownIndicator] = useState(false);
 
-  const scrollableContainerRef = useRef<HTMLDivElement>(null);
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
   const itemsPerPage = !isDesktop ? 8 : 10;
@@ -52,8 +64,21 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
     }
   }, [hasMore]);
 
+  // Event handlers for search/filter UI
+  const handleToggleFilterBox = () => {
+    setShowFilterBox((prev) => !prev);
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
   const fetchCollections = useCallback(
-    async (offsetToFetch: number, append = true) => {
+    async (offsetToFetch: number, append = true, currentSearchTerm: string) => {
       if (!profileId) {
         if (!append) {
           setLoadingInitial(false);
@@ -64,12 +89,12 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
       if (!append) {
         setLoadingInitial(true);
         setCollections([]);
-        setCurrentOffset(0);
+        setOffset(0);
         setHasMore(true);
       }
 
       try {
-        const collectionsData = supabase
+        let collectionsData = supabase
           .from("collection_view")
           .select("*", { count: "exact" })
           .eq("collection->>author_id", profileId)
@@ -86,7 +111,14 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
           void collectionsData.eq("collection->>private", false);
         }
 
-        const { data, error } = await collectionsData;
+        if (currentSearchTerm) {
+          collectionsData = collectionsData.ilike(
+            "collection->>title",
+            `%${currentSearchTerm}%`,
+          );
+        }
+
+        const { data, count, error } = await collectionsData;
 
         if (error) {
           console.error("Error fetching collections:", error);
@@ -99,11 +131,14 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
             const newCollections = append ? [...prev, ...data] : data;
             return newCollections;
           });
-          setCurrentOffset(offsetToFetch + data.length);
+          setOffset(offsetToFetch + data.length);
           setHasMore(data.length === itemsPerPage);
         } else {
           setHasMore(false);
         }
+        if (count) {
+          setTotalCollectionCount(count);
+        } else setTotalCollectionCount(0);
       } catch (error) {
         console.error("Unexpected error in fetchCollections: ", error);
         setHasMore(false);
@@ -114,12 +149,26 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
     [profileId, itemsPerPage],
   );
 
-  useEffect(() => {
-    void fetchCollections(0, false);
-  }, [profileId, isMobile, fetchCollections]);
+  const debouncedFetchCollections = useDebounce(fetchCollections, 300);
 
+  // --- useEffect hooks for data fetching ---
+
+  // Effect to trigger initial data fetch when component mounts or teamId changes
+  useEffect(() => {
+    void fetchCollections(0, false, searchTerm);
+  }, [profileId, fetchCollections]); // 'fetchCollections' is a dependency because it's a useCallback
+
+  // Effect to trigger a new fetch when the search term changes (debounced)
+  useEffect(() => {
+    debouncedFetchCollections(0, false, searchTerm);
+  }, [searchTerm, debouncedFetchCollections]);
+
+  // Function called by InfiniteScroll to load more data
   const loadMoreCollections = () => {
-    void fetchCollections(currentOffset, true);
+    // Only load more if not already loading and there's potentially more data
+    if (hasMore) {
+      void fetchCollections(offset, true, searchTerm);
+    }
   };
 
   useEffect(() => {
@@ -150,36 +199,89 @@ const ProfileCollections = ({ profileId }: ProfileCollectionsProps) => {
         justifyContent: "center",
         // gap: 1,
         p: 1,
+        position: "relative",
       }}
     >
       <Box
         sx={{
           display: "flex",
           width: "100%",
-          gap: 2,
+          gap: 1,
           justifyContent: "center",
           alignItems: "center",
+          mb: 1,
         }}
       >
-        <PageTitle size="small" title="User Collections" />
-        {user.userId === profileId && (
-          <CreateCollection icon={true} standaloneTrigger={true} />
-        )}
+        <PageTitle size="small" title={`User Collections`} />
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+          ({totalCollectionCount})
+        </Typography>
+        <IconButton
+          onClick={handleToggleFilterBox}
+          size="small"
+          aria-label="toggle filter menu"
+        >
+          <FilterListIcon color={showFilterBox ? "primary" : "inherit"} />
+        </IconButton>
       </Box>
+
+      {showFilterBox && (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            width: { xs: "100%", sm: "80%", md: "60%" },
+            p: 2,
+            borderRadius: "8px",
+            boxShadow: 3,
+            bgcolor: "background.paper",
+            alignItems: "center",
+            flexShrink: 0,
+            mx: "auto",
+            mb: 2,
+          }}
+        >
+          <TextField
+            label="Search Collections"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            size="small"
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: searchTerm ? (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleClearSearch}
+                    size="small"
+                    edge="end"
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            }}
+          />
+        </Box>
+      )}
 
       <Box
         id="collectionsScrollableContainer"
         ref={scrollableContainerRef}
         sx={{
           flexGrow: 1,
-          position: "relative",
           overflowY: "auto",
           maxHeight: { xs: "400px", md: "600px" },
           p: 0.5,
           display: "flex",
           flexDirection: "column",
           gap: 1,
-          // Removed alignItems: "center" here to allow collections to fill width
           width: "100%",
         }}
       >
